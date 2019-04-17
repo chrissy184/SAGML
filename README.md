@@ -1,6 +1,6 @@
 # Zementis Modeler (ZMOD)
 
-<img src="https://www.zmod.org/assets/logo.png" alt="zmod_logo" height="120" style="float:right"/>
+<img src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/zmod_logo.ng" alt="zmod_logo" height="120" style="float:right"/>
 
 **Zementis modeler** is an open source machine learning and artificial intelligence platform for Data Scientist to solve business problems faster and quicker, build prototypes and convert them to actual project. The modeler helps from data preparation to model building and deployment, the tool supports large variety of algorithms that can be run without a single line of code. The web based tool has various components which help Data Scientist to perfrom several model building tasks and provides deployment ready PMML files which can be hosted as a REST services.
 
@@ -246,7 +246,7 @@ Zementis Modeler has 5 sections :
 1. Data
 2. Model
 3. Code
-4. Task
+4. Tasks
 5. Assets
 
 **Data** : In this section, user uploads the data and can manage the data by performing all the CRUD operations. The data section supports, zip folders, image files, mp4 files, csv files.
@@ -266,3 +266,12 @@ Zementis Modeler has 5 sections :
 [Demo 3 : Import data from Cumulocity](https://www.zmod.org/learn/_YCGPhMETF4)<br/>
 [Demo 4 : Jupyter Notebook](https://www.zmod.org/learn/dm98Rjb8l6w)<br/>
 [Demo 5 : Python Execution](https://www.zmod.org/learn/Hnu7lvcc0kc)<br/>
+
+
+## Support
+
+You can ask questions at:
+
+*	[https://stackoverflow.com](https://stackoverflow.com) by tagging your questions with #pmml, #zmod
+*	You can also post bug reports in [GitHub issues](https://github.com/SoftwareAG/ZMOD/issues) 
+ 
