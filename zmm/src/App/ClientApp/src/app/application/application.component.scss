@@ -1,0 +1,16 @@
+.application-container {
+    position: absolute;
+    top: 64px;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    .application-sidenav {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      width: 110px;
+      background: #fff;
+      border-right: 1px solid #ddd;
+    }
+  }

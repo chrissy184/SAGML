@@ -1,0 +1,55 @@
+export const ApiRoutes = {
+    methods: {
+        POST: 'post',
+        PUT: 'put',
+        GET: 'get',
+        DELETE: 'delete'
+    },
+    accountUserInfo: 'account/userInfo',
+    accountLogout: 'account/logout',
+
+    data: 'data',
+    dataGet: (id: string) => `data/${id}`,
+    dataAutoML: (id: string) => `data/${id}/automl`,
+    predictData: `data/predict`,
+    scoreData: 'data/score',
+    dataDownload: (id: string) => `data/${id}/download`,
+    dataRename: (id: string) => `data/${id}/rename`,
+    dataBaseImageForWelding: `data/baseImage`,
+    generateImageForWelding: `data/generateImages`,
+
+    models: 'model',
+    modelCreate: 'model/createnn',
+    modelGetLayers: `model/layers`,
+    modelGet: (id: string) => `model/${id}`,
+    modelEdit: (id: string) => `model/${id}/edit`,
+    modelLoad: (id: string) => `model/${id}/load`,
+    modelUnload: (id: string) => `model/${id}/unload`,
+    modelTrain: (id: string) => `model/${id}/train`,
+    modelUpdateLayer: (id: string) => `model/${id}/layer`,
+    modelDownload: (id: string) => `model/${id}/download`,
+    modelDeploy: (id: string) => `model/${id}/loadinzs`,
+    modelDeployUndo: (id: string) => `model/${id}/unloadfromzs`,
+    modelDeployed: 'model/deployed',
+    modelLoaded: 'model/loaded',
+    modelCompile: (id: string) => `model/${id}/compile`,
+    modelRename: (id: string) => `model/${id}/rename`,
+
+    code: 'code',
+    codeGet: (id: string) => `code/${id}`,
+    codeJupyter: (id: string) => `code/${id}/jupyter`,
+    codeDownload: (id: string) => `code/${id}/download`,
+    codeExecute: (id: string) => `code/${id}/execute`,
+    codeRename: (id: string) => `code/${id}/rename`,
+
+    task: 'task',
+    taskGet: (id: number) => `task/${id}`,
+    taskSaveModel: (id: number) => `task/${id}/saveModel`,
+
+    instance: 'instances',
+    instanceKill: (id: string) => `instances/${id}`,
+
+    cumulocityGetManagedObjects: (tenant: string) => `https://${tenant}.cumulocity.com/inventory/managedObjects`,
+    cumulocityGetSeries: (tenant: string) => `https://${tenant}.cumulocity.com/measurement/measurements/series`,
+    cumulocityGetFiles: (tenant: string) => `https://${tenant}.cumulocity.com/inventory/binaries`,
+};
