@@ -56,9 +56,9 @@ A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an en
 
 ## Test
 *   Open Browser and go to "http://localhost:5000", If everything is set and up and running then you will see  login screen.
-*   Get logged in with 
-    User        : testuser
-    Possword    : test
+*   Get logged in with (You can also login using github account)
+    User        : registered username
+    Possword    : your secret password
 *   Once logged in successfully, It redirects to localhost:5000/data page. 
 
 
