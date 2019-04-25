@@ -49,9 +49,9 @@ __Note__ :
 
 * Type the below command to load docker images.
 
-  * docker load -i aianalytics/zmod_nginx
-  * docker load -i aianalytics/zmod_zmm
-  * docker load -i aianalytics/zmod_zmk
+  * docker load -i softwareag/zementis-modeler-nginx
+  * docker load -i softwareag/zementis-modeler-zmm
+  * docker load -i softwareag/zementis-modeler-zmk
 
 * Skip the first bullet point in next heading stating __how to download the images from docker hub__ and follow rest of the instructions.
 
@@ -61,9 +61,9 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
 
 * Pull the docker images in your system by typing the below commands:
 
-    * docker pull aianalytics/zmod_nginx
-    * docker pull aianalytics/zmod_zmk
-    * docker pull aianalytics/zmod_zmm
+    * docker pull softwareag/zementis-modeler-nginx
+    * docker pull softwareag/zementis-modeler-zmm
+    * docker pull softwareag/zementis-modeler-zmk
 
 **Note** - Try prefix sudo with docker commands if you do not see any results or see an error.
 
@@ -113,9 +113,9 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
 
 * Type the below command to load docker images.
 
-  * docker load -i aianalytics/zmod_nginx
-  * docker load -i aianalytics/zmod_zmm
-  * docker load -i aianalytics/zmod_zmk
+  * docker load -i softwareag/zementis-modeler-nginx
+  * docker load -i softwareag/zementis-modeler-zmm
+  * docker load -i softwareag/zementis-modeler-zmk
 
 * Skip the first bullet point in next heading stating __how to download the images from docker hub__ and follow rest of the instructions.
 
@@ -126,9 +126,9 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
 
 * Pull the docker images in your system by typing the below commands:
 
-    * docker pull aianalytics/zmod_nginx
-    * docker pull aianalytics/zmod_zmk
-    * docker pull aianalytics/zmod_zmm
+    * docker pull softwareag/zementis-modeler-nginx
+    * docker pull softwareag/zementis-modeler-zmm
+    * docker pull softwareag/zementis-modeler-zmk
 
 ### Run ZMOD in Windows Directly ###
 
@@ -183,9 +183,9 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
 
 * Type the below command to load docker images.
 
-  * docker load -i aianalytics/zmod_nginx
-  * docker load -i aianalytics/zmod_zmm
-  * docker load -i aianalytics/zmod_zmk
+  * docker load -i softwareag/zementis-modeler-nginx
+  * docker load -i softwareag/zementis-modeler-zmm
+  * docker load -i softwareag/zementis-modeler-zmk
 
 * Skip the first bullet point in next heading stating __how to download the images from docker hub__ and follow rest of the instructions.
 
@@ -196,9 +196,9 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
 
 * Pull the docker images in your system by typing the below commands:
 
-    * docker pull aianalytics/zmod_nginx
-    * docker pull aianalytics/zmod_zmk
-    * docker pull aianalytics/zmod_zmm
+    * docker pull softwareag/zementis-modeler-nginx
+    * docker pull softwareag/zementis-modeler-zmm
+    * docker pull softwareag/zementis-modeler-zmk
 
 **Note** - Try prefix sudo with docker commands if you do not see any results or see an error.
 
