@@ -1,6 +1,6 @@
 # Zementis Modeler (ZMOD)
 
-<img src="https://www.zmod.org/assets/logo.png" alt="zmod_logo" height="120" style="float:right"/>
+<img src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/zmod_logo.png" alt="zmod_logo" height="120" style="float:right"/>
 
 **Zementis modeler** is an open source machine learning and artificial intelligence platform for Data Scientist to solve business problems faster and quicker, build prototypes and convert them to actual project. The modeler helps from data preparation to model building and deployment, the tool supports large variety of algorithms that can be run without a single line of code. The web based tool has various components which help Data Scientist to perfrom several model building tasks and provides deployment ready PMML files which can be hosted as a REST services.
 
@@ -26,9 +26,9 @@ ZMK is the Django REST based application which handles all the AI/ML related tra
 4. **trainModel**: This is the individual app within Django framework to train AutoML and NN models
 5. **Utility**: This is the individual app within Django framework to support additional functionalities like download a file, code utilities like execute a Python file.
 
-**To start the ZMK app**: python manage.py runserver and other django parameters are supported by default
+**To start the ZMK app**: `python manage.py runserver` and other django parameters are supported by default
 
-**To access the ZMK swagger**: localhost:{port}/ default localhost:8888/
+**To access the ZMK swagger**: `localhost:{port}/` default `localhost:8888/`
 
 
 
