@@ -4,9 +4,9 @@
 A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an end-to-end login (keycloak integration), data, models, code and tasks implementation.
 
 ## INTRODUCING ZMM App
-*   Overview [iWiki](https://iwiki.eur.ad.sag/pages/viewpage.action?pageId=551011559)
-*   Features logs or raise defect [iTrac] (https://itrac.eur.ad.sag/projects/ZENA/issues/ZENA-466?filter=allopenissues)
-*   External identity server as [KeyCloak] (https://accounts.zmod.org)
+*   Overview 
+*   Features logs or raise defect 
+*   External identity server 
 
 [Live Demo - ZMM App on Test](https://lambda-quad)
 
@@ -22,7 +22,7 @@ A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an en
 
 ## Gettting started for Development
 
-*   Clone the [iRepo](http://irepo.eur.ad.sag/projects/AIAN/repos/zmm/browse) on Ubuntu 18.04.
+*   Clone the App.
 *   Install .Net Core 2.2 from [here](https://www.microsoft.com/net/download/dotnet-core/2.2)
 *   Install your favorite IDE Visual Studio 2017 or Visual Studio Code.
 *   If you are using Visual Studio Code then install extension like [C# extension](https://marketplace.visualstudio.com/items?itemName=jchannon.csharpextensions) and [C# Project Solution](https://marketplace.visualstudio.com/items?itemName=fernandoescolar.vscode-solution-explorer)
@@ -47,7 +47,7 @@ A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an en
     
     *"run from the project folder" that means run the commands on the command line from those folders  
     If any step fails, post the error details on the [support forum] for the needed assistance.
-*   For help and support post in the [support forum](?). For bug reports open an [issue on iTrac](https://itrac.eur.ad.sag/projects/ZENA/issues/ZENA-466?filter=allopenissues)
+*   For help and support post in the [support forum](?).
 
 ## Run Project
 *   Once ZMM projects build successfully, You can run project in your system with below command.
@@ -66,8 +66,8 @@ A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an en
 
 ## Documentation
 
-*   [Overview](https://iwiki.eur.ad.sag/pages/viewpage.action?pageId=551011559)
-*   [Achitecute/Design](https://iwiki.eur.ad.sag/pages/viewpage.action?pageId=551011559)
+*   [Overview]
+*   [Achitecute/Design]
 
 
 
