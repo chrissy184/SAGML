@@ -1,0 +1,12 @@
+django
+django-rest-framework
+django-rest-swagger
+tpot
+opencv-python
+django-cors-headers
+tensorflow==1.9.0
+keras
+imutils
+lxml
+sklearn
+sklearn-pandas
