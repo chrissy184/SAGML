@@ -8,8 +8,6 @@ A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an en
 *   Features logs or raise defect 
 *   External identity server 
 
-[Live Demo - ZMM App on Test](https://lambda-quad)
-
 ## This application consists of:
 
 *   Pages using Angular7.1.1 and TypeScript
