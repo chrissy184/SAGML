@@ -49,9 +49,9 @@ __Note__ :
 
 * Type the below command to load docker images.
 
-  * docker load -i store/softwareag/zementis-modeler-nginx:1.38.1
-  * docker load -i store/softwareag/zementis-modeler-zmm:1.38.1
-  * docker load -i store/softwareag/zementis-modeler-zmk:1.38.1
+  * docker load -i zementis-modeler-nginx.tar.tz
+  * docker load -i zementis-modeler-zmm.tz
+  * docker load -i zementis-modeler-zmk.tz
 
 * Skip the first bullet point in next heading stating __how to download the images from docker hub__ and follow rest of the instructions.
 
@@ -113,9 +113,9 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
 
 * Type the below command to load docker images.
 
-  * docker load -i store/softwareag/zementis-modeler-nginx:1.38.1
-  * docker load -i store/softwareag/zementis-modeler-zmm:1.38.1
-  * docker load -i store/softwareag/zementis-modeler-zmk:1.38.1
+  * docker load -i zementis-modeler-nginx.tar.tz
+  * docker load -i zementis-modeler-zmm.tz
+  * docker load -i zementis-modeler-zmk.tz
 
 * Skip the first bullet point in next heading stating __how to download the images from docker hub__ and follow rest of the instructions.
 
@@ -183,9 +183,9 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
 
 * Type the below command to load docker images.
 
-  * docker load -i store/softwareag/zementis-modeler-nginx:1.38.1
-  * docker load -i store/softwareag/zementis-modeler-zmm:1.38.1
-  * docker load -i store/softwareag/zementis-modeler-zmk:1.38.1
+  * docker load -i zementis-modeler-nginx.tar.tz
+  * docker load -i zementis-modeler-zmm.tz
+  * docker load -i zementis-modeler-zmk.tz
 
 * Skip the first bullet point in next heading stating __how to download the images from docker hub__ and follow rest of the instructions.
 
