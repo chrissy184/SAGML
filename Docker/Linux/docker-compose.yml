@@ -3,7 +3,7 @@ version: '3.5'
 services:
 
    nginx:
-     image: zmod_nginx
+     image: store/softwareag/zementis-modeler-nginx
      container_name: nginx_zmod
      ports:
        - "80:80"
@@ -19,7 +19,7 @@ services:
 
 
    zmm:
-    image: zmod_zmm
+    image: store/softwareag/zementis-modeler-zmm
     container_name: zmm
     command: /bin/bash -c "dotnet App.dll --environment=Production && alias nyoka=""/publish/nyokacli/client/bin/release/netcoreapp2.1/linux-x64/nyoka"""
     working_dir: /publish
