@@ -26,6 +26,8 @@ namespace ZMM.Tasks
         string param;
         string workingDirectory;
         bool hasWorkindDirectory = false;
+        int toolStartupTimeout = 60;
+        string startupSuccessMessage = string.Empty;
         
         public Tool(ToolTypes name, bool HTTPSConfiguration)
         {
@@ -48,10 +50,14 @@ namespace ZMM.Tasks
             string hasWorkingDir = this.configuration["HasWorkingDirectory"];
             this.hasWorkindDirectory = bool.Parse(hasWorkingDir == null ? "false" : hasWorkingDir);
             this.workingDirectory = this.hasWorkindDirectory ? this.configuration["WorkingDirectory"] : string.Empty;
-            Console.WriteLine("Tool initializing " + tempPath);
+            this.startupSuccessMessage = this.configuration["Startup.SuccessMessage"];
+            this.toolStartupTimeout = int.Parse(this.configuration["Startup.Timeout"]);
+            Console.WriteLine("Tool : " + toolName + " " + tempPath + " is initialized, WorkingDir : " + this.workingDirectory + " Startup Timeout " + this.ToolStartupTimeout + " confirmation message " + this.StartupSuccessMessage);
         }
 
         public string Name { get => name; set => name = value; }
+        public int ToolStartupTimeout { get => toolStartupTimeout; set => toolStartupTimeout = value; }
+        public string StartupSuccessMessage { get => startupSuccessMessage; set => startupSuccessMessage = value; }
 
         public string GetParam()
         {

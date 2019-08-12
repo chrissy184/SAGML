@@ -9,7 +9,9 @@
     "Command.2.Name": "Stop",
     "Command.2.Value": "stop {Port}",
     "Command.3.Name": "Kill",
-    "Command.3.Value": "kill {Pid}"
+    "Command.3.Value": "kill {Pid}",
+    "Startup.Timeout": "60",
+    "Startup.SuccessMessage": "?token="
   },
   "TensorBoard": {
     "Path": "tensorboard",
@@ -17,7 +19,9 @@
     "Command.0.Name": "Start",
     "Command.0.Value": "  --logdir={TensorBoardDir}  --port {Port}",
     "Command.1.Name": "Kill",
-    "Command.1.Value": "kill {Pid}"
+    "Command.1.Value": "kill {Pid}",
+    "Startup.Timeout": "60",
+    "Startup.SuccessMessage": "CTRL+C to quit"
   },
   "Logging": {
     "LogLevel": {
