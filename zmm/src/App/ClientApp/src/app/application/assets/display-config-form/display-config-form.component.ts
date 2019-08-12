@@ -19,7 +19,7 @@ export class DisplayConfigFormComponent implements OnInit {
   ngOnInit() {
     const listOfInstances = this.option;
     if (listOfInstances && listOfInstances.length) {
-      const gpuList = listOfInstances.filter((value: any) => { return value.type === 'GPU' });
+      const gpuList = listOfInstances.filter((value: any) => (value.type === 'GPU'));
       if (gpuList && gpuList.length) {
         this.gpuOptions = this.gpuOptions.concat(gpuList);
       }
