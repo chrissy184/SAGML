@@ -1,5 +1,5 @@
 .application-footer {
-    position: fixed;
+    position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
@@ -7,7 +7,9 @@
     border-top: 1px solid #ddd;
     z-index: 9;
     font-size: 14px;
-    height: 40px;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    text-align: right;
     .application-version {
       cursor: pointer;
     }
