@@ -77,7 +77,7 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
   * Remove older ZMOD docker images/container by typing:
 
     * docker rmi -f  ***image_name***
-    * dokcer container rm -f ***container_name***
+    * docker container rm -f ***container_name***
 
   * Once the images are loaded. Start ZMOD application by running the below command. Please make sure that docker-compose.yml and ZMOD.sh and startup.sh, lie in the same directory.
   
