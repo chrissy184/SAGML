@@ -1,7 +1,7 @@
 <div class="zms-page">
   <ng-container>
 
-    <app-header></app-header>
+   
 
     <mat-sidenav-container class="application-container">
       <mat-sidenav #sidenav mode="side" opened class="application-sidenav" [fixedInViewport]="sidenavOptions.fixed" [fixedTopGap]="sidenavOptions.top"
@@ -11,17 +11,15 @@
 
       </mat-sidenav>
       <mat-sidenav-content>
+          
         <main class="main-container">
           <div id="content" role="main">
-
+            <app-header></app-header>
             <router-outlet></router-outlet>
-
+            <app-footer></app-footer>
           </div>
         </main>
       </mat-sidenav-content>
     </mat-sidenav-container>
-
-    <app-footer></app-footer>
-
   </ng-container>
 </div>

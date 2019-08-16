@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UtilService, HttpService, ApiRoutes } from '../../shared';
 import { SwUpdate } from '@angular/service-worker';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -9,10 +10,20 @@ import { SwUpdate } from '@angular/service-worker';
 })
 export class HeaderComponent implements OnInit {
   public userInfo: any = {};
-  constructor(private swUpdate: SwUpdate, private utilService: UtilService, private apiService: HttpService) { }
-
+  public isNavOpen = true;
+  public title = '';
+  constructor(private swUpdate: SwUpdate, 
+    private utilService: UtilService, 
+    private apiService: HttpService,
+    private router: Router) {
+      this.router.events.subscribe(() => {
+        console.log(this.router.url.substr(1));
+        this.title = this.router.url.substr(1);
+      });
+     }
   navOpen() {
     this.utilService.toggleSidebar('MENU');
+    this.isNavOpen = !this.isNavOpen;
   }
   checkUpdate() {
     if (this.swUpdate.isEnabled) {
