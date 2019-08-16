@@ -10,7 +10,7 @@ A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an en
 
 ## This application consists of:
 
-*   Pages using Angular7.1.1 and TypeScript
+*   Pages using Angular 7.1.1 and TypeScript
 *   RESTful API Backend using ASP.NET Core 2.2 MVC Web API
 *   Authentication based on OpenID Connect/OAuth 2.0 using KeyCloak
 *   API Documentation using Swagger
