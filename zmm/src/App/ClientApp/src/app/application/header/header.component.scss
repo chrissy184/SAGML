@@ -1,5 +1,5 @@
 .application-header {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -7,11 +7,7 @@
     -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12);
     -ms-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12);
-    color: #0b385b;
-    padding: 0 10px 0 5px !important;
-    .mdi {
-      color: #0b385b;
-    }
+    color: #fff;
     .avatar {
       position: absolute;
       top: 0;
@@ -26,14 +22,12 @@
       }
   }
   .logo {
-
-   a, h3 {
-      color: #0b385b;
+    cursor: pointer;
+    a {
+      color: #fff;
       text-decoration: none !important;
       line-height: 1.3;
-      font-size: 1.4rem;
-   }
-
+    }
   }
 }
 

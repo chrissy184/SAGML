@@ -1,10 +1,15 @@
-<mat-toolbar class="application-header bg-white">
+<mat-toolbar class="application-header bg-primary">
   <div class="application-brand d-flex align-items-center">
-    <button mat-icon-button (click)="navOpen()" class="mr-1">
-      <span class="mdi " [ngClass]="{'mdi-chevron-double-left': isNavOpen, 'mdi-chevron-double-right': !isNavOpen }"></span>
+    <button mat-icon-button (click)="navOpen()" class="mr-1" hidden>
+      <span class="mdi mdi-menu"></span>
     </button>
     <div class="logo">
-      <h3 class="text-capitalize"><img *ngIf="!isNavOpen" alt="" src="assets/logo-zm.png" width="40" class="pb-1 pr-2"> {{ title }}</h3>
+      <h1>
+        <a href="https://www.softwareag.com" target="_blank">SOFTWARE AG</a>
+      </h1>
+      <h3>
+        <a href="https://www.zmod.org" target="_blank">Zementis Modeler</a>
+      </h3>
     </div>
   </div>
   <span class="toolbar-mid"></span>
@@ -28,7 +33,7 @@
       </button>
     </mat-menu>
     <button mat-icon-button disabled>
-      <span class="mdi mdi-account-circle"></span>
+      <span class="mdi mdi-account-circle text-white"></span>
       <span class="avatar">
         <img alt="" *ngIf="userInfo.gravtarUrl" [src]="userInfo.gravtarUrl">
       </span>
