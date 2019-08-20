@@ -72,31 +72,6 @@ namespace ZMM.Tools.JNB
             
         }
 
-        private int GetAvailablePort(int StartingPort, int endPort)
-        {
-            IPEndPoint [] endPoints;
-            List<int> portArray = new List<int>();
-            IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
-            // getting active connections 
-            TcpConnectionInformation[] connections = properties.GetActiveTcpConnections();
-            portArray.AddRange(from n in connections
-                                where n.LocalEndPoint.Port >= StartingPort
-                                select n.LocalEndPoint.Port);
-
-            // getting active tcp listeneres - wcf service Listening in tcp
-            endPoints = properties.GetActiveTcpListeners();
-            portArray.AddRange(from n in endPoints
-                                where n.Port >= StartingPort
-                                select n.Port);
-
-            portArray.Sort();
-            for (int i = StartingPort; i<= endPort; i++)
-                if (!portArray.Contains(i))
-                    return i;
-            
-            return 0;
-        }
-
         
 
         private int GetPortFromLiveTask(ITask task)

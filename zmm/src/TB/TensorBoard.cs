@@ -40,10 +40,10 @@ namespace ZMM.Tools.TB
                     ITask tempTask = FindTask(taskName);
                     if (tempTask.IsEmpty())
                     {
-                        int FreePort = GetFreePort();
-                        string LogDirectory = CreateNewLogDir();
+                        int FreePort = GetAvailablePort(6006, 6008);
                         if (FreePort > 0)
                         {
+                            string LogDirectory = CreateNewLogDir();
                             UpdateStartTaskInfo(ref info, FreePort, LogDirectory);
                             tempTask = TaskFactory.Get(taskType, taskName, this, info);
                             tempTask.StartAsync();

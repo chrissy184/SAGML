@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
@@ -168,5 +171,30 @@ namespace ZMM.Tasks
         {
             return this.configuration;
         }
+
+        #region GetAvailablePort
+        public int GetAvailablePort(int MinPort, int MaxPort)
+        {
+            IPEndPoint[] endPoints;
+            List<int> portArray = new List<int>();
+            IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
+            TcpConnectionInformation[] connections = properties.GetActiveTcpConnections();
+            portArray.AddRange(from n in connections
+                               where n.LocalEndPoint.Port >= MinPort
+                               select n.LocalEndPoint.Port);
+            
+            endPoints = properties.GetActiveTcpListeners();
+            portArray.AddRange(from n in endPoints
+                               where n.Port >= MinPort
+                               select n.Port);
+
+            portArray.Sort();
+            for (int i = MinPort; i <= MaxPort; i++)
+                if (!portArray.Contains(i))
+                    return i;
+
+            return 0;
+        }
+        #endregion
     }
 }
