@@ -28,7 +28,8 @@ export const AlertMessages = {
         save: ' saved to Models',
         delete: 'Task Deleted',
         taskError: 'Model training failed',
-        deleteConfirmationTask: 'Are you sure to delete task file'
+        deleteConfirmationTask: 'Are you sure to delete task file',
+        taskStopped: 'Task stopped.'
     },
 
     MODEL: {

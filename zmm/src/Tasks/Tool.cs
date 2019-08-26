@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
@@ -29,8 +26,6 @@ namespace ZMM.Tasks
         string param;
         string workingDirectory;
         bool hasWorkindDirectory = false;
-        int toolStartupTimeout = 60;
-        string startupSuccessMessage = string.Empty;
         
         public Tool(ToolTypes name, bool HTTPSConfiguration)
         {
@@ -53,14 +48,10 @@ namespace ZMM.Tasks
             string hasWorkingDir = this.configuration["HasWorkingDirectory"];
             this.hasWorkindDirectory = bool.Parse(hasWorkingDir == null ? "false" : hasWorkingDir);
             this.workingDirectory = this.hasWorkindDirectory ? this.configuration["WorkingDirectory"] : string.Empty;
-            this.startupSuccessMessage = this.configuration["Startup.SuccessMessage"];
-            this.toolStartupTimeout = int.Parse(this.configuration["Startup.Timeout"]);
-            Console.WriteLine("Tool : " + toolName + " " + tempPath + " is initialized, WorkingDir : " + this.workingDirectory + " Startup Timeout " + this.ToolStartupTimeout + " confirmation message " + this.StartupSuccessMessage);
+            Console.WriteLine("Tool initializing " + tempPath);
         }
 
         public string Name { get => name; set => name = value; }
-        public int ToolStartupTimeout { get => toolStartupTimeout; set => toolStartupTimeout = value; }
-        public string StartupSuccessMessage { get => startupSuccessMessage; set => startupSuccessMessage = value; }
 
         public string GetParam()
         {
@@ -171,30 +162,5 @@ namespace ZMM.Tasks
         {
             return this.configuration;
         }
-
-        #region GetAvailablePort
-        public int GetAvailablePort(int MinPort, int MaxPort)
-        {
-            IPEndPoint[] endPoints;
-            List<int> portArray = new List<int>();
-            IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
-            TcpConnectionInformation[] connections = properties.GetActiveTcpConnections();
-            portArray.AddRange(from n in connections
-                               where n.LocalEndPoint.Port >= MinPort
-                               select n.LocalEndPoint.Port);
-            
-            endPoints = properties.GetActiveTcpListeners();
-            portArray.AddRange(from n in endPoints
-                               where n.Port >= MinPort
-                               select n.Port);
-
-            portArray.Sort();
-            for (int i = MinPort; i <= MaxPort; i++)
-                if (!portArray.Contains(i))
-                    return i;
-
-            return 0;
-        }
-        #endregion
     }
 }

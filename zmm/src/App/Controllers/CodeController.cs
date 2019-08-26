@@ -20,10 +20,12 @@ using ZMM.Helpers.Common;
 using ZMM.Tools.JNB;
 using ZMM.Tasks;
 using System.Text.RegularExpressions;
+using Quartz;
+using Quartz.Impl;
 
 namespace ZMM.App.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [Route("api/[controller]")]
     public class CodeController : Controller
     {
@@ -36,22 +38,25 @@ namespace ZMM.App.Controllers
         private List<CodeResponse> codeResponse;
 
         private readonly string BASEURLJUP;
-        private static string[] extensions = new[] { "py", "ipynb" };
+        private static string[] extensions = new[] { "py", "ipynb","r" };
+
+        private readonly IScheduler _scheduler;
 
         #endregion
 
         #region Constructor...
-        public CodeController(IHostingEnvironment environment, IConfiguration configuration, ILogger<CodeController> log, IPyJupyterServiceClient _jupyterClient, IPyCompile _pyCodeCompile)
+        public CodeController(IHostingEnvironment environment, IConfiguration configuration, ILogger<CodeController> log, IPyJupyterServiceClient _jupyterClient, IPyCompile _pyCodeCompile, IScheduler factory)
         {
             //update 
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.Configuration = configuration;
             this.jupyterClient = _jupyterClient;
             this.pyCompileClient = _pyCodeCompile;
+            _scheduler = factory;
             this.Logger = log;
             this.BASEURLJUP = Configuration["JupyterServer:srvurl"];
             try
-            {                
+            {
                 codeResponse = CodePayload.Get();
             }
             catch (Exception ex)
@@ -134,6 +139,9 @@ namespace ZMM.App.Controllers
                                 case "ipynb":
                                     type = "JUPYTER_NOTEBOOK";
                                     break;
+                                case "r":
+                                    type = "R";
+                                    break;
                                 default:
                                     type = "UNRECOGNIZED";
                                     break;
@@ -175,7 +183,7 @@ namespace ZMM.App.Controllers
         public IActionResult Get(bool refresh)
         {
             //
-            if (refresh) 
+            if (refresh)
             {
                 CodePayload.Clear();
                 InitZmodDirectory.ScanCodeDirectory();
@@ -338,7 +346,7 @@ namespace ZMM.App.Controllers
                 InstancePayload.Create(objJNBInst);
                 notebookLinkURL = notebookLinkURL.Replace(@"//", @"/");
                 //
-                return Ok(new { user = CURRENT_USER, id = id, message = message, url = notebookLinkURL.Replace(notebookLinkURL.Substring(0,notebookLinkURL.IndexOf("jnb")),"") });
+                return Ok(new { user = CURRENT_USER, id = id, message = message, url = notebookLinkURL.Replace(notebookLinkURL.Substring(0, notebookLinkURL.IndexOf("jnb")), "") });
             }
             catch (Exception ex)
             {
@@ -505,29 +513,38 @@ namespace ZMM.App.Controllers
                 if (!string.IsNullOrEmpty(filePath))
                 {
                     zmkResponse = await pyCompileClient.CompilePy(filePath);
-                    JObject json = JObject.Parse(zmkResponse);                    
+                    JObject json = JObject.Parse(zmkResponse);
                     return Json(json);
                 }
                 else
                 {
-                    return BadRequest(new { message = "File compilation failed."});
+                    return BadRequest(new { message = "File compilation failed." });
                 }
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = "File compilation failed.", exception = ex.StackTrace });
-            }            
+            }
         }
         #endregion
-        
+
         #region execute
-        [HttpGet("{id}/execute")]
+        [HttpPost("{id}/execute")]
         public async Task<IActionResult> ExecutePyAsync(string id)
         {
             string zmkResponse = "";
             string filePath = "";
+            string reqBody = "";
             try
             {
+                //read cron information from the request body
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var body = reader.ReadToEnd();
+                    reqBody = body.ToString();
+                }
+
+                //
                 foreach (var record in codeResponse)
                 {
                     if (record.Id.ToString() == id)
@@ -536,21 +553,102 @@ namespace ZMM.App.Controllers
                         break;
                     }
                 }
+                //
                 if (!string.IsNullOrEmpty(filePath))
                 {
-                    zmkResponse = await pyCompileClient.ExecutePy(filePath,"");
-                    JObject json = JObject.Parse(zmkResponse);                    
-                    return Json(json);
+                    zmkResponse = await pyCompileClient.ExecutePy(filePath, "");
+                    var jsonObj = JsonConvert.DeserializeObject<ExecuteCodeResponse>(zmkResponse);
+                    jsonObj.executedAt = DateTime.Now;
+                    List<ExecuteCodeResponse> tresp = new List<ExecuteCodeResponse>();
+                    tresp.Add(jsonObj);
+
+                    JObject cronjson = JObject.Parse(reqBody);
+                    if (cronjson["recurrence"].ToString() == "REPEAT")
+                    {
+                        //check if same job is scheduled
+                        ISchedulerFactory schfack = new StdSchedulerFactory();
+                        IScheduler scheduler = await schfack.GetScheduler();
+                        var jobKey = new JobKey(filePath);
+                        if (await scheduler.CheckExists(jobKey))
+                        {
+                            await scheduler.ResumeJob(jobKey);
+                        }
+                        else
+                        {
+                            #region create quartz job for execute code
+                            ITrigger trigger = TriggerBuilder.Create()
+                            .WithIdentity($"Execute Code Job-{DateTime.Now}")
+                            .WithCronSchedule(cronjson["cronExpression"].ToString())
+                            .WithPriority(1)
+                            .Build();
+
+                            IJobDetail job = JobBuilder.Create<ExecuteCodeJob>()
+                            .WithIdentity(filePath)
+                            .Build();
+
+                            job.JobDataMap["id"] = id;
+                            job.JobDataMap["filePath"] = filePath;
+                            job.JobDataMap["baseurl"] = Configuration["PyServiceLocation:srvurl"];
+
+                            await _scheduler.ScheduleJob(job, trigger);
+                            //add to scheduler payload                            
+                            SchedulerResponse schJob = new SchedulerResponse()
+                            {
+                                CreatedOn = DateTime.Now.ToString(),
+                                CronExpression = cronjson["cronExpression"].ToString(),
+                                DateCreated = DateTime.Now,
+                                EditedOn = DateTime.Now.ToString(),
+                                FilePath = filePath,
+                                Id = id,
+                                Name = id,
+                                Type = "PYTHON",
+                                Url = "",
+                                Recurrence = cronjson["recurrence"].ToString(),
+                                StartDate = cronjson["startDate"].ToString(),
+                                StartTimeH = (cronjson["startTimeH"].ToString() == null) ? "" : cronjson["startTimeH"].ToString(),
+                                StartTimeM = (cronjson["startTimeM"].ToString() == null) ? "" : cronjson["startTimeM"].ToString(),
+                                ZMKResponse = tresp.ToList<object>()
+                            };
+                            SchedulerPayload.Create(schJob);
+                            #endregion
+                        }
+                    }
+                    else
+                    {
+                        //add to scheduler payload                            
+                        SchedulerResponse schJob = new SchedulerResponse()
+                        {
+                            CreatedOn = DateTime.Now.ToString(),
+                            CronExpression = "",
+                            DateCreated = DateTime.Now,
+                            EditedOn = DateTime.Now.ToString(),
+                            FilePath = filePath,
+                            Id = id,
+                            Name = id,
+                            Type = "PYTHON",
+                            Url = "",
+                            Recurrence = "ONE_TIME",
+                            StartDate = "",
+                            StartTimeH = "",
+                            StartTimeM = "",
+                            ZMKResponse = tresp.ToList<object>(),
+                            Status = ""
+                        };
+                        SchedulerPayload.Create(schJob);
+                    }
+
+
+                    return Json(jsonObj);
                 }
                 else
                 {
-                    return BadRequest(new { message = "File execution failed."});
+                    return BadRequest(new { message = "File execution failed." });
                 }
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = "File execution failed.", exception = ex.StackTrace });
-            }            
+            }
         }
         #endregion
         #endregion

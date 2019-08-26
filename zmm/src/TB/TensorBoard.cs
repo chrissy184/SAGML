@@ -40,10 +40,10 @@ namespace ZMM.Tools.TB
                     ITask tempTask = FindTask(taskName);
                     if (tempTask.IsEmpty())
                     {
-                        int FreePort = GetAvailablePort(6006, 6008);
+                        int FreePort = GetFreePort();
+                        string LogDirectory = CreateNewLogDir();
                         if (FreePort > 0)
                         {
-                            string LogDirectory = CreateNewLogDir();
                             UpdateStartTaskInfo(ref info, FreePort, LogDirectory);
                             tempTask = TaskFactory.Get(taskType, taskName, this, info);
                             tempTask.StartAsync();
@@ -144,11 +144,12 @@ namespace ZMM.Tools.TB
                 List<string> logs = result.GetLog();
                 for (int i = 0; i < logs.Count; i++)
                 {
-                    if (logs[i].Contains(StartupSuccessMessage))
+                    if (logs[i].Contains("Press CTRL+C to quit"))
                     {
                         Found = true;
                         break;
                     }
+                    if (i == 100) break;
                 }
             }
             return Found;
@@ -157,14 +158,14 @@ namespace ZMM.Tools.TB
         private bool WaitForTaskToStart(ITask task)
         {
             bool Status = WaitForStartupMessage(task);
-            for (int i = 1; i < ToolStartupTimeout; i++)
+            for (int i = 1; i < 20; i++)
             {
                 if (Status) break;
                 else
-                {                    
+                {
+                    Console.WriteLine("Waiting for token id...");
+                    System.Threading.Thread.Sleep(500);
                     Status = WaitForStartupMessage(task);
-                    Console.WriteLine("Tensorboard is starting");
-                    System.Threading.Thread.Sleep(1000);
                 }
             }
             return Status;

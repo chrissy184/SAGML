@@ -35,6 +35,8 @@ namespace ZMM.Tools.JNB
         
         protected static string HostURL = "http://localhost";
 
+        private const string  TokenPattern = "?token=";
+
         //We can add this to configuration
         private static List<int> ListOfAllowedPorts = new List<int> { 8888, 8889, 8890 };
 
@@ -70,6 +72,31 @@ namespace ZMM.Tools.JNB
                     break;                
             }
             
+        }
+
+        private int GetAvailablePort(int StartingPort, int endPort)
+        {
+            IPEndPoint [] endPoints;
+            List<int> portArray = new List<int>();
+            IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
+            // getting active connections 
+            TcpConnectionInformation[] connections = properties.GetActiveTcpConnections();
+            portArray.AddRange(from n in connections
+                                where n.LocalEndPoint.Port >= StartingPort
+                                select n.LocalEndPoint.Port);
+
+            // getting active tcp listeneres - wcf service Listening in tcp
+            endPoints = properties.GetActiveTcpListeners();
+            portArray.AddRange(from n in endPoints
+                                where n.Port >= StartingPort
+                                select n.Port);
+
+            portArray.Sort();
+            for (int i = StartingPort; i<= endPort; i++)
+                if (!portArray.Contains(i))
+                    return i;
+            
+            return 0;
         }
 
         
@@ -136,9 +163,9 @@ namespace ZMM.Tools.JNB
                 List<string> logs = result.GetLog();
                 for (int i = 0; i < logs.Count; i++)
                 {
-                    if (logs[i].Contains(StartupSuccessMessage))
+                    if (logs[i].Contains(TokenPattern))
                     {
-                        tokenId = logs[i].Substring(logs[i].IndexOf(StartupSuccessMessage) + 7);
+                        tokenId = logs[i].Substring(logs[i].IndexOf(TokenPattern) + 7);
                         break;
                     }
                     if (i == 100) break;
@@ -150,14 +177,14 @@ namespace ZMM.Tools.JNB
         private string WaitForStartTaskToken(ITask task)
         {
             string tokenId = GetToken(task);
-            for (int i = 1; i < ToolStartupTimeout; i++)
+            for (int i = 1; i < 40; i++)
             {
                 if (tokenId != string.Empty) break;
                 else
                 {
-                    tokenId = GetToken(task);
                     Console.WriteLine("Waiting for token id...");
-                    System.Threading.Thread.Sleep(1000);                    
+                    System.Threading.Thread.Sleep(500);
+                    tokenId = GetToken(task);
                 }
             }
             return tokenId;

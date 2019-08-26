@@ -31,16 +31,21 @@ import { AssetsComponent } from './assets/assets.component';
 import { DisplayConfigFormComponent } from './assets/display-config-form/display-config-form.component';
 import { WeldingConfigFormComponent } from './data/welding-config-form/welding-config-form.component';
 import { LicenseComponent } from './license/license.component';
+import { ExcuteFormComponent } from './code/excute-form/excute-form.component';
+import { CronEditorModule } from 'cron-editor';
+import { RepositoryComponent } from './repository/repository.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     ApplicationRouting,
-    NgbModule.forRoot(),
+    NgbModule,
     SharedModule,
     MonacoEditorModule.forRoot(),
-    NgxDnDModule
+    NgxDnDModule,
+    CronEditorModule
   ],
   declarations: [
     ApplicationComponent,
@@ -64,7 +69,10 @@ import { LicenseComponent } from './license/license.component';
     AssetsComponent,
     DisplayConfigFormComponent,
     WeldingConfigFormComponent,
-    LicenseComponent
+    LicenseComponent,
+    ExcuteFormComponent,
+    RepositoryComponent,
+    SettingsComponent
   ]
 })
 export class ApplicationModule { }

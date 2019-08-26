@@ -12,6 +12,8 @@ import { ContentSidenavDemoComponent } from './content-sidenav-demo/content-side
 import { TasksComponent } from './tasks/tasks.component';
 import { AssetsComponent } from './assets/assets.component';
 import { LicenseComponent } from './license/license.component';
+import { RepositoryComponent } from './repository/repository.component';
+import { SettingsComponent } from './settings/settings.component';
 
 const MAIN_ROUTES: Routes = [
     {
@@ -27,6 +29,8 @@ const MAIN_ROUTES: Routes = [
             { path: 'tasks', component: TasksComponent },
             { path: 'assets', component: AssetsComponent },
             { path: 'license', component: LicenseComponent },
+            { path: 'repository', component: RepositoryComponent},
+            { path: 'settings', component: SettingsComponent },
             { path: '**', redirectTo: 'data' }
         ]
     }

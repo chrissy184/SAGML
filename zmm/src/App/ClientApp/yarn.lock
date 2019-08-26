@@ -1961,6 +1961,18 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
+cron-editor@^2.1.7:
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/cron-editor/-/cron-editor-2.1.7.tgz#8e252431b4769ad6f5e1128e24702a510e227d5b"
+  integrity sha512-SsmPX0DDAouKpsfVCavEKwF5RKcRH7AZyujRH3GW5h91oN6oR0jTNOE6R9KQ322khjCazFSldw1zgcX74+ahzw==
+  dependencies:
+    tslib "^1.9.0"
+
+cronstrue@^1.68.0:
+  version "1.68.0"
+  resolved "https://registry.yarnpkg.com/cronstrue/-/cronstrue-1.68.0.tgz#aee4dd58baf38a5528ce623b37b1e4bed174d978"
+  integrity sha512-0KwAGGil5RRbZ63duL2eMuX8bSeamvPO3rJf3OAQWGLsKyFeJ+fb/TBs/mc2PxcapNsrO/ugcNlmuHc05gWM0w==
+
 cross-fetch@2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-2.1.0.tgz#7d4ea7e10a4f3bb73d5c2f0a3791ec3752d39b50"

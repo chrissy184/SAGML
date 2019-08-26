@@ -4,7 +4,7 @@ import { timer } from 'rxjs';
 import { finalize, takeWhile } from 'rxjs/operators';
 import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-
+//NN, AUTOML, PYTHON, SCORE
 @Component({
     selector: 'app-tasks',
     templateUrl: './tasks.component.html',
@@ -25,14 +25,12 @@ export class TasksComponent implements OnInit {
     public listOfTasks: any = [];
     public dataSource: any = [];
     public selectedTask: any = {};
-
     public tabSelectedIndex = 0;
-
     public displayedColumns: string[] = ['expand', 'modelName', 'score', 'bestmodel'];
-
-    public tensorboardUrl;
-    public taskCompleted = false;
     public filter: any = '';
+
+    public dataSourceTaskHistory: any = [];
+    public displayedColumnsTaskHistory: string[] = ['expand', 'executedAt', 'status'];
 
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
@@ -54,8 +52,8 @@ export class TasksComponent implements OnInit {
             .pipe(finalize(() => { this.isLoading = false; }))
             .subscribe(response => {
                 // select first record by default
-                if (response && (response.runningTask && response.runningTask.length)) {
-                    this.listOfTasks = response.runningTask;
+                if (response && response.length) {
+                    this.listOfTasks = response;
                     this.selectTask(this.listOfTasks[0]);
                 }
             });
@@ -64,53 +62,53 @@ export class TasksComponent implements OnInit {
     public selectTask(selectedTaskData: any) {
         this.selectedTask = selectedTaskData;
         this.dataSource = [];
-        this.taskCompleted = false;
+        this.dataSourceTaskHistory = [];
         this.isContentLoading = true;
-        this.tensorboardUrl = '';
-        timer(0, 10000).pipe(takeWhile(() => !this.taskCompleted))
-            .subscribe(() => {
-                this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.taskGet(this.selectedTask.idforData))
-                    .pipe(finalize(() => { this.isContentLoading = false; }))
-                    .subscribe(response => {
-                        this.selectedTask.status = response.status;
-                        if (response.errorMessage) {
-                            this.selectedTask.errorMessage = response.errorMessage;
-                            this.taskCompleted = true;
-                            this.utilService.alert(AlertMessages.TASK.taskError);
-                        } else if (this.selectedTask.type === 'NNProject' && response.tensorboardUrl) {
-                            this.tensorboardUrl = response.tensorboardUrl + '?t=' + Date.now();
-                            this.taskCompleted = true;
-                            this.iframeLoaded();
-                        } else if (this.selectedTask.type === 'AutoMLProject') {
-                            this.selectedTask.newPMMLFileName = response.newPMMLFileName;
-                            this.selectedTask.pmmlFilelocation = response.pmmlFilelocation;
-                            this.selectedTask.listOfModelAccuracy = response.listOfModelAccuracy;
-                            if (response.listOfModelAccuracy && response.listOfModelAccuracy.length) {
-                                this.dataSource = new MatTableDataSource(response.listOfModelAccuracy);
-                                this.taskCompleted = true;
-                            } else {
-                                this.dataSource = new MatTableDataSource(response.generationInfo);
-                            }
-                            this.dataSource.paginator = this.paginator;
-                            this.dataSource.sort = this.sort;
-                        } else if (this.selectedTask.type === 'WeldGen') {
-                            this.selectedTask.information = response.information;
-                            if (this.selectedTask.status === 'Completed') {
-                                this.taskCompleted = true;
-                            }
-                        } else if (this.selectedTask.type === 'Code') {
-                            this.selectedTask.information = response.information;
-                            if (this.selectedTask.status === 'Complete') {
-                                this.taskCompleted = true;
-                            }
-                        }
-                    }, responseError => {
-                        this.taskCompleted = true;
-                    });
-            });
+        this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.taskGet(this.selectedTask.id))
+        .pipe(finalize(() => { this.isContentLoading = false; }))
+        .subscribe(response => {
+            this.selectedTask = response;
+            this.dataSourceTaskHistory = new MatTableDataSource(response.zmkResponse);
+            this.dataSourceTaskHistory.paginator = this.paginator;
+            this.dataSourceTaskHistory.sort = this.sort;
+            //     this.dataSource.sort = this.sort;
+            // this.selectedTask.status = response.status;
+            // if (response.errorMessage) {
+            //     this.selectedTask.errorMessage = response.errorMessage;
+            //     this.taskCompleted = true;
+            //     this.utilService.alert(AlertMessages.TASK.taskError);
+            // } else if (this.selectedTask.type === 'NNProject' && response.tensorboardUrl) {
+            //     this.tensorboardUrl = response.tensorboardUrl + '?t=' + Date.now();
+            //     this.selectedTask.tensorboardUrl = response.tensorboardUrl + '?t=' + Date.now();
+            //     this.taskCompleted = true;
+            //     this.iframeLoaded();
+            // } else if (this.selectedTask.type === 'AutoMLProject') {
+            //     this.selectedTask.newPMMLFileName = response.newPMMLFileName;
+            //     this.selectedTask.pmmlFilelocation = response.pmmlFilelocation;
+            //     this.selectedTask.listOfModelAccuracy = response.listOfModelAccuracy;
+            //     if (response.listOfModelAccuracy && response.listOfModelAccuracy.length) {
+            //         this.dataSource = new MatTableDataSource(response.listOfModelAccuracy);
+            //         this.taskCompleted = true;
+            //     } else {
+            //         this.dataSource = new MatTableDataSource(response.generationInfo);
+            //     }
+            //     this.dataSource.paginator = this.paginator;
+            //     this.dataSource.sort = this.sort;
+            // } else if (this.selectedTask.type === 'WeldGen') {
+            //     this.selectedTask.information = response.information;
+            //     if (this.selectedTask.status === 'Completed') {
+            //         this.taskCompleted = true;
+            //     }
+            // } else if (this.selectedTask.type === 'PYTHON') {
+            //     this.selectedTask.information = response.information;
+            //     if (this.selectedTask.status === 'Complete') {
+            //         this.taskCompleted = true;
+            //     }
+            // }
+        });
     }
 
-    public refreshTaskStatus() {
+    public refreshTask() {
         this.selectTask(this.selectedTask);
     }
 
@@ -131,13 +129,24 @@ export class TasksComponent implements OnInit {
 
     public deleteTask() {
         this.isLoading = true;
-        this.apiService.request(ApiRoutes.methods.DELETE, ApiRoutes.taskGet(this.selectedTask.idforData))
+        this.apiService.request(ApiRoutes.methods.DELETE, ApiRoutes.taskGet(this.selectedTask.id))
             .pipe(finalize(() => { this.isLoading = false; }))
             .subscribe(response => {
                 this.getAllTasks();
                 this.utilService.alert(AlertMessages.TASK.delete);
             });
     }
+
+    public stopTask() {
+        this.isLoading = true;
+        this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.taskStop(this.selectedTask.id))
+            .pipe(finalize(() => { this.isLoading = false; }))
+            .subscribe(response => {
+                this.selectedTask = response;
+                this.utilService.alert(AlertMessages.TASK.taskStopped);
+            });
+    }
+
     public toggleSidebar(action: string) {
         this.utilService.toggleSidebar(action);
     }

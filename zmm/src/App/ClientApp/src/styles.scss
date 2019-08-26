@@ -280,3 +280,58 @@ dt {
   background-color: $primary;
   color: $white;
 }
+
+.cron-editor {
+    .form-control {
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-clip: padding-box;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        -webkit-transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        -o-transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        outline: 0;
+        -webkit-box-shadow: none;
+        box-shadow: none !important;
+        border: none;
+        border-bottom: 2px solid #ced4da;
+        box-sizing: content-box;
+        margin: 0 .5rem .5rem 0;
+        border-radius: 0;
+        padding: .3rem 0 .55rem 0;
+        background-image: none;
+        background-color: transparent;
+        height: auto;
+    }
+
+    ul.nav.nav-tabs.tab-nav {
+        display: block;
+        margin: 0 -20px;
+        margin-bottom: 15px;
+        border: 0;
+    }
+
+    ul.nav.nav-tabs.tab-nav>li {
+        display: inline-block;
+        border: 1px solid #164f63;
+        margin: 0 2px;
+        padding: 5px;
+        border-radius: 4px;
+        margin-bottom: 5px;
+    }
+
+    ul.nav.nav-tabs.tab-nav>li.active {
+        background: #1776bf;
+        color: #fff;
+        border-color: #1776bf;
+    }
+
+    .timeFormControl {
+        width: 45px;
+        display: inline-block;
+    }
+}

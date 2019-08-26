@@ -71,16 +71,33 @@
                   (blur)="updateName(name)">{{ selectedModel?.id }}</span>.{{ selectedModel?.extension }}</h2>
               <div class="toolbar-mid"></div>
               <div calss="content-toolbar">
+                <button mat-icon-button matTooltip="Publish Model" (click)="publishModel()">
+                  <span class="mdi text-secondary mdi-publish"></span>
+                </button>
                 <button mat-icon-button (click)="deployModel()"
                   [matTooltip]="!selectedModel.deployed ? 'Deploy model to server' : 'Remove model from server'">
                   <span class="mdi mdi-cloud-outline text-secondary"
                     [ngClass]="{'mdi-cloud-outline': !selectedModel.deployed, 'mdi-cloud': selectedModel.deployed}"></span>
                 </button>
-                <button mat-icon-button (click)="loadInMemory()"
-                  [matTooltip]="selectedModel.loaded ? 'Unload from Memory' : 'Load in Memory'">
-                  <span class="mdi mdi-progress-upload text-secondary"
-                    [ngClass]="{'mdi-progress-download': selectedModel.loaded, 'mdi-progress-upload': !selectedModel.loaded}"></span>
+                <button *ngIf="!selectedModel.loaded" mat-icon-button [matMenuTriggerFor]="loadInMemoryMenu"
+                  matTooltip="Load in Memory">
+                  <span class="mdi mdi-progress-upload text-secondary"></span>
                 </button>
+                <mat-menu #loadInMemoryMenu="matMenu">
+                  <button *ngFor="let option of listOfZMKInstances" mat-menu-item (click)="loadInMemory(option.id)">
+                    {{option.name}}
+                  </button>
+                  <button *ngIf="!listOfZMKInstances.length" mat-menu-item>
+                    No ZMK available
+                  </button>
+                </mat-menu>
+
+                <button *ngIf="selectedModel.loaded" mat-icon-button matTooltip="Unload from Memory"
+                  (click)="unloadFromMemory()">
+                  <span class="mdi text-secondary mdi-progress-download"></span>
+                </button>
+
+
                 <button mat-icon-button *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork'"
                   (click)="trainPmml()" matTooltip="Train pmml">
                   <span class="mdi mdi-settings  text-secondary"></span>
@@ -222,5 +239,49 @@
       (close)="showCompileFormPanel = false;" (selected)="onCompileFormDataSubmit($event)"></app-compile-parameter-form>
     <app-filter-panel [option]="filterConfig" *ngIf="showFilterPanel" (close)="showFilterPanel = false;"
       (selected)="onFilteredItemSelection($event)"></app-filter-panel>
+    <div class="filterPanel" *ngIf="publishModelData">
+      <mat-toolbar>
+        <div class="toolbar-mid">
+          Select Item
+        </div>
+        <div class="content-toolbar">
+          <button mat-icon-button matTooltip="Cancel" (click)="closeFilter()">
+            <span class="mdi mdi-close text-secondary"></span>
+          </button>
+          <button mat-icon-button matTooltip="Submit" (click)="closeFilter()">
+            <span class="mdi mdi-check text-secondary"></span>
+          </button>
+        </div>
+      </mat-toolbar>
+      <mat-toolbar>
+        <div class="toolbar-mid">
+          <div class="filter">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <span class="mdi mdi-magnify"></span>
+                </span>
+              </div>
+              <input type="text" class="form-control" [(ngModel)]="filter" placeholder="Filter">
+            </div>
+          </div>
+        </div>
+      </mat-toolbar>
+      <app-loader [isLoading]="isLoading" [message]=""></app-loader>
+      <cdk-virtual-scroll-viewport itemSize="51" class="details-list">
+        <ul class="list-group list-group-flush">
+          <li *cdkVirtualFor="let item of publishModelDataList | searchfilter:'name':filter"
+            class="list-group-item list-group-item-action text-truncate">
+            <mat-checkbox>
+              <span class="mdi mr-2" [ngClass]="utilService.fileTypeIcon(item.type)"></span>
+              <span innerHtml="{{ item.name | highlight: filter }}"></span>
+            </mat-checkbox>
+          </li>
+          <li *ngIf="!(publishModelDataList && publishModelDataList.length) && !isLoading" class="list-group-item text-truncate text-center text-muted">
+            No data available
+          </li>
+        </ul>
+      </cdk-virtual-scroll-viewport>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

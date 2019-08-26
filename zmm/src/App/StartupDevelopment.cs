@@ -33,15 +33,17 @@ using ZMM.App.PyServicesClient;
 using ZMM.App.ZSServiceClient;
 using ZMM.Authorizations.Claims;
 using ZMM.Helpers.ZMMDirectory;
-//using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.OpenApi.Models;
+using Quartz;
+using System.Collections.Specialized;
+using Quartz.Impl;
+
 namespace ZMM.App
 {
     public class StartupDevelopment
     {
-
         private readonly ILogger Logger;
         public IConfiguration Configuration { get; }
         public IHostingEnvironment Environment { get; }
@@ -99,7 +101,10 @@ namespace ZMM.App
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Zementis Modeler", Version = "v1" });
-            }); 
+            });
+            #endregion
+            #region Quartz
+            
             #endregion
             
             #region Initialize clients in singleton service
@@ -114,7 +119,11 @@ namespace ZMM.App
             services.AddSingleton<IZSModelPredictionClient>(new ZSModelPredictionClient(Configuration));      
             services.AddSingleton<IPyTensorServiceClient>(new PyTensorServiceClient(ToolHostURL,ContentDir));
             services.AddSingleton<IPyCompile>(new PyCompile(Configuration));  
+            services.AddSingleton(provider => GetScheduler());
             #endregion
+
+            Console.WriteLine("*****************************************");
+            Console.WriteLine($"ZMK Dev =====>>> {pySrvLocation}");
         }
 
         #region Setup User Identity Provider (KeyCloak) configuration
@@ -210,8 +219,8 @@ namespace ZMM.App
             {
                 FileProvider = new PhysicalFileProvider(ContentDir),
                 RequestPath = "/data"
-            });            
-            
+            });   
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -284,6 +293,21 @@ namespace ZMM.App
             {
                 Logger.LogCritical("Initializing ZMOD directory " + ex.StackTrace);
             }
+        }
+
+        private IScheduler GetScheduler()
+        {
+            var properties = new NameValueCollection
+            {
+                ["quartz.scheduler.instanceName"] = "ZMM_JobScheduler",
+                ["quartz.threadPool.type"] = "ZMM.App.ThreadPool, ZMMPool",
+                ["quartz.threadPool.threadCount"] = "10",
+                ["quartz.jobStore.type"] = "ZMM.App.JobStore, ZMMJobStore",
+            };
+            var schedulerFactory = new StdSchedulerFactory();
+            var scheduler = schedulerFactory.GetScheduler().Result;
+            scheduler.Start();
+            return scheduler;
         }
     }
 }

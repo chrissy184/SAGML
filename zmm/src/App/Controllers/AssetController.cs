@@ -22,7 +22,7 @@ using Newtonsoft.Json;
 
 namespace ZMM.App.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [Route("api/instances")]
     public class AssetController : Controller
     {
@@ -94,7 +94,9 @@ namespace ZMM.App.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new {message="running instance loading failed.", exception=ex.StackTrace});             
+                string err = ex.StackTrace;
+                getAllInstances.Add(ZMKDockerCmdHelper.GetNonDockerZMK());
+                //return BadRequest(new {message="running instance loading failed.", exception=ex.StackTrace});             
             }
             #endregion
             
@@ -111,18 +113,6 @@ namespace ZMM.App.Controllers
         }
         #endregion
     
-        #region [Get] get running instances by Type
-        [HttpGet("type")]
-        public async Task<IActionResult> GetInstancesByTypeAsync(string type)        
-        {            
-            bool result = false;                  
-            await System.Threading.Tasks.Task.FromResult(0);
-            
-            
-            return Ok(result);
-        }
-        #endregion
-
         #region [POST] start instances
         [HttpPost]
         public async Task<IActionResult> StartInstancesAsync()

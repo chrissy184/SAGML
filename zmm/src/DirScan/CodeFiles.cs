@@ -66,4 +66,15 @@ namespace ZMM.DS
         {
         }
     }
+    
+    public class RFileInfo : ZmodFileInfo
+    {
+        public RFileInfo(string path)
+        : base(path)
+        {
+        }
+        public RFileInfo()
+        {
+        }
+    }
 }

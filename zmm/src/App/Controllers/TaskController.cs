@@ -16,82 +16,130 @@ using Microsoft.Extensions.Logging;
 using ZMM.Models.ResponseMessages;
 using ZMM.Models.Payloads;
 using ZMM.Helpers.ZMMDirectory;
+using Quartz;
+using Quartz.Impl;
+using System.Linq;
 
 namespace ZMM.App.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [Route("api/[controller]")]
-    public class TaskController: Controller
-    {   
+    public class TaskController : Controller
+    {
         #region variables
-        private readonly IHostingEnvironment _environment; 
+        private readonly IHostingEnvironment _environment;
         private IConfiguration Configuration { get; }
-        readonly ILogger<TaskController>  Logger;
-        private readonly IPyNNServiceClient nnclient;      
-        private readonly IPyAutoMLServiceClient autoMLclient;     
-        
+        readonly ILogger<TaskController> Logger;
+        private readonly IPyNNServiceClient nnclient;
+        private readonly IPyAutoMLServiceClient autoMLclient;
+
         private List<TaskResponse> taskResponse;
         private List<ModelResponse> modelResponse;
         private readonly string CURRENT_USER = "";
+
         #endregion
-       
+
         #region Constructor...
-        public TaskController(IHostingEnvironment environment,IConfiguration configuration, ILogger<TaskController> log ,IPyNNServiceClient srv, IPyAutoMLServiceClient automlSrv)
+        public TaskController(IHostingEnvironment environment, IConfiguration configuration, ILogger<TaskController> log, IPyNNServiceClient srv, IPyAutoMLServiceClient automlSrv)
         {
-            _environment = environment ?? throw new ArgumentNullException(nameof(environment));   
-            this.Configuration = configuration; 
+            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
+            this.Configuration = configuration;
             this.nnclient = srv;
             this.Logger = log;
             this.autoMLclient = automlSrv;
-
             try
-            {   
+            {
                 taskResponse = TaskPayload.Get();
                 modelResponse = ModelPayload.Get();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 //ILogger
                 string error = ex.Message;
-            }           
-        } 
+            }
+        }
         #endregion
-        
+
         #region Get tasks...
         [HttpGet]
         public async Task<IActionResult> GetAsync()
-        {  
-            string response = string.Empty;
-            
-            response = await nnclient.GetAllRunningTask();
-
-            if(!string.IsNullOrEmpty(response))    
+        {
+            var tasks = SchedulerPayload.Get().Select(t => new
             {
-                JObject jsonObj = JObject.Parse(response);
-                return Json(jsonObj);
-            }       
+                t.Id,
+                t.Name,
+                t.CreatedOn,
+                t.EditedOn,
+                t.Type,
+                t.CronExpression,
+                t.StartDate,
+                t.StartTimeH,
+                t.StartTimeM,
+                t.Recurrence,
+                t.Status
+            });
+            await Task.FromResult(0);
+            if (tasks.Count() > 0)
+            {
+                return Json(tasks);
+            }
             else
             {
-                return BadRequest("error!");
+                return Ok(new { });
             }
-                       
+
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSelectedTaskAysnc(string id)
         {
-            string response = string.Empty;
-
-            response = await autoMLclient.GetSelectedTask(id);
-            if(!string.IsNullOrEmpty(response))    
+            var taskData = SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault();
+            if (!string.IsNullOrEmpty(taskData.Id))
             {
-                JObject jsonObj = JObject.Parse(response);
-                return Json(jsonObj);
-            }       
+                var resp = await nnclient.GetRunningTaskByTaskName(id);
+                JObject joResp = JObject.Parse(resp);
+                JArray jArr = (JArray)joResp["runningTask"];
+                JArray jHist = new JArray();
+                //
+                foreach(var i in jArr.Children())
+                {
+                    foreach (var j in taskData.ZMKResponse)
+                    {
+                        string _type = j.GetType().ToString();
+                        if (_type.Contains("ExecuteCodeResponse"))
+                        {
+                            ExecuteCodeResponse ecr = (ExecuteCodeResponse)j;
+                            if (i["idforData"].ToString() == ecr.idforData)
+                            {
+                                jHist.Add(new JObject(){
+                                    {"idforData", ecr.idforData},
+                                    {"status", i["status"].ToString()},
+                                    {"executedAt",ecr.executedAt}
+                                });
+                                break;
+                            }
+                        }
+                    }
+                }
+                //
+                taskData.History = jHist.ToList<object>();
+                SchedulerPayload.Update(taskData);
+
+                return Json(SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault());
+            }
             else
             {
-                return BadRequest("error!");
-            }            
+                return Ok(new { });
+            }
+        }
+
+        [HttpGet("{id}/history/{idforData}")]
+        public async Task<IActionResult> GetSelectedTaskAysnc(string id, string idforData)
+        {
+            await Task.FromResult(0);
+
+
+            return Json(new { });
         }
 
         #endregion
@@ -99,7 +147,7 @@ namespace ZMM.App.Controllers
         #region Save model...
         [HttpPost("{id}/saveModel")]
         public async Task<IActionResult> SavePmmlAsync(string id)
-        {  
+        {
             //variables
             string response = string.Empty;
             string reqBody = string.Empty;
@@ -114,11 +162,11 @@ namespace ZMM.App.Controllers
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = reader.ReadToEnd();
-                reqBody = body.ToString(); 
+                reqBody = body.ToString();
             }
             //
             JObject jObj = new JObject();
-            if(!string.IsNullOrEmpty(reqBody))    
+            if (!string.IsNullOrEmpty(reqBody))
             {
                 jObj = JObject.Parse(reqBody);
                 filePath = jObj["filePath"].ToString();
@@ -128,25 +176,25 @@ namespace ZMM.App.Controllers
             long fileSize = 0L;
             string dirFullpath = DirectoryHelper.GetModelDirectoryPath();
             string newFile = fileName;
-            
+
             try
             {
                 //check if folder path exists...if not then create folder
-                if(!Directory.Exists(dirFullpath))
+                if (!Directory.Exists(dirFullpath))
                 {
                     Directory.CreateDirectory(dirFullpath);
-                }              
+                }
 
                 //call py service and add content to pmml file
-                fileContent = await autoMLclient.SaveBestPmml(filePath);                               
+                fileContent = await autoMLclient.SaveBestPmml(filePath);
                 //
-                using (StreamWriter writer = new StreamWriter(Path.Combine(dirFullpath,newFile))) 
+                using (StreamWriter writer = new StreamWriter(Path.Combine(dirFullpath, newFile)))
                 {
                     await writer.WriteLineAsync(fileContent);
                     writer.Flush();
                     fileSize = writer.BaseStream.Length;
-                } 
-                string _url = DirectoryHelper.GetModelUrl(newFile);  
+                }
+                string _url = DirectoryHelper.GetModelUrl(newFile);
                 string _filePath = Path.Combine(dirFullpath, newFile);
                 //
                 ModelResponse newRecord = new ModelResponse()
@@ -174,29 +222,59 @@ namespace ZMM.App.Controllers
                 //write to Ilogger
                 string message = ex.Message;
             }
-            string jsonStr = JsonConvert.SerializeObject(_data, Formatting.None); 
+            string jsonStr = JsonConvert.SerializeObject(_data, Formatting.None);
             return Json(_data);
         }
         #endregion
-    
+
         #region delete task
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTaskAsync(string id)
-        { 
+        {
             string response = string.Empty;
-
+            //
+            SchedulerPayload.Delete(id);
+            //
             response = await nnclient.DeleteRunningTask(id);
-            if(!string.IsNullOrEmpty(response))    
-            {
-                JObject jsonObj = JObject.Parse(response);
-                return Json(jsonObj);
-            }       
-            else
-            {
-                return BadRequest("error!");
-            }      
-
+            // if (!string.IsNullOrEmpty(response))
+            // {
+            //     JObject jsonObj = JObject.Parse(response);
+            //     return Json(jsonObj);
+            // }
+            // else
+            // {                
+            //     return BadRequest("error!");
+            // }
+            return Json(new { message = "Task deleted.", id = id });
         }
+
+        #endregion
+
+        #region Scheduler related
+        //
+        #region Stop running scheduler
+        [HttpGet("{id}/stop")]
+        public async Task<IActionResult> PauseScheduledJob(string id)
+        {
+            string response = string.Empty;
+            string filePath = Helpers.Common.FilePathHelper.GetFilePathById(id, CodePayload.Get());
+
+            ISchedulerFactory schfack = new StdSchedulerFactory();
+            IScheduler scheduler = await schfack.GetScheduler();
+            await scheduler.PauseJob(new JobKey(filePath));
+
+            var resp = new
+            {
+                id = id,
+                taskName = id,
+                createdOn = "",
+                type = "Code",
+                cronExpression = "0 * * ? * *",
+                status = "STOPPED"
+            };
+            return Ok(resp);
+        }
+        #endregion
 
         #endregion
     }

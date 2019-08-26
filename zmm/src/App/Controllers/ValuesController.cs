@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ZMM.App.PyServicesClient;
 using ZMM.Helpers.ZMMDirectory;
+using ZMM.Models.Payloads;
 using ZMM.Tasks;
 using ZMM.Tools.JNB;
 
@@ -18,29 +20,30 @@ namespace ZMM.App.Controllers
     public class ValuesController : Controller
     {
 
-       private readonly IPyJupyterServiceClient jupyterClient;   
-       readonly ILogger<ValuesController>  Logger;
+        private readonly IPyJupyterServiceClient jupyterClient;
+        readonly ILogger<ValuesController> Logger;
 
-       private readonly IConfiguration configuration;
+        private readonly IConfiguration configuration;
 
-       public ValuesController(IConfiguration configuration, ILogger<ValuesController> log , IPyJupyterServiceClient _jupyterClient)
-       {
-           this.jupyterClient = _jupyterClient;
-           this.Logger = log;
-           this.configuration = configuration;
-       }
-       IConfiguration Configuration { get; }
-
-         [HttpGet("path")]
-        public string GetPath()
+        public ValuesController(IConfiguration configuration, ILogger<ValuesController> log, IPyJupyterServiceClient _jupyterClient)
         {
-            return DirectoryHelper.fileUploadDirectoryPath;
+            this.jupyterClient = _jupyterClient;
+            this.Logger = log;
+            this.configuration = configuration;
+        }
+        IConfiguration Configuration { get; }
+
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Json(SchedulerPayload.Get());
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Post([FromBody]string value)
         {
+            return Json(value);
         }
 
         // PUT api/values/5
@@ -55,48 +58,19 @@ namespace ZMM.App.Controllers
         {
         }
 
-        #region To stop any running instance of Jupyter Notebook 
-        //This is work around code to stop jupyter notebook instance.
-        [HttpGet]        
-        public JsonResult Stop()
-        {  
-            string ResourceName = Request.Query["name"].ToString();
-            string ResourceNameWithoutExtension = ResourceName.Substring(0, ResourceName.LastIndexOf("."));
-            string notebookDir = DirectoryHelper.GetCodeDirectoryPath() + ResourceNameWithoutExtension;
-            string ResourcePath = notebookDir + System.IO.Path.DirectorySeparatorChar + ResourceName; //http://localhost:5000//uploads/TestUser/code/HelloClass2.ipynb
-            string Message = "Error";
-            System.Console.WriteLine("Resource Path " + ResourcePath);
-            Dictionary<string,string> Result = new Dictionary<string, string>(); 
-            var obj = new
-            {         
-                base_url = "/",             
-                NotebookDir = $"{notebookDir}",
-                ResourcePath = $"{ResourcePath}"
-            };
-            try
-            {              
-                   
-                JupyterNotebook  JNBTool = this.jupyterClient.GetJupyterNotebookTool();                 
-                ITask JupyterNoteBookTask = JNBTool.FindTask(ResourcePath);         
-                if(JupyterNoteBookTask.IsEmpty())
-                {
-                    Message = "Error : There is no such task running";
-                }   
-                else
-                {
-                    JNBTool.StopTask(ResourcePath);
-                    Message = "Notebook successfully stop";                    
-                }
-                
-            }
-            catch(Exception ex)
+        //Job scheduler
+        [HttpPost("myjob")]
+        public IActionResult ScheduleJob()
+        {
+            string reqBody = "";
+            using (var reader = new StreamReader(Request.Body))
             {
-                Message =  ex.Message;
+                var body = reader.ReadToEnd();
+                reqBody = body.ToString();
             }
-            Result.Add("Result", Message);
-            return new JsonResult(Result);
+            return Ok(new { status = "Job Added to scheduler.", bodydata=reqBody });
         }
-        #endregion
+
     }
 }
 

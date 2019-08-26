@@ -53,7 +53,7 @@ namespace ZMM.App.Controllers
         private List<DataResponse> responseData;
         private List<ModelResponse> modelResponseData;
         private List<CodeResponse> codeResponseData;
-        private static string[] extensions = new[] { "csv", "jpg", "jpeg", "png", "json", "webp", "zip", "mp4" };
+        private static string[] extensions = new[] { "csv", "jpg", "jpeg", "png", "json", "webp", "zip", "mp4","txt" };
         string zipOr7zPath = string.Empty;
         string extractPath = string.Empty;
         string fileName = string.Empty;
@@ -285,6 +285,10 @@ namespace ZMM.App.Controllers
                             {
                                 type = "VIDEO";
                             }
+                            else if (formFile.ContentType.Contains("text") || fileExt == "txt")
+                            {
+                                type = "TEXT";
+                            }
                             else
                             {
                                 type = "UNRECOGNIZED";
@@ -366,8 +370,9 @@ namespace ZMM.App.Controllers
             {
                 response = await _client.GetPreprocessingForm(filePath);
                 if (!string.IsNullOrEmpty(response))
-                    jsonObj = JObject.Parse(response);
-
+                {
+                   jsonObj = JObject.Parse(response);
+                }
                 return Json(jsonObj);
             }
             catch (Exception ex)
@@ -400,6 +405,33 @@ namespace ZMM.App.Controllers
 
             if (!string.IsNullOrEmpty(response))
             {
+                var jo = JsonConvert.DeserializeObject<AutoMLResponse>(response);
+                jo.executedAt = DateTime.Now;
+                List<AutoMLResponse> tresp = new List<AutoMLResponse>();
+                tresp.Add(jo);
+                //
+                //add to scheduler payload 
+                SchedulerResponse schJob = new SchedulerResponse()
+                {
+                    CreatedOn = DateTime.Now.ToString(),
+                    CronExpression = "",
+                    DateCreated = DateTime.Now,
+                    EditedOn = DateTime.Now.ToString(),
+                    FilePath = "",
+                    Id = id,
+                    Name = id,
+                    Type = "AUTOML",
+                    Url = "",
+                    Recurrence = "ONE_TIME",
+                    StartDate = "",
+                    StartTimeH = "",
+                    StartTimeM = "",
+                    ZMKResponse = tresp.ToList<object>(),
+                    Status = "COMPLETED"
+                };
+                SchedulerPayload.Create(schJob);
+
+                //
                 JObject jsonObj = JObject.Parse(response);
                 return Json(jsonObj);
             }

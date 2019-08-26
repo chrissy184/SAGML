@@ -45,6 +45,7 @@ export const ApiRoutes = {
     task: 'task',
     taskGet: (id: number) => `task/${id}`,
     taskSaveModel: (id: number) => `task/${id}/saveModel`,
+    taskStop: (id: number) => `task/${id}/stop`,
 
     instance: 'instances',
     instanceKill: (id: string) => `instances/${id}`,
