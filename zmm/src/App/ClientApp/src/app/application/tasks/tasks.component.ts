@@ -68,7 +68,7 @@ export class TasksComponent implements OnInit {
         .pipe(finalize(() => { this.isContentLoading = false; }))
         .subscribe(response => {
             this.selectedTask = response;
-            this.dataSourceTaskHistory = new MatTableDataSource(response.zmkResponse);
+            this.dataSourceTaskHistory = new MatTableDataSource(response.history);
             this.dataSourceTaskHistory.paginator = this.paginator;
             this.dataSourceTaskHistory.sort = this.sort;
             //     this.dataSource.sort = this.sort;
