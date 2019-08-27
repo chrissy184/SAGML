@@ -44,7 +44,7 @@
           Schedule: {{ formData.cronExpression | cronstrue }}
         </div>
       </ng-template>
-      <ng-template [ngIf]="option.trainModelAction === 'TRAIN' || option.fileStatus !== 'Incomplete'">
+      <ng-template [ngIf]="option.trainModelAction === 'TRAIN'">
 
         <mat-form-field class="w-100">
           <mat-select [(ngModel)]="formData.problemType" placeholder="Problem Type" name="problemType" required>
