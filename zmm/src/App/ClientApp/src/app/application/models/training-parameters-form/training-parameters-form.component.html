@@ -44,69 +44,72 @@
           Schedule: {{ formData.cronExpression | cronstrue }}
         </div>
       </ng-template>
-      <mat-form-field class="w-100">
-        <mat-select [(ngModel)]="formData.problemType" placeholder="Problem Type" name="problemType" required>
-          <mat-option *ngFor="let option of problemTypeOptions" [value]="option">{{option}}</mat-option>
-        </mat-select>
-        <mat-error>required</mat-error>
-      </mat-form-field>
+      <ng-template [ngIf]="option.trainModelAction === 'TRAIN' || option.fileStatus !== 'Incomplete'">
 
-      <mat-form-field class="w-100">
-        <input matInput [(ngModel)]="formData.batchSize" placeholder="Batch Size" name="batchSize" type="number"
-          required>
-        <mat-error>required</mat-error>
-      </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-select [(ngModel)]="formData.problemType" placeholder="Problem Type" name="problemType" required>
+            <mat-option *ngFor="let option of problemTypeOptions" [value]="option">{{option}}</mat-option>
+          </mat-select>
+          <mat-error>required</mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="w-100">
-        <input matInput [(ngModel)]="formData.epoch" placeholder="Epoch" name="epoch" type="number" required>
-        <mat-error>required</mat-error>
-      </mat-form-field>
+        <mat-form-field class="w-100">
+          <input matInput [(ngModel)]="formData.batchSize" placeholder="Batch Size" name="batchSize" type="number"
+            required>
+          <mat-error>required</mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="w-100">
-        <input matInput [(ngModel)]="formData.stepPerEpoch" placeholder="Steps Per Epoch" name="stepPerEpoch"
-          type="number" required>
-        <mat-error>required</mat-error>
-      </mat-form-field>
+        <mat-form-field class="w-100">
+          <input matInput [(ngModel)]="formData.epoch" placeholder="Epoch" name="epoch" type="number" required>
+          <mat-error>required</mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="w-100">
-        <input matInput [(ngModel)]="formData.learningRate" placeholder="Learning Rate" name="learningRate"
-          type="number" required>
-        <mat-error>required</mat-error>
-      </mat-form-field>
+        <mat-form-field class="w-100">
+          <input matInput [(ngModel)]="formData.stepPerEpoch" placeholder="Steps Per Epoch" name="stepPerEpoch"
+            type="number" required>
+          <mat-error>required</mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="w-100">
-        <mat-select [(ngModel)]="formData.loss" placeholder="Loss" name="loss" required>
-          <mat-option *ngFor="let option of lossOptions" [value]="option">{{option}}</mat-option>
-        </mat-select>
-        <mat-error>required</mat-error>
-      </mat-form-field>
+        <mat-form-field class="w-100">
+          <input matInput [(ngModel)]="formData.learningRate" placeholder="Learning Rate" name="learningRate"
+            type="number" required>
+          <mat-error>required</mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="w-100">
-        <mat-select [(ngModel)]="formData.metrics" placeholder="Metrics" name="metrics" multiple required>
-          <mat-option *ngFor="let option of metricsOptions" [value]="option">{{option}}</mat-option>
-        </mat-select>
-        <mat-error>required</mat-error>
-      </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-select [(ngModel)]="formData.loss" placeholder="Loss" name="loss" required>
+            <mat-option *ngFor="let option of lossOptions" [value]="option">{{option}}</mat-option>
+          </mat-select>
+          <mat-error>required</mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="w-100">
-        <mat-select [(ngModel)]="formData.optimizer" placeholder="Optimizer" name="optimizer" required>
-          <mat-option *ngFor="let option of optimizerOptions" [value]="option">{{option}}</mat-option>
-        </mat-select>
-        <mat-error>required</mat-error>
-      </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-select [(ngModel)]="formData.metrics" placeholder="Metrics" name="metrics" multiple required>
+            <mat-option *ngFor="let option of metricsOptions" [value]="option">{{option}}</mat-option>
+          </mat-select>
+          <mat-error>required</mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="w-100">
-        <input matInput [(ngModel)]="formData.testSize" placeholder="Test Size" name="testSize" type="number" required>
-        <mat-error>required</mat-error>
-      </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-select [(ngModel)]="formData.optimizer" placeholder="Optimizer" name="optimizer" required>
+            <mat-option *ngFor="let option of optimizerOptions" [value]="option">{{option}}</mat-option>
+          </mat-select>
+          <mat-error>required</mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="w-100">
-        <mat-select [(ngModel)]="formData.scriptOutput" placeholder="Script Output" name="scriptOutput" required>
-          <mat-option *ngFor="let option of scriptOutputOptions" [value]="option">{{option}}</mat-option>
-        </mat-select>
-        <mat-error>required</mat-error>
-      </mat-form-field>
+        <mat-form-field class="w-100">
+          <input matInput [(ngModel)]="formData.testSize" placeholder="Test Size" name="testSize" type="number"
+            required>
+          <mat-error>required</mat-error>
+        </mat-form-field>
 
+        <mat-form-field class="w-100">
+          <mat-select [(ngModel)]="formData.scriptOutput" placeholder="Script Output" name="scriptOutput" required>
+            <mat-option *ngFor="let option of scriptOutputOptions" [value]="option">{{option}}</mat-option>
+          </mat-select>
+          <mat-error>required</mat-error>
+        </mat-form-field>
+      </ng-template>
     </form>
   </div>
 </div>

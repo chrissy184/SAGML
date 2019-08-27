@@ -97,11 +97,12 @@
                   <span class="mdi text-secondary mdi-progress-download"></span>
                 </button>
 
-
-                <button mat-icon-button *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork'"
-                  (click)="trainPmml()" matTooltip="Train pmml">
-                  <span class="mdi mdi-settings  text-secondary"></span>
+                <button mat-icon-button
+                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' && selectedModel?.fileStatus !== 'Incomplete'"
+                  (click)="trainPmml('RETRAIN')" matTooltip="Re-train Model">
+                  <span class="mdi mdi-settings text-secondary"></span>
                 </button>
+
                 <button *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork'" mat-icon-button (click)="editpmml()"
                   matTooltip="Edit Model">
                   <span class="mdi mdi-square-edit-outline  text-secondary"></span>
@@ -124,6 +125,10 @@
                   <ng-template [ngIf]="selectedModel?.modelGeneratedFrom">
                     <dt class="col-sm-3 text-truncate text-capitalize">Model</dt>
                     <dd class="col-sm-9">{{ selectedModel?.modelGeneratedFrom }}</dd>
+                  </ng-template>
+                  <ng-template [ngIf]="selectedModel?.fileStatus">
+                    <dt class="col-sm-3 text-truncate text-capitalize">File Status</dt>
+                    <dd class="col-sm-9">{{ selectedModel?.fileStatus }}</dd>
                   </ng-template>
                   <dt class="col-sm-3 text-truncate text-capitalize">Loaded in Memory</dt>
                   <dd class="col-sm-9">
@@ -189,8 +194,8 @@
                   <span class="mdi mdi-play text-secondary"></span>
                 </button> -->
                 <button mat-icon-button *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork'"
-                  (click)="trainPmml()" matTooltip="Train pmml">
-                  <span class="mdi mdi-settings text-secondary"></span>
+                  (click)="trainPmml('TRAIN')" matTooltip="Train Model">
+                  <span class="mdi mdi-settings  text-secondary"></span>
                 </button>
                 <button mat-icon-button matTooltip="Cancel" (click)="closeEditor()">
                   <span class="mdi mdi-close text-secondary"></span>
@@ -234,7 +239,7 @@
 
     </mat-tab-group>
     <app-training-parameters-form *ngIf="showTrainingFormPanel" (close)="showTrainingFormPanel = false;"
-      (selected)="onTrainingFormDataSubmit($event)"></app-training-parameters-form>
+      (selected)="onTrainingFormDataSubmit($event)" [option]="selectedModel"></app-training-parameters-form>
     <app-compile-parameter-form [showCompileError]="showCompileError" *ngIf="showCompileFormPanel"
       (close)="showCompileFormPanel = false;" (selected)="onCompileFormDataSubmit($event)"></app-compile-parameter-form>
     <app-filter-panel [option]="filterConfig" *ngIf="showFilterPanel" (close)="showFilterPanel = false;"
@@ -277,7 +282,8 @@
               <span innerHtml="{{ item.name | highlight: filter }}"></span>
             </mat-checkbox>
           </li>
-          <li *ngIf="!(publishModelDataList && publishModelDataList.length) && !isLoading" class="list-group-item text-truncate text-center text-muted">
+          <li *ngIf="!(publishModelDataList && publishModelDataList.length) && !isLoading"
+            class="list-group-item text-truncate text-center text-muted">
             No data available
           </li>
         </ul>

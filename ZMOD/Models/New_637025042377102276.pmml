@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_3" version="4.3Ext">
+<Header copyright="Copyright (c) 2018 Software AG" description="Neural Network Model">
+<Timestamp>2019-08-27 12:03:57.10000</Timestamp>
+</Header>
+<DeepNetwork>
+</DeepNetwork>
+</PMML>
