@@ -400,14 +400,15 @@ class AutoMLTrainer:
             finalPipe=Pipeline(pipelineList)
             finalPipe.fit(data[featureVar],data[targetVar])
             finalPMMLfile=dataFolder+newPMMLFileName
+            finalPMMLfile='../ZMOD/Models/'+newPMMLFileName
             finalpklfile=dataFolder+newPMMLFileName+'.pkl'
             joblib.dump(finalPipe,finalpklfile)
             try:
                 if pp[-1][1].__class__.__name__ in ['XGBClassifier','XGBRegressor']:
-                    from nyokaBase.xgboost.xgboost_to_pmml import xgboost_to_pmml
+                    from nyokaBaseOld.xgboost.xgboost_to_pmml import xgboost_to_pmml
                     xgboost_to_pmml(finalPipe,featureVar,targetVar,finalPMMLfile)
                 else:
-                    from nyokaBase.skl.skl_to_pmml import skl_to_pmml
+                    from nyokaBaseOld.skl.skl_to_pmml import skl_to_pmml
                     skl_to_pmml(finalPipe, featureVar, targetVar, finalPMMLfile)
                 procComp=False
                 print ('>>>>>>>>>>>>>>>>>>>>>>> Success')

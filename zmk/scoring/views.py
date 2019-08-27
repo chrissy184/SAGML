@@ -50,7 +50,7 @@ class ModelsView(APIView):
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
 		print('filpath >>>>>>>>>>>>>>>> ',filePath)
-		return Scoring.loadModelfile(filePath,idfordata)
+		return Scoring().loadModelfile(filePath,idfordata)
 
 
 class ModelOperationView(APIView):
@@ -65,7 +65,7 @@ class ModelOperationView(APIView):
 
 	def delete(self,requests,modelName):
 		print('>>>>>>>>>>>>>>',modelName)
-		return Scoring.removeModelfromMemory(modelName)
+		return Scoring().removeModelfromMemory(modelName)
 
 
 
@@ -88,38 +88,59 @@ class ScoreView(APIView):
 				raise Exception("Invalid Request Parameter")
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return Scoring.predicttestdata(None,modelName,jsonData)
+		return Scoring().predictTestDataWithModification(None,modelName,jsonData)
 
 
 	def post(self,requests,modelName):
+		# print (modelName)
 		try:
 			filePath=requests.POST.get('filePath')
 			if not filePath:
 				raise Exception("Invalid Request Parameter")
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return Scoring.predicttestdata(filePath,modelName)
+		return Scoring().predictTestDataWithModification(filePath,modelName,None)
 
 
-class ObjDetectionScoreView(APIView):
-	http_method_names=['post','get']
+# class ObjDetectionScoreView(APIView):
+# 	http_method_names=['post','get']
 
-	def dispatch(self,requests,modelName):
-		if requests.method=='POST':
-			result=self.post(requests,modelName)
-		else:
-			return JsonResponse({},status=405)
-		return result
+# 	def dispatch(self,requests,modelName):
+# 		if requests.method=='POST':
+# 			result=self.post(requests,modelName)
+# 		else:
+# 			return JsonResponse({},status=405)
+# 		return result
 
-	def post(self,requests,modelName):
-		try:
-			filePath=requests.POST.get('filePath')
-			if not filePath:
-				raise Exception("Invalid Request Parameter")
-		except:
-			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return Scoring.detectObject(filePath,modelName)
+# 	def post(self,requests,modelName):
+# 		try:
+# 			filePath=requests.POST.get('filePath')
+# 			if not filePath:
+# 				raise Exception("Invalid Request Parameter")
+# 		except:
+# 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
+# 		return Scoring.detectObject(filePath,modelName)
 
 
 			
 
+class ScoreViewReturnJson(APIView):
+	http_method_names=['get']
+
+	def dispatch(self,requests,modelName):
+		if requests.method=='POST':
+			result=self.post(requests,modelName)
+		elif requests.method=='GET':
+			result=self.get(requests,modelName)
+		else:
+			return JsonResponse({},status=405)
+		return result
+
+	def get(self,requests,modelName):
+		try:
+			jsonData = json.loads(requests.GET['jsonRecord'])
+			if not jsonData:
+				raise Exception("Invalid Request Parameter")
+		except:
+			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
+		return Scoring().predictTestDataWithModificationReturnJson(None,modelName,jsonData)

@@ -23,12 +23,14 @@ from rest_framework.documentation import include_docs_urls
 
 
 from nyokaserver.nyokaServerClass import create_lock
+from scoring.scoringClass import create_lockForModel
 from nyokaserver.nyokaServerClass import NyokaServer
-from trainModel.views import RunningTaskView,TrainAutoMLView,RunningTaskOperationView,TrainNNView, ModelCompileView,MRCNNView
+from trainModel.views import RunningTaskView,TrainAutoMLView,RunningTaskNameOperationView,RunningTaskOperationView,TrainNNView, ModelCompileView,MRCNNView
 
 from nyokaserver.views import PMMLView,PMMLOpeartionView,PMMLLayerView,PMMLGlobalView
-from scoring.views import ScoreView,ModelsView,ModelOperationView,ObjDetectionScoreView
-from utility.views import UtilityView,SwaggerUtilityView,SwaggerView,ImageGeneratorUtilityView,CodeUtilityView
+from scoring.views import ScoreView,ModelsView,ModelOperationView,ScoreViewReturnJson#,ObjDetectionScoreView
+from utility.views import UtilityView,SwaggerUtilityView,SwaggerView,ImageGeneratorUtilityView,CodeUtilityView,CodeUtilityViewNewUpdate
+from executionEngine.views import ModelOperation2View,NewScoreOperation2View,NewTrainOperation2View,NewCodeOperation2View,NewScoreOperation2ViewLong,NewCodeExecution2View
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -39,7 +41,7 @@ from testUseCase.initLog import initiateLogging
 initiateLogging()
 
 create_lock()
-
+create_lockForModel()
 
 pref='api/v1/'
 
@@ -50,6 +52,7 @@ urlpatterns=[
     path(pref+'models',csrf_exempt(ModelsView.as_view()), name="Models"),
     path(pref+'models/<modelName>',csrf_exempt(ModelOperationView.as_view()), name="Models"),
     path(pref+'models/<modelName>/score',csrf_exempt(ScoreView.as_view()), name="Models"),
+    path(pref+'models/<modelName>/scoreJson',csrf_exempt(ScoreViewReturnJson.as_view()), name="Models"),
 
     path(pref+'listOfLayers',NyokaServer.listOfLayers,name='listOfLayers'),
     path(pref+'pmml',csrf_exempt(PMMLView.as_view()), name="PMML"),
@@ -58,14 +61,26 @@ urlpatterns=[
     path(pref+'pmml/<projectID>/layer',csrf_exempt(PMMLLayerView.as_view()), name="PMML"),
 
     path(pref+'runningTasks',csrf_exempt(RunningTaskView.as_view()), name="Running Tasks"),
+    path(pref+'runningTasks/<taskName>',csrf_exempt(RunningTaskNameOperationView.as_view()), name="Running Tasks"),
     path(pref+'runningTasks/<id_for_task>',csrf_exempt(RunningTaskOperationView.as_view()), name="Running Tasks"),
     path(pref+'trainAutoMLModel',csrf_exempt(TrainAutoMLView.as_view()), name="Train Model"),
     path(pref+'trainNNModel',csrf_exempt(TrainNNView.as_view()), name="Train Model"),
     path(pref+'objectDetection/train/mrcnn',csrf_exempt(MRCNNView.as_view()), name="Train MRCNN"),
     path(pref+'code',csrf_exempt(CodeUtilityView.as_view()), name="Code Utility"),
+    path(pref+'codeExecute',csrf_exempt(CodeUtilityViewNewUpdate.as_view()), name="Code Utility"),
     path(pref+'swagger',csrf_exempt(SwaggerView.as_view()), name='swagger'),
     path(pref,csrf_exempt(SwaggerView.as_view()),name='swagger'),
     path('',csrf_exempt(SwaggerView.as_view()),name='swagger'),
-    path('swagger/v1/swagger.json',csrf_exempt(SwaggerUtilityView.as_view()),name='swagger')
+    path('swagger/v1/swagger.json',csrf_exempt(SwaggerUtilityView.as_view()),name='swagger'),
+
+    path(pref+'newloadmodels',csrf_exempt(ModelOperation2View.as_view()), name="NewModelOperations"),
+    path(pref+'newloadmodels/<modelName>/scoreJson',csrf_exempt(NewScoreOperation2View.as_view()), name="NewScoreOperations"),
+    path(pref+'newloadmodels/<modelName>/scoreJsonLongProcess',csrf_exempt(NewScoreOperation2ViewLong.as_view()), name="NewScoreOperations"),
+    path(pref+'newtrainmodels/<modelName>',csrf_exempt(NewTrainOperation2View.as_view()), name="NewTrainingView"),
+
+    path(pref+'codeLoad',csrf_exempt(NewCodeOperation2View.as_view()), name="Code Utility"),
+    path(pref+'codeLoad/<scriptName>/Execute',csrf_exempt(NewCodeExecution2View.as_view()), name="Code Utility"),
+
+
 ]
 

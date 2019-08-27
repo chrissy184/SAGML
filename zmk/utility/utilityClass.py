@@ -120,3 +120,10 @@ class Utility:
 		runTaskListSorted=sorted(RUNNING_TASK_MEMORY, key=itemgetter('createdOn'),reverse=True)
 		runningTask={'runningTask':runTaskListSorted}
 		return JsonResponse(runningTask,status=200)
+
+	def taskUpdateByTaskName(taskName):
+		print ('taskName >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ',taskName)
+		allTaskList=RUNNING_TASK_MEMORY
+		filtListofTask=[i for i in allTaskList if i['taskName']==taskName]
+		runningTask={'runningTask':filtListofTask}
+		return JsonResponse(runningTask,status=200)

@@ -386,7 +386,7 @@ class NyokaUtilities:
         for j in mm:
             if j in ['Model information','DeepNetwork information']:
                 if j =='Model information':
-                    allInfo['modelGeneratedFrom']='Sklearn'
+                    allInfo['modelGeneratedFrom']='DeepNetwork'
                 else:
                     allInfo['modelGeneratedFrom']='DeepNetwork'
                 for k in mm[j]:
@@ -400,6 +400,7 @@ class NyokaUtilities:
                 tempDict['property']=j
                 tempDict['value']=mm[j]
                 allInfo['information'].append(tempDict)
+                allInfo['fileStatus']='Incomplete'
         return allInfo
 
 

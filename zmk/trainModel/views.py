@@ -82,6 +82,20 @@ class RunningTaskOperationView(APIView):
 	def get(self,requests,id_for_task):
 		return Training.statusOfModel(id_for_task)
 
+class RunningTaskNameOperationView(APIView):
+	http_method_names=['get','delete']
+
+	def dispatch(self,requests,taskName):
+		if requests.method=='GET':
+			result=self.get(requests,taskName)
+		elif requests.method=='DELETE':
+			result=self.delete(requests,taskName)
+		else:
+			return JsonResponse({},status=405)
+		return result
+
+	def get(self,requests,taskName):
+		return Utility.taskUpdateByTaskName(taskName)
 
 
 class TrainAutoMLView(APIView):

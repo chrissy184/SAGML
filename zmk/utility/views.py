@@ -26,7 +26,7 @@ from utility.utilityClass import Utility
 from django.template import Context, loader
 
 
-from utility.codeUtilityClass import CodeUtilityClass
+from utility.codeUtilityClass import CodeUtilityClass,CodeUtilityClassNew
 
 
 class CodeUtilityView(APIView):
@@ -54,6 +54,33 @@ class CodeUtilityView(APIView):
 		except:
 			params=userInput['params']
 		return CodeUtilityClass.executeCode(filePath,params)
+
+
+class CodeUtilityViewNewUpdate(APIView):
+	http_method_names=['get','post']
+
+	def dispatch(self,requests):
+		if requests.method=='GET':
+			result=self.get(requests)
+		elif requests.method=='POST':
+			result=self.post(requests)
+		return result
+
+	def get(self,requests):
+		filePath = requests.GET['filePath']
+		return CodeUtilityClassNew.compileCode(filePath)
+
+	def post(self,requests):
+		userInput = json.loads(requests.body)
+		filePath = userInput['filePath']
+		# print (userInput)
+		# print ('>>>>>>>>>>>>>>>',filePath)
+		import ast
+		try:
+			params = ast.literal_eval(userInput['params'])
+		except:
+			params=userInput['params']
+		return CodeUtilityClassNew.executeCode(filePath,params)
 
 class SwaggerView(APIView):
 	http_method_names=['get']

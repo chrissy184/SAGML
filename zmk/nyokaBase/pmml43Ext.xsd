@@ -446,6 +446,7 @@
             <xs:attribute name="modelName" type="xs:string" use="optional"/>
             <xs:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
             <xs:attribute name="algorithmName" type="xs:string" use="optional"/>
+            <xs:attribute name="taskType" type="TRAINORSCORE" use="required"/>
             <xs:attribute name="modelClass" use="required">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
@@ -656,6 +657,7 @@
                 <xs:element ref="Taxonomy" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
             <xs:attribute name="numberOfFields" type="xs:nonNegativeInteger"/>
+			<xs:attribute name="for" type="xs:string" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -806,6 +808,7 @@
             <xs:attribute name="normalizationMethod" type="NN-NORMALIZATION-METHOD" default="none"/>
             <xs:attribute name="numberOfLayers" type="xs:nonNegativeInteger"/>
             <xs:attribute name="isScorable" type="xs:boolean" default="true"/>
+			<xs:attribute name="taskType" type="TRAINORSCORE" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="NetworkLayer">
@@ -816,6 +819,7 @@
                 <xs:element ref="LayerParameters"/>
                 <xs:element ref="LayerWeights" minOccurs="0"/>
                 <xs:element ref="LayerBias" minOccurs="0"/>
+				<xs:element ref="LayerRecurrentWeights" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="normalizationMethod" type="NN-NORMALIZATION-METHOD" default="none"/>
             <xs:attribute name="layerType" type="LAYER-TYPE" use="required"/>
@@ -1090,6 +1094,17 @@
             <xs:attribute name="weightsFlattenAxis" type="xs:string"/>
         </xs:complexType>
     </xs:element>
+	
+	<xs:element name="LayerRecurrentWeights">
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="recurrentWeightsShape" type="xs:string"/>
+            <xs:attribute name="recurrentWeightsFlattenAxis" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+	
     <xs:element name="LayerBias">
         <xs:complexType mixed="true">
             <xs:sequence>
@@ -1177,6 +1192,13 @@
             <xs:attribute name="pool_shape" type="xs:string"/>
             <xs:attribute name="proposal_count" type="INT-NUMBER"/>
             <xs:attribute name="nms_threshold" type="REAL-NUMBER"/>
+			<xs:attribute name="unroll" type="xs:boolean"/>
+			<xs:attribute name="use_bias" type="xs:boolean"/>
+			<xs:attribute name="unit_forget_bias" type="xs:boolean"/>
+			<xs:attribute name="recurrent_activation" type="xs:string"/>
+			<xs:attribute name="dropout" type="REAL-NUMBER"/>
+			<xs:attribute name="recurrent_dropout" type="REAL-NUMBER"/>
+            <xs:attribute name="batch_input_shape" type="xs:string"/>
         </xs:complexType>
     </xs:element>
     <xs:simpleType name="DNN-ACTIVATION-FUNCTION">
@@ -1625,6 +1647,7 @@
             <xs:sequence>
                 <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
+			<xs:attribute name="for" type="xs:string" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:simpleType name="MINING-FUNCTION">
@@ -1648,6 +1671,7 @@
                     <xs:attribute name="extender" type="xs:string" use="optional"/>
                     <xs:attribute name="name" type="xs:string" use="optional"/>
                     <xs:attribute name="value" type="xs:string" use="optional"/>
+                    <xs:attribute name="for" type="xs:string" use="required"/>
                 </xs:restriction>
             </xs:complexContent>
         </xs:complexType>
@@ -1806,6 +1830,23 @@
             <xs:enumeration value="postprocessing"/>
         </xs:restriction>
     </xs:simpleType>
+	
+	<xs:simpleType name="TRAINORSCORE">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="train"/>
+            <xs:enumeration value="score"/>
+			<xs:enumeration value="trainAndscore"/>
+        </xs:restriction>
+    </xs:simpleType>
+	
+	<xs:simpleType name="SCRIPTTASK">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="train"/>
+            <xs:enumeration value="score"/>
+			<xs:enumeration value="trainAndscore"/>
+			<xs:enumeration value="postProcess"/>
+        </xs:restriction>
+    </xs:simpleType>
 
     <!-- <xs:simpleType name="LANGUAGES">
         <xs:restriction base="xs:string">
@@ -1823,6 +1864,7 @@
             <!-- <xs:attribute name="id" type="xs:string"/> -->
             <xs:attribute name="for" type="xs:string" use="required"/>
             <xs:attribute name="class" type="PROCESSING" use="required"/>
+			<xs:attribute name="scriptPurpose" type="SCRIPTTASK" use="required"/>
             <!-- <xs:attribute name="type" type="LANGUAGES"/> -->
             <xs:anyAttribute/>
         </xs:complexType>
@@ -1878,6 +1920,7 @@
             <xs:attribute name="instanceIdVariable" type="xs:string"/>
             <xs:attribute name="threshold" type="REAL-NUMBER" default="0.001"/>
             <xs:attribute name="isScorable" type="xs:boolean" default="true"/>
+            <xs:attribute name="taskType" type="TRAINORSCORE" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="TrainingInstances">
@@ -2284,6 +2327,7 @@
             <xs:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
             <xs:attribute name="algorithmName" type="xs:string" use="optional"/>
             <xs:attribute name="isScorable" type="xs:boolean" default="true"/>
+            <xs:attribute name="taskType" type="TRAINORSCORE" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="Segmentation">
@@ -2407,6 +2451,7 @@
             <xs:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
             <xs:attribute name="algorithmName" type="xs:string"/>
             <xs:attribute name="isScorable" type="xs:boolean" default="true"/>
+            <xs:attribute name="taskType" type="TRAINORSCORE" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="BayesInputs">
@@ -2512,6 +2557,7 @@
             <xs:attribute name="altitude" type="REAL-NUMBER" default="1.0"/>
             <xs:attribute name="numberOfLayers" type="xs:nonNegativeInteger"/>
             <xs:attribute name="isScorable" type="xs:boolean" default="true"/>
+            <xs:attribute name="taskType" type="TRAINORSCORE" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -2778,6 +2824,7 @@
 			<xs:attribute name="sampleDataSize" type="xs:string" />
             <xs:attribute name="functionName" type="MINING-FUNCTION" use="required" />
             <xs:attribute name="algorithmType" type="ALGORITHM-TYPE" use="required" />
+            <xs:attribute name="taskType" type="TRAINORSCORE" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -2818,6 +2865,7 @@
             <xs:attribute name="targetFieldName" type="FIELD-NAME" use="optional"/>
             <xs:attribute name="normalizationMethod" type="REGRESSIONNORMALIZATIONMETHOD" default="none"/>
             <xs:attribute name="isScorable" type="xs:boolean" default="true"/>
+			<xs:attribute name="taskType" type="TRAINORSCORE" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -3439,6 +3487,7 @@
             <xs:attribute name="classificationMethod" type="SVM-CLASSIFICATION-METHOD" use="optional" default="OneAgainstAll"/>
             <xs:attribute name="maxWins" type="xs:boolean" default="false"/>
             <xs:attribute name="isScorable" type="xs:boolean" default="true"/>
+            <xs:attribute name="taskType" type="TRAINORSCORE" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:simpleType name="SVM-CLASSIFICATION-METHOD">
@@ -4512,6 +4561,7 @@
                 <xs:element ref="DefineFunction" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="DerivedField" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
+		<xs:attribute name="for" type="xs:string" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -4746,6 +4796,7 @@
             <xs:attribute name="missingValueStrategy" type="MISSING-VALUE-STRATEGY" default="none"/>
             <xs:attribute name="missingValuePenalty" type="PROB-NUMBER" default="1.0"/>
             <xs:attribute name="noTrueChildStrategy" type="NO-TRUE-CHILD-STRATEGY" default="returnNullPrediction"/>
+            <xs:attribute name="taskType" type="TRAINORSCORE" use="required"/>
             <xs:attribute name="splitCharacteristic" default="multiSplit">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">

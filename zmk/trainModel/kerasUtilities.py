@@ -57,6 +57,18 @@ class KerasUtilities:
             json.dump(data_details, filetosave)
         return 'Success'
 
+    def updateStatusofProcess(self,filePath,updatedStatus):
+        sFile=open(filePath,'r')
+        sFileText=sFile.read()
+        sFile.close()
+        data_details=json.loads(sFileText)
+        data_details['status']=updatedStatus
+        if updatedStatus=='Complete':
+                data_details['completedOn']=str(datetime.datetime.now())
+        with open(filePath,'w') as filetosave:
+            json.dump(data_details, filetosave)
+        return 'Success'
+
     def getPredClasses(self,nyoka_pmml_obj):
         targetVar = self.getTargetVariable(nyoka_pmml_obj)
         tempObj=nyoka_pmml_obj.get_DataDictionary()
@@ -194,15 +206,19 @@ class KerasUtilities:
             #Sklearn Model
             else:
                 print ('Next Step 2 >>>>>>>>>>>>')
-                from nyokaBase.skl.pmml_to_skl import pmml_to_skl
+                from nyokaBase.reconstruct.pmml_to_pipeline import generate_skl_pipeline
                 print ('Next Step 3 >>>>>>>>>>>>')
-                sklModelPipeline=pmml_to_skl(filepath)
+                sklModelPipeline=generate_skl_pipeline(filepath)
                 print ('Next Step 4 >>>>>>>>>>>>')
-                if hasattr(sklModelPipeline.steps[-1][-1],'classes_'):
-                    predClasses=sklModelPipeline.steps[-1][-1].classes_
-                else:
+                # if hasattr(sklModelPipeline.steps[-1][-1],'classes_'):
+                #     print ('sklModelPipeline.steps[-1][-1] >>> ',sklModelPipeline.steps[-1][-1])
+                #     predClasses=sklModelPipeline.steps[-1][-1].classes_
+                # else:
+                try:
+                    predClasses=self.getPredClasses(nyoka_pmml_obj)
+                except:
                     predClasses=[]
-                print ('Next Step >>>>>>>>>>>>')
+                print ('Next Step 5 >>>>>>>>>>>>')
                 targetVar = self.getTargetVariable(nyoka_pmml_obj)
                 PMMLMODELSTORAGE[pmmlName]={}
                 PMMLMODELSTORAGE[pmmlName]['model']=sklModelPipeline
@@ -398,6 +414,48 @@ class KerasUtilities:
             with open(resafile,'w') as fila:
                 json.dump(targetResult,fila)
         return resafile
+
+
+    def predictFiledataReturnJson(self,pmmlstoragepointer,testData, modelType=None):
+        # print('$$$$$$$$$$$$$$$$$$ PredictFileData $$$$$$$$$$$$$$$')
+        global PMMLMODELSTORAGE
+        pointerObj=PMMLMODELSTORAGE[pmmlstoragepointer]
+        target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+        self.checkCreatePath(target_path)
+        if modelType and modelType=="sklearnM":
+            model=pointerObj['model']
+            predClasses=pointerObj['predClasses']
+            targetVar=pointerObj['targetVar']
+            if len(predClasses) >1:
+                pred=model.predict_proba(testData)
+                seraSera=[]
+                for i in scores:
+                    seraSera.append({k:j for k,j in zip(['1','2'],i)})
+                resaRes={'predictions':seraSera}
+            else:
+                pred=model.predict(testData)
+                resaRes={'predictions':pred.tolist()}
+        
+            
+        else:
+            model_graph = pointerObj['model_graph']
+            tf_session = pointerObj['tf_session']
+            with model_graph.as_default():
+                with tf_session.as_default():
+                    model=PMMLMODELSTORAGE[pmmlstoragepointer]['model']
+                    predClasses=PMMLMODELSTORAGE[pmmlstoragepointer]['predClasses']
+                    inputShapevals=PMMLMODELSTORAGE[pmmlstoragepointer]['inputShape']
+                    pred=model.predict(testData.values)
+
+            if len(predClasses) > 1:
+                seraSera=[]
+                for i in scores:
+                    seraSera.append({k:j for k,j in zip(['1','2'],i)})
+                resaRes={'predictions':seraSera}
+            else:
+                resaRes={'predictions':pred}
+            
+        return resaRes
 
     def predictDataWithPostScript(self,pmmlstoragepointer,filpath,scriptOutput):
 
