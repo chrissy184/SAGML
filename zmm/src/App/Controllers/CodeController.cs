@@ -615,6 +615,16 @@ namespace ZMM.App.Controllers
                     }
                     else
                     {
+                        //add history
+                        JArray jHist = new JArray();
+                        foreach(var r in tresp)
+                        {
+                            jHist.Add(new JObject(){
+                                    {"idforData", r.idforData},
+                                    {"status", r.status},
+                                    {"executedAt",r.executedAt}
+                                });
+                        }
                         //add to scheduler payload                            
                         SchedulerResponse schJob = new SchedulerResponse()
                         {
@@ -632,8 +642,11 @@ namespace ZMM.App.Controllers
                             StartTimeH = "",
                             StartTimeM = "",
                             ZMKResponse = tresp.ToList<object>(),
-                            Status = ""
+                            Status = "",
+                            History = jHist.ToList<object>()
                         };
+                        
+                        
                         SchedulerPayload.Create(schJob);
                     }
 
