@@ -26,7 +26,7 @@ from utility.utilityClass import Utility
 from django.template import Context, loader
 
 
-from utility.codeUtilityClass import CodeUtilityClass,CodeUtilityClassNew
+from utility.codeUtilityClass import CodeUtilityClass
 
 
 class CodeUtilityView(APIView):
@@ -41,46 +41,29 @@ class CodeUtilityView(APIView):
 
 	def get(self,requests):
 		filePath = requests.GET['filePath']
-		return CodeUtilityClass.compileCode(filePath)
-
-	def post(self,requests):
-		userInput = json.loads(requests.body)
-		filePath = userInput['filePath']
-		# print (userInput)
-		# print ('>>>>>>>>>>>>>>>',filePath)
-		import ast
-		try:
-			params = ast.literal_eval(userInput['params'])
-		except:
-			params=userInput['params']
+		params=[]
 		return CodeUtilityClass.executeCode(filePath,params)
 
+class CodeUtilityView2View(APIView):
+	http_method_names=['post','get']
 
-class CodeUtilityViewNewUpdate(APIView):
-	http_method_names=['get','post']
-
-	def dispatch(self,requests):
-		if requests.method=='GET':
-			result=self.get(requests)
-		elif requests.method=='POST':
-			result=self.post(requests)
+	def dispatch(self,requests,scriptName):
+		if requests.method=='POST':
+			result=self.post(requests,scriptName)
+		# if requests.method=='GET':
+		# 	result=self.get(requests)
+		else:
+			return JsonResponse({},status=405)
 		return result
 
-	def get(self,requests):
-		filePath = requests.GET['filePath']
-		return CodeUtilityClassNew.compileCode(filePath)
-
-	def post(self,requests):
-		userInput = json.loads(requests.body)
-		filePath = userInput['filePath']
-		# print (userInput)
-		# print ('>>>>>>>>>>>>>>>',filePath)
-		import ast
+	def post(self,requests,scriptName):
 		try:
-			params = ast.literal_eval(userInput['params'])
+			jsonData = json.loads(requests.body)['jsonRecord']
+			if not jsonData:
+				raise Exception("Invalid Request Parameter")
 		except:
-			params=userInput['params']
-		return CodeUtilityClassNew.executeCode(filePath,params)
+			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
+		return CodeUtilityClass().executeFeatureScript(scriptName,jsonData)
 
 class SwaggerView(APIView):
 	http_method_names=['get']

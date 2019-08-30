@@ -29,7 +29,7 @@ from trainModel.views import RunningTaskView,TrainAutoMLView,RunningTaskNameOper
 
 from nyokaserver.views import PMMLView,PMMLOpeartionView,PMMLLayerView,PMMLGlobalView
 from scoring.views import ScoreView,ModelsView,ModelOperationView,ScoreViewReturnJson#,ObjDetectionScoreView
-from utility.views import UtilityView,SwaggerUtilityView,SwaggerView,ImageGeneratorUtilityView,CodeUtilityView,CodeUtilityViewNewUpdate
+from utility.views import UtilityView,SwaggerUtilityView,SwaggerView,ImageGeneratorUtilityView,CodeUtilityView,CodeUtilityView2View
 from executionEngine.views import ModelOperation2View,NewScoreOperation2View,NewTrainOperation2View,NewCodeOperation2View,NewScoreOperation2ViewLong,NewCodeExecution2View
 from django.views.decorators.csrf import csrf_exempt
 
@@ -67,7 +67,7 @@ urlpatterns=[
     path(pref+'trainNNModel',csrf_exempt(TrainNNView.as_view()), name="Train Model"),
     path(pref+'objectDetection/train/mrcnn',csrf_exempt(MRCNNView.as_view()), name="Train MRCNN"),
     path(pref+'code',csrf_exempt(CodeUtilityView.as_view()), name="Code Utility"),
-    path(pref+'codeExecute',csrf_exempt(CodeUtilityViewNewUpdate.as_view()), name="Code Utility"),
+    path(pref+'code/<scriptName>/Execute',csrf_exempt(CodeUtilityView2View.as_view()), name="Code Utility"),
     path(pref+'swagger',csrf_exempt(SwaggerView.as_view()), name='swagger'),
     path(pref,csrf_exempt(SwaggerView.as_view()),name='swagger'),
     path('',csrf_exempt(SwaggerView.as_view()),name='swagger'),
@@ -78,8 +78,8 @@ urlpatterns=[
     path(pref+'newloadmodels/<modelName>/scoreJsonLongProcess',csrf_exempt(NewScoreOperation2ViewLong.as_view()), name="NewScoreOperations"),
     path(pref+'newtrainmodels/<modelName>',csrf_exempt(NewTrainOperation2View.as_view()), name="NewTrainingView"),
 
-    path(pref+'codeLoad',csrf_exempt(NewCodeOperation2View.as_view()), name="Code Utility"),
-    path(pref+'codeLoad/<scriptName>/Execute',csrf_exempt(NewCodeExecution2View.as_view()), name="Code Utility"),
+    # path(pref+'codeLoad',csrf_exempt(NewCodeOperation2View.as_view()), name="Code Utility"),
+    
 
 
 ]
