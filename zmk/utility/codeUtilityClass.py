@@ -72,7 +72,7 @@ class CodeUtilityClass:
         with open(statusfileLocation,'w') as filetosave:
             json.dump({}, filetosave)
 
-        print ('>>>>>>>>>>>>>>>>',params)
+        print ('>>>>>>>>>>>>>>>> parmas',params)
 
         import threading
         pp = threading.Thread(target=monitorThread,args=(filePath,params,statusfileLocation))

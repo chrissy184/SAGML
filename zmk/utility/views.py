@@ -39,8 +39,9 @@ class CodeUtilityView(APIView):
 			result=self.post(requests)
 		return result
 
-	def get(self,requests):
-		filePath = requests.GET['filePath']
+	def post(self,requests):
+		filePath = json.loads(requests.body)['filePath']
+		print (filePath)
 		params=[]
 		return CodeUtilityClass.executeCode(filePath,params)
 
