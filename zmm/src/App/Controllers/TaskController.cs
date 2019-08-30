@@ -22,7 +22,7 @@ using System.Linq;
 
 namespace ZMM.App.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     public class TaskController : Controller
     {
