@@ -97,6 +97,21 @@ class RunningTaskNameOperationView(APIView):
 	def get(self,requests,taskName):
 		return Utility.taskUpdateByTaskName(taskName)
 
+class RunningTaskNameOperationViewIdForData(APIView):
+	http_method_names=['get','delete']
+
+	def dispatch(self,requests,taskName,idForData):
+		if requests.method=='GET':
+			result=self.get(requests,taskName,idForData)
+		elif requests.method=='DELETE':
+			result=self.delete(requests,taskName,idForData)
+		else:
+			return JsonResponse({},status=405)
+		return result
+
+	def get(self,requests,taskName,idForData):
+		return Utility.taskUpdateByTaskNameIdForData(taskName,idForData)
+
 
 class TrainAutoMLView(APIView):
 	http_method_names=['get','post']

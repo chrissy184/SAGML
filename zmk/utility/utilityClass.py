@@ -127,3 +127,14 @@ class Utility:
 		filtListofTask=[i for i in allTaskList if i['taskName']==taskName]
 		runningTask={'runningTask':filtListofTask}
 		return JsonResponse(runningTask,status=200)
+
+	def taskUpdateByTaskNameIdForData(taskName,idForData):
+		print ('taskName >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ',taskName)
+		allTaskList=RUNNING_TASK_MEMORY
+		filtListofTask=[i for i in allTaskList if i['taskName']==taskName]
+		filtListofTaskId=[i for i in allTaskList if i['idforData']==idForData]
+		runningTask={'runningTask':filtListofTaskId}
+		return JsonResponse(runningTask,status=200)
+
+
+		
