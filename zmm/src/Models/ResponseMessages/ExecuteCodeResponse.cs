@@ -6,7 +6,7 @@ namespace ZMM.Models.ResponseMessages
     public class Information
     {
         public string property { get; set; }
-        public string value { get; set; }
+        public List<object> value { get; set; }
     }
 
     public class ExecuteCodeResponse
