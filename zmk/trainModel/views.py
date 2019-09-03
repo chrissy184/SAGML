@@ -38,7 +38,7 @@ class RunningTaskView(APIView):
 		return result
 
 	def get(self,requests):
-		return Utility.runningTaskList()
+		return Utility().runningTaskList()
 
 class ModelCompileView(APIView):
 	http_method_names=['post']
@@ -95,7 +95,7 @@ class RunningTaskNameOperationView(APIView):
 		return result
 
 	def get(self,requests,taskName):
-		return Utility.taskUpdateByTaskName(taskName)
+		return Utility().taskUpdateByTaskName(taskName)
 
 class RunningTaskNameOperationViewIdForData(APIView):
 	http_method_names=['get','delete']
@@ -110,7 +110,7 @@ class RunningTaskNameOperationViewIdForData(APIView):
 		return result
 
 	def get(self,requests,taskName,idForData):
-		return Utility.taskUpdateByTaskNameIdForData(taskName,idForData)
+		return Utility().taskUpdateByTaskNameIdForData(taskName,idForData)
 
 
 class TrainAutoMLView(APIView):

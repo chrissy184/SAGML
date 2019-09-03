@@ -101,7 +101,7 @@ class Utility:
 			return JsonResponse({'idforData': taskId, 'message':'Something went wrong. Please contact Admin'},status=500)
 
 
-	def runningTaskList():
+	def runningTaskList(self):
 		for num,tempRS in enumerate(RUNNING_TASK_MEMORY):
 			try:
 				data_details=autoMLutilities.readStatusFile(tempRS['idforData'])
@@ -121,14 +121,16 @@ class Utility:
 		runningTask={'runningTask':runTaskListSorted}
 		return JsonResponse(runningTask,status=200)
 
-	def taskUpdateByTaskName(taskName):
+	def taskUpdateByTaskName(self,taskName):
+		self.runningTaskList()
 		print ('taskName >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ',taskName)
 		allTaskList=RUNNING_TASK_MEMORY
 		filtListofTask=[i for i in allTaskList if i['taskName']==taskName]
 		runningTask={'runningTask':filtListofTask}
 		return JsonResponse(runningTask,status=200)
 
-	def taskUpdateByTaskNameIdForData(taskName,idForData):
+	def taskUpdateByTaskNameIdForData(self,taskName,idForData):
+		self.runningTaskList()
 		print ('taskName >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ',taskName)
 		allTaskList=RUNNING_TASK_MEMORY
 		filtListofTask=[i for i in allTaskList if i['taskName']==taskName]
