@@ -506,6 +506,7 @@ class NyokaUtilities:
         
         hd=pmmlDictObj['Header']
         scrptVal=pmmlDictObj['script']
+        DataVal=pmmlDictObj['Data']
         # print ('Came here')
         import ast,pathlib
         try:

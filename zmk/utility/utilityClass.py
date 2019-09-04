@@ -131,7 +131,7 @@ class Utility:
 
 	def taskUpdateByTaskNameIdForData(self,taskName,idForData):
 		self.runningTaskList()
-		print ('taskName >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ',taskName)
+		print ('taskName >>>>>> >>>>>>>>>>>>>>>>>>>>>>>>>> ',taskName)
 		allTaskList=RUNNING_TASK_MEMORY
 		filtListofTask=[i for i in allTaskList if i['taskName']==taskName]
 		filtListofTaskId=[i for i in allTaskList if i['idforData']==idForData]
