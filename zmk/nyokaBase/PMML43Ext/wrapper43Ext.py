@@ -109,7 +109,7 @@ def new_init():
         self.content_ = [supermod.MixedContainer(1, 2, "", str(content))]
         self.valueOf_ = str(content)
 
-    def PMML_init(self, version='4.3', Header=None, script=None, MiningBuildTask=None, DataDictionary=None, TransformationDictionary=None, AssociationModel=None, AnomalyDetectionModel=None, BayesianNetworkModel=None, BaselineModel=None, ClusteringModel=None, DeepNetwork=None, GaussianProcessModel=None, GeneralRegressionModel=None, MiningModel=None, NaiveBayesModel=None, NearestNeighborModel=None, NeuralNetwork=None, RegressionModel=None, RuleSetModel=None, SequenceModel=None, Scorecard=None, SupportVectorMachineModel=None, TextModel=None, TimeSeriesModel=None, TreeModel=None, Extension=None):
+    def PMML_init(self, version='4.3', Header=None,Data=None, script=None, MiningBuildTask=None, DataDictionary=None, TransformationDictionary=None, AssociationModel=None, AnomalyDetectionModel=None, BayesianNetworkModel=None, BaselineModel=None, ClusteringModel=None, DeepNetwork=None, GaussianProcessModel=None, GeneralRegressionModel=None, MiningModel=None, NaiveBayesModel=None, NearestNeighborModel=None, NeuralNetwork=None, RegressionModel=None, RuleSetModel=None, SequenceModel=None, Scorecard=None, SupportVectorMachineModel=None, TextModel=None, TimeSeriesModel=None, TreeModel=None, Extension=None):
         self.original_tagname_ = None
         self.version = supermod._cast(None, version)
         self.Header = Header
@@ -117,6 +117,12 @@ def new_init():
             self.script = []
         else:
             self.script = script
+
+        if Data is None:
+            self.Data=[]
+        else:
+            print ('print',Data)
+            self.Data=Data
         self.MiningBuildTask = MiningBuildTask
         self.DataDictionary = DataDictionary
         if AssociationModel is None:
@@ -252,7 +258,7 @@ def orig_init():
             self.content_ = content_
         self.valueOf_ = valueOf_
         
-    def LayerRecurrentWeights_init(self, recurrentWeightsShape=None, recurrentWeightsFlattenAxis=None, content=None, floatType="float32", floatsPerLine=12, src=None, Extension=None, mixedclass_=None):
+    def LayerRecurrentWeights_init(self, recurrentWeightsShape=None, recurrentWeightsFlattenAxis=None, src=None, Extension=None, valueOf_=None, mixedclass_=None, content_=None):
         self.original_tagname_ = None
         self.recurrentWeightsShape = supermod._cast(None, recurrentWeightsShape)
         self.recurrentWeightsFlattenAxis = supermod._cast(None, recurrentWeightsFlattenAxis)
@@ -265,14 +271,11 @@ def orig_init():
             self.mixedclass_ = supermod.MixedContainer
         else:
             self.mixedclass_ = mixedclass_
-        validFloatTypes = ["float6", "float7", "float8", "float16", "float32", "float64"]
-        if floatType not in validFloatTypes:
-            floatType = "float32"
-        from nyoka.Base64 import FloatBase64
-        base64string = "\t\t\t\t" + "data:" + floatType + ";base64," + FloatBase64.from_floatArray(content, floatsPerLine)
-        base64string = base64string.replace("\n", "\n\t\t\t\t")
-        self.content_ = [supermod.MixedContainer(1, 2, "", base64string)]
-        self.valueOf_ = base64string
+        if content_ is None:
+            self.content_ = []
+        else:
+            self.content_ = content_
+        self.valueOf_ = valueOf_
 
     def LayerBias_init(self, biasShape=None, biasFlattenAxis=None, src=None, Extension=None, valueOf_=None, mixedclass_=None, content_=None):
         self.original_tagname_ = None
@@ -343,7 +346,7 @@ def orig_init():
             self.content_ = content_
         self.valueOf_ = valueOf_
 
-    def PMML_init(self, version=None, Header=None, script=None, MiningBuildTask=None, DataDictionary=None, TransformationDictionary=None, AssociationModel=None, AnomalyDetectionModel=None, BayesianNetworkModel=None, BaselineModel=None, ClusteringModel=None, DeepNetwork=None, GaussianProcessModel=None, GeneralRegressionModel=None, MiningModel=None, NaiveBayesModel=None, NearestNeighborModel=None, NeuralNetwork=None, RegressionModel=None, RuleSetModel=None, SequenceModel=None, Scorecard=None, SupportVectorMachineModel=None, TextModel=None, TimeSeriesModel=None, TreeModel=None, Extension=None):
+    def PMML_init(self, version=None, Header=None,Data=None, script=None, MiningBuildTask=None, DataDictionary=None, TransformationDictionary=None, AssociationModel=None, AnomalyDetectionModel=None, BayesianNetworkModel=None, BaselineModel=None, ClusteringModel=None, DeepNetwork=None, GaussianProcessModel=None, GeneralRegressionModel=None, MiningModel=None, NaiveBayesModel=None, NearestNeighborModel=None, NeuralNetwork=None, RegressionModel=None, RuleSetModel=None, SequenceModel=None, Scorecard=None, SupportVectorMachineModel=None, TextModel=None, TimeSeriesModel=None, TreeModel=None, Extension=None):
         self.original_tagname_ = None
         self.version = supermod._cast(None, version)
         self.Header = Header
@@ -351,6 +354,10 @@ def orig_init():
             self.script = []
         else:
             self.script = script
+        if Data is None:
+            self.Data = []
+        else:
+            self.Data = Data
         self.MiningBuildTask = MiningBuildTask
         self.DataDictionary = DataDictionary
         self.TransformationDictionary = TransformationDictionary

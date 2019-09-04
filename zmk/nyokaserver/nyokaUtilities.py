@@ -406,8 +406,9 @@ class NyokaUtilities:
 
 
     def pmmlToJson(self,filePath):
+        print('parse success 1')
         pmmlObj=ny.parse(filePath,silence=True)
-        # print('parse success 1')
+        
         pmmlDictObj=pmmlObj.__dict__
         
         overAll=[]
@@ -510,13 +511,14 @@ class NyokaUtilities:
         # print ('Came here')
         import ast,pathlib
         try:
-            hf=hd.Extension[0]
-            headerExt=hf.get_value()
-            # print ('headerExtheaderExtheaderExtheaderExtheaderExt',headerExt,type(headerExt))
+            # hf=hd.Extension[0]
+            # headerExt=hf.get_value()
+            # # print ('headerExtheaderExtheaderExtheaderExtheaderExt',headerExt,type(headerExt))
             try:
-                dataUrl=ast.literal_eval(headerExt)
+                # dataUrl=ast.literal_eval(headerExt)
+                dataUrl=DataVal[0].filePath
             except:
-                dataUrl=headerExt
+                dataUrl='Some issue'
             # print ('$$$$$$$$$$$$$$$$$$$$$$',dataUrl)
             fObj=pathlib.Path(dataUrl['dataUrl'])
             # print ('data URL path>>>>>>>>>>>>',dataUrl)

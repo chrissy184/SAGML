@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Generated Thu Jun 27 11:02:44 2019 by generateDS.py version 2.28a.
+# Generated Wed Sep  4 12:12:01 2019 by generateDS.py version 2.28a.
 #
 # Command line options:
 #   ('--no-warnings', '')
@@ -17,7 +17,7 @@
 #   ..\pmml43Ext.xsd
 #
 # Command line:
-#   C:\Users\swsh\Desktop\nyokaDurr\nyoka_deurr\nyoka-43Ext\nyoka\PMML43Ext\gds_local.py --no-warnings --export="write literal etree" --super="pmml43ExtSuper" --subclass-suffix -o "pmml43ExtSuper.py" -s "pmml43Ext.py" -b "behaviorsDir.xml" -f ..\pmml43Ext.xsd
+#   C:\Users\swsh\Desktop\ZMODGit\nyoka\nyoka\PMML43Ext\gds_local.py --no-warnings --export="write literal etree" --super="pmml43ExtSuper" --subclass-suffix -o "pmml43ExtSuper.py" -s "pmml43Ext.py" -b "behaviorsDir.xml" -f ..\pmml43Ext.xsd
 #
 # Current working directory (os.getcwd()):
 #   PMML43Ext
@@ -1507,8 +1507,8 @@ supermod.EventValues.subclass = EventValues
 
 
 class PMML(supermod.PMML):
-    def __init__(self, version=None, Header=None, script=None, MiningBuildTask=None, DataDictionary=None, TransformationDictionary=None, AssociationModel=None, AnomalyDetectionModel=None, BayesianNetworkModel=None, BaselineModel=None, ClusteringModel=None, DeepNetwork=None, GaussianProcessModel=None, GeneralRegressionModel=None, MiningModel=None, NaiveBayesModel=None, NearestNeighborModel=None, NeuralNetwork=None, RegressionModel=None, RuleSetModel=None, SequenceModel=None, Scorecard=None, SupportVectorMachineModel=None, TextModel=None, TimeSeriesModel=None, TreeModel=None, Extension=None):
-        super(PMML, self).__init__(version, Header, script, MiningBuildTask, DataDictionary, TransformationDictionary, AssociationModel, AnomalyDetectionModel, BayesianNetworkModel, BaselineModel, ClusteringModel, DeepNetwork, GaussianProcessModel, GeneralRegressionModel, MiningModel, NaiveBayesModel, NearestNeighborModel, NeuralNetwork, RegressionModel, RuleSetModel, SequenceModel, Scorecard, SupportVectorMachineModel, TextModel, TimeSeriesModel, TreeModel, Extension, )
+    def __init__(self, version=None, Header=None, script=None, Data=None, MiningBuildTask=None, DataDictionary=None, TransformationDictionary=None, AssociationModel=None, AnomalyDetectionModel=None, BayesianNetworkModel=None, BaselineModel=None, ClusteringModel=None, DeepNetwork=None, GaussianProcessModel=None, GeneralRegressionModel=None, MiningModel=None, NaiveBayesModel=None, NearestNeighborModel=None, NeuralNetwork=None, RegressionModel=None, RuleSetModel=None, SequenceModel=None, Scorecard=None, SupportVectorMachineModel=None, TextModel=None, TimeSeriesModel=None, TreeModel=None, Extension=None):
+        super(PMML, self).__init__(version, Header, script, Data, MiningBuildTask, DataDictionary, TransformationDictionary, AssociationModel, AnomalyDetectionModel, BayesianNetworkModel, BaselineModel, ClusteringModel, DeepNetwork, GaussianProcessModel, GeneralRegressionModel, MiningModel, NaiveBayesModel, NearestNeighborModel, NeuralNetwork, RegressionModel, RuleSetModel, SequenceModel, Scorecard, SupportVectorMachineModel, TextModel, TimeSeriesModel, TreeModel, Extension, )
 
     #
     # XMLBehaviors
@@ -1741,6 +1741,43 @@ class script(supermod.script):
 
 supermod.script.subclass = script
 # end class script
+
+
+class Data(supermod.Data):
+    def __init__(self, filePath=None, for_=None, Extension=None, valueOf_=None, mixedclass_=None, content_=None):
+        super(Data, self).__init__(filePath, for_, Extension, valueOf_, mixedclass_, content_, )
+
+    #
+    # XMLBehaviors
+    #
+    def export(self, outfile, level, namespace_='', name_='Data', namespacedef_='', pretty_print=True, *args):
+        imported_ns_def_ = supermod.GenerateDSNamespaceDefs_.get('Data')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None:
+            name_ = self.original_tagname_
+        supermod.showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='Data')
+        if self.hasContent_():
+            outfile.write('>%s' % ('', ))
+            self.exportChildren(outfile, level + 1, namespace_='', name_='Data', pretty_print=pretty_print)
+            supermod.showIndent(outfile, 0, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+        
+    def export_wrapper(self, outfile, level, namespace_='', name_='Data', namespacedef_='', pretty_print=True, *args):
+        result = self.export(outfile, level, namespace_='', name_='Data', namespacedef_='', pretty_print=True, *args)
+        return result
+
+supermod.Data.subclass = Data
+# end class Data
 
 
 class Application(supermod.Application):
@@ -2179,8 +2216,8 @@ supermod.VerificationField.subclass = VerificationField
 
 
 class MiningModel(supermod.MiningModel):
-    def __init__(self, modelName=None, functionName=None, algorithmName=None, isScorable=True, taskType=None, MiningSchema=None, Output=None, ModelStats=None, ModelExplanation=None, Targets=None, LocalTransformations=None, Regression=None, DecisionTree=None, Segmentation=None, ModelVerification=None, Extension=None):
-        super(MiningModel, self).__init__(modelName, functionName, algorithmName, isScorable, taskType, MiningSchema, Output, ModelStats, ModelExplanation, Targets, LocalTransformations, Regression, DecisionTree, Segmentation, ModelVerification, Extension, )
+    def __init__(self, modelName=None, functionName=None, algorithmName=None, isScorable=True, taskType=None, objective=None, numberOfClass=None, MiningSchema=None, Output=None, ModelStats=None, ModelExplanation=None, Targets=None, LocalTransformations=None, Regression=None, DecisionTree=None, Segmentation=None, ModelVerification=None, Extension=None):
+        super(MiningModel, self).__init__(modelName, functionName, algorithmName, isScorable, taskType, objective, numberOfClass, MiningSchema, Output, ModelStats, ModelExplanation, Targets, LocalTransformations, Regression, DecisionTree, Segmentation, ModelVerification, Extension, )
 
     #
     # XMLBehaviors
@@ -4182,8 +4219,8 @@ supermod.BlockIndicator.subclass = BlockIndicator
 
 
 class TreeModel(supermod.TreeModel):
-    def __init__(self, modelName=None, functionName=None, algorithmName=None, missingValueStrategy='none', missingValuePenalty='1.0', noTrueChildStrategy='returnNullPrediction', taskType=None, splitCharacteristic='multiSplit', isScorable=True, MiningSchema=None, Output=None, ModelStats=None, ModelExplanation=None, Targets=None, LocalTransformations=None, Node=None, ModelVerification=None, Extension=None):
-        super(TreeModel, self).__init__(modelName, functionName, algorithmName, missingValueStrategy, missingValuePenalty, noTrueChildStrategy, taskType, splitCharacteristic, isScorable, MiningSchema, Output, ModelStats, ModelExplanation, Targets, LocalTransformations, Node, ModelVerification, Extension, )
+    def __init__(self, modelName=None, functionName=None, algorithmName=None, shrinkage=None, missingValueStrategy='none', missingValuePenalty='1.0', noTrueChildStrategy='returnNullPrediction', taskType=None, splitCharacteristic='multiSplit', isScorable=True, MiningSchema=None, Output=None, ModelStats=None, ModelExplanation=None, Targets=None, LocalTransformations=None, Node=None, ModelVerification=None, Extension=None):
+        super(TreeModel, self).__init__(modelName, functionName, algorithmName, shrinkage, missingValueStrategy, missingValuePenalty, noTrueChildStrategy, taskType, splitCharacteristic, isScorable, MiningSchema, Output, ModelStats, ModelExplanation, Targets, LocalTransformations, Node, ModelVerification, Extension, )
 
     #
     # XMLBehaviors
@@ -4193,8 +4230,8 @@ supermod.TreeModel.subclass = TreeModel
 
 
 class Node(supermod.Node):
-    def __init__(self, id=None, score=None, recordCount=None, defaultChild=None, SimplePredicate=None, CompoundPredicate=None, SimpleSetPredicate=None, True_=None, False_=None, Partition=None, ScoreDistribution=None, Node_member=None, Extension=None, Regression=None, DecisionTree=None):
-        super(Node, self).__init__(id, score, recordCount, defaultChild, SimplePredicate, CompoundPredicate, SimpleSetPredicate, True_, False_, Partition, ScoreDistribution, Node_member, Extension, Regression, DecisionTree, )
+    def __init__(self, id=None, gain=None, missingType=None, score=None, recordCount=None, defaultChild=None, SimplePredicate=None, CompoundPredicate=None, SimpleSetPredicate=None, True_=None, False_=None, Partition=None, ScoreDistribution=None, Node_member=None, Extension=None, Regression=None, DecisionTree=None):
+        super(Node, self).__init__(id, gain, missingType, score, recordCount, defaultChild, SimplePredicate, CompoundPredicate, SimpleSetPredicate, True_, False_, Partition, ScoreDistribution, Node_member, Extension, Regression, DecisionTree, )
 
     #
     # XMLBehaviors

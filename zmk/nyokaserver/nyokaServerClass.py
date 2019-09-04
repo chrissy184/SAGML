@@ -130,10 +130,11 @@ class NyokaServer:
 			MEMORY_DICT_ARCHITECTURE[projectID]
 		except:
 			MEMORY_DICT_ARCHITECTURE[projectID]={}
+			# archFromPMML=nyokaUtilities.pmmlToJson(filePath)
 			try:
-				# print ('filePath >>>> ',filePath)
+				print ('filePath >>>> ',filePath)
 				archFromPMML=nyokaUtilities.pmmlToJson(filePath)
-				# print ('pass')
+				print ('pass')
 				MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=archFromPMML
 			except Exception as e:
 				# print('<>>>><<>>>>',str(e))
