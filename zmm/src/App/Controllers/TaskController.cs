@@ -135,11 +135,11 @@ namespace ZMM.App.Controllers
 
         [HttpGet("{id}/history/{idforData}")]
         public async Task<IActionResult> GetSelectedTaskAysnc(string id, string idforData)
-        {
-            await Task.FromResult(0);
+        {            
+            var zmkresp = await nnclient.GetRunningTaskByTaskNameAndId(id,idforData);     
+            var jo = JObject.Parse(zmkresp);      
 
-
-            return Json(new { });
+            return Json(jo);
         }
 
         #endregion
