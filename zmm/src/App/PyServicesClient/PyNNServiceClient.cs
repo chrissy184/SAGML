@@ -296,6 +296,43 @@ namespace ZMM.App.PyServicesClient
         }
         #endregion
         
+        #region get running task details by id
+        public async Task<string> GetRunningTaskByTaskNameAndId(string taskName, string idforData)
+        {            
+            string jsonResult = string.Empty;
+            using(var httpClient = new HttpClient())
+            {                
+                httpClient.BaseAddress = new System.Uri(Configuration["PyServiceLocation:srvurl"]);
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                //
+                //request params
+                var content = new FormUrlEncodedContent(
+                    new List<KeyValuePair<string, string>>
+                    {
+                        //empty
+                    }
+                );   
+                try
+                {
+                    HttpResponseMessage response = await httpClient.GetAsync($"runningTasks/{taskName}/{idforData}");
+                    Console.WriteLine(httpClient.BaseAddress);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        jsonResult = await response.Content.ReadAsStringAsync();
+                    } 
+                }
+                catch(HttpRequestException ex)
+                {
+                    jsonResult = "{'message': '" + ex.Message + "'}";
+                }            
+            }
+
+            return jsonResult;
+
+        }
+
+        #endregion 
         #endregion
     
         #region Edit NN pmml file...
