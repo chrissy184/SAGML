@@ -406,15 +406,11 @@ class NyokaUtilities:
 
 
     def pmmlToJson(self,filePath):
-        print('parse success 1')
         pmmlObj=ny.parse(filePath,silence=True)
-        
         pmmlDictObj=pmmlObj.__dict__
-        
         overAll=[]
 
         deepObject=pmmlDictObj['DeepNetwork'][0]
-        # print('parse success 2')
         listOfNetworkLayer=deepObject.NetworkLayer
         for lay in listOfNetworkLayer:
             networkDict=lay.__dict__
@@ -434,8 +430,6 @@ class NyokaUtilities:
                                 except:
                                     evalVal=layerDict[kk]
                                 tempDict['layerParam'][kk]=evalVal
-                        # tempDict['layerParam']['trainable']=layerDict['layerDict']
-                    # print (layerDict['trainable'])
                     tempDict['layerParam']['trainable']=False if layerDict['trainable'] == False else True
 
                     if len(networkDict['Extension']) > 0:
@@ -445,7 +439,6 @@ class NyokaUtilities:
                         tempDict['sectionId']=ast.literal_eval(sectionVal)['sectionId']
                     else:
                         tempDict['sectionId']=None
-            # print ('tempDict',tempDict['layerParam']['trainable'])
             overAll.append(tempDict)
 
         allLayers=MEMORY_OF_LAYERS['layerinfo'][0]['layers']
@@ -473,21 +466,12 @@ class NyokaUtilities:
                 pass
             tempSpace['trainable']=layerPARA['trainable']
             architecture.append(tempSpace)
-
-        # print ('architecture',architecture)
-            
+        
         forLoopSection=[j['sectionId'] for j in architecture]
         # print ('forLoopSection $$$$$$$$$$$$$$$',forLoopSection)
-        tempSection={'children': [],
-         'class': 'wide',
-         'icon': 'mdi mdi-group',
-         'id': '',
-         'itemType': 'FOLDING',
-         'layerId': 'Section',
-         'layerIndex': '',
-         'name': 'Section',
-         'sectionId': '',
-         "sectionCollapse":True}
+        tempSection={'children': [],'class': 'wide','icon': 'mdi mdi-group','id': '',
+         'itemType': 'FOLDING','layerId': 'Section','layerIndex': '','name': 'Section',
+         'sectionId': '',"sectionCollapse":True}
 
         newarchitecture=[]
         tempSectionA=copy.deepcopy(tempSection)
@@ -508,22 +492,15 @@ class NyokaUtilities:
         hd=pmmlDictObj['Header']
         scrptVal=pmmlDictObj['script']
         DataVal=pmmlDictObj['Data']
-        # print ('Came here')
         import ast,pathlib
         try:
-            # hf=hd.Extension[0]
-            # headerExt=hf.get_value()
-            # # print ('headerExtheaderExtheaderExtheaderExtheaderExt',headerExt,type(headerExt))
             try:
-                # dataUrl=ast.literal_eval(headerExt)
                 dataUrl=DataVal[0].filePath
             except:
                 dataUrl='Some issue'
-            # print ('$$$$$$$$$$$$$$$$$$$$$$',dataUrl)
-            fObj=pathlib.Path(dataUrl['dataUrl'])
-            # print ('data URL path>>>>>>>>>>>>',dataUrl)
-            try:
-                print ('DataURL found')
+            print ('$$$$$$$$$$$$$$$$$$$$$$',dataUrl)
+            if dataUrl !='Some issue':
+                fObj=pathlib.Path(dataUrl)
                 dataCon={'icon': 'mdi mdi-database-plus','id': 'NNN',
                   'itemType': 'DATA','layerId':fObj.name ,'layerIndex': 0,'name': 'Data','url': dataUrl}
                 newarchitecture.insert(0,dataCon)
@@ -533,11 +510,10 @@ class NyokaUtilities:
                     scriptUrl=sc.class_
                     useForSc=sc.for_
                     fObjScrpt=pathlib.Path(scriptUrl)
-                    # print ('>>>>>>>>>>>>>>>',scriptUrl)
                     scriptCon=  {"name": "Code","icon": "mdi mdi-code-braces","itemType": "CODE",
                         "layerId": fObjScrpt.name,'url':scriptUrl,"layerIndex": "NA",'useFor':useForSc}
                     newarchitecture.insert(counT+1,scriptCon)
-            except:
+            else:
                 pass
 
         except Exception as e:
@@ -545,15 +521,11 @@ class NyokaUtilities:
                 scriptUrl=sc.class_
                 import pathlib
                 fObjScrpt=pathlib.Path(scriptUrl)
-
-                print ('>>>>>>>>>>>>>>>',scriptUrl)
                 scriptCon=  {"name": "Code","icon": "mdi mdi-code-braces","itemType": "CODE",
                     "layerId": fObjScrpt.name,'url':scriptUrl,"layerIndex": "NA"}
                 newarchitecture.insert(counT,scriptCon)
             print (e,'some error occured')
 
-        
-        
         for num,i in enumerate(newarchitecture):
             if i['itemType']=='FOLDING':
                 i['layerIndex']=num

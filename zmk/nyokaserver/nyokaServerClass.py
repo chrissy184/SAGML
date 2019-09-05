@@ -130,7 +130,6 @@ class NyokaServer:
 			MEMORY_DICT_ARCHITECTURE[projectID]
 		except:
 			MEMORY_DICT_ARCHITECTURE[projectID]={}
-			# archFromPMML=nyokaUtilities.pmmlToJson(filePath)
 			try:
 				print ('filePath >>>> ',filePath)
 				archFromPMML=nyokaUtilities.pmmlToJson(filePath)
@@ -570,10 +569,6 @@ class NyokaServer:
 	
 
 	def deletelayer(payload,projectID):
-
-		
-
-
 		global MEMORY_DICT_ARCHITECTURE
 		global lockForPMML
 		# print ('>>>>>',userInput)
