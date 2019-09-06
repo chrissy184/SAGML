@@ -103,10 +103,24 @@ class Utility:
 
 	def runningTaskList(self):
 		for num,tempRS in enumerate(RUNNING_TASK_MEMORY):
+			tempStat=RUNNING_TASK_MEMORY[num]
 			try:
 				data_details=autoMLutilities.readStatusFile(tempRS['idforData'])
+				try:
+					projectName=idforData
+					logFolder='logs/'
+					data_details['generationInfo']=autoMLutilities.progressOfModel(logFolder,projectName)
+					tempStat['generationInfo']=data_details['generationInfo']
+					# print ('STep 3')
+				except:
+					pass
+				try:
+					data_details=autoMLutilities.readStatusFile(tempRS['idforData'])
+					tempStat['generationInfo']=data_details['listOfModelAccuracy']
+				except:
+					pass
 				statusOfProject=data_details['status']
-				tempStat=RUNNING_TASK_MEMORY[num]
+				
 				tempStat['status']=statusOfProject
 				if tempStat['type']=='NNProject':
 					tempStat['url']=data_details['tensorboardUrl']

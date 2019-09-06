@@ -93,7 +93,7 @@ class AutoMLUtilities:
         for num,j in enumerate(listOffiles):
             xx=open(tpotFolder+j,'r')
             genData=xx.read()
-            pp=[k for k in genData.split('\n') if 'Score on the training' in k ]
+            pp=[k for k in genData.split('\n') if 'CV score on the training set was' in k ]
             ll=pp[0].split()[-1].split(':')[-1]
             overallList.append({'modelName':'Generation '+str(num+1),'score':str(ll)})
         return overallList
