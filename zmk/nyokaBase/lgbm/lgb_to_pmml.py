@@ -5,7 +5,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(BASE_DIR)
 import numpy as np
 import PMML43Ext as pml
-#import nyoka.skl.skl_to_pmml as skl_to_pmml
+#import nyokaBase.skl.skl_to_pmml as skl_to_pmml
 import nyokaBase.xgboost.xgboost_to_pmml as xgboostToPmml
 import json
 from skl import pre_process as pp
@@ -264,7 +264,7 @@ def create_node(obj, main_node,derived_col_names):
     obj: Json
         Contains nodes in json format.
     main_node:
-        Contains node build with Nyoka class.
+        Contains node build with nyokaBase class.
     derived_col_names: List
         Contains column names after preprocessing.
     """

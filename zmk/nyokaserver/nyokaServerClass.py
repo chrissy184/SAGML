@@ -289,13 +289,14 @@ class NyokaServer:
 
 			
 			elif processedOutput['itemType']=='DATA':
-				# print ("DATA layer came")
-				extensionInfoForData=[pml.Extension(value=[],anytypeobjs_=[''])]
-				dataVal={}
+				# print ("DATA layer came",processedOutput['filePath'])
 				try:
-					dataVal['dataUrl']=processedOutput['filePath']
-					extensionInfoForData=[pml.Extension(value=dataVal,anytypeobjs_=[''])]
-					pmmlObject.Header.Extension=extensionInfoForData
+					dataUrl=processedOutput['filePath']
+				# if processedOutput['for']:
+				# 	dataTagValues=pml.Data(filePath=dataVal,for_=processedOutput['for'])
+				# else:
+					dataTagValues=pml.Data(filePath=dataUrl,for_='model_1')
+					pmmlObject.Data=[dataTagValues]
 					# print ('Data Step 3')
 					# pmmlObject.export(sys.stdout,0)
 				except:

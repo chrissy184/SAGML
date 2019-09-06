@@ -8,6 +8,7 @@ import PMML43Ext as pml
 from skl import pre_process as pp
 from datetime import datetime
 import math
+import copy
 import metadata
 import inspect
 from nyokaBase.keras.keras_model_to_pmml import KerasToPmml
@@ -15,7 +16,7 @@ from nyokaBase.xgboost.xgboost_to_pmml import xgboost_to_pmml
 from nyokaBase.lgbm.lgb_to_pmml import lgb_to_pmml
 from nyokaBase.lgbm.lgbmTrainingAPI_to_pmml import ExportToPMML as ext
 
-def model_to_pmml(toExportDict, pmml_f_name='from_sklearn.pmml'):
+def model_to_pmml(toExportDict, PMMLFileName='from_sklearn.pmml'):
 
     """
     Exports scikit-learn pipeline object into pmml
@@ -44,12 +45,16 @@ def model_to_pmml(toExportDict, pmml_f_name='from_sklearn.pmml'):
     categoric_values = None
     derived_col_names = None
     mining_imp_val = None
+    dataObj = []
 
 
     for model_name in toExportDict.keys():
         col_names = toExportDict[model_name]['featuresUsed']
         target_name = toExportDict[model_name]['targetName']
         tasktype = toExportDict[model_name]['taskType']
+
+        if toExportDict[model_name]['data'] is not None:
+            dataObj.append(pml.Data(for_=model_name,filePath=toExportDict[model_name]['data']))
 
         model = toExportDict[model_name]['modelObj']
 
@@ -71,10 +76,10 @@ def model_to_pmml(toExportDict, pmml_f_name='from_sklearn.pmml'):
                 with model_graph.as_default():
                     tf_session = KModelObj['tf_session']
                     with tf_session.as_default():
-                        KerasPMML = KerasToPmml(model,model_name=pmml_f_name,targetVarName=target_name)
+                        KerasPMML = KerasToPmml(model,model_name=PMMLFileName,targetVarName=target_name)
                             
             else:
-                KerasPMML = KerasToPmml(model,model_name=pmml_f_name,targetVarName=target_name)
+                KerasPMML = KerasToPmml(model,model_name=PMMLFileName,targetVarName=target_name)
 
             model_obj = KerasPMML.DeepNetwork[0]
             model_obj.modelName = model_name
@@ -126,20 +131,36 @@ def model_to_pmml(toExportDict, pmml_f_name='from_sklearn.pmml'):
                 PMML_kwargs = {key:[model_obj]}
                 models_dict.update(PMML_kwargs)
 
-            data_dicts.append(get_data_dictionary(model, col_names, target_name, categoric_values))
+            data_dicts.append(get_data_dictionary(model, derived_col_names, target_name, categoric_values))
                    
     
     pmml = pml.PMML(
         version=get_version(),
         Header=get_header(),
+        Data=dataObj,
         MiningBuildTask=get_mining_buildtask(toExportDict),
         DataDictionary=get_data_dictionary_values(data_dicts),
         script = get_script_execution(toExportDict),
         **trfm_dict_kwargs,
         **models_dict
     )
-    pmml.export(outfile=open(pmml_f_name, "w"), level=0)
+    pmml.export(outfile=open(PMMLFileName, "w"), level=0)
 
+def scikitLearnPipelineToPMML(pipeline, features, target, PMMLFileName='from_sklearn.pmml'):
+    tempPipe = copy.deepcopy(pipeline)
+    model = tempPipe.steps.pop(-1)[1]
+    toExportDict={
+    model.__class__.__name__:{
+        'hyperparameters':None,
+        'preProcessingScript':None,
+        'pipelineObj':tempPipe,
+        'modelObj':model,
+        'featuresUsed':features,
+        'targetName':target,
+        'postProcessingScript':None,
+        'taskType': 'score'
+    }}
+    model_to_pmml(toExportDict,PMMLFileName)
 
 def get_trfm_dict_kwargs(col_names,pipelineOnly,trfm_dict_kwargs,model,model_name):
     if isinstance(col_names, np.ndarray):
@@ -151,7 +172,9 @@ def get_trfm_dict_kwargs(col_names,pipelineOnly,trfm_dict_kwargs,model,model_nam
     mining_imp_val = tuple()
     if ppln_sans_predictor:
         pml_pp = pp.get_preprocess_val(ppln_sans_predictor, col_names, model, model_name)
-        trfm_dict_kwargs['TransformationDictionary'].append(pml_pp['trfm_dict'])
+        if (pml_pp['trfm_dict']):
+            trfm_dict_kwargs['TransformationDictionary'].append(pml_pp['trfm_dict'])
+        # trfm_dict_kwargs['TransformationDictionary'].append(pml_pp['trfm_dict'])
         derived_col_names = pml_pp['derived_col_names']
         col_names = pml_pp['preprocessed_col_names']
         categoric_values = pml_pp['categorical_feat_values']
@@ -547,7 +570,7 @@ def get_anomalydetection_model(model, derived_col_names, col_names, target_name,
                 modelName=model.__class__.__name__,
                 algorithmType="ocsvm",
                 functionName="regression",
-                MiningSchema=get_mining_schema(model, col_names, target_name, mining_imp_val,categoric_values),
+                MiningSchema=get_mining_schema(model, derived_col_names, target_name, mining_imp_val,categoric_values),
                 Output=get_anomaly_detection_output(model),
                 taskType=tasktype,
                 SupportVectorMachineModel=get_supportVectorMachine_models(model,
@@ -693,7 +716,7 @@ def get_clustering_model(model, derived_col_names, col_names, target_name, minin
     """
 
     clustering_models = list()
-    model_kwargs = get_model_kwargs(model, col_names, target_name, mining_imp_val,categoric_values)
+    model_kwargs = get_model_kwargs(model, derived_col_names, target_name, mining_imp_val,categoric_values)
     values, counts = np.unique(model.labels_,return_counts=True)
     model_kwargs["Output"] = get_output_for_clustering(values)
     clustering_models.append(
@@ -848,7 +871,7 @@ def get_nearestNeighbour_model(model, derived_col_names, col_names, target_name,
         Returns a nearest neighbour model instance
         
     """
-    model_kwargs = get_model_kwargs(model, col_names, target_name, mining_imp_val,categoric_values)
+    model_kwargs = get_model_kwargs(model, derived_col_names, target_name, mining_imp_val,categoric_values)
     nearest_neighbour_model = list()
     nearest_neighbour_model.append(
         pml.NearestNeighborModel(
@@ -1034,7 +1057,7 @@ def get_naiveBayesModel(model, derived_col_names, col_names, target_name, mining
     naive_bayes_model : List
         Returns the NaiveBayesModel
     """
-    model_kwargs = get_model_kwargs(model, col_names, target_name, mining_imp_val,categoric_values)
+    model_kwargs = get_model_kwargs(model, derived_col_names, target_name, mining_imp_val,categoric_values)
     naive_bayes_model = list()
     naive_bayes_model.append(pml.NaiveBayesModel(
         modelName=model.__class__.__name__,
@@ -1151,7 +1174,7 @@ def get_supportVectorMachine_models(model, derived_col_names, col_names, target_
         VectorDictionary, SupportVectorMachine, kernelType
         
     """
-    model_kwargs = get_model_kwargs(model, col_names, target_names, mining_imp_val,categoric_values)
+    model_kwargs = get_model_kwargs(model, derived_col_names, target_names, mining_imp_val,categoric_values)
     supportVector_models = list()
     kernel_type = get_kernel_type(model)
     supportVector_models.append(pml.SupportVectorMachineModel(
@@ -1206,7 +1229,7 @@ def get_ensemble_models(model, derived_col_names, col_names, target_name, mining
     mining_models : List
         Returns the MiningModel of the respective ensemble model
     """
-    model_kwargs = get_model_kwargs(model, col_names, target_name, mining_imp_val,categoric_values)
+    model_kwargs = get_model_kwargs(model, derived_col_names, target_name, mining_imp_val,categoric_values)
     if model.__class__.__name__ == 'GradientBoostingRegressor':
         model_kwargs['Targets'] = get_targets(model, target_name)
 
@@ -1855,7 +1878,7 @@ def get_tree_models(model, derived_col_names, col_names, target_name, mining_imp
         Get the TreeModel element.
         
     """
-    model_kwargs = get_model_kwargs(model, col_names, target_name, mining_imp_val,categoric_values)
+    model_kwargs = get_model_kwargs(model, derived_col_names, target_name, mining_imp_val,categoric_values)         #Chanegd This
     tree_models = list()
     tree_models.append(pml.TreeModel(
         modelName=model.__class__.__name__,
@@ -1890,7 +1913,7 @@ def get_neural_models(model, derived_col_names, col_names, target_name, mining_i
         Model attributes for PMML file.
         
     """
-    model_kwargs = get_model_kwargs(model, col_names, target_name, mining_imp_val,categoric_values)
+    model_kwargs = get_model_kwargs(model, derived_col_names, target_name, mining_imp_val,categoric_values)
     neural_model = list()
     neural_model.append(pml.NeuralNetwork(
         modelName=model.__class__.__name__,
@@ -1952,7 +1975,7 @@ def get_regrs_models(model, derived_col_names, col_names, target_name, mining_im
     regrs_models : List
         Returns a regression model of the respective model
     """
-    model_kwargs = get_model_kwargs(model, col_names, target_name, mining_imp_val, categoric_values)
+    model_kwargs = get_model_kwargs(model, derived_col_names, target_name, mining_imp_val, categoric_values)
     if model.__class__.__name__ not in ['LinearRegression','LinearSVR']: 
         model_kwargs['normalizationMethod'] = 'logit'
     regrs_models = list()

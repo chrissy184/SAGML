@@ -378,17 +378,10 @@ class AutoMLTrainer:
                 # sys.exit()
                 return
             joblib.dump(pp,dataFolder+'tpotPipeline.pkl')
-
-
             prePipeline=mapper1
-
             pipelineList=[('feature_mapper',prePipeline)]
             pipelineList.append(pp[-1])
             
-            # print ('pipeline lsit>>>>>>>>>',pipelineList)
-
-
-
             statusFile=dataFolder+'status'+'.txt'
             with open(statusFile,'r') as sFile:
                 sFileText=sFile.read()
@@ -399,34 +392,31 @@ class AutoMLTrainer:
 
             finalPipe=Pipeline(pipelineList)
             finalPipe.fit(data[featureVar],data[targetVar])
+            print ('finalPipe >>>>> ',finalPipe)
+
             finalPMMLfile=dataFolder+newPMMLFileName
             finalPMMLfile='../ZMOD/Models/'+newPMMLFileName
             finalpklfile=dataFolder+newPMMLFileName+'.pkl'
             joblib.dump(finalPipe,finalpklfile)
+            toExportDict={
+                            'model1':{'data':None,'hyperparameters':None,'preProcessingScript':None,
+                                'pipelineObj':Pipeline(finalPipe.steps[:-1]),'modelObj':finalPipe.steps[-1][1],
+                                'featuresUsed':featureVar,
+                                'targetName':targetVar,'postProcessingScript':None,'taskType': 'score'}
+                        }
             try:
-                if pp[-1][1].__class__.__name__ in ['XGBClassifier','XGBRegressor']:
-                    from nyokaBaseOld.xgboost.xgboost_to_pmml import xgboost_to_pmml
-                    xgboost_to_pmml(finalPipe,featureVar,targetVar,finalPMMLfile)
-                else:
-                    from nyokaBaseOld.skl.skl_to_pmml import skl_to_pmml
-                    skl_to_pmml(finalPipe, featureVar, targetVar, finalPMMLfile)
-                procComp=False
+                print ('toExportDict >>>>>>>>>>>> ',toExportDict)
+                from nyokaBase.skl.skl_to_pmml import model_to_pmml
+                model_to_pmml(toExportDict, PMMLFileName=finalPMMLfile)
                 print ('>>>>>>>>>>>>>>>>>>>>>>> Success')
-
-            except Exception as e:
+                procComp=False
+            except:
                 procComp=True
-                print ('>>>>>>>>>>>>>>>>>>>>>>> Some error occcured', str(e))
-                # print(traceback.format_exc())
-
-        # sFile=open(statusFile,'r')
-        # sFileText=sFile.read()
-        # data_details=json.loads(sFileText)
-        # data_details['status']='Complete'
-        # data_details['pmmlFilelocation']=finalPMMLfile
-        # with open(statusFile,'w') as filetosave:
-        #     json.dump(data_details, filetosave)
-
+                print ('>>>>>>>>>>>>>>>>>>>>>>> Failed Saving Trying again')
+            
         model_accuracy=[]
+
+        print ('Came here')
 
         for num,i in enumerate(tpot.evaluated_individuals_):
             k= {'modelDetail':i,'modelName':i.split("(")[0],'score':round(tpot.evaluated_individuals_[i]['internal_cv_score'],4),'bestmodel':0}
