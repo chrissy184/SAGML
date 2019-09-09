@@ -395,7 +395,7 @@ class AutoMLTrainer:
             print ('finalPipe >>>>> ',finalPipe)
 
             finalPMMLfile=dataFolder+newPMMLFileName
-            finalPMMLfile='../ZMOD/Models/'+newPMMLFileName
+            # finalPMMLfile='../ZMOD/Models/'+newPMMLFileName
             finalpklfile=dataFolder+newPMMLFileName+'.pkl'
             joblib.dump(finalPipe,finalpklfile)
             toExportDict={

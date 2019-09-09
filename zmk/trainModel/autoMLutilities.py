@@ -85,17 +85,20 @@ class AutoMLUtilities:
 
 
     def progressOfModel(self,logFolder,idforData):
+        # print ('Came here')
         projectName=idforData
         projectPath=logFolder+projectName
         tpotFolder=projectPath+'/tpotFolder/'
         listOffiles=os.listdir(tpotFolder)
         overallList=[]
         for num,j in enumerate(listOffiles):
+            # print('num in listofFiles',num)
             xx=open(tpotFolder+j,'r')
             genData=xx.read()
             pp=[k for k in genData.split('\n') if 'CV score on the training set was' in k ]
             ll=pp[0].split()[-1].split(':')[-1]
             overallList.append({'modelName':'Generation '+str(num+1),'score':str(ll)})
+        print (overallList)
         return overallList
 
     def readStatusFile(self,projectName):
