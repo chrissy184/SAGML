@@ -71,8 +71,11 @@ def writePmml(pmmlObj, filepath, lockForPMML):
 		scrptVal=pmmlObj.script
 		if len(scrptVal) > 0:
 			for num,sc in enumerate(scrptVal):
-				urlOfScript=sc.class_
-				useFor=sc.for_
+				scriptPurpose=sc.scriptPurpose
+				modelVal=sc.for_
+				classVal=sc.class_
+				filePathUrl=sc.filePath
+
 				code=None
 				scripCode=sc.get_valueOf_()
 				code = scripCode.lstrip('\n')
@@ -83,8 +86,7 @@ def writePmml(pmmlObj, filepath, lockForPMML):
 					lines.append(line[leading_spaces:])
 				code = '\n'.join(lines)
 				scriptCode=code.replace('<','&lt;')
-				# print (scriptCode)
-				scrp=pml.script(content=scriptCode,class_=urlOfScript,for_=useFor)
+				scrp=pml.script(content=scriptCode,for_=modelVal,class_=classVal,scriptPurpose=scriptPurpose,filePath=filePathUrl)
 				scrptVal2.append(scrp)
 		pmmlObj.script=scrptVal2
 		# print ('Code Step 10.1')
@@ -303,17 +305,21 @@ class NyokaServer:
 					pass
 
 			elif processedOutput['itemType']=='CODE':
-				# print ("CODE layer came")
+				print ("CODE layer came")
+				print ('processedOutput',processedOutput)
 				try:
 					scrptVal=pmmlObject.script
 					urlOfScript=processedOutput['url']
+					filePathUrl=processedOutput['filePath']
 					scriptFile=open(processedOutput['filePath'],'r')
 					scriptCode=scriptFile.read()
 					scriptCode=scriptCode.replace('<','&lt;')
 					# print (scriptCode)
+					modelVal=processedOutput['modelFor']
 					useFor=processedOutput['useFor']
-					scrp=pml.script(content=scriptCode,class_=urlOfScript,for_=useFor)
-					# scrp.export(sys.stdout,0)
+					scriptPurpose=processedOutput['scriptPurpose']
+					scrp=pml.script(content=scriptCode,for_=modelVal,class_=useFor,scriptPurpose=scriptPurpose,filePath=filePathUrl)
+					scrp.export(sys.stdout,0)
 					scrptVal.append(scrp)
 					pmmlObject.script=scrptVal
 					# print ('Code Step 10')

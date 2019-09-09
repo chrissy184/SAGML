@@ -507,11 +507,13 @@ class NyokaUtilities:
 
                 for counT,sc in enumerate(scrptVal):
                     import pathlib
-                    scriptUrl=sc.class_
-                    useForSc=sc.for_
-                    fObjScrpt=pathlib.Path(scriptUrl)
-                    scriptCon=  {"name": "Code","icon": "mdi mdi-code-braces","itemType": "CODE",
-                        "layerId": fObjScrpt.name,'url':scriptUrl,"layerIndex": "NA",'useFor':useForSc}
+                    scriptPurpose=sc.scriptPurpose
+                    modelVal=sc.for_
+                    classVal=sc.class_
+                    filePathUrl=sc.filePath
+                    fObjScrpt=pathlib.Path(filePathUrl)
+                    scriptCon=  {"name": "Code","icon": "mdi mdi-code-braces","itemType": "CODE","modelFor":modelVal,
+                        "layerId": fObjScrpt.name,"scriptPurpose":scriptPurpose,'url':filePathUrl,"layerIndex": "NA",'useFor':classVal}
                     newarchitecture.insert(counT+1,scriptCon)
             else:
                 pass
