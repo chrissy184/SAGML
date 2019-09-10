@@ -119,6 +119,19 @@ namespace ZMM.App.Controllers
                                 break;
                             }
                         }
+                        else if(_type.Contains("AutoMLResponse"))
+                        {
+                            AutoMLResponse amlr = (AutoMLResponse)j;
+                            if (i["idforData"].ToString() == amlr.idforData)
+                            {
+                                jHist.Add(new JObject(){
+                                    {"idforData", amlr.idforData},
+                                    {"status", i["status"].ToString()},
+                                    {"executedAt",amlr.executedAt}
+                                });
+                                break;
+                            }
+                        }
                     }
                 }
                 //
