@@ -310,7 +310,7 @@ class Scoring:
 		global PMMLMODELSTORAGE
 		# print (list(PMMLMODELSTORAGE.keys()))
 		if modelName in PMMLMODELSTORAGE:
-			# print ('Came here model found')
+			print ('Came here model found')
 			scoredOutput=self.predicttestdata(filpath,modelName,jsonData)
 			return scoredOutput
 		else:

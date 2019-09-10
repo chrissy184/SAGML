@@ -42,7 +42,6 @@ class ModelsView(APIView):
 		return Scoring.getListOfModelinMemory()
 
 	def post(self,requests):
-		print ("requests.POST.get('filePath')",requests.POST.get('filePath'))
 		try:
 			filePath=requests.POST.get('filePath')
 			idfordata=requests.POST.get('idforData')

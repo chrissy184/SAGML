@@ -362,12 +362,13 @@ class KerasUtilities:
         return targetResult
 
     def predictFiledata(self,pmmlstoragepointer,testData, modelType=None):
-        # print('$$$$$$$$$$$$$$$$$$ PredictFileData $$$$$$$$$$$$$$$')
+        print('$$$$$$$$$$$$$$$$$$ PredictFileData $$$$$$$$$$$$$$$')
         global PMMLMODELSTORAGE
         pointerObj=PMMLMODELSTORAGE[pmmlstoragepointer]
         target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
         self.checkCreatePath(target_path)
-        if modelType and modelType=="sklearnM":
+        if modelType =="sklearnM":
+            print ('Came to sklearn part')
             model=pointerObj['model']
             predClasses=pointerObj['predClasses']
             targetVar=pointerObj['targetVar']
