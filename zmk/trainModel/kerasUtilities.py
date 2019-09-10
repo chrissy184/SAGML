@@ -206,9 +206,9 @@ class KerasUtilities:
             #Sklearn Model
             else:
                 print ('Next Step 2 >>>>>>>>>>>>')
-                from nyokaBase.reconstruct.pmml_to_pipeline import generate_skl_pipeline
+                from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
                 print ('Next Step 3 >>>>>>>>>>>>')
-                sklModelPipeline=generate_skl_pipeline(filepath)
+                sklModelPipeline=generate_skl_model(filepath)
                 print ('Next Step 4 >>>>>>>>>>>>')
                 # if hasattr(sklModelPipeline.steps[-1][-1],'classes_'):
                 #     print ('sklModelPipeline.steps[-1][-1] >>> ',sklModelPipeline.steps[-1][-1])

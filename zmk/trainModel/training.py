@@ -246,7 +246,9 @@ class Training:
 		data_details['problem_type']=problem_type
 		data_details['idforData']=idforData
 		data_details['shape']=data.shape
-		data_details['taskName']=newPMMLFileName.split('/')[-1]
+		import pathlib
+		fVar=pathlib.Path(dataPath)
+		data_details['taskName']=fVar.name.replace(fVar.suffix,'')#newPMMLFileName.split('/')[-1]
 		
 		autoMLLock.acquire()
 		with open(statusFile,'w') as filetosave:
@@ -258,8 +260,9 @@ class Training:
 		      'type': 'AutoMLProject',
 		      'pid': pID,
 		      'createdOn': str(datetime.datetime.now()),
-		      'newPMMLFileName': newPMMLFileName.split('/')[-1]}
-		tempRunMemory['taskName']=tempRunMemory['newPMMLFileName']
+		      'newPMMLFileName': newPMMLFileName.split('/')[-1]
+			  }
+		tempRunMemory['taskName']=data_details['taskName']
 		print ('>>>>>>>>>>>>>>>>>>>>AutoML',tempRunMemory)
 
 		RUNNING_TASK_MEMORY.append(tempRunMemory)
