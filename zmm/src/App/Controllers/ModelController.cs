@@ -398,8 +398,8 @@ namespace ZMM.App.Controllers
 
         #region NN Create PMML- /api/model/createnn...
         // POST api/
-        [HttpPost("createNN")]
-        public async Task<IActionResult> CreatePmmlAsync()
+        [HttpPost("create")]
+        public async Task<IActionResult> CreatePmmlAsync(string type)
         {
             //create blank pmml file
             long fileSize = 0L;
@@ -408,6 +408,8 @@ namespace ZMM.App.Controllers
             string _filePath = Path.Combine(dirFullpath, newFile);
             ModelResponse _data = new ModelResponse();
             List<Property> _props = new List<Property>();
+            StringBuilder fileContent = new StringBuilder();
+
             try
             {
                 //check if folder path exists...if not then create folder
@@ -415,18 +417,33 @@ namespace ZMM.App.Controllers
                 {
                     Directory.CreateDirectory(dirFullpath);
                 }
-
-                //create blank model data
-                StringBuilder fileContent = new StringBuilder();
-                fileContent.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>,@,");
-                fileContent.Append("<PMML xmlns=\"http://www.dmg.org/PMML-4_3\" version=\"4.3Ext\">,@,");
-                fileContent.Append("<Header copyright=\"Copyright (c) 2018 Software AG\" description=\"Neural Network Model\">,@,");
-                fileContent.Append("<Timestamp>" + DateTime.Now.ToString("yyyy-MM-dd H:mm:ss.") + TimeSpan.TicksPerMillisecond + "</Timestamp>,@,");
-                fileContent.Append("</Header>,@,");
-                fileContent.Append("<DeepNetwork>,@,");
-                fileContent.Append("</DeepNetwork>,@,");
-                fileContent.Append("</PMML>");
-                //
+                if (type == "NN")
+                {
+                    //create blank model data                    
+                    fileContent.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>,@,");
+                    fileContent.Append("<PMML xmlns=\"http://www.dmg.org/PMML-4_3\" version=\"4.3Ext\">,@,");
+                    fileContent.Append("<Header copyright=\"Copyright (c) 2018 Software AG\" description=\"Neural Network Model\">,@,");
+                    fileContent.Append("<Timestamp>" + DateTime.Now.ToString("yyyy-MM-dd H:mm:ss.") + TimeSpan.TicksPerMillisecond + "</Timestamp>,@,");
+                    fileContent.Append("</Header>,@,");
+                    fileContent.Append("<DeepNetwork>,@,");
+                    fileContent.Append("</DeepNetwork>,@,");
+                    fileContent.Append("</PMML>");
+                    //
+                }
+                else if (type == "WF")
+                {
+                    //create blank model data for WORKFLOW                    
+                    fileContent.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>,@,");
+                    fileContent.Append("<PMML xmlns=\"http://www.dmg.org/PMML-4_3\" version=\"4.3Ext\">,@,");
+                    fileContent.Append("<Header copyright=\"Copyright (c) 2018 Software AG\" description=\"Workflow Model\">,@,");
+                    fileContent.Append("<Timestamp>" + DateTime.Now.ToString("yyyy-MM-dd H:mm:ss.") + TimeSpan.TicksPerMillisecond + "</Timestamp>,@,");
+                    fileContent.Append("</Header>,@,");
+                    fileContent.Append("<DeepNetwork>,@,");
+                    fileContent.Append("</DeepNetwork>,@,");
+                    fileContent.Append("</PMML>");
+                    //
+                }
+                
                 using (StreamWriter writer = new StreamWriter(_filePath))
                 {
                     foreach (string line in fileContent.ToString().Split(",@,"))
