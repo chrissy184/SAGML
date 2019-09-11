@@ -260,10 +260,15 @@ export class ModelsComponent implements OnInit {
       });
   }
 
-  public newPmml() {
+  public newPmml(type: string) {
     this.isLoading = true;
     this.uploadFiles = false;
-    this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.modelCreate)
+    const options = {
+      body: {
+        type: type
+      }
+    };
+    this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.modelCreate, options)
       .pipe(finalize(() => { this.isLoading = false; }))
       .subscribe(responseData => {
         this.utilService.alert(responseData.name + AlertMessages.MODEL.create);

@@ -19,7 +19,7 @@ export const ApiRoutes = {
     generateImageForWelding: `data/generateImages`,
 
     models: 'model',
-    modelCreate: 'model/createnn',
+    modelCreate: 'model/create',
     modelGetLayers: `model/layers`,
     modelGet: (id: string) => `model/${id}`,
     modelEdit: (id: string) => `model/${id}/edit`,

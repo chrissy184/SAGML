@@ -23,8 +23,11 @@
           <span class="mdi mdi-file-plus text-secondary"></span>
         </button>
         <mat-menu #newPMMLMenu="matMenu">
-          <button mat-menu-item (click)="newPmml()">
-            New NN
+          <button mat-menu-item (click)="newPmml('NN')">
+            Neural Network
+          </button>
+          <button mat-menu-item (click)="newPmml('WF')">
+            Workflow
           </button>
           <button mat-menu-item (click)="autoML()">
             AutoML
