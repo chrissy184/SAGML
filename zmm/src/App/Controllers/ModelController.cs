@@ -27,7 +27,7 @@ using Quartz.Impl;
 
 namespace ZMM.App.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [Route("api/[controller]")]
     public class ModelController : Controller
     {
@@ -396,7 +396,7 @@ namespace ZMM.App.Controllers
 
         #endregion
 
-        #region NN Create PMML- /api/model/createnn...
+        #region Create PMML- /api/model/create...
         // POST api/
         [HttpPost("create")]
         public async Task<IActionResult> CreatePmmlAsync(string type)
@@ -409,6 +409,7 @@ namespace ZMM.App.Controllers
             ModelResponse _data = new ModelResponse();
             List<Property> _props = new List<Property>();
             StringBuilder fileContent = new StringBuilder();
+            string _type ="";
 
             try
             {
@@ -417,7 +418,16 @@ namespace ZMM.App.Controllers
                 {
                     Directory.CreateDirectory(dirFullpath);
                 }
-                if (type == "NN")
+
+                //read request body                
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var body = await reader.ReadToEndAsync();
+                    var reqBody = JObject.Parse(body);
+                    _type = reqBody["type"].ToString();
+                }
+
+                if (_type == "NN")
                 {
                     //create blank model data                    
                     fileContent.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>,@,");
@@ -430,7 +440,7 @@ namespace ZMM.App.Controllers
                     fileContent.Append("</PMML>");
                     //
                 }
-                else if (type == "WF")
+                else if (_type == "WF")
                 {
                     //create blank model data for WORKFLOW                    
                     fileContent.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>,@,");
