@@ -17,6 +17,7 @@ from random import choice
 from utility.utilityClass import RUNNING_TASK_MEMORY
 import datetime
 import skimage
+import numpy as np
 
 global PMMLMODELSTORAGE
 
@@ -72,11 +73,14 @@ class KerasUtilities:
     def getPredClasses(self,nyoka_pmml_obj):
         targetVar = self.getTargetVariable(nyoka_pmml_obj)
         tempObj=nyoka_pmml_obj.get_DataDictionary()
-        predClasses = list()
-        for dataField in tempObj.get_DataField():
-            if dataField.name == targetVar:
-                for val in dataField.get_Value():
-                    predClasses.append(val.get_value())
+        if str(tempObj) != 'None':
+            predClasses = list()
+            for dataField in tempObj.get_DataField():
+                if dataField.name == targetVar:
+                    for val in dataField.get_Value():
+                        predClasses.append(val.get_value())
+        else:
+            predClasses=[]
         # predClasses=[eleData.get_value() for dataFobj in tempObj.get_DataField() for eleData in dataFobj.get_Value()]
     #     predClasses={j:k for j,k in enumerate(predClasses)}
         return predClasses
@@ -288,9 +292,11 @@ class KerasUtilities:
         return data_details
 
     def predictImagedata(self,pmmlstoragepointer,testimage):
+        # print ('Came to image prediction')
         global PMMLMODELSTORAGE
 
         pointerObj=PMMLMODELSTORAGE[pmmlstoragepointer]
+        # print ('pointerObj',pointerObj)
         model_graph = pointerObj['model_graph']
         tf_session = pointerObj['tf_session']
         with model_graph.as_default():
@@ -306,6 +312,8 @@ class KerasUtilities:
                 x=x.reshape(1,img_height, img_width,3)
                 predi=model.predict(x)
                 # print(' >>>>>>>>>>>>>>> predi ',predi,predClasses)
+                if len(predClasses)==0:
+                    predClasses=['class_'+str(i) for i in range(len(np.ravel(predi)))]
                 targetResult= {j:str(float(k)) for j,k in zip(predClasses,list(predi[0]))}
 
         target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'

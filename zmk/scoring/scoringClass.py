@@ -140,6 +140,7 @@ class Scoring:
 
 		
 		if filpath and (modelType != 'MRCNN'):
+			print ('Came here in Image classfication')
 			extenFile=checkExtensionOfFile(filpath)
 			PMMLMODELSTORAGE[pmmlstoragepointer]['extenFile']=extenFile
 			import pandas as pd

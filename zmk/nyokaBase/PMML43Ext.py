@@ -1040,7 +1040,7 @@ class LayerWeights(supermod.LayerWeights):
         else:
             return None
 
-        from nyoka.Base64 import FloatBase64
+        from nyokaBase.Base64 import FloatBase64
         if raw_content.find("+") > 0:
             return FloatBase64.to_floatArray_urlsafe(raw_content)
         else:
@@ -1197,7 +1197,7 @@ class LayerBias(supermod.LayerBias):
         else:
             return None
 
-        from nyoka.Base64 import FloatBase64
+        from nyokaBase.Base64 import FloatBase64
         if raw_content.find("+") > 0:
             return FloatBase64.to_floatArray_urlsafe(raw_content)
         else:

@@ -155,12 +155,11 @@ class TrainNNView(APIView):
 		return result
 
 	def post(self,requests):
-		userInput=requests.body
 		try:
-			userInput=json.loads(userInput)
+			requests.POST.get('filePath')
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return Training.trainNeuralNetworkModels(userInput)
+		return Training.trainNeuralNetworkModels(requests)
 
 
 class MRCNNView(APIView):

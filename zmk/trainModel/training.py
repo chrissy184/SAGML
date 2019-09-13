@@ -59,44 +59,51 @@ class Training:
 	# @api_view(['POST'])
 	# @schema(trainNeuralNetworkModelsSwagger)
 	# @api_view()
-	def trainNeuralNetworkModels(userInput):
+	def trainNeuralNetworkModels(requests):
 		# userInput=requests.body
+		# print ('userInput >>>>>',userInput)
 		# userInput=json.loads(userInput)
-		# print (userInput)
-		pmmlFile=userInput['filePath']
+		pmmlFile=requests.POST.get('filePath')
 		try:
-			dataFolder=userInput['dataFolder']
-		except:
-			dataFolder='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
-			kerasUtilities.checkCreatePath(dataFolder)
-
-		try:
-			fileName=userInput['filePath']
-		except:
-			fileName=userInput['filePath']
-		try:
-			tensorboardLogFolder=userInput['tensorboardLogFolder']
-			print ('Log folder came correct')
-		except:
-			print ('Log folder has some issue')
-			tensorboardLogFolder=target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
-			# print ('tensorboardLogFolder',tensorboardLogFolder)
-			kerasUtilities.checkCreatePath(tensorboardLogFolder)
-		
-		lossType=userInput['loss']
-		listOfMetrics=userInput['metrics']
-		batchSize=userInput['batchSize']
-		epoch=userInput['epoch']
-		stepsPerEpoch=userInput['stepPerEpoch']
-		problemType=userInput['problemType']
-		testSize=userInput['testSize']
-		scriptOutput=userInput['scriptOutput']
-		optimizerName=userInput['optimizer']
-		learningRate=userInput['learningRate']
-		try:
-			tensorboardUrl=userInput['tensorboardUrl']
+			tensorboardUrl=requests.POST.get('tensorboardUrl')
 		except:
 			tensorboardUrl=''
+		try:
+			tensorboardLogFolder=requests.POST.get('tensorboardLogFolder')
+		except:
+			tensorboardLogFolder=''
+		# pmmlFile=userInput
+		
+		# try:
+		# 	dataFolder=userInput['dataFolder']
+		# except:
+		# 	dataFolder='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+		# 	kerasUtilities.checkCreatePath(dataFolder)
+
+		# try:
+		# 	fileName=userInput['filePath']
+		# except:
+		# 	fileName=userInput['filePath']
+		# try:
+		# 	tensorboardLogFolder=userInput['tensorboardLogFolder']
+		# 	print ('Log folder came correct')
+		# except:
+		# 	print ('Log folder has some issue')
+		# 	tensorboardLogFolder=target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+		# 	# print ('tensorboardLogFolder',tensorboardLogFolder)
+		# 	kerasUtilities.checkCreatePath(tensorboardLogFolder)
+		
+		# lossType=userInput['loss']
+		# listOfMetrics=userInput['metrics']
+		# batchSize=userInput['batchSize']
+		# epoch=userInput['epoch']
+		# stepsPerEpoch=userInput['stepPerEpoch']
+		# problemType=userInput['problemType']
+		# testSize=userInput['testSize']
+		# scriptOutput=userInput['scriptOutput']
+		# optimizerName=userInput['optimizer']
+		# learningRate=userInput['learningRate']
+		
 		# idforData=pmmlFile.split('/')[-1].replace('.pmml','')
 		idforData=os.path.basename(pmmlFile).replace('.pmml','')
 
