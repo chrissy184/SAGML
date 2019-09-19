@@ -287,22 +287,15 @@ namespace ZMM.App.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
-            if (string.IsNullOrEmpty(InstancePayload.GetById(id).Id))
-            {
-                bool result = CodePayload.Delete(id);
+            bool result = CodePayload.Delete(id);
 
-                if (result == true)
-                {
-                    return Ok(new { user = string.Empty, id = id, message = "File deleted successfully." });
-                }
-                else
-                {
-                    return BadRequest(new { user = string.Empty, id = id, message = "Error deleting file. Try again or contact adminstrator." });
-                }
+            if (result == true)
+            {
+                return Ok(new { user = string.Empty, id = id, message = "File deleted successfully." });
             }
             else
             {
-                return BadRequest(new { user = string.Empty, id = id, message = "Error deleting file. An instance of this file is running." });
+                return BadRequest(new { user = string.Empty, id = id, message = "Error deleting file. Try again or contact adminstrator." });
             }
         }
         #endregion
