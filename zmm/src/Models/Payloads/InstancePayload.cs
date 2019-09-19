@@ -23,7 +23,7 @@ namespace ZMM.Models.Payloads
 
         #endregion
 
-        #region Read
+        #region Read/Get
         /// <summary>
         /// GetAllInstancePayload : get all running instance information
         /// </summary>
@@ -43,6 +43,17 @@ namespace ZMM.Models.Payloads
         }
         #endregion
 
+        #region Get by Id
+        /// <summary>
+        /// GetById : get the running instance information
+        /// </summary>
+        /// <returns>List<InstanceResponse></returns>
+        public static InstanceResponse GetById(string id)
+        {
+            var inst = (InstanceResponse)GlobalStorage.InstanceStorage.Where(i=>i.Key == id);            
+            return inst;
+        }
+        #endregion
         #region Delete
         /// <summary>
         /// Delete record from the payload
