@@ -696,7 +696,7 @@ namespace ZMM.App.Controllers
 
         #endregion
 
-        #region Training POST - /api/model/{id}/train
+        #region Training POST - /api/model/{id}/train (ScheduledJob)
         [HttpPost("{id}/train")]
         public async Task<IActionResult> PostModelTrainAsync(string id)
         {
