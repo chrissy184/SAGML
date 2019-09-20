@@ -10,9 +10,6 @@ import sys, os,ast,json,copy,traceback
 from keras import backend as K
 import keras
 from multiprocessing import Process
-# import nyokaBase.PMML43Ext as ny
-# from nyokaBase.keras.pmml_to_keras_model import GenerateKerasModel
-# 
 from trainModel import kerasUtilities
 kerasUtilities = kerasUtilities.KerasUtilities()
 from multiprocessing import Lock, Process
@@ -45,7 +42,6 @@ class NeuralNetworkModelTrainer:
 		data_details=json.loads(sFileText)
 		sFile.close()
 		self.lockForStatus.release()
-
 		return data_details
 
 
@@ -163,7 +159,14 @@ class NeuralNetworkModelTrainer:
 				networkObj[0].NetworkLayer[index].Extension = layer.Extension
 		return networkObj
 
-
+	def updateStatusWithError(self,data_details,statusOFExe,errorMessage,errorTraceback,statusFile):
+		data_details=self.upDateStatus()
+		data_details['status']=statusOFExe
+		data_details['errorMessage']=errorMessage
+		data_details['errorTraceback']=errorTraceback
+		with open(statusFile,'w') as filetosave:
+			json.dump(data_details, filetosave)
+		return ('done')
 
 	def generateAndCompileModel(self, lossType, optimizerName, learningRate, listOfMetrics, compileTestOnly=False):
 
@@ -187,16 +190,10 @@ class NeuralNetworkModelTrainer:
 		except Exception as e:
 			if not compileTestOnly:
 				data_details=self.upDateStatus()
-				data_details['status']='Training Failed'
-				data_details['errorMessage']='Unable to get the optimizer '+optimizerName+' >> '+ str(e)
-				data_details['errorTraceback']=traceback.format_exc()
-				with open(self.statusFile,'w') as filetosave:
-					json.dump(data_details, filetosave)
+				self.updateStatusWithError(data_details,'Training Failed','Unable to get the optimizer '+optimizerName+' >> '+ str(e),traceback.format_exc(),self.statusFile)
 			else:
 				data_details = {}
-				data_details['status']='Model Compilation Failed'
-				data_details['errorMessage']='Error while compiling the Model >> '+ str(e)
-				data_details['errorTraceback']=traceback.format_exc()
+				self.updateStatusWithError(data_details,'Model Compilation Failed','Error while compiling the Model >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return data_details
 
 		try:
@@ -205,16 +202,10 @@ class NeuralNetworkModelTrainer:
 		except Exception as e:
 			if not compileTestOnly:
 				data_details=self.upDateStatus()
-				data_details['status']='Training Failed'
-				data_details['errorMessage']='Error while generating Keras Model >> '+ str(e)
-				data_details['errorTraceback']=traceback.format_exc()
-				with open(self.statusFile,'w') as filetosave:
-					json.dump(data_details, filetosave)
+				self.updateStatusWithError(data_details,'Training Failed','Error while generating Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
 			else:
 				data_details = {}
-				data_details['status']='Model Compilation Failed'
-				data_details['errorMessage']='Error while compiling the Model >> '+ str(e)
-				data_details['errorTraceback']=traceback.format_exc()
+				self.updateStatusWithError(data_details,'Model Compilation Failed','Error while compiling Model >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return data_details
 		model=modelObj.model
 
@@ -227,16 +218,10 @@ class NeuralNetworkModelTrainer:
 		except Exception as e:
 			if not compileTestOnly:
 				data_details=self.upDateStatus()
-				data_details['status']='Training Failed'
-				data_details['errorMessage']='Error while compiling the Model >> '+ str(e)
-				data_details['errorTraceback']=traceback.format_exc()
-				with open(self.statusFile,'w') as filetosave:
-					json.dump(data_details, filetosave)
+				self.updateStatusWithError(data_details,'Training Failed','Error while compiling Model >> '+ str(e),traceback.format_exc(),self.statusFile)
 			else:
 				data_details = {}
-				data_details['status']='Model Compilation Failed'
-				data_details['errorMessage']='Error while compiling the Model >> '+ str(e)
-				data_details['errorTraceback']=traceback.format_exc()
+				self.updateStatusWithError(data_details,'Model Compilation Failed','Error while compiling Model >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return data_details
 		if not compileTestOnly:
 			kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Successfully compiled')
@@ -244,25 +229,15 @@ class NeuralNetworkModelTrainer:
 		return modelObj
 
 
-	def train(self,pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,batchSize,epoch,\
-		stepsPerEpoch,idforData,testSize,problemType,scriptOutput,optimizerName,learningRate):
-		# print ('>>>>>> Step ',1)
-		
-		
+	def train(self,idforData,pmmlFile,tensorboardLogFolder):
 		saveStatus=self.logFolder+idforData+'/'
-		
 		self.statusFile=saveStatus+'status.txt'
 
 		try:
 			self.pmmlfileObj=ny.parse(pmmlFile,silence=True)
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='Error while parsing the PMML file >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit()
+			self.updateStatusWithError(data_details,'Training Failed','Error while parsing the PMML file >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return -1   
 		# print ('>>>>>> Step ',2)
 
@@ -272,11 +247,7 @@ class NeuralNetworkModelTrainer:
 			self.hdExtDet=ast.literal_eval(hdInfo.Extension[0].get_value())
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='Error while extracting Header information from the PMML file >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
+			self.updateStatusWithError(data_details,'Training Failed','Error while extracting Header information from the PMML file >> '+ str(e),traceback.format_exc(),self.statusFile)
 			# sys.exit()
 			return -1
 		# print ('>>>>>> Step ',3)
@@ -287,24 +258,14 @@ class NeuralNetworkModelTrainer:
 				self.hdExtDet['scriptOutput']=scriptOutput
 			except Exception as e:
 				data_details=self.upDateStatus()
-				data_details['status']='Training Failed'
-				data_details['errorMessage']='scriptOutput is not found in the PMML Header >> '+ str(e)
-				data_details['errorTraceback']=traceback.format_exc()
-				with open(self.statusFile,'w') as filetosave:
-					json.dump(data_details, filetosave)
-				# sys.exit()
+				self.updateStatusWithError(data_details,'Training Failed','scriptOutput is not found in the PMML Header >> '+ str(e),traceback.format_exc(),self.statusFile)
 				return -1
 
 		try:
 		    self.pathOfData=self.hdExtDet['dataUrl']
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='dataUrl is not found in the PMML Header >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit()
+			self.updateStatusWithError(data_details,'Training Failed','dataUrl is not found in the PMML Header >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return -1
 		# print ('>>>>>> Step ',4,self.pathOfData)
 		if os.path.isdir(self.pathOfData):
@@ -324,12 +285,7 @@ class NeuralNetworkModelTrainer:
 			train_prc.start()
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']="Couldn't start the training process  >> "+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit()
+			self.updateStatusWithError(data_details,'Training Failed',"Couldn't start the training process >> "+ str(e),traceback.format_exc(),self.statusFile)
 			return -1
 		return train_prc.ident
 
@@ -347,12 +303,7 @@ class NeuralNetworkModelTrainer:
 		except Exception as e:
 			# print ('Exception Occured')
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='Unable to find train and validation folder >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit()
+			self.updateStatusWithError(data_details,'Training Failed','Unable to find train and validation folder >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return
 
 		# print(">>>>>>>>>>>>>>ImageClassifier")
@@ -365,24 +316,14 @@ class NeuralNetworkModelTrainer:
 			img_height, img_width=modelObj.image_input.shape.as_list()[1:3]
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='Model input_shape is invalid >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit()
+			self.updateStatusWithError(data_details,'Training Failed','Model input_shape is invalid >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return
 
 		try:
 			tGen,vGen,nClass=self.kerasDataPrep(dataFolder,batchSize,img_height,img_width)
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='Error while generating data for Keras >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit()
+			self.updateStatusWithError(data_details,'Training Failed','Error while generating data for Keras >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return
 
 		tensor_board = self.startTensorBoard(tensorboardLogFolder)
@@ -396,12 +337,7 @@ class NeuralNetworkModelTrainer:
 				model.fit_generator(tGen,steps_per_epoch=stepsPerEpoch,validation_steps=10,epochs=epoch,validation_data=vGen,callbacks=[tensor_board])
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='There is a problem with training parameters >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit()
+			self.updateStatusWithError(data_details,'Training Failed','There is a problem with training parameters >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return
 		
 		kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
@@ -427,12 +363,7 @@ class NeuralNetworkModelTrainer:
 				data=pd.read_csv(self.pathOfData)
 			except Exception as e:
 				data_details=self.upDateStatus()
-				data_details['status']='Training Failed'
-				data_details['errorMessage']='Error while reading the csv file >> '+ str(e)
-				data_details['errorTraceback']=traceback.format_exc()
-				with open(self.statusFile,'w') as filetosave:
-					json.dump(data_details, filetosave)
-				sys.exit() 	 
+				self.updateStatusWithError(data_details,'Training Failed','Error while reading the csv file >> '+ str(e),traceback.format_exc(),self.statusFile)
 			XVar=list(data.columns)
 			XVar.remove('target')
 		else:
@@ -493,12 +424,7 @@ class NeuralNetworkModelTrainer:
 			createImages(testDataX,testDataY,self.validationFolder)
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='Error while generating the images >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit() 
+			self.updateStatusWithError(data_details,'Training Failed','Error while generating the images >> '+ str(e),traceback.format_exc(),self.statusFile) 
 			return
 
 		os.remove(fnaMe)
@@ -510,11 +436,7 @@ class NeuralNetworkModelTrainer:
 			tGen,vGen,nClass=self.kerasDataPrep(dataFolder,batchSize,img_height,img_width)
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='Error while generating data for Keras >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
+			self.updateStatusWithError(data_details,'Training Failed','Error while generating data for Keras >> '+ str(e),traceback.format_exc(),self.statusFile)
 			sys.exit()
 
 		tensor_board = self.startTensorBoard(tensorboardLogFolder)
@@ -525,12 +447,7 @@ class NeuralNetworkModelTrainer:
 				model.fit_generator(tGen,steps_per_epoch=stepsPerEpoch,epochs=epoch,validation_data=vGen,callbacks=[tensor_board])
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='There is a problem with training parameters >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit()
+			self.updateStatusWithError(data_details,'Training Failed','There is a problem with training parameters >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return
 
 		kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
@@ -559,12 +476,7 @@ class NeuralNetworkModelTrainer:
 				X = df.drop([targetColumnName], axis=1)
 			except Exception as e:
 				data_details=self.upDateStatus()
-				data_details['status']='Training Failed'
-				data_details['errorMessage']='Error while reading the csv file >> '+ str(e)
-				data_details['errorTraceback']=traceback.format_exc()
-				with open(self.statusFile,'w') as filetosave:
-					json.dump(data_details, filetosave)
-				# sys.exit()
+				self.updateStatusWithError(data_details,'Training Failed','Error while reading the csv file >> '+ str(e),traceback.format_exc(),self.statusFile)
 				return
 			targetCol = df[targetColumnName]
 			if problemType=='classification':
@@ -621,12 +533,7 @@ class NeuralNetworkModelTrainer:
 					validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpoch, validation_steps=stepsPerEpoch)
 		except Exception as e:
 			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='Error while fitting data to Keras Model >> '+ str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit()
+			self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return
 
 		kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
