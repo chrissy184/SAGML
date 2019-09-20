@@ -287,6 +287,11 @@ namespace ZMM.App.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            if(InstancePayload.IsInstanceExists(id) && CodePayload.GetById(id).Type == "JUPYTER_NOTEBOOK")
+            {
+                return BadRequest(new { user = string.Empty, id = id, message = "Error deleting file. Instance of the file is running. Check Assests module" });
+            }
+
             bool result = CodePayload.Delete(id);
 
             if (result == true)
