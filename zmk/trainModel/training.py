@@ -72,6 +72,7 @@ class Training:
 			tensorboardLogFolder=requests.POST.get('tensorboardLogFolder')
 		except:
 			tensorboardLogFolder=''
+		print ('>>>>>>>>   ',pmmlFile,tensorboardUrl,tensorboardLogFolder)
 		# pmmlFile=userInput
 		
 		# try:
@@ -105,7 +106,9 @@ class Training:
 		# learningRate=userInput['learningRate']
 		
 		# idforData=pmmlFile.split('/')[-1].replace('.pmml','')
-		idforData=os.path.basename(pmmlFile).replace('.pmml','')
+		idforData=int(time.time())
+		idforData=str(idforData)+'_NN'
+		# idforData=pathlib.Path(pmmlFile).name.replace('.pmml','')
 
 		saveStatus=logFolder+idforData+'/'
 		kerasUtilities.checkCreatePath(saveStatus)
@@ -114,32 +117,33 @@ class Training:
 		# print("status file generated")
 
 		data_details={}
-		data_details['pmmlFile']=idforData
-		data_details['dataFolder']=dataFolder
-		data_details['fileName']=fileName
-		data_details['tensorboardLogFolder']=tensorboardLogFolder
 		data_details['tensorboardUrl']=tensorboardUrl
-		data_details['lossType']=lossType
-		data_details['listOfMetrics']=listOfMetrics
-		data_details['batchSize']=batchSize
-		data_details['epoch']=epoch
-		data_details['stepsPerEpoch']=stepsPerEpoch
-		data_details['problemType']=problemType
-		data_details['testSize']=testSize
-		data_details['scriptOutput']=scriptOutput
-		data_details['optimizerName']=optimizerName
-		data_details['learningRate']=learningRate
 		data_details['idforData']=idforData
 		data_details['status']='In Progress'
-		fObjScrpt=pathlib.Path(fileName)
+		fObjScrpt=pathlib.Path(pmmlFile)
 		data_details['taskName']=fObjScrpt.name
+		# data_details['pmmlFile']=idforData
+		# data_details['dataFolder']=dataFolder
+		# data_details['fileName']=fileName
+		# data_details['tensorboardLogFolder']=tensorboardLogFolder
+		
+		# data_details['lossType']=lossType
+		# data_details['listOfMetrics']=listOfMetrics
+		# data_details['batchSize']=batchSize
+		# data_details['epoch']=epoch
+		# data_details['stepsPerEpoch']=stepsPerEpoch
+		# data_details['problemType']=problemType
+		# data_details['testSize']=testSize
+		# data_details['scriptOutput']=scriptOutput
+		# data_details['optimizerName']=optimizerName
+		# data_details['learningRate']=learningRate
+		
 
 		with open(statusfileLocation,'w') as filetosave:
 			json.dump(data_details, filetosave)
 		nntrainer = mergeTrainingNN.NeuralNetworkModelTrainer()
 
-		pID = nntrainer.train(pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,batchSize,\
-			epoch,stepsPerEpoch,idforData,testSize,problemType,scriptOutput,optimizerName,learningRate)
+		pID = nntrainer.train(idforData,pmmlFile,tensorboardLogFolder)
 		
 		data_details['pID']=str(pID)
 		saveStatus=logFolder+idforData+'/'
@@ -161,7 +165,7 @@ class Training:
 			'createdOn': str(datetime.datetime.now()),
 			'type': 'NNProject',
 			'pid':pID,
-			'newPMMLFileName':fileName.split('/')[-1]}
+			'newPMMLFileName':fObjScrpt.name.split('/')[-1]}
 			tempRunMemory['taskName']=data_details['taskName']
 			RUNNING_TASK_MEMORY.append(tempRunMemory)
 		else:
