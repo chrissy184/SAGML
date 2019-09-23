@@ -102,6 +102,7 @@ class Utility:
 
 
 	def runningTaskList(self):
+		print ('RUNNING_TASK_MEMORY RUNNING_TASK_MEMORY',RUNNING_TASK_MEMORY)
 		for num,tempRS in enumerate(RUNNING_TASK_MEMORY):
 			tempStat=RUNNING_TASK_MEMORY[num]
 			try:
@@ -124,16 +125,25 @@ class Utility:
 						tempStat['generationInfo']=data_details['listOfModelAccuracy']
 				except:
 					pass
+
 				statusOfProject=data_details['status']
-				
 				tempStat['status']=statusOfProject
+			except:
+				pass
+
+			try:
+				print ('ppppppppppp >>>>>>>>',1)
 				if tempStat['type']=='NNProject':
 					tempStat['url']=data_details['tensorboardUrl']
+				print ('ppppppppppp >>>>>>>>',3)
 				if data_details['errorMessage']:
 					tempStat['errorMessage']=data_details['errorMessage']
+				print ('ppppppppppp >>>>>>>>',4)
 				if tempStat['errorTraceback']:
 					tempStat['errorTraceback']=data_details['errorTraceback']
+				print ('ppppppppppp >>>>>>>>',5)
 				RUNNING_TASK_MEMORY[num]=tempStat
+				print ('RUNNING_TASK_MEMORY hhaha',RUNNING_TASK_MEMORY)
 			except:
 				pass
 		runTaskListSorted=sorted(RUNNING_TASK_MEMORY, key=itemgetter('createdOn'),reverse=True)

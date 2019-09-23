@@ -44,6 +44,12 @@ class NeuralNetworkModelTrainer:
 		self.lockForStatus.release()
 		return data_details
 
+	def startTensorBoard(self, tensorboardLogFolder):
+		print ('tensorboardLogFolder >>>>>>',tensorboardLogFolder)
+		tensor_board=keras.callbacks.TensorBoard(log_dir=tensorboardLogFolder, histogram_freq=0,write_graph=True, write_images=False)
+		return tensor_board
+
+
 
 	def setOptimizer(self, optimizerName, learningRate):
 
@@ -138,10 +144,12 @@ class NeuralNetworkModelTrainer:
 		return networkObj
 
 	def updateStatusWithError(self,data_details,statusOFExe,errorMessage,errorTraceback,statusFile):
+		print ('came to update status')
 		data_details=self.upDateStatus()
 		data_details['status']=statusOFExe
 		data_details['errorMessage']=errorMessage
 		data_details['errorTraceback']=errorTraceback
+		print ('12ns',data_details)
 		with open(statusFile,'w') as filetosave:
 			json.dump(data_details, filetosave)
 		return ('done')
@@ -217,49 +225,135 @@ class NeuralNetworkModelTrainer:
 			data_details=self.upDateStatus()
 			self.updateStatusWithError(data_details,'Training Failed','Error while parsing the PMML file >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return -1   
-		# print ('>>>>>> Step ',2)
+		print ('>>>>>> Step ',2)
 
 		self.pmmlObj=self.pmmlfileObj.__dict__
-		try:
-			hdInfo=self.pmmlObj['Header']
-			self.hdExtDet=ast.literal_eval(hdInfo.Extension[0].get_value())
-		except Exception as e:
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed','Error while extracting Header information from the PMML file >> '+ str(e),traceback.format_exc(),self.statusFile)
-			# sys.exit()
-			return -1
-		# print ('>>>>>> Step ',3)
-		if scriptOutput is None:
-		    pass
-		else:
-			try:
-				self.hdExtDet['scriptOutput']=scriptOutput
-			except Exception as e:
-				data_details=self.upDateStatus()
-				self.updateStatusWithError(data_details,'Training Failed','scriptOutput is not found in the PMML Header >> '+ str(e),traceback.format_exc(),self.statusFile)
-				return -1
+		data_details=self.upDateStatus()
+		print (data_details)
 
+		#Getting data information
 		try:
-		    self.pathOfData=self.hdExtDet['dataUrl']
+			self.pathOfData=self.pmmlObj['Data'][0].__dict__['filePath']
 		except Exception as e:
+			self.pathOfData=None
 			data_details=self.upDateStatus()
 			self.updateStatusWithError(data_details,'Training Failed','dataUrl is not found in the PMML Header >> '+ str(e),traceback.format_exc(),self.statusFile)
 			return -1
+		print ('>>>>>> Step ',3)
+		#Getting Hyperparameters
+		try:
+			print ('came here')
+			for minBT in self.pmmlObj['MiningBuildTask'].Extension:
+				if minBT.__dict__['name']=='hyperparameters':
+					datHyperPara=minBT.__dict__['value']
+					datHyperPara=ast.literal_eval(datHyperPara)
+		except Exception as e:
+			self.pathOfData=None
+			data_details=self.upDateStatus()
+			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters >> "+ str(e),traceback.format_exc(),self.statusFile)
+			return -1
+
+		try:
+			lossType=datHyperPara['lossType']
+		except Exception as e:
+			self.pathOfData=None
+			data_details=self.upDateStatus()
+			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters lossType >> "+ str(e),traceback.format_exc(),self.statusFile)
+			return -1
+		try:
+			listOfMetrics=datHyperPara['listOfMetrics']
+		except Exception as e:
+			self.pathOfData=None
+			data_details=self.upDateStatus()
+			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters listOfMetrics >> "+ str(e),traceback.format_exc(),self.statusFile)
+			return -1
+		
+		try:
+			batchSize=datHyperPara['batchSize']
+		except Exception as e:
+			self.pathOfData=None
+			data_details=self.upDateStatus()
+			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters batchSize >> "+ str(e),traceback.format_exc(),self.statusFile)
+			return -1
+		
+		try:
+			epoch=datHyperPara['epoch']
+		except Exception as e:
+			self.pathOfData=None
+			data_details=self.upDateStatus()
+			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters epoch >> "+ str(e),traceback.format_exc(),self.statusFile)
+			return -1
+		
+		try:
+			problemType=datHyperPara['problemType']
+		except Exception as e:
+			self.pathOfData=None
+			data_details=self.upDateStatus()
+			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters problemType >> "+ str(e),traceback.format_exc(),self.statusFile)
+			return -1
+		
+		try:
+			optimizerName=datHyperPara['optimizerName']
+		except Exception as e:
+			self.pathOfData=None
+			data_details=self.upDateStatus()
+			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters optimizerName >> "+ str(e),traceback.format_exc(),self.statusFile)
+			return -1
+
+		try:
+			learningRate=datHyperPara['learningRate']
+		except Exception as e:
+			self.pathOfData=None
+			data_details=self.upDateStatus()
+			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters learningRate >> "+ str(e),traceback.format_exc(),self.statusFile)
+			return -1
+		
+		scriptOutput=None
+		fileName=pmmlFile
+		# idforData=datHyperPara['idforData']
+		# testSize=datHyperPara['testSize']
+		# problemType=datHyperPara['problemType']
+		# scriptOutput=datHyperPara['scriptOutput']
+
+
+		
+		# try:
+		# 	hdInfo=self.pmmlObj['Header']
+		# 	self.hdExtDet=ast.literal_eval(hdInfo.Extension[0].get_value())
+		# except Exception as e:
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed','Error while extracting Header information from the PMML file >> '+ str(e),traceback.format_exc(),self.statusFile)
+		# 	# sys.exit()
+		# 	return -1
+		print ('>>>>>> Step ',3)
+		# if scriptOutput is None:
+		#     pass
+		# else:
+		# 	try:
+		# 		self.hdExtDet['scriptOutput']=scriptOutput
+		# 	except Exception as e:
+		# 		data_details=self.upDateStatus()
+		# 		self.updateStatusWithError(data_details,'Training Failed','scriptOutput is not found in the PMML Header >> '+ str(e),traceback.format_exc(),self.statusFile)
+		# 		return -1
+
 		# print ('>>>>>> Step ',4,self.pathOfData)
 		if os.path.isdir(self.pathOfData):
+			print ('Image Classifier')
 			target=self.trainImageClassifierNN
 		else:
-			if self.pmmlObj['script'] == []:
-				target=self.trainSimpleDNN
-			else:
-				if scriptOutput == 'IMAGE':
-					target=self.trainCustomNN
-				else:
-					target=self.trainSimpleDNN
+			pass
+
+		print ('>>>>>> Step ',4)
+			# if self.pmmlObj['script'] == []:
+			# 	target=self.trainSimpleDNN
+			# else:
+			# 	if scriptOutput == 'IMAGE':
+			# 		target=self.trainCustomNN
+			# 	else:
+			# 		target=self.trainSimpleDNN
 		try:
 			train_prc = Process(target=target,args=(pmmlFile,self.pathOfData,fileName,tensorboardLogFolder,lossType,\
-				listOfMetrics,batchSize,epoch,stepsPerEpoch,idforData,testSize,problemType,scriptOutput,\
-				optimizerName,learningRate))
+				listOfMetrics,batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate))
 			train_prc.start()
 		except Exception as e:
 			data_details=self.upDateStatus()
@@ -269,7 +363,7 @@ class NeuralNetworkModelTrainer:
 
 
 	def trainImageClassifierNN(self,pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,\
-		batchSize,epoch,stepsPerEpoch,idforData,testSize,problemType,scriptOutput,optimizerName,learningRate):
+		batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate):
 		# print ('Classification data folder at',dataFolder)
 		try:
 			self.trainFolder=dataFolder+'/'+'train/'
@@ -299,6 +393,7 @@ class NeuralNetworkModelTrainer:
 
 		try:
 			tGen,vGen,nClass=self.kerasDataPrep(dataFolder,batchSize,img_height,img_width)
+			stepsPerEpoch=tGen.n/tGen.batch_size
 		except Exception as e:
 			data_details=self.upDateStatus()
 			self.updateStatusWithError(data_details,'Training Failed','Error while generating data for Keras >> '+ str(e),traceback.format_exc(),self.statusFile)

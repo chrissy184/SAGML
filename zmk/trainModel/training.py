@@ -60,9 +60,6 @@ class Training:
 	# @schema(trainNeuralNetworkModelsSwagger)
 	# @api_view()
 	def trainNeuralNetworkModels(requests):
-		# userInput=requests.body
-		# print ('userInput >>>>>',userInput)
-		# userInput=json.loads(userInput)
 		pmmlFile=requests.POST.get('filePath')
 		try:
 			tensorboardUrl=requests.POST.get('tensorboardUrl')
@@ -73,49 +70,11 @@ class Training:
 		except:
 			tensorboardLogFolder=''
 		print ('>>>>>>>>   ',pmmlFile,tensorboardUrl,tensorboardLogFolder)
-		# pmmlFile=userInput
-		
-		# try:
-		# 	dataFolder=userInput['dataFolder']
-		# except:
-		# 	dataFolder='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
-		# 	kerasUtilities.checkCreatePath(dataFolder)
-
-		# try:
-		# 	fileName=userInput['filePath']
-		# except:
-		# 	fileName=userInput['filePath']
-		# try:
-		# 	tensorboardLogFolder=userInput['tensorboardLogFolder']
-		# 	print ('Log folder came correct')
-		# except:
-		# 	print ('Log folder has some issue')
-		# 	tensorboardLogFolder=target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
-		# 	# print ('tensorboardLogFolder',tensorboardLogFolder)
-		# 	kerasUtilities.checkCreatePath(tensorboardLogFolder)
-		
-		# lossType=userInput['loss']
-		# listOfMetrics=userInput['metrics']
-		# batchSize=userInput['batchSize']
-		# epoch=userInput['epoch']
-		# stepsPerEpoch=userInput['stepPerEpoch']
-		# problemType=userInput['problemType']
-		# testSize=userInput['testSize']
-		# scriptOutput=userInput['scriptOutput']
-		# optimizerName=userInput['optimizer']
-		# learningRate=userInput['learningRate']
-		
-		# idforData=pmmlFile.split('/')[-1].replace('.pmml','')
 		idforData=int(time.time())
 		idforData=str(idforData)+'_NN'
-		# idforData=pathlib.Path(pmmlFile).name.replace('.pmml','')
-
 		saveStatus=logFolder+idforData+'/'
 		kerasUtilities.checkCreatePath(saveStatus)
 		statusfileLocation=saveStatus+'status.txt'
-
-		# print("status file generated")
-
 		data_details={}
 		data_details['tensorboardUrl']=tensorboardUrl
 		data_details['idforData']=idforData
