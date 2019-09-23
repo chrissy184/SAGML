@@ -41,6 +41,23 @@ namespace ZMM.Models.Payloads
             var sortDesc = _code.OrderByDescending(d => d.DateCreated);
             return sortDesc.ToList();
         }
+
+        public static CodeResponse GetById(string id)
+        {
+            CodeResponse result = new CodeResponse();
+            if (GlobalStorage.CodeStorage != null)
+            {
+                foreach (var item in GlobalStorage.CodeStorage)
+                {
+                    if (item.Key == id)
+                    {
+                        result = item.Value;
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
         #endregion
 
         #region Update
@@ -65,7 +82,7 @@ namespace ZMM.Models.Payloads
         /// <returns></returns>
         public static bool Delete(string id)
         {
-            bool result = false;            
+            bool result = false;
             //logic to delete 
             CodeResponse _code = new CodeResponse();
 
@@ -74,13 +91,13 @@ namespace ZMM.Models.Payloads
                 try
                 {
                     if ((item.Key == id))
-                    {                        
-                        File.Delete(item.Value.FilePath); 
-                        if(item.Value.Type == "JUPYTER_NOTEBOOK")
+                    {
+                        File.Delete(item.Value.FilePath);
+                        if (item.Value.Type == "JUPYTER_NOTEBOOK")
                         {
-                            Directory.Delete(item.Value.FilePath.Replace(item.Value.Name,""), true);
+                            Directory.Delete(item.Value.FilePath.Replace(item.Value.Name, ""), true);
                         }
-                        GlobalStorage.CodeStorage.TryRemove(id, out _code);                       
+                        GlobalStorage.CodeStorage.TryRemove(id, out _code);
                         result = true;
                     }
                 }
@@ -97,7 +114,7 @@ namespace ZMM.Models.Payloads
         public static bool RemoveOnlyFromCodePayload(string id)
         {
             bool result = false;
-            
+
             CodeResponse _data = new CodeResponse();
 
             foreach (var item in GlobalStorage.CodeStorage)
@@ -108,12 +125,14 @@ namespace ZMM.Models.Payloads
             return result;
         }
         #endregion
-    
+
         #region Clear payload
         public static void Clear()
-        {            
+        {
             GlobalStorage.CodeStorage.Clear();
         }
-        #endregion 
+        #endregion
+
+
     }
 }
