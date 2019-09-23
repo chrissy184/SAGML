@@ -484,6 +484,7 @@ class KerasDataDictionary(ny.DataDictionary):
     """ 
     def __init__(self, dataSet, predictedClasses):
         ny.DataDictionary.__init__(self)
+        print ('dataSet',dataSet,'predictedClasses',predictedClasses)
 
         if dataSet:
             if predictedClasses:
@@ -571,7 +572,7 @@ class KerasMiningSchema(ny.MiningSchema):
         if targetVarName:
             ny.MiningSchema.add_MiningField(self, ny.MiningField(name=targetVarName, usageType="target",invalidValueTreatment="asIs"))
         else:
-            print('Came here')
+            # print('Came here')
             ny.MiningSchema.add_MiningField(self, ny.MiningField(name="predictions", usageType="target",invalidValueTreatment="asIs"))
 
 

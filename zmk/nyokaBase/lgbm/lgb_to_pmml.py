@@ -5,7 +5,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(BASE_DIR)
 import numpy as np
 import PMML43Ext as pml
-#import nyokaBase.skl.skl_to_pmml as skl_to_pmml
+#import nyoka.skl.skl_to_pmml as skl_to_pmml
 import nyokaBase.xgboost.xgboost_to_pmml as xgboostToPmml
 import json
 from skl import pre_process as pp
@@ -100,11 +100,11 @@ def get_ensemble_models(model, derived_col_names, col_names, target_name, mining
     mining_models :
         Returns the MiningModel of the respective LGB model
     """
-    model_kwargs = skl_to_pmml.get_model_kwargs(model, col_names, target_name, mining_imp_val,tasktype)
+    model_kwargs = skl_to_pmml.get_model_kwargs(model, col_names, target_name, mining_imp_val,categoric_values)
     mining_models = list()
     mining_models.append(pml.MiningModel(
         modelName="LightGBModel",
-        Segmentation=get_outer_segmentation(model, derived_col_names, col_names, target_name, mining_imp_val,categoric_values,tasktype),
+        Segmentation=get_outer_segmentation(model, col_names, col_names, target_name, mining_imp_val,categoric_values,tasktype),
         **model_kwargs
     ))
     return mining_models
@@ -264,7 +264,7 @@ def create_node(obj, main_node,derived_col_names):
     obj: Json
         Contains nodes in json format.
     main_node:
-        Contains node build with nyokaBase class.
+        Contains node build with Nyoka class.
     derived_col_names: List
         Contains column names after preprocessing.
     """

@@ -1,5 +1,5 @@
-from nyoka.reconstruct import model as modellib
-from nyoka.reconstruct import config
+from nyokaBase.reconstruct import model as modellib
+from nyokaBase.reconstruct import config
 import sys,os
 import numpy as np
 import functools

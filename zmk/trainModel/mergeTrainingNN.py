@@ -83,72 +83,50 @@ class NeuralNetworkModelTrainer:
 		    return train_generator,None,len(train_generator.class_indices)
 
 
-	def startTensorBoard(self, tensorboardLogFolder):
-		print ('tensorboardLogFolder >>>>>>',tensorboardLogFolder)
-		tensor_board=keras.callbacks.TensorBoard(log_dir=tensorboardLogFolder, histogram_freq=0,write_graph=True, write_images=False)
-		# portToUse=kerasUtilities.tensorboardInfo()
-		# # tensor_board=keras.callbacks.TensorBoard(log_dir=tensorboardLogFolder, histogram_freq=0,write_graph=True, write_images=False)
-		# cmdFortensorboard='tensorboard --host localhost --port={} --logdir={}'.format(portToUse,tensorboardLogFolder)
-		# # print ('start '+cmdFortensorboard)
-		# import subprocess
-		# subprocess.Popen(cmdFortensorboard,shell=True)
+	# def writePMML(self,dataObj,hyperParaMM, model,preProcessingScriptObj,pipelineObj,modelObj,featureUsedList,targetNameVar,postProcessingScriptObj, predictedClass, fileName, dataSet):
 
-		# sFile=open(self.statusFile,'r')
-		# sFileText=sFile.read()
-		# data_details=json.loads(sFileText)
-		# # ura='https://lambda-quad/'
-		# ura='https://localhost:'
-		# if portToUse==6006:
-		#     data_details['tensorboardUrl']=ura+'tb/1'
-		#     # data_details['tensorboardUrl']=ura+'6006'
-		# elif portToUse==6007:
-		#     data_details['tensorboardUrl']=ura+'tb/2'
-		# elif portToUse==6008:
-		#     data_details['tensorboardUrl']=ura+'tb/3'
-		# # data_details['tensorboardUrl']=str(port)
-		# with open(self.statusFile,'w') as filetosave:
-		#     json.dump(data_details, filetosave)
-
-		return tensor_board
+	# 	try:
+	# 		from nyoka.skl.skl_to_pmml import model_to_pmml
+	# 		toExportDict={
+    #         'model1':{'data':dataObj,'hyperparameters':hyperParaMM,'preProcessingScript':preProcessingScriptObj,
+    #             'pipelineObj':pipelineObj,'modelObj':modelObj,
+    #             'featuresUsed':featureUsedList,
+    #             'targetName':targetNameVar,'postProcessingScript':postProcessingScriptObj,'taskType': 'trainAndscore'}
+    #                     }
+	# 		from nyokaBase.keras.keras_model_to_pmml import KerasToPmml
+	# 		pmmlToBack=KerasToPmml(model,model_name="TrainedModel",
+	# 						description="Keras Models in PMML",
+	# 						 dataSet=dataSet, predictedClasses=predictedClass)
+	# 	except Exception as e:
+	# 		data_details=self.upDateStatus()
+	# 		data_details['status']='Training Failed'
+	# 		data_details['errorMessage']='Error while converting Keras to PMML >> '+str(e)
+	# 		data_details['errorTraceback']=traceback.format_exc()
+	# 		with open(self.statusFile,'w') as filetosave:
+	# 			json.dump(data_details, filetosave)
+	# 		# sys.exit()
+	# 		return -1
 
 
-	def writePMML(self, model, predictedClass, fileName, dataSet):
-
-		try:
-			from nyokaBase.keras.keras_model_to_pmml import KerasToPmml
-			pmmlToBack=KerasToPmml(model,model_name="TrainedModel",
-							description="Keras Models in PMML",
-							 dataSet=dataSet, predictedClasses=predictedClass)
-		except Exception as e:
-			data_details=self.upDateStatus()
-			data_details['status']='Training Failed'
-			data_details['errorMessage']='Error while converting Keras to PMML >> '+str(e)
-			data_details['errorTraceback']=traceback.format_exc()
-			with open(self.statusFile,'w') as filetosave:
-				json.dump(data_details, filetosave)
-			# sys.exit()
-			return -1
+	# 	scriptCode=self.pmmlObj['script']
+	# 	if scriptCode == []:
+	# 		scriptCode = None
+	# 	else:
+	# 		for sc in scriptCode:
+	# 			sc.__dict__['valueOf_']=sc.get_valueOf_().replace('<','&lt;')
 
 
-		scriptCode=self.pmmlObj['script']
-		if scriptCode == []:
-			scriptCode = None
-		else:
-			for sc in scriptCode:
-				sc.__dict__['valueOf_']=sc.get_valueOf_().replace('<','&lt;')
-
-
-		pmmlObjNew=pmmlToBack.__dict__
-		dDict=pmmlObjNew['DataDictionary']
-		netw=pmmlObjNew['DeepNetwork']
-		netw=self.updateSectionInfo(netw)
-		extensionInfoForData=[ny.Extension(value=self.hdExtDet,anytypeobjs_=[''])]
-		hd=ny.Header(copyright="Copyright (c) 2018 Software AG",Extension=extensionInfoForData,
-				description="Neural Network Model",
-				Timestamp=ny.Timestamp(datetime.now()))
-		with open(fileName,'w') as filetosave:
-			jj=ny.PMML(version="4.3Ext",DeepNetwork=netw,DataDictionary=dDict,Header=hd,script=scriptCode)
-			jj.export(filetosave,0)
+	# 	pmmlObjNew=pmmlToBack.__dict__
+	# 	dDict=pmmlObjNew['DataDictionary']
+	# 	netw=pmmlObjNew['DeepNetwork']
+	# 	netw=self.updateSectionInfo(netw)
+	# 	extensionInfoForData=[ny.Extension(value=self.hdExtDet,anytypeobjs_=[''])]
+	# 	hd=ny.Header(copyright="Copyright (c) 2018 Software AG",Extension=extensionInfoForData,
+	# 			description="Neural Network Model",
+	# 			Timestamp=ny.Timestamp(datetime.now()))
+	# 	with open(fileName,'w') as filetosave:
+	# 		jj=ny.PMML(version="4.3Ext",DeepNetwork=netw,DataDictionary=dDict,Header=hd,script=scriptCode)
+	# 		jj.export(filetosave,0)
 
 
 	def updateSectionInfo(self,networkObj):
