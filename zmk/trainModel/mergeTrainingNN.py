@@ -89,52 +89,6 @@ class NeuralNetworkModelTrainer:
 		    return train_generator,None,len(train_generator.class_indices)
 
 
-	# def writePMML(self,dataObj,hyperParaMM, model,preProcessingScriptObj,pipelineObj,modelObj,featureUsedList,targetNameVar,postProcessingScriptObj, predictedClass, fileName, dataSet):
-
-	# 	try:
-	# 		from nyoka.skl.skl_to_pmml import model_to_pmml
-	# 		toExportDict={
-    #         'model1':{'data':dataObj,'hyperparameters':hyperParaMM,'preProcessingScript':preProcessingScriptObj,
-    #             'pipelineObj':pipelineObj,'modelObj':modelObj,
-    #             'featuresUsed':featureUsedList,
-    #             'targetName':targetNameVar,'postProcessingScript':postProcessingScriptObj,'taskType': 'trainAndscore'}
-    #                     }
-	# 		from nyokaBase.keras.keras_model_to_pmml import KerasToPmml
-	# 		pmmlToBack=KerasToPmml(model,model_name="TrainedModel",
-	# 						description="Keras Models in PMML",
-	# 						 dataSet=dataSet, predictedClasses=predictedClass)
-	# 	except Exception as e:
-	# 		data_details=self.upDateStatus()
-	# 		data_details['status']='Training Failed'
-	# 		data_details['errorMessage']='Error while converting Keras to PMML >> '+str(e)
-	# 		data_details['errorTraceback']=traceback.format_exc()
-	# 		with open(self.statusFile,'w') as filetosave:
-	# 			json.dump(data_details, filetosave)
-	# 		# sys.exit()
-	# 		return -1
-
-
-	# 	scriptCode=self.pmmlObj['script']
-	# 	if scriptCode == []:
-	# 		scriptCode = None
-	# 	else:
-	# 		for sc in scriptCode:
-	# 			sc.__dict__['valueOf_']=sc.get_valueOf_().replace('<','&lt;')
-
-
-	# 	pmmlObjNew=pmmlToBack.__dict__
-	# 	dDict=pmmlObjNew['DataDictionary']
-	# 	netw=pmmlObjNew['DeepNetwork']
-	# 	netw=self.updateSectionInfo(netw)
-	# 	extensionInfoForData=[ny.Extension(value=self.hdExtDet,anytypeobjs_=[''])]
-	# 	hd=ny.Header(copyright="Copyright (c) 2018 Software AG",Extension=extensionInfoForData,
-	# 			description="Neural Network Model",
-	# 			Timestamp=ny.Timestamp(datetime.now()))
-	# 	with open(fileName,'w') as filetosave:
-	# 		jj=ny.PMML(version="4.3Ext",DeepNetwork=netw,DataDictionary=dDict,Header=hd,script=scriptCode)
-	# 		jj.export(filetosave,0)
-
-
 	def updateSectionInfo(self,networkObj):
 		originalNetworkLayer = self.pmmlfileObj.DeepNetwork[0].NetworkLayer
 		assert len(originalNetworkLayer) == len(networkObj[0].NetworkLayer)
@@ -310,33 +264,7 @@ class NeuralNetworkModelTrainer:
 		
 		scriptOutput=None
 		fileName=pmmlFile
-		# idforData=datHyperPara['idforData']
-		# testSize=datHyperPara['testSize']
-		# problemType=datHyperPara['problemType']
-		# scriptOutput=datHyperPara['scriptOutput']
-
-
-		
-		# try:
-		# 	hdInfo=self.pmmlObj['Header']
-		# 	self.hdExtDet=ast.literal_eval(hdInfo.Extension[0].get_value())
-		# except Exception as e:
-		# 	data_details=self.upDateStatus()
-		# 	self.updateStatusWithError(data_details,'Training Failed','Error while extracting Header information from the PMML file >> '+ str(e),traceback.format_exc(),self.statusFile)
-		# 	# sys.exit()
-		# 	return -1
 		print ('>>>>>> Step ',3)
-		# if scriptOutput is None:
-		#     pass
-		# else:
-		# 	try:
-		# 		self.hdExtDet['scriptOutput']=scriptOutput
-		# 	except Exception as e:
-		# 		data_details=self.upDateStatus()
-		# 		self.updateStatusWithError(data_details,'Training Failed','scriptOutput is not found in the PMML Header >> '+ str(e),traceback.format_exc(),self.statusFile)
-		# 		return -1
-
-		# print ('>>>>>> Step ',4,self.pathOfData)
 		if os.path.isdir(self.pathOfData):
 			print ('Image Classifier')
 			target=self.trainImageClassifierNN
@@ -344,16 +272,9 @@ class NeuralNetworkModelTrainer:
 			pass
 
 		print ('>>>>>> Step ',4)
-			# if self.pmmlObj['script'] == []:
-			# 	target=self.trainSimpleDNN
-			# else:
-			# 	if scriptOutput == 'IMAGE':
-			# 		target=self.trainCustomNN
-			# 	else:
-			# 		target=self.trainSimpleDNN
 		try:
 			train_prc = Process(target=target,args=(pmmlFile,self.pathOfData,fileName,tensorboardLogFolder,lossType,\
-				listOfMetrics,batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate))
+				listOfMetrics,batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate,datHyperPara))
 			train_prc.start()
 		except Exception as e:
 			data_details=self.upDateStatus()
@@ -363,22 +284,18 @@ class NeuralNetworkModelTrainer:
 
 
 	def trainImageClassifierNN(self,pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,\
-		batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate):
-		# print ('Classification data folder at',dataFolder)
+		batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate,datHyperPara):
+		print ('Classification data folder at',dataFolder,fileName)
 		try:
 			self.trainFolder=dataFolder+'/'+'train/'
 			self.validationFolder=dataFolder+'/'+'validation/'
-			# print (self.trainFolder)
-			# print (self.validationFolder)
 			kerasUtilities.checkCreatePath(self.trainFolder)
 			kerasUtilities.checkCreatePath(self.validationFolder)
 		except Exception as e:
-			# print ('Exception Occured')
 			data_details=self.upDateStatus()
 			self.updateStatusWithError(data_details,'Training Failed','Unable to find train and validation folder >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return
+			return -1
 
-		# print(">>>>>>>>>>>>>>ImageClassifier")
 		modelObj = self.generateAndCompileModel(lossType,optimizerName,learningRate,listOfMetrics)
 		if modelObj.__class__.__name__ == 'dict':
 			return
@@ -389,40 +306,48 @@ class NeuralNetworkModelTrainer:
 		except Exception as e:
 			data_details=self.upDateStatus()
 			self.updateStatusWithError(data_details,'Training Failed','Model input_shape is invalid >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return
+			return -1
 
 		try:
 			tGen,vGen,nClass=self.kerasDataPrep(dataFolder,batchSize,img_height,img_width)
-			stepsPerEpoch=tGen.n/tGen.batch_size
+			stepsPerEpochT=tGen.n/tGen.batch_size
+			stepsPerEpochV=vGen.n/vGen.batch_size
 		except Exception as e:
 			data_details=self.upDateStatus()
 			self.updateStatusWithError(data_details,'Training Failed','Error while generating data for Keras >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return
+			return -1
 
 		tensor_board = self.startTensorBoard(tensorboardLogFolder)
 
-		##### Train model#################################
 		kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
-
 		try:
 			import tensorflow as tf
+			print ('started Trianing')
 			with tf.device(gpuCPUSelect(selDev)):
-				model.fit_generator(tGen,steps_per_epoch=stepsPerEpoch,validation_steps=10,epochs=epoch,validation_data=vGen,callbacks=[tensor_board])
+				model.fit_generator(tGen,steps_per_epoch=stepsPerEpochT,validation_steps=stepsPerEpochV,epochs=epoch,validation_data=vGen,callbacks=[tensor_board])
 		except Exception as e:
 			data_details=self.upDateStatus()
 			self.updateStatusWithError(data_details,'Training Failed','There is a problem with training parameters >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return
+			return -1
 		
 		kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
 
 		predictedClass=list(tGen.class_indices.keys())
-		returnVal=self.writePMML(model, predictedClass, fileName, 'image')
-		if returnVal == -1:
-			return
+		try:
+			toExportDict={
+            'model1':{'data':dataFolder,'hyperparameters':datHyperPara,'preProcessingScript':None,
+			'pipelineObj':None,'modelObj':model,'featuresUsed':None,'targetName':None,'postProcessingScript':None,
+			'taskType': 'trainAndscore','predictedClasses':predictedClass,'dataSet':'image'}
+                        }
+			from nyokaBase.skl.skl_to_pmml import model_to_pmml
+			model_to_pmml(toExportDict, PMMLFileName=fileName)
+			kerasUtilities.updateStatusOfTraining(self.statusFile,'PMML file Successfully Saved')
+			return 'Success'
+		except Exception as e:
+			data_details=self.upDateStatus()
+			self.updateStatusWithError(data_details,'Saving File Failed',' '+ str(e),traceback.format_exc(),self.statusFile)
+			return -1
 
-		kerasUtilities.updateStatusOfTraining(self.statusFile,'PMML file Successfully Saved')
-
-		return 'Success'
 
 
 	def trainCustomNN(self,pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,\

@@ -105,31 +105,23 @@ class Utility:
 		print ('RUNNING_TASK_MEMORY RUNNING_TASK_MEMORY',RUNNING_TASK_MEMORY)
 		for num,tempRS in enumerate(RUNNING_TASK_MEMORY):
 			tempStat=RUNNING_TASK_MEMORY[num]
+			data_details=autoMLutilities.readStatusFile(tempRS['idforData'])
 			try:
-				data_details=autoMLutilities.readStatusFile(tempRS['idforData'])
-				# try:
-				# print ('Came herre 1st')
 				projectName=tempRS['idforData']
 				logFolder='logs/'
-				# print ('Came herre 2nd')
 				data_details['generationInfo']=autoMLutilities.progressOfModel(logFolder,projectName)
-				# print ('Came herre 3rd')
-				# print ('tempStat',tempStat)
 				tempStat['generationInfo']=data_details['generationInfo']
-					# print ('STep 3')
-				# except:
-				# 	pass
 				try:
 					data_details=autoMLutilities.readStatusFile(tempRS['idforData'])
 					if data_details['listOfModelAccuracy'] != []:
 						tempStat['generationInfo']=data_details['listOfModelAccuracy']
 				except:
 					pass
-
-				statusOfProject=data_details['status']
-				tempStat['status']=statusOfProject
 			except:
 				pass
+
+			statusOfProject=data_details['status']
+			tempStat['status']=statusOfProject
 
 			try:
 				print ('ppppppppppp >>>>>>>>',1)
