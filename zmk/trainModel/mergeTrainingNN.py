@@ -108,6 +108,21 @@ class NeuralNetworkModelTrainer:
 			json.dump(data_details, filetosave)
 		return ('done')
 
+	def getCode(self,strngVal):
+		lines = []
+		code = strngVal.lstrip('\n')
+		leading_spaces = len(code) - len(code.lstrip(' '))
+		for line in code.split('\n'):
+			lines.append(line[leading_spaces:])
+		code = '\n'.join(lines)
+		return code
+
+	def getCodeObjectToProcess(self,codeVal):
+		d = {}
+		exec(codeVal, None,d)
+		objeCode=d[list(d.keys())[0]]
+		return objeCode
+
 	def generateAndCompileModel(self, lossType, optimizerName, learningRate, listOfMetrics, compileTestOnly=False):
 
 		def f1(y_true, y_pred):
@@ -267,21 +282,42 @@ class NeuralNetworkModelTrainer:
 		except Exception as e:
 			testSize=None
 		
-		scriptOutput=None
+		#get script information
+
+		try:
+			scriptOutputPrepro=None
+			for sc1 in self.pmmlObj['script']:
+				if sc1.class_ == 'preprocessing':
+					try:
+						scriptOutputPrepro=sc1.scriptOutput
+						scriptObj=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
+						scrDictObj={'scripts':[scriptObj],'scriptpurpose':[sc1.scriptPurpose],'scriptOutput':[scriptOutputPrepro]}
+					except Exception as e:
+						data_details=self.upDateStatus()
+						self.updateStatusWithError(data_details,'Training Failed',"Couldn't load the code >> "+ str(e),traceback.format_exc(),self.statusFile)
+						return -1
+		except:
+			scriptOutputPrepro=None
+			scriptObj=None
+
 		fileName=pmmlFile
 		print ('>>>>>> Step ',3)
-		if os.path.isdir(self.pathOfData):
+		if (os.path.isdir(self.pathOfData)) & (scriptOutputPrepro==None) :
 			print ('Image Classifier')
 			target=self.trainImageClassifierNN
-		elif pathlib.Path(self.pathOfData).suffix == '.csv':
+		elif (pathlib.Path(self.pathOfData).suffix == '.csv') & (scriptOutputPrepro==None) :
 			print('Simple DNN')
 			target=self.trainSimpleDNN
+		elif scriptOutputPrepro != None:
+			print('Custom NN')
+			target = self.trainCustomNN
 			pass
 
 		print ('>>>>>> Step ',4)
 		try:
 			train_prc = Process(target=target,args=(pmmlFile,self.pathOfData,fileName,tensorboardLogFolder,lossType,\
-				listOfMetrics,batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate,datHyperPara,testSize))
+				listOfMetrics,batchSize,epoch,idforData,problemType,scriptOutputPrepro,optimizerName,learningRate,
+				datHyperPara,testSize,scrDictObj))
 			train_prc.start()
 		except Exception as e:
 			data_details=self.upDateStatus()
@@ -291,7 +327,7 @@ class NeuralNetworkModelTrainer:
 
 
 	def trainImageClassifierNN(self,pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,\
-		batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate,datHyperPara,testSize):
+		batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate,datHyperPara,testSize,scriptObj):
 		print ('Classification data folder at',dataFolder,fileName)
 		try:
 			self.trainFolder=dataFolder+'/'+'train/'
@@ -358,21 +394,22 @@ class NeuralNetworkModelTrainer:
 
 
 	def trainCustomNN(self,pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,\
-		batchSize,epoch,stepsPerEpoch,idforData,testSize,problemType,scriptOutput,optimizerName,learningRate):
-		# print ('>>>>>> Step ',5)
+		batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate,datHyperPara,testSize,scrDictObj):
+		print ('>>>>>> Step ',5)
 		self.trainFolder=dataFolder+'/'+'train/'
 		self.validationFolder=dataFolder+'/'+'validation/'
-		# print(">>>>>>>>>>>>>>CustomNN")
-		if self.pathOfData is not None:
-			try:
-				data=pd.read_csv(self.pathOfData)
-			except Exception as e:
-				data_details=self.upDateStatus()
-				self.updateStatusWithError(data_details,'Training Failed','Error while reading the csv file >> '+ str(e),traceback.format_exc(),self.statusFile)
-			XVar=list(data.columns)
-			XVar.remove('target')
-		else:
-			print ('Data not found')
+
+		if os.path.isdir(dataFolder):
+			print ('Image Classifier 2nd time')
+			# target=self.trainImageClassifierNN
+		elif pathlib.Path(self.pathOfData).suffix == '.csv':
+			print('Simple DNN')
+			sData=pd.read_csv(dataFolder)
+			print (scrDictObj)
+			nData=scrDictObj['scripts'][0](sData)
+			pp=self.trainSimpleDNNObj(nData,fileName,tensorboardLogFolder,lossType,listOfMetrics,\
+				problemType,optimizerName,learningRate,datHyperPara,testSize,scrDictObj)
+			return pp
 
 	    ##### Split data into test and validation set for training#################################
 		trainDataX,testDataX,trainDataY,testDataY=model_selection.train_test_split(data[XVar],data['target'],test_size  =testSize)
@@ -469,7 +506,7 @@ class NeuralNetworkModelTrainer:
 
 
 	def trainSimpleDNN(self,pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,\
-		batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate,datHyperPara,testSize):
+		batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate,datHyperPara,testSize,scriptObj):
 		print(">>>>>>>>>>>>>>SimpleDNN")
 		print('pathofdata>>>>>',self.pathOfData)
 		predictedClass=None
@@ -477,12 +514,24 @@ class NeuralNetworkModelTrainer:
 			targetColumnName = 'target'
 			try:
 				df = pd.read_csv(self.pathOfData)
-				indevar=list(df.columns)
-				indevar.remove('target')
+				pp=self.trainSimpleDNNObj(self,dataObj,fileName,tensorboardLogFolder,lossType,listOfMetrics,\
+					problemType,optimizerName,learningRate,datHyperPara,testSize,scriptObj)
+				return pp
 			except Exception as e:
 				data_details=self.upDateStatus()
 				self.updateStatusWithError(data_details,'Training Failed','Error while reading the csv file >> '+ str(e),traceback.format_exc(),self.statusFile)
-				return
+				return -1
+
+
+	def trainSimpleDNNObj(self,dataObj,fileName,tensorboardLogFolder,lossType,listOfMetrics,\
+			problemType,optimizerName,learningRate,datHyperPara,testSize,scriptObj):
+			print(">>>>>>>>>>>>>>SimpleDNN")
+			print('pathofdata>>>>>',self.pathOfData)
+			predictedClass=None
+			targetColumnName = 'target'
+			df = dataObj
+			indevar=list(df.columns)
+			indevar.remove('target')
 			targetCol = df[targetColumnName]
 			if problemType=='classification':
 				lb=preprocessing.LabelBinarizer()
@@ -491,73 +540,47 @@ class NeuralNetworkModelTrainer:
 			else:
 				y=df[targetColumnName]
 				predictedClass=None
-		else:
-			print ('Data not found')
+			##### Split data into test and validation set for training#################################
+			trainDataX,testDataX,trainDataY,testDataY=model_selection.train_test_split(df[indevar],y,
+															test_size=datHyperPara['testSize'])
+			stepsPerEpochT=int(len(trainDataX)/datHyperPara['batchSize'])
+			stepsPerEpochV=int(len(testDataX)/datHyperPara['batchSize'])
+			kerasUtilities.updateStatusOfTraining(self.statusFile,'Data split in Train validation part')
 
-	    ##### Split data into test and validation set for training#################################
-		trainDataX,testDataX,trainDataY,testDataY=model_selection.train_test_split(df[indevar],y,
-                                                         test_size=datHyperPara['testSize'])
-		stepsPerEpochT=int(len(trainDataX)/datHyperPara['batchSize'])
-		stepsPerEpochV=int(len(testDataX)/datHyperPara['batchSize'])
-		kerasUtilities.updateStatusOfTraining(self.statusFile,'Data split in Train validation part')
+			modelObj = self.generateAndCompileModel(lossType,optimizerName,learningRate,listOfMetrics)
+			if modelObj.__class__.__name__ == 'dict':
+				return
+			model = modelObj.model
+			tensor_board = self.startTensorBoard(tensorboardLogFolder)
 
-		# if self.pmmlObj['script'] != []:
-		# 	for num,sc in enumerate(self.pmmlObj['script']):
-		# 		useFor=sc.for_
-		# 		fnaMe=self.scriptFilepath+'scriptFilepathname_'+useFor+'.py'
-		# 		scripCode=sc.get_valueOf_()
-		# 		code = scripCode.lstrip('\n')
-		# 		lines = []
-		# 		code = scripCode.lstrip('\n')
-		# 		leading_spaces = len(code) - len(code.lstrip(' '))
-		# 		for line in code.split('\n'):
-		# 			lines.append(line[leading_spaces:])
-		# 		code = '\n'.join(lines)
-		# 		with open(fnaMe,'w') as k:
-		# 			k.write(code)
-		# 		if useFor=='train':
-		# 			import importlib.util
-		# 			kerasUtilities.updateStatusOfTraining(self.statusFile,'Saving Image files from script')
-		# 			spec=importlib.util.spec_from_file_location('preProcessing',fnaMe)
-		# 			preProcessing=spec.loader.load_module()
-		# 	from preProcessing import preProcessing
-		# kerasUtilities.updateStatusOfTraining(self.statusFile,'Script saved and loaded')
+			##### Train model#################################
+			kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
 
+			try:
+				import tensorflow as tf
+				with tf.device(gpuCPUSelect(selDev)):
+					model.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+						validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+			except Exception as e:
+				data_details=self.upDateStatus()
+				self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+				return
 
-		modelObj = self.generateAndCompileModel(lossType,optimizerName,learningRate,listOfMetrics)
-		if modelObj.__class__.__name__ == 'dict':
-			return
-		model = modelObj.model
-		tensor_board = self.startTensorBoard(tensorboardLogFolder)
-
-		##### Train model#################################
-		kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
-
-		try:
-			import tensorflow as tf
-			with tf.device(gpuCPUSelect(selDev)):
-				model.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
-					validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
-		except Exception as e:
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return
-
-		kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
-		try:
-			toExportDict={
-            'model1':{'data':self.pathOfData,'hyperparameters':datHyperPara,
-                      'preProcessingScript':None,
-                        'pipelineObj':None,'modelObj':model,
-                        'featuresUsed':indevar,
-                        'targetName':'target','postProcessingScript':None,'taskType': 'trainAndscore',
-                     'predictedClasses':predictedClass,'dataSet':None}
-                        }
-			from nyokaBase.skl.skl_to_pmml import model_to_pmml
-			model_to_pmml(toExportDict, PMMLFileName=fileName)
-			kerasUtilities.updateStatusOfTraining(self.statusFile,'PMML file Successfully Saved')
-			return 'Success'
-		except Exception as e:
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Saving File Failed',' '+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+			kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
+			try:
+				toExportDict={
+				'model1':{'data':self.pathOfData,'hyperparameters':datHyperPara,
+						'preProcessingScript':scriptObj,
+							'pipelineObj':None,'modelObj':model,
+							'featuresUsed':indevar,
+							'targetName':'target','postProcessingScript':None,'taskType': 'trainAndscore',
+						'predictedClasses':predictedClass,'dataSet':None}
+							}
+				from nyokaBase.skl.skl_to_pmml import model_to_pmml
+				model_to_pmml(toExportDict, PMMLFileName=fileName)
+				kerasUtilities.updateStatusOfTraining(self.statusFile,'PMML file Successfully Saved')
+				return 'Success'
+			except Exception as e:
+				data_details=self.upDateStatus()
+				self.updateStatusWithError(data_details,'Saving File Failed',' '+ str(e),traceback.format_exc(),self.statusFile)
+				return -1
