@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -26,8 +25,6 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using ZMM.App.PyServicesClient;
 using ZMM.App.ZSServiceClient;
@@ -46,14 +43,14 @@ namespace ZMM.App
     {
         private readonly ILogger Logger;
         public IConfiguration Configuration { get; }
-        public IHostingEnvironment Environment { get; }
+        public IWebHostEnvironment Environment { get; }
 
         private string ContentDir = string.Empty;
 
         private const string XForwardedPathBase = "X-Forwarded-PathBase";
         private const string XForwardedProto = "X-Forwarded-Proto";
 
-        public StartupDevelopment(IConfiguration configuration, IHostingEnvironment environment,ILogger<StartupDevelopment> logger)
+        public StartupDevelopment(IConfiguration configuration, IWebHostEnvironment environment,ILogger<StartupDevelopment> logger)
         {
             Configuration = configuration;
             Environment = environment;
@@ -66,17 +63,19 @@ namespace ZMM.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            #region MVC behaviour to specific .net version 2.2
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);     
-            #endregion            
-            #region Development profile works with "npm" and "ng server" with dotnet 2.2 inbuilt configuration
+            #region Added Controller and Razor Page for Login
+            services.AddControllersWithViews();
+            services.AddRazorPages();
+            #endregion
+       
+            #region Development profile works with "npm" and "ng server" with dotnet 3.0 inbuilt configuration
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath =  Configuration["WebApp:SourcePath"];
             }); 
             #endregion
 
-            #region KeyCloak Integration
+            #region Identity Provider (KeyCloak) Integration
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -84,6 +83,7 @@ namespace ZMM.App
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;               
             })
             .AddCookie("Cookies")
+
             .AddOpenIdConnect(options =>
             {   
                 SetOIDCConfiguration(ref options, bool.Parse(Configuration["Authentication:OIDC:IsSecuredHTTP"])); 
@@ -97,15 +97,6 @@ namespace ZMM.App
             });        
             #endregion
             
-            #region Add Swagger
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Zementis Modeler", Version = "v1" });
-            });
-            #endregion
-            #region Quartz
-            
-            #endregion
             
             #region Initialize clients in singleton service
             var pySrvLocation = Configuration["PyServiceLocation:srvurl"];
@@ -157,11 +148,13 @@ namespace ZMM.App
         }
         #endregion
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-        {           
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        {          
+
             #region Add Log Factory -> You can update its behaviour from appsettings*.json configuration
             AddLogger(ref loggerFactory);     
             #endregion
+
           	app.Use((context, next) =>
             {
               	if (context.Request.Headers.TryGetValue(XForwardedPathBase, out StringValues pathBase))
@@ -175,13 +168,12 @@ namespace ZMM.App
                 }              	
               	return next();
             });
-          	
+          	          
+
             // below is the fix for angular app reload redirections          
             app.Use(async (context, next) =>
-            {
-                // Do work that doesn't write to the Response.
+            {                
                 await next.Invoke();
-                // Do logging or other work that doesn't write to the Response.
                 if (context.User.Identity.IsAuthenticated && context.Response.StatusCode == 404 && !context.Request.Path.Value.Contains("/api"))
                 {
                     
@@ -192,55 +184,40 @@ namespace ZMM.App
                 {                    
                     context.Request.Path = new PathString("/");                    
                 }                
-            });
-
-            
-            app.Use(async (context, next) =>
-            {
-                context.Features.Get<IHttpMaxRequestBodySizeFeature>()
-                    .MaxRequestBodySize = 5368709120;
-
-                var serverAddressesFeature = app.ServerFeatures.Get<Microsoft.AspNetCore.Hosting.Server.Features.IServerAddressesFeature>();
-                var addresses = string.Join(", ", serverAddressesFeature?.Addresses);
-                await next.Invoke();
-            });
+            }); 
 
             app.UseDeveloperExceptionPage();
-             
             
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            }); 
+            });                                 
 
             app.UseStaticFiles();
-            
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(ContentDir),
-                RequestPath = "/data"
-            });   
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZMM API v1");
-            }); 
+            app.UseRouting();
+           
             app.UseAuthentication();
-            app.UseMvc(routes =>
+
+            app.UseAuthorization();
+
+            #region Endpoints
+            app.UseEndpoints(routes =>
             {
-                routes.MapRoute(
+                routes.MapRazorPages();
+
+                routes.MapControllers();
+
+                routes.MapControllerRoute(
                     name: "default",
-                    template: "{controller}/{action}/{id?}");
+                    pattern: "{controller}/{action}/{id?}");
 
-                routes.MapRoute(
+                routes.MapControllerRoute(
                     name: "train",
-                    template: "{controller}/{action}");
+                    pattern: "{controller}/{action}");               
 
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
             });
+            #endregion
 
             #region To start ng serve without building client ui
             string ClientUIDirectory = Configuration["WebApp:SourcePath"];

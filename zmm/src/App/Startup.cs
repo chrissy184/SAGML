@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -26,14 +25,11 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using ZMM.App.PyServicesClient;
 using ZMM.App.ZSServiceClient;
 using ZMM.Authorizations.Claims;
 using ZMM.Helpers.ZMMDirectory;
-//using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.OpenApi.Models;
@@ -48,14 +44,14 @@ namespace ZMM.App
 
         private readonly ILogger Logger;
         public IConfiguration Configuration { get; }
-        public IHostingEnvironment Environment { get; }
+        public IWebHostEnvironment Environment { get; }
 
         private string ContentDir = string.Empty;
 
         private const string XForwardedPathBase = "X-Forwarded-PathBase";
         private const string XForwardedProto = "X-Forwarded-Proto";
 
-        public Startup(IConfiguration configuration, IHostingEnvironment environment,ILogger<Startup> logger)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment,ILogger<Startup> logger)
         {
             Configuration = configuration;
             Environment = environment;
@@ -68,12 +64,12 @@ namespace ZMM.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            #region MVC behaviour to specific .net version 2.2
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);     
+            #region Added Controller and Razor Page for Login
+            services.AddControllersWithViews();
+            services.AddRazorPages();
             #endregion
 
-            
-            #region Production profile works on Client UI /wwwroot with dotnet 2.2 inbuilt configuration
+            #region Production profile works on Client UI /wwwroot with dotnet 3.0 inbuilt configuration
             string ClientUIDirectory = Configuration["WebApp:BuildPath"];
             if(ClientUIDirectory.Equals(string.Empty) || ClientUIDirectory == null) throw new Exception("Error : Please, configure WebApp:BuildPath in appsettings*.json"); 
             if(!System.IO.Directory.Exists(ClientUIDirectory)) throw new Exception("Error : It seems Client UI folder : " + ClientUIDirectory + " is not present; To resolve this, You need to publish solution once with command : dotnet publish ZMM.sln from ZMM folder.");
@@ -83,6 +79,7 @@ namespace ZMM.App
             }); 
             #endregion
 
+            
             #region Identity Provider (KeyCloak) Integration
             services.AddAuthentication(options =>
             {
@@ -91,6 +88,7 @@ namespace ZMM.App
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;               
             })
             .AddCookie("Cookies")
+
             .AddOpenIdConnect(options =>
             {   
                 SetOIDCConfiguration(ref options, bool.Parse(Configuration["Authentication:OIDC:IsSecuredHTTP"])); 
@@ -104,12 +102,6 @@ namespace ZMM.App
             });        
             #endregion
             
-            #region Add Swagger
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Zementis Modeler", Version = "v1" });
-            }); 
-            #endregion
             
             #region Initialize clients in singleton service
             var pySrvLocation = Configuration["PyServiceLocation:srvurl"];
@@ -162,10 +154,10 @@ namespace ZMM.App
         #endregion
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {          
             #region Enable HSTS option for production https enable system 
-            if(!env.IsEnvironment("Production")) app.UseHsts();
+            if(!env.EnvironmentName.Equals("Production")) app.UseHsts();
             #endregion
 
             #region Add Log Factory -> You can update its behaviour from appsettings*.json configuration
@@ -185,7 +177,8 @@ namespace ZMM.App
                 }              	
               	return next();
             });
-          	
+          	          
+
             // below is the fix for angular app reload redirections          
             app.Use(async (context, next) =>
             {                
@@ -200,19 +193,7 @@ namespace ZMM.App
                 {                    
                     context.Request.Path = new PathString("/");                    
                 }                
-            });         
-
-            app.Use(async (context, next) =>
-            {
-                context.Features.Get<IHttpMaxRequestBodySizeFeature>()
-                    .MaxRequestBodySize = 5368709120;
-
-                var serverAddressesFeature = app.ServerFeatures.Get<Microsoft.AspNetCore.Hosting.Server.Features.IServerAddressesFeature>();
-                var addresses = string.Join(", ", serverAddressesFeature?.Addresses);
-                await next.Invoke();
-            });
-
-            app.UseExceptionHandler("/Account/Error");           
+            }); 
             
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
@@ -221,33 +202,27 @@ namespace ZMM.App
 
             app.UseStaticFiles();
 
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(ContentDir),
-                RequestPath = "/data"
-            });       
-                     
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZMM API v1");
-            }); 
-            
+            app.UseRouting();
+           
             app.UseAuthentication();
-            app.UseMvc(routes =>
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(routes =>
             {
-                routes.MapRoute(
+                routes.MapRazorPages();
+
+                routes.MapControllers();
+
+                routes.MapControllerRoute(
                     name: "default",
-                    template: "{controller}/{action}/{id?}");
+                    pattern: "{controller}/{action}/{id?}");
 
-                routes.MapRoute(
+                routes.MapControllerRoute(
                     name: "train",
-                    template: "{controller}/{action}");
+                    pattern: "{controller}/{action}");               
 
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
-            });           
+            });
 
         }
         private void AddLogger(ref ILoggerFactory loggerFactory)
