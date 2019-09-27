@@ -81,21 +81,6 @@ class Training:
 		data_details['status']='In Progress'
 		fObjScrpt=pathlib.Path(pmmlFile)
 		data_details['taskName']=fObjScrpt.name
-		# data_details['pmmlFile']=idforData
-		# data_details['dataFolder']=dataFolder
-		# data_details['fileName']=fileName
-		# data_details['tensorboardLogFolder']=tensorboardLogFolder
-		
-		# data_details['lossType']=lossType
-		# data_details['listOfMetrics']=listOfMetrics
-		# data_details['batchSize']=batchSize
-		# data_details['epoch']=epoch
-		# data_details['stepsPerEpoch']=stepsPerEpoch
-		# data_details['problemType']=problemType
-		# data_details['testSize']=testSize
-		# data_details['scriptOutput']=scriptOutput
-		# data_details['optimizerName']=optimizerName
-		# data_details['learningRate']=learningRate
 		
 
 		with open(statusfileLocation,'w') as filetosave:

@@ -17,6 +17,7 @@ import re
 import traceback
 
 def generate_pipeline(parsedPMML,pmmlModel):
+    print ('parsedPMML',parsedPMML)
     scikitLearnModel = None
     derivedField = list()
     try:

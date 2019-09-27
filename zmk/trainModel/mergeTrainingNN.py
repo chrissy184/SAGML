@@ -15,6 +15,8 @@ kerasUtilities = kerasUtilities.KerasUtilities()
 from multiprocessing import Lock, Process
 from nyokaBase import PMML43Ext as ny
 
+from trainModel.mergeTrainingV2 import TrainingViewModels
+
 selDev="/device:CPU:0"
 def gpuCPUSelect(selDev):
 	return selDev
@@ -185,139 +187,143 @@ class NeuralNetworkModelTrainer:
 
 
 	def train(self,idforData,pmmlFile,tensorboardLogFolder):
-		saveStatus=self.logFolder+idforData+'/'
-		self.statusFile=saveStatus+'status.txt'
+		print (idforData,pmmlFile,tensorboardLogFolder)
+		# saveStatus=self.logFolder+idforData+'/'
+		# self.statusFile=saveStatus+'status.txt'
 
-		try:
-			self.pmmlfileObj=ny.parse(pmmlFile,silence=True)
-		except Exception as e:
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed','Error while parsing the PMML file >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return -1   
-		print ('>>>>>> Step ',2)
+		# try:
+		# 	self.pmmlfileObj=ny.parse(pmmlFile,silence=True)
+		# except Exception as e:
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed','Error while parsing the PMML file >> '+ str(e),traceback.format_exc(),self.statusFile)
+		# 	return -1   
+		# print ('>>>>>> Step ',2)
 
-		self.pmmlObj=self.pmmlfileObj.__dict__
-		data_details=self.upDateStatus()
-		print (data_details)
+		# self.pmmlObj=self.pmmlfileObj.__dict__
+		# data_details=self.upDateStatus()
+		# print (data_details)
 
-		#Getting data information
-		try:
-			self.pathOfData=self.pmmlObj['Data'][0].__dict__['filePath']
-		except Exception as e:
-			self.pathOfData=None
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed','dataUrl is not found in the PMML Header >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
-		print ('>>>>>> Step ',3)
-		#Getting Hyperparameters
-		try:
-			print ('came here')
-			for minBT in self.pmmlObj['MiningBuildTask'].Extension:
-				if minBT.__dict__['name']=='hyperparameters':
-					datHyperPara=minBT.__dict__['value']
-					datHyperPara=ast.literal_eval(datHyperPara)
-		except Exception as e:
-			self.pathOfData=None
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters >> "+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+		# #Getting data information
+		# try:
+		# 	self.pathOfData=self.pmmlObj['Data'][0].__dict__['filePath']
+		# except Exception as e:
+		# 	self.pathOfData=None
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed','dataUrl is not found in the PMML Header >> '+ str(e),traceback.format_exc(),self.statusFile)
+		# 	return -1
+		# print ('>>>>>> Step ',3)
+		# #Getting Hyperparameters
+		# try:
+		# 	print ('came here')
+		# 	for minBT in self.pmmlObj['MiningBuildTask'].Extension:
+		# 		if minBT.__dict__['name']=='hyperparameters':
+		# 			datHyperPara=minBT.__dict__['value']
+		# 			datHyperPara=ast.literal_eval(datHyperPara)
+		# except Exception as e:
+		# 	self.pathOfData=None
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters >> "+ str(e),traceback.format_exc(),self.statusFile)
+		# 	return -1
 
-		try:
-			lossType=datHyperPara['lossType']
-		except Exception as e:
-			self.pathOfData=None
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters lossType >> "+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
-		try:
-			listOfMetrics=datHyperPara['listOfMetrics']
-		except Exception as e:
-			self.pathOfData=None
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters listOfMetrics >> "+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+		# try:
+		# 	lossType=datHyperPara['lossType']
+		# except Exception as e:
+		# 	self.pathOfData=None
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters lossType >> "+ str(e),traceback.format_exc(),self.statusFile)
+		# 	return -1
+		# try:
+		# 	listOfMetrics=datHyperPara['listOfMetrics']
+		# except Exception as e:
+		# 	self.pathOfData=None
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters listOfMetrics >> "+ str(e),traceback.format_exc(),self.statusFile)
+		# 	return -1
 		
-		try:
-			batchSize=datHyperPara['batchSize']
-		except Exception as e:
-			self.pathOfData=None
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters batchSize >> "+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+		# try:
+		# 	batchSize=datHyperPara['batchSize']
+		# except Exception as e:
+		# 	self.pathOfData=None
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters batchSize >> "+ str(e),traceback.format_exc(),self.statusFile)
+		# 	return -1
 		
-		try:
-			epoch=datHyperPara['epoch']
-		except Exception as e:
-			self.pathOfData=None
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters epoch >> "+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+		# try:
+		# 	epoch=datHyperPara['epoch']
+		# except Exception as e:
+		# 	self.pathOfData=None
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters epoch >> "+ str(e),traceback.format_exc(),self.statusFile)
+		# 	return -1
 		
-		try:
-			problemType=datHyperPara['problemType']
-		except Exception as e:
-			self.pathOfData=None
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters problemType >> "+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+		# try:
+		# 	problemType=datHyperPara['problemType']
+		# except Exception as e:
+		# 	self.pathOfData=None
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters problemType >> "+ str(e),traceback.format_exc(),self.statusFile)
+		# 	return -1
 		
-		try:
-			optimizerName=datHyperPara['optimizerName']
-		except Exception as e:
-			self.pathOfData=None
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters optimizerName >> "+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+		# try:
+		# 	optimizerName=datHyperPara['optimizerName']
+		# except Exception as e:
+		# 	self.pathOfData=None
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters optimizerName >> "+ str(e),traceback.format_exc(),self.statusFile)
+		# 	return -1
 
-		try:
-			learningRate=datHyperPara['learningRate']
-		except Exception as e:
-			self.pathOfData=None
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters learningRate >> "+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+		# try:
+		# 	learningRate=datHyperPara['learningRate']
+		# except Exception as e:
+		# 	self.pathOfData=None
+		# 	data_details=self.upDateStatus()
+		# 	self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters learningRate >> "+ str(e),traceback.format_exc(),self.statusFile)
+		# 	return -1
 
-		try:
-			testSize=datHyperPara['testSize']
-		except Exception as e:
-			testSize=None
+		# try:
+		# 	testSize=datHyperPara['testSize']
+		# except Exception as e:
+		# 	testSize=None
 		
-		#get script information
+		# #get script information
 
-		try:
-			scriptOutputPrepro=None
-			for sc1 in self.pmmlObj['script']:
-				if sc1.class_ == 'preprocessing':
-					try:
-						scriptOutputPrepro=sc1.scriptOutput
-						scriptObj=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
-						scrDictObj={'scripts':[scriptObj],'scriptpurpose':[sc1.scriptPurpose],'scriptOutput':[scriptOutputPrepro]}
-					except Exception as e:
-						data_details=self.upDateStatus()
-						self.updateStatusWithError(data_details,'Training Failed',"Couldn't load the code >> "+ str(e),traceback.format_exc(),self.statusFile)
-						return -1
-		except:
-			scriptOutputPrepro=None
-			scriptObj=None
+		# try:
+		# 	scriptOutputPrepro=None
+		# 	for sc1 in self.pmmlObj['script']:
+		# 		if sc1.class_ == 'preprocessing':
+		# 			try:
+		# 				scriptOutputPrepro=sc1.scriptOutput
+		# 				scriptObj=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
+		# 				scrDictObj={'scripts':[scriptObj],'scriptpurpose':[sc1.scriptPurpose],'scriptOutput':[scriptOutputPrepro]}
+		# 			except Exception as e:
+		# 				data_details=self.upDateStatus()
+		# 				self.updateStatusWithError(data_details,'Training Failed',"Couldn't load the code >> "+ str(e),traceback.format_exc(),self.statusFile)
+		# 				return -1
+		# except:
+		# 	scriptOutputPrepro=None
+		# 	scriptObj=None
 
-		fileName=pmmlFile
-		print ('>>>>>> Step ',3)
-		if (os.path.isdir(self.pathOfData)) & (scriptOutputPrepro==None) :
-			print ('Image Classifier')
-			target=self.trainImageClassifierNN
-		elif (pathlib.Path(self.pathOfData).suffix == '.csv') & (scriptOutputPrepro==None) :
-			print('Simple DNN')
-			target=self.trainSimpleDNN
-		elif scriptOutputPrepro != None:
-			print('Custom NN')
-			target = self.trainCustomNN
-			pass
+		# fileName=pmmlFile
+		# print ('>>>>>> Step ',3)
+		# if (os.path.isdir(self.pathOfData)) & (scriptOutputPrepro==None) :
+		# 	print ('Image Classifier')
+		# 	target=self.trainImageClassifierNN
+		# elif (pathlib.Path(self.pathOfData).suffix == '.csv') & (scriptOutputPrepro==None) :
+		# 	print('Simple DNN')
+		# 	target=self.trainSimpleDNN
+		# elif scriptOutputPrepro != None:
+		# 	print('Custom NN')
+		# 	target = self.trainCustomNN
+		# 	pass
+
+		target=TrainingViewModels().trainModel
 
 		print ('>>>>>> Step ',4)
 		try:
-			train_prc = Process(target=target,args=(pmmlFile,self.pathOfData,fileName,tensorboardLogFolder,lossType,\
-				listOfMetrics,batchSize,epoch,idforData,problemType,scriptOutputPrepro,optimizerName,learningRate,
-				datHyperPara,testSize,scrDictObj))
+			# train_prc = Process(target=target,args=(pmmlFile,self.pathOfData,fileName,tensorboardLogFolder,lossType,\
+			# 	listOfMetrics,batchSize,epoch,idforData,problemType,scriptOutputPrepro,optimizerName,learningRate,
+			# 	datHyperPara,testSize,scrDictObj))
+			train_prc=Process(target=target,args=(idforData,pmmlFile,tensorboardLogFolder))
 			train_prc.start()
 		except Exception as e:
 			data_details=self.upDateStatus()
