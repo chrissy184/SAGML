@@ -103,10 +103,15 @@ namespace ZMM.App
                 options.AddPolicy("Administrator", policy => policy.RequireClaim("role", "Administrator"));
                 options.AddPolicy("User", policy => policy.RequireClaim("role", "User"));  
                 options.AddPolicy("CanUploadResourceInCode", policy => policy.RequireClaim("role", "User" , "Administrator"));        
-            });        
+            });
             #endregion
-            
-            
+
+            #region Register the Swagger generator
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZMOD", Version = "v1" });
+            });
+            #endregion
             #region Initialize clients in singleton service
             var pySrvLocation = Configuration["PyServiceLocation:srvurl"];
             string ToolHostURL = Configuration["Tool:Host"];
@@ -185,7 +190,21 @@ namespace ZMM.App
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });                                 
+            });
+
+            #region swagger middleware
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZMOD v1");
+            });      
+
+            #endregion                  
 
             app.UseStaticFiles();
 
