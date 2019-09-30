@@ -30,7 +30,7 @@ namespace ZMM.App.Controllers
     public class CodeController : Controller
     {
         #region Variables... 
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         readonly ILogger<CodeController> Logger;
         public IConfiguration Configuration { get; }
         private readonly IPyJupyterServiceClient jupyterClient;
@@ -45,7 +45,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #region Constructor...
-        public CodeController(IHostingEnvironment environment, IConfiguration configuration, ILogger<CodeController> log, IPyJupyterServiceClient _jupyterClient, IPyCompile _pyCodeCompile, IScheduler factory)
+        public CodeController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<CodeController> log, IPyJupyterServiceClient _jupyterClient, IPyCompile _pyCodeCompile, IScheduler factory)
         {
             //update 
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));

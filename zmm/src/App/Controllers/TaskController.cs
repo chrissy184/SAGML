@@ -27,7 +27,7 @@ namespace ZMM.App.Controllers
     public class TaskController : Controller
     {
         #region variables
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private IConfiguration Configuration { get; }
         readonly ILogger<TaskController> Logger;
         private readonly IPyNNServiceClient nnclient;
@@ -40,7 +40,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #region Constructor...
-        public TaskController(IHostingEnvironment environment, IConfiguration configuration, ILogger<TaskController> log, IPyNNServiceClient srv, IPyAutoMLServiceClient automlSrv)
+        public TaskController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<TaskController> log, IPyNNServiceClient srv, IPyAutoMLServiceClient automlSrv)
         {
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.Configuration = configuration;

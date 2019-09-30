@@ -36,6 +36,7 @@ using Microsoft.OpenApi.Models;
 using Quartz;
 using System.Collections.Specialized;
 using Quartz.Impl;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace ZMM.App
 {
@@ -63,9 +64,17 @@ namespace ZMM.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            #region Allow Synchronous IO to read stream in model and code
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+            #endregion
+            
             #region Added Controller and Razor Page for Login
-            services.AddControllersWithViews();
-            services.AddRazorPages();
+            services.AddControllersWithViews().AddNewtonsoftJson();
+            services.AddRazorPages().AddNewtonsoftJson();
             #endregion
        
             #region Development profile works with "npm" and "ng server" with dotnet 3.0 inbuilt configuration
@@ -153,22 +162,7 @@ namespace ZMM.App
 
             #region Add Log Factory -> You can update its behaviour from appsettings*.json configuration
             AddLogger(ref loggerFactory);     
-            #endregion
-
-          	app.Use((context, next) =>
-            {
-              	if (context.Request.Headers.TryGetValue(XForwardedPathBase, out StringValues pathBase))
-                {
-                    context.Request.PathBase = new PathString(pathBase);
-                    
-                }
-            	if(context.Request.Headers.TryGetValue(XForwardedProto, out StringValues proto))
-                {
-                	context.Request.Scheme = proto;
-                }              	
-              	return next();
-            });
-          	          
+            #endregion          	          
 
             // below is the fix for angular app reload redirections          
             app.Use(async (context, next) =>
