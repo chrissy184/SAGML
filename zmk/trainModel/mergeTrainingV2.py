@@ -312,6 +312,26 @@ class TrainingViewModels:
         self.lockForStatus.release()
         return data_details
 
+    def setOptimizer(self, optimizerName, learningRate):
+
+        if optimizerName == 'Adadelta':
+            opti=optimizers.Adadelta(lr=learningRate, rho=0.95, epsilon=None, decay=0.0)
+        elif optimizerName == 'Adagrad':
+            opti=optimizers.Adagrad(lr=learningRate, epsilon=None, decay=0.0)
+        elif optimizerName == 'Adam':
+            opti=optimizers.Adam(lr=learningRate, beta_1=0.9, beta_2=0.999, epsilon=None, decay=1e-6, amsgrad=False)
+        elif optimizerName == 'Adamax':
+            opti=optimizers.Adamax(lr=learningRate, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0)
+        elif optimizerName == 'Nadam':
+            opti=optimizers.Nadam(lr=learningRate, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
+        elif optimizerName == 'Rmsprop':
+            opti=optimizers.RMSprop(lr=learningRate, rho=0.9, epsilon=None, decay=0.0)
+        elif optimizerName == 'Sgd':
+            opti=optimizers.SGD(lr=learningRate, momentum=0.0, decay=0.0, nesterov=False)
+        else:
+            opti=optimizers.Adam(lr=learningRate, beta_1=0.9, beta_2=0.999, epsilon=None, decay=1e-6, amsgrad=False)
+        return opti
+
     def updateStatusWithError(self,data_details,statusOFExe,errorMessage,errorTraceback,statusFile):
         data_details=self.upDateStatus()
         data_details['status']=statusOFExe
@@ -347,56 +367,81 @@ class TrainingViewModels:
                     nameExist=False
         return fName
 
+    def f1(self,y_true, y_pred):
+        def recall(y_true, y_pred):
+            true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+            possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+            recall = true_positives / (possible_positives + K.epsilon())
+            return recall
 
-    def generateAndCompileModel(self, lossType, optimizerName, learningRate, listOfMetrics, compileTestOnly=False):
+        def precision(y_true, y_pred):
+            true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+            predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+            precision = true_positives / (predicted_positives + K.epsilon())
+            return precision
+        precision = precision(y_true, y_pred)
+        recall = recall(y_true, y_pred)
+        return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
-		def f1(y_true, y_pred):
-			def recall(y_true, y_pred):
-			    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-			    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-			    recall = true_positives / (possible_positives + K.epsilon())
-			    return recall
 
-			def precision(y_true, y_pred):
-			    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-			    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
-			    precision = true_positives / (predicted_positives + K.epsilon())
-			    return precision
-			precision = precision(y_true, y_pred)
-			recall = recall(y_true, y_pred)
-			return 2*((precision*recall)/(precision+recall+K.epsilon()))
-		try:
-			optiMi=self.setOptimizer(optimizerName,learningRate)
-		except Exception as e:
-			if not compileTestOnly:
-				data_details=self.upDateStatus()
-				self.updateStatusWithError(data_details,'Training Failed','Unable to get the optimizer '+optimizerName+' >> '+ str(e),traceback.format_exc(),self.statusFile)
-			else:
-				data_details = {}
-				self.updateStatusWithError(data_details,'Model Compilation Failed','Error while compiling the Model >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return data_details
+    def generateAndCompileModel(self,modelObjZG, lossType, optimizerName, learningRate, listOfMetrics, compileTestOnly=False):
 
-		model=modelObj.model
+       
+        try:
+            optiMi=self.setOptimizer(optimizerName,learningRate)
+        except Exception as e:
+            if not compileTestOnly:
+                data_details=self.upDateStatus()
+                self.updateStatusWithError(data_details,'Training Failed','Unable to get the optimizer '+optimizerName+' >> '+ str(e),traceback.format_exc(),self.statusFile)
+            else:
+                data_details = {}
+                self.updateStatusWithError(data_details,'Model Compilation Failed','Error while compiling the Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+            return data_details
 
-		try:
-		    if 'f1' in listOfMetrics:
-		        listOfMetrics.remove('f1')
-		        model.compile(optimizer=optiMi, loss=lossType, metrics=listOfMetrics+[f1])
-		    else:
-		        model.compile(optimizer=optiMi, loss=lossType, metrics=listOfMetrics)
-		except Exception as e:
-			if not compileTestOnly:
-				data_details=self.upDateStatus()
-				self.updateStatusWithError(data_details,'Training Failed','Error while compiling Model >> '+ str(e),traceback.format_exc(),self.statusFile)
-			else:
-				data_details = {}
-				self.updateStatusWithError(data_details,'Model Compilation Failed','Error while compiling Model >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return data_details
-		if not compileTestOnly:
-			kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Successfully compiled')
-		modelObj.model = model
-		return modelObj
-        
+        try:
+            model_graph = modelObjZG['modelObj']['model_graph']
+            tf_session = modelObjZG['modelObj']['tf_session']
+            print ('model_graph,tf_session',model_graph,tf_session)
+            with model_graph.as_default():
+                with tf_session.as_default():
+                    model=modelObjZG['modelObj']['recoModelObj'].model
+                    if 'f1' in listOfMetrics:
+                        listOfMetrics.remove('f1')
+                        model.compile(optimizer=optiMi, loss=lossType, metrics=listOfMetrics+[self.f1])
+                    else:
+                        model.compile(optimizer=optiMi, loss=lossType, metrics=listOfMetrics)
+        except Exception as e:
+            if not compileTestOnly:
+                data_details=self.upDateStatus()
+                self.updateStatusWithError(data_details,'Training Failed','Error while compiling Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+            else:
+                data_details = {}
+                self.updateStatusWithError(data_details,'Model Compilation Failed','Error while compiling Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+            return data_details
+        if not compileTestOnly:
+            kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Successfully compiled')
+        return model,model_graph,tf_session
+
+    def startTensorBoard(self, tensorboardLogFolder):
+        print ('tensorboardLogFolder >>>>>>',tensorboardLogFolder)
+        tensor_board=keras.callbacks.TensorBoard(log_dir=tensorboardLogFolder, histogram_freq=0,write_graph=True, write_images=False)
+        return tensor_board
+    def kerasDataPrep(self,dataFolder,batch_size,img_height, img_width):
+        train_data_dir=dataFolder+'/'+'train/'
+        val_data_dir=dataFolder+'/'+'validation/'
+
+        train_datagen = ImageDataGenerator(rescale=1. / 255,shear_range=0.2,zoom_range=0.2,horizontal_flip=True)
+        test_datagen = ImageDataGenerator(rescale=1. / 255)
+
+        train_generator = train_datagen.flow_from_directory(train_data_dir,target_size=(img_height, img_width),
+        batch_size=batch_size,class_mode='categorical')
+        if os.path.exists(val_data_dir)==True:
+            validation_generator = test_datagen.flow_from_directory(val_data_dir,target_size=(img_height, img_width),
+            batch_size=batch_size,class_mode='categorical')
+            return train_generator,validation_generator,len(train_generator.class_indices)
+        else:
+            return train_generator,None,len(train_generator.class_indices)
+
     def verifyHyperparameters(self,datHyperPara):
         try:
             lossType=datHyperPara['lossType']
@@ -466,8 +511,8 @@ class TrainingViewModels:
         except:
             scriptOutputPrepro=None
 
-        datHyperPara=modelObj['hyperparameters']
-        checkVal=self.verifyHyperparameters(modelObj['hyperparameters'])
+        datHyperPara=modelObj['modelObj']['hyperparameters']
+        checkVal=self.verifyHyperparameters(datHyperPara)
         if checkVal == 'done':
             pass
         else:
@@ -478,7 +523,8 @@ class TrainingViewModels:
         if dataObj == None:
             pass
         elif (os.path.isdir(dataObj)) & (scriptOutputPrepro==None):
-            modelObjTrained=self.trainImageClassifierNN(modelObj)
+            print ('Came to Image classifier')
+            modelObjTrained=self.trainImageClassifierNN(modelObj,tensorboardLogFolder)
             pass
         elif (pathlib.Path(dataObj).suffix == '.csv') & (scriptOutputPrepro==None) :
             print('Simple DNN')
@@ -489,63 +535,76 @@ class TrainingViewModels:
             data_details=self.upDateStatus()
             self.updateStatusWithError(data_details,'Training Failed',"Not supported >> ",'No traceback',self.statusFile)
             return -1
+        return modelObjTrained
 
-        # if 'preprocessing' in modeScope:
-        #         print ('Finaly came to preprocessing')
-        #         try:
-        #             trainData=modeScope['preprocessing']()
-        #             print (trainData.shape)
-        #             print('Preprocess step completed')
-        #             kerasUtilities.updateStatusofProcess(self.statusFile,'Preprocessing for Model 1 Completed')
-        #         except Exception as e:
-        #             data_details=self.upDateStatus()
-        #             self.updateStatusWithError(data_details,'Training Failed',"Some issue with preprocessing >> "+ str(e),traceback.format_exc(),self.statusFile)
-        #             return -1
-        # else:
-        #     pass
-        # XVar=modeScope['modelObj']['listOFColumns']
-        # YVar=modeScope['modelObj']['targetCol']
+    def trainImageClassifierNN(self,modelObj,tensorboardLogFolder):
+        print ('Enter image classifier')
+        dataFolder=modelObj['Data']
+        # modelToCompile=modelObj['modelObj']['recoModelObj']
+        datHyperPara=modelObj['modelObj']['hyperparameters']
+        listOfMetrics=datHyperPara['listOfMetrics']
+        modelV1=modelObj['modelObj']['recoModelObj'].model
 
-        # modltToTrain=modeScope['modelObj']['recoModelObj']
-        # print('Training step Started')
-        # kerasUtilities.updateStatusofProcess(self.statusFile,'Training in Progress')
-        # if str(type(modltToTrain))=="<class 'lightgbm.basic.Booster'>":
-        #     print('Booster Model started')
-        #     import lightgbm as lgb
-        #     train_data=lgb.Dataset(trainData[XVar],trainData[YVar])
-        #     modelHyParameters=modeScope['modelObj']['hyperparameters']
-        #     newmodel1_ = lgb.train(modelHyParameters, train_data,init_model=modltToTrain)
-        #     data_details=self.upDateStatus(statusFile)
-        #     data_details['status']='Complete'
-        #     with open(statusFile,'w') as filetosave:
-        #         json.dump(data_details, filetosave)
+        print ('Classification data folder at',dataFolder)
+        try:
+            self.trainFolder=dataFolder+'/'+'train/'
+            self.validationFolder=dataFolder+'/'+'validation/'
+            kerasUtilities.checkCreatePath(self.trainFolder)
+            kerasUtilities.checkCreatePath(self.validationFolder)
+        except Exception as e:
+            data_details=self.upDateStatus()
+            self.updateStatusWithError(data_details,'Training Failed','Unable to find train and validation folder >> '+ str(e),traceback.format_exc(),self.statusFile)
+            return -1
 
-        # elif 'sklearn.ensemble' in str(type(modltToTrain)):
-        #     print('ensemble Model started')
-        #     modelHyParameters=modeScope['modelObj']['hyperparameters']
-        #     if YVar is None:
-        #         modltToTrain.fit(trainData[XVar])
-        #     else:
-        #         print('XVar  >>>> ',XVar)
-        #         modltToTrain.fit(trainData[XVar],trainData[YVar])
-        #     newmodel1_=modltToTrain
-            
-        #     data_details=self.upDateStatus(statusFile)
-        #     data_details['status']='Complete'
-        #     with open(statusFile,'w') as filetosave:
-        #         json.dump(data_details, filetosave)
-        # else:
-        #     data_details=self.upDateStatus(statusFile)
-        #     data_details['status']='Training Failed'
-        #     data_details['errorMessage']='Add support for other model '+str(e)
-        #     data_details['errorTraceback']=traceback.format_exc()
-        #     with open(statusFile,'w') as filetosave:
-        #         json.dump(data_details, filetosave)
+        try:
+            img_height, img_width=modelV1.input_shape[1:3]
+        except Exception as e:
+            data_details=self.upDateStatus()
+            self.updateStatusWithError(data_details,'Training Failed','Model input_shape is invalid >> '+ str(e),traceback.format_exc(),self.statusFile)
+            return -1
 
-        # modelInformation['score'][modelObjsTrain[0]]['modelObj']['recoModelObj']=modelInformation['train'][modelObjsTrain[0]]['modelObj']['recoModelObj']=newmodel1_
-        # print ('tempDict is ready to be')
+        try:
+            tGen,vGen,nClass=self.kerasDataPrep(dataFolder,datHyperPara['batchSize'],img_height,img_width)
+            stepsPerEpochT=tGen.n/tGen.batch_size
+            stepsPerEpochV=vGen.n/vGen.batch_size
+        except Exception as e:
+            data_details=self.upDateStatus()
+            self.updateStatusWithError(data_details,'Training Failed','Error while generating data for Keras >> '+ str(e),traceback.format_exc(),self.statusFile)
+            return -1
 
-        return 'dones'
+        tensor_board = self.startTensorBoard(tensorboardLogFolder)
+
+        try:
+            print ('Came here 1'*5 )
+            model_graph = modelObj['modelObj']['model_graph']
+            tf_session = modelObj['modelObj']['tf_session']
+            with model_graph.as_default():
+                with tf_session.as_default():
+                    
+                    if 'f1' in listOfMetrics:
+                        listOfMetrics.remove('f1')
+                        modelV1.compile(optimizer=datHyperPara['optimizerName'], loss=datHyperPara['lossType'], 
+                        metrics=listOfMetrics+[self.f1])
+                        import tensorflow as tf
+                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                        with tf.device(gpuCPUSelect(selDev)):
+                            modelV1.fit_generator(tGen,steps_per_epoch=stepsPerEpochT,validation_steps=stepsPerEpochV,epochs=datHyperPara['epoch'],validation_data=vGen,callbacks=[tensor_board])
+                    else:
+                        modelV1.compile(optimizer=datHyperPara['optimizerName'], loss=datHyperPara['lossType'], metrics=listOfMetrics)
+                        import tensorflow as tf
+                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                        with tf.device(gpuCPUSelect(selDev)):
+                            modelV1.fit_generator(tGen,steps_per_epoch=stepsPerEpochT,validation_steps=stepsPerEpochV,epochs=datHyperPara['epoch'],validation_data=vGen,callbacks=[tensor_board])
+        except Exception as e:
+            print ('Came here 2'*5 )
+            data_details=self.upDateStatus()
+            self.updateStatusWithError(data_details,'Training Failed','Error while compiling Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+
+        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
+
+        predictedClass=list(tGen.class_indices.keys())
+        modelObj['modelObj']['recoModelObj'].model=modelV1
+        return modelObj
     def trainModel(self,idforData,pmmlFile,tensorboardLogFolder):
         global PMMLMODELSTORAGE
         pmmlFileObj=pathlib.Path(pmmlFile)
@@ -583,6 +642,12 @@ class TrainingViewModels:
             kerasUtilities.updateStatusofProcess(self.statusFile,'Training Model Loaded')
 
             modeScope=self.trainModelObjectDict(modeScope,idforData,tensorboardLogFolder)
+            modelInformation['train'][modelObjsTrain[0]]=modeScope
+
+        if modeScope == -1:
+            return -1
+
+        print ('trainModelObjectDict modeScope  >>>>>>>>> ',modeScope)
         
         tempDict=modelInformation
         listOfModelNames=set([k for j in tempDict for k in tempDict[j]])
@@ -591,23 +656,29 @@ class TrainingViewModels:
         toExportDict={}
         for objDet in listOfModelNames:
             toExportDict[objDet]={'hyperparameters':None,
-                'preProcessingScript':{'scripts':[], 'scriptpurpose':[]},
+            'data':None,
+                'preProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[]},
                 'modelObj':None,
                 'pipelineObj':None,
                 'featuresUsed':None,
                 'targetName':None,
-                'postProcessingScript':{'scripts':[], 'scriptpurpose':[]},
+                'postProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[]},
                 'taskType': None}
+
+        print ('tempDict>>>>>>>>>>>>>>>>>>>>>>>',tempDict)
 
         for modObjeCom in tempDict:
             if modObjeCom == 'train':
                 for echMod in toExportDict:
                     if echMod in tempDict[modObjeCom]:
                         print ('>>>>>',echMod)
+                        print ('8'*100)
+                        print (tempDict[modObjeCom][echMod]['modelObj']['model_graph'])
                         if tempDict[modObjeCom][echMod]['modelObj']['modelArchType']=='NNModel':
-                            toExportDict[echMod]['modelObj']=tempDict[modObjeCom][echMod]['modelObj']['recoModelObj']
-                            toExportDict[echMod]['modelObj']['model_graph']=tempDict[modObjeCom][echMod]['modelObj']['model_graph']
-                            toExportDict[echMod]['modelObj']['tf_session']=tempDict[modObjeCom][echMod]['modelObj']['tf_session']
+                        #                     print (tempDict[modObjeCom][echMod]['modelObj'])
+                            toExportDict[echMod]['modelObj']=tempDict[modObjeCom][echMod]['modelObj']['recoModelObj'].model
+                            toExportDict[echMod]['model_graph']=tempDict[modObjeCom][echMod]['modelObj']['model_graph']
+                            toExportDict[echMod]['tf_session']=tempDict[modObjeCom][echMod]['modelObj']['tf_session']
                         else:
                             toExportDict[echMod]['modelObj']=tempDict[modObjeCom][echMod]['modelObj']['recoModelObj']
                         if 'preprocessing_code' in tempDict[modObjeCom][echMod]:
@@ -626,7 +697,7 @@ class TrainingViewModels:
                         print ('>>>>',echMod)
                         if tempDict[modObjeCom][echMod]['modelObj']['modelArchType']=='NNModel':
         #                     print (tempDict[modObjeCom][echMod]['modelObj'])
-                            toExportDict[echMod]['modelObj']=tempDict[modObjeCom][echMod]['modelObj']['recoModelObj']
+                            toExportDict[echMod]['modelObj']=tempDict[modObjeCom][echMod]['modelObj']['recoModelObj'].model
                             toExportDict[echMod]['model_graph']=tempDict[modObjeCom][echMod]['modelObj']['model_graph']
                             toExportDict[echMod]['tf_session']=tempDict[modObjeCom][echMod]['modelObj']['tf_session']
                         else:
@@ -664,85 +735,34 @@ class TrainingViewModels:
 
         print (toExportDict)
         print('*'*100)
-        orgfName='../ZMOD/Models/'+modelName+'.pmml'
-        copyOrgFName='../ZMOD/Models/'+self.increName(modelName)+'.pmml'
-
+        fN=pathlib.Path(pmmlFile).name
+        orgfName='../ZMOD/Models/'+fN#+'.pmml'
+        fN=fN.replace('.pmml','')
+        copyOrgFName='../ZMOD/Models/'+self.increName(fN)+'.pmml'
+        import shutil
+        from nyokaBase.skl.skl_to_pmml import model_to_pmml
         shutil.copy2(orgfName,copyOrgFName)
-        model_to_pmml(toExportDict, pmml_f_name=copyOrgFName)
+        model_to_pmml(toExportDict, PMMLFileName=copyOrgFName)
         NewModelOperations().loadExecutionModel(orgfName)
-        data_details=self.upDateStatus(statusFile)
-        data_details['status']='Model Saved in different Version'
-        # data_details['errorMessage']='Add support for other model '+str(e)
-        # data_details['errorTraceback']=traceback.format_exc()
-        with open(statusFile,'w') as filetosave:
-            json.dump(data_details, filetosave)
+        # data_details['status']='Model Saved in different Version'
+        kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Saved in different Version')
+        data_details=self.upDateStatus()
 
         return JsonResponse(data_details)
 
 
-    def trainImageClassifierNN(self,modelObj):
-        dataFolder=modelObj['Data']
-        datHyperPara=modelObj['hyperparameters']
 
-        print ('Classification data folder at',dataFolder)
-        try:
-            self.trainFolder=dataFolder+'/'+'train/'
-            self.validationFolder=dataFolder+'/'+'validation/'
-            kerasUtilities.checkCreatePath(self.trainFolder)
-            kerasUtilities.checkCreatePath(self.validationFolder)
-        except Exception as e:
-            data_details=self.upDateStatus()
-            self.updateStatusWithError(data_details,'Training Failed','Unable to find train and validation folder >> '+ str(e),traceback.format_exc(),self.statusFile)
-            return -1
-
-        modelObj = self.generateAndCompileModel(datHyperPara['lossType'],datHyperPara['optimizerName'],datHyperPara['learningRate'],datHyperPara['listOfMetrics'])
-        if modelObj.__class__.__name__ == 'dict':
-            return
-        model = modelObj.model
-
-        try:
-            img_height, img_width=modelObj.image_input.shape.as_list()[1:3]
-        except Exception as e:
-            data_details=self.upDateStatus()
-            self.updateStatusWithError(data_details,'Training Failed','Model input_shape is invalid >> '+ str(e),traceback.format_exc(),self.statusFile)
-            return -1
-
-        try:
-            tGen,vGen,nClass=self.kerasDataPrep(dataFolder,batchSize,img_height,img_width)
-            stepsPerEpochT=tGen.n/tGen.batch_size
-            stepsPerEpochV=vGen.n/vGen.batch_size
-        except Exception as e:
-            data_details=self.upDateStatus()
-            self.updateStatusWithError(data_details,'Training Failed','Error while generating data for Keras >> '+ str(e),traceback.format_exc(),self.statusFile)
-            return -1
-
-        tensor_board = self.startTensorBoard(tensorboardLogFolder)
-
-        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
-        try:
-            import tensorflow as tf
-            print ('started Trianing')
-            with tf.device(gpuCPUSelect(selDev)):
-                model.fit_generator(tGen,steps_per_epoch=stepsPerEpochT,validation_steps=stepsPerEpochV,epochs=epoch,validation_data=vGen,callbacks=[tensor_board])
-        except Exception as e:
-            data_details=self.upDateStatus()
-            self.updateStatusWithError(data_details,'Training Failed','There is a problem with training parameters >> '+ str(e),traceback.format_exc(),self.statusFile)
-            return -1
-
-        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
-
-        predictedClass=list(tGen.class_indices.keys())
-        try:
-            toExportDict={
-            'model1':{'data':dataFolder,'hyperparameters':datHyperPara,'preProcessingScript':None,
-            'pipelineObj':None,'modelObj':model,'featuresUsed':None,'targetName':None,'postProcessingScript':None,
-            'taskType': 'trainAndscore','predictedClasses':predictedClass,'dataSet':'image'}
-                        }
-            from nyokaBase.skl.skl_to_pmml import model_to_pmml
-            model_to_pmml(toExportDict, PMMLFileName=fileName)
-            kerasUtilities.updateStatusOfTraining(self.statusFile,'PMML file Successfully Saved')
-            return 'Success'
-        except Exception as e:
-            data_details=self.upDateStatus()
-            self.updateStatusWithError(data_details,'Saving File Failed',' '+ str(e),traceback.format_exc(),self.statusFile)
-            return -1
+        # try:
+        #     toExportDict={
+        #     'model1':{'data':dataFolder,'hyperparameters':datHyperPara,'preProcessingScript':None,
+        #     'pipelineObj':None,'modelObj':model,'featuresUsed':None,'targetName':None,'postProcessingScript':None,
+        #     'taskType': 'trainAndscore','predictedClasses':predictedClass,'dataSet':'image'}
+        #                 }
+        #     from nyokaBase.skl.skl_to_pmml import model_to_pmml
+        #     model_to_pmml(toExportDict, PMMLFileName=fileName)
+        #     kerasUtilities.updateStatusOfTraining(self.statusFile,'Complete')
+        #     return 'Success'
+        # except Exception as e:
+        #     data_details=self.upDateStatus()
+        #     self.updateStatusWithError(data_details,'Saving File Failed',' '+ str(e),traceback.format_exc(),self.statusFile)
+        #     return -1
