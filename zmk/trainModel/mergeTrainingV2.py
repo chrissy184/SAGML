@@ -531,6 +531,9 @@ class TrainingViewModels:
             print (dataObjPd.shape)
             modelObjTrained=self.trainSimpleDNNObj(modelObj,tensorboardLogFolder,dataObjPd)
         elif (pathlib.Path(dataObj).suffix == '.csv') & (scriptOutputPrepro!=None) :
+            dataObjPd=pd.read_csv(modelObj['Data'])
+            print (dataObjPd.shape)
+            modelObjTrained=self.trainSimpleDNNObj(modelObj,tensorboardLogFolder,dataObjPd)
             print('Simple DNN with preprocessing')
         else:
             data_details=self.upDateStatus()
@@ -755,9 +758,11 @@ class TrainingViewModels:
                         if 'preprocessing_code' in tempDict[modObjeCom][echMod]:
                             toExportDict[echMod]['preProcessingScript']['scripts'].append(tempDict[modObjeCom][echMod]['preprocessing_code'])
                             toExportDict[echMod]['preProcessingScript']['scriptpurpose'].append(modObjeCom)
+                            toExportDict[echMod]['preProcessingScript']['scriptOutput'].append(tempDict[modObjeCom][echMod]['scriptOutput'])
                         if 'postprocessing_code' in tempDict[modObjeCom][echMod]:
                             toExportDict[echMod]['postProcessingScript']['scripts'].append(tempDict[modObjeCom][echMod]['postprocessing_code'])
                             toExportDict[echMod]['postProcessingScript']['scriptpurpose'].append(modObjeCom)
+                            toExportDict[echMod]['postProcessingScript']['scriptOutput'].append(tempDict[modObjeCom][echMod]['scriptOutput'])
                         toExportDict[echMod]['taskType']=modObjeCom
                         toExportDict[echMod]['featuresUsed']=tempDict[modObjeCom][echMod]['modelObj']['listOFColumns']
                         toExportDict[echMod]['targetName']=tempDict[modObjeCom][echMod]['modelObj']['targetCol']
@@ -806,7 +811,7 @@ class TrainingViewModels:
 
         print('*'*100)
 
-        # print (toExportDict)
+        print (toExportDict)
         print('*'*100)
         fN=pathlib.Path(pmmlFile).name
         orgfName='../ZMOD/Models/'+fN#+'.pmml'
