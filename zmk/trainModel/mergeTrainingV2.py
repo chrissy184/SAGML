@@ -181,7 +181,7 @@ class NewModelOperations:
         modelLoadStatus=[]
 
         for taskT in tempDict:
-            print (taskT)
+            # print (taskT)
             for mO in tempDict[taskT]:
                 if tempDict[taskT][mO]['modelObj']['modelArchType']=="NNModel":
                     modelProp=tempDict[taskT][mO]['modelObj']['pmmlNyokaObj']
@@ -401,7 +401,7 @@ class TrainingViewModels:
         try:
             model_graph = modelObjZG['modelObj']['model_graph']
             tf_session = modelObjZG['modelObj']['tf_session']
-            print ('model_graph,tf_session',model_graph,tf_session)
+            # print ('model_graph,tf_session',model_graph,tf_session)
             with model_graph.as_default():
                 with tf_session.as_default():
                     model=modelObjZG['modelObj']['recoModelObj'].model
@@ -525,10 +525,11 @@ class TrainingViewModels:
         elif (os.path.isdir(dataObj)) & (scriptOutputPrepro==None):
             print ('Came to Image classifier')
             modelObjTrained=self.trainImageClassifierNN(modelObj,tensorboardLogFolder)
-            pass
         elif (pathlib.Path(dataObj).suffix == '.csv') & (scriptOutputPrepro==None) :
             print('Simple DNN')
-            pass
+            dataObjPd=pd.read_csv(modelObj['Data'])
+            print (dataObjPd.shape)
+            modelObjTrained=self.trainSimpleDNNObj(modelObj,tensorboardLogFolder,dataObjPd)
         elif (pathlib.Path(dataObj).suffix == '.csv') & (scriptOutputPrepro!=None) :
             print('Simple DNN with preprocessing')
         else:
@@ -536,6 +537,75 @@ class TrainingViewModels:
             self.updateStatusWithError(data_details,'Training Failed',"Not supported >> ",'No traceback',self.statusFile)
             return -1
         return modelObjTrained
+
+
+    def trainSimpleDNNObj(self,modelObj,tensorboardLogFolder,dataObj):
+        dataFolder=modelObj['Data']
+        # modelToCompile=modelObj['modelObj']['recoModelObj']
+        datHyperPara=modelObj['modelObj']['hyperparameters']
+        listOfMetrics=datHyperPara['listOfMetrics']
+        modelV1=modelObj['modelObj']['recoModelObj'].model
+        print(">>>>>>>>>>>>>>SimpleDNN")
+        print('pathofdata>>>>>',dataFolder)
+        predictedClass=None
+        targetColumnName = 'target'
+        df = dataObj
+        indevar=list(df.columns)
+        indevar.remove('target')
+        targetCol = df[targetColumnName]
+        if datHyperPara['problemType']=='classification':
+            lb=preprocessing.LabelBinarizer()
+            y=lb.fit_transform(targetCol)
+            predictedClass = list(targetCol.unique())
+        else:
+            y=df[targetColumnName]
+            predictedClass=None
+        ##### Split data into test and validation set for training#################################
+        trainDataX,testDataX,trainDataY,testDataY=model_selection.train_test_split(df[indevar],y,
+                                                        test_size=datHyperPara['testSize'])
+        stepsPerEpochT=int(len(trainDataX)/datHyperPara['batchSize'])
+        stepsPerEpochV=int(len(testDataX)/datHyperPara['batchSize'])
+        kerasUtilities.updateStatusOfTraining(self.statusFile,'Data split in Train validation part')
+
+        # modelObj = self.generateAndCompileModel(datHyperPara['lossType'],datHyperPara['optimizerName'],datHyperPara['learningRate'],listOfMetrics)
+        # if modelObj.__class__.__name__ == 'dict':
+        #     return
+        # model = modelObj.model
+        tensor_board = self.startTensorBoard(tensorboardLogFolder)
+        try:
+            # print ('Came here 1'*5 )
+            model_graph = modelObj['modelObj']['model_graph']
+            tf_session = modelObj['modelObj']['tf_session']
+            with model_graph.as_default():
+                with tf_session.as_default():
+                    
+                    if 'f1' in listOfMetrics:
+                        listOfMetrics.remove('f1')
+                        optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'],metrics=listOfMetrics+[self.f1])
+                        import tensorflow as tf
+                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                        with tf.device(gpuCPUSelect(selDev)):
+                            modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                        validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+                    else:
+                        optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'], metrics=listOfMetrics)
+                        import tensorflow as tf
+                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                        with tf.device(gpuCPUSelect(selDev)):
+                           modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                        validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+
+                        print ('9'*500)
+        except Exception as e:
+            print ('Came here 2'*5 )
+            data_details=self.upDateStatus()
+            self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+
+        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
+        modelObj['modelObj']['recoModelObj'].model=modelV1
+        return modelObj
 
     def trainImageClassifierNN(self,modelObj,tensorboardLogFolder):
         print ('Enter image classifier')
@@ -575,7 +645,7 @@ class TrainingViewModels:
         tensor_board = self.startTensorBoard(tensorboardLogFolder)
 
         try:
-            print ('Came here 1'*5 )
+            # print ('Came here 1'*5 )
             model_graph = modelObj['modelObj']['model_graph']
             tf_session = modelObj['modelObj']['tf_session']
             with model_graph.as_default():
@@ -583,14 +653,15 @@ class TrainingViewModels:
                     
                     if 'f1' in listOfMetrics:
                         listOfMetrics.remove('f1')
-                        modelV1.compile(optimizer=datHyperPara['optimizerName'], loss=datHyperPara['lossType'], 
-                        metrics=listOfMetrics+[self.f1])
+                        optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'], metrics=listOfMetrics+[self.f1])
                         import tensorflow as tf
                         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
                         with tf.device(gpuCPUSelect(selDev)):
                             modelV1.fit_generator(tGen,steps_per_epoch=stepsPerEpochT,validation_steps=stepsPerEpochV,epochs=datHyperPara['epoch'],validation_data=vGen,callbacks=[tensor_board])
                     else:
-                        modelV1.compile(optimizer=datHyperPara['optimizerName'], loss=datHyperPara['lossType'], metrics=listOfMetrics)
+                        optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'], metrics=listOfMetrics)
                         import tensorflow as tf
                         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
                         with tf.device(gpuCPUSelect(selDev)):
@@ -635,10 +706,10 @@ class TrainingViewModels:
             self.updateStatusWithError(data_details,'Training Failed',"Add support for training multiple model >> "+ str(e),traceback.format_exc(),self.statusFile)
             return -1
         elif len(modelObjsTrain) ==1:
-            print ('>>>>>>>>>>>>>>>                 ',self.statusFile)
+            # print ('>>>>>>>>>>>>>>>                 ',self.statusFile)
             print('Came in model 1')
             modeScope=modelInformation['train'][modelObjsTrain[0]]
-            print ('modeScope>>>>>>>>>>> ',modeScope)
+            # print ('modeScope>>>>>>>>>>> ',modeScope)
             kerasUtilities.updateStatusofProcess(self.statusFile,'Training Model Loaded')
 
             modeScope=self.trainModelObjectDict(modeScope,idforData,tensorboardLogFolder)
@@ -647,23 +718,23 @@ class TrainingViewModels:
         if modeScope == -1:
             return -1
 
-        print ('trainModelObjectDict modeScope  >>>>>>>>> ',modeScope)
+        # print ('trainModelObjectDict modeScope  >>>>>>>>> ',modeScope)
         
         tempDict=modelInformation
         listOfModelNames=set([k for j in tempDict for k in tempDict[j]])
-        print ('listOfModelNames',listOfModelNames)
+        # print ('listOfModelNames',listOfModelNames)
 
         toExportDict={}
         for objDet in listOfModelNames:
             toExportDict[objDet]={'hyperparameters':None,
-            'data':None,
-                'preProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[]},
-                'modelObj':None,
-                'pipelineObj':None,
-                'featuresUsed':None,
-                'targetName':None,
-                'postProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[]},
-                'taskType': None}
+                                'data':None,
+                                'preProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[]},
+                                'modelObj':None,
+                                'pipelineObj':None,
+                                'featuresUsed':None,
+                                'targetName':None,
+                                'postProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[]},
+                                'taskType': None}
 
         print ('tempDict>>>>>>>>>>>>>>>>>>>>>>>',tempDict)
 
@@ -673,7 +744,7 @@ class TrainingViewModels:
                     if echMod in tempDict[modObjeCom]:
                         print ('>>>>>',echMod)
                         print ('8'*100)
-                        print (tempDict[modObjeCom][echMod]['modelObj']['model_graph'])
+                        # print (tempDict[modObjeCom][echMod]['modelObj']['model_graph'])
                         if tempDict[modObjeCom][echMod]['modelObj']['modelArchType']=='NNModel':
                         #                     print (tempDict[modObjeCom][echMod]['modelObj'])
                             toExportDict[echMod]['modelObj']=tempDict[modObjeCom][echMod]['modelObj']['recoModelObj'].model
@@ -691,10 +762,11 @@ class TrainingViewModels:
                         toExportDict[echMod]['featuresUsed']=tempDict[modObjeCom][echMod]['modelObj']['listOFColumns']
                         toExportDict[echMod]['targetName']=tempDict[modObjeCom][echMod]['modelObj']['targetCol']
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
+                        toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
             if modObjeCom == 'score':
                 for echMod in toExportDict:
                     if echMod in tempDict[modObjeCom]:
-                        print ('>>>>',echMod)
+                        # print ('>>>>',echMod)
                         if tempDict[modObjeCom][echMod]['modelObj']['modelArchType']=='NNModel':
         #                     print (tempDict[modObjeCom][echMod]['modelObj'])
                             toExportDict[echMod]['modelObj']=tempDict[modObjeCom][echMod]['modelObj']['recoModelObj'].model
@@ -712,6 +784,7 @@ class TrainingViewModels:
                         toExportDict[echMod]['featuresUsed']=tempDict[modObjeCom][echMod]['modelObj']['listOFColumns']
                         toExportDict[echMod]['targetName']=tempDict[modObjeCom][echMod]['modelObj']['targetCol']
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
+                        toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
                         
         for modNa in listOfModelNames:
             if (modNa in tempDict['train']) & (modNa in tempDict['score']):
@@ -733,7 +806,7 @@ class TrainingViewModels:
 
         print('*'*100)
 
-        print (toExportDict)
+        # print (toExportDict)
         print('*'*100)
         fN=pathlib.Path(pmmlFile).name
         orgfName='../ZMOD/Models/'+fN#+'.pmml'
