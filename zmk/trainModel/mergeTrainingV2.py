@@ -504,24 +504,32 @@ class TrainingViewModels:
             testSize=None
         return 'done'
     def trainModelObjectDict(self,modelObj,idforData,tensorboardLogFolder):
-        dataObj=modelObj['Data']
+        print ('modelObj???????????????????',modelObj)
+        try:
+            dataObj=modelObj['Data']
+        except:
+            dataObj=None
         modelArch=modelObj['modelObj']['modelArchType']
         try:
             scriptOutputPrepro=modelObj['scriptOutput']
         except:
             scriptOutputPrepro=None
+        
+        print ('scriptOutputPrepro',scriptOutputPrepro,dataObj,modelArch)
 
         datHyperPara=modelObj['modelObj']['hyperparameters']
-        checkVal=self.verifyHyperparameters(datHyperPara)
-        if checkVal == 'done':
-            pass
-        else:
-            data_details=self.upDateStatus()
-            self.updateStatusWithError(data_details,'Training Failed',"Some issue with hyperparameters >> ",'No info',self.statusFile)
-            return -1
+        if modelArch == 'NNModel':
+            checkVal=self.verifyHyperparameters(datHyperPara)
+            if checkVal == 'done':
+                pass
+            else:
+                data_details=self.upDateStatus()
+                self.updateStatusWithError(data_details,'Training Failed',"Some issue with hyperparameters >> ",'No info',self.statusFile)
+                return -1
 		
-        if dataObj == None:
-            pass
+        if (dataObj == None) & (scriptOutputPrepro != None):
+            print ('To complicated 1')
+            modelObjTrained=self.trainComplicatedDNNObj(modelObj,tensorboardLogFolder,scriptOutputPrepro)
         elif (os.path.isdir(dataObj)) & (scriptOutputPrepro==None):
             print ('Came to Image classifier')
             modelObjTrained=self.trainImageClassifierNN(modelObj,tensorboardLogFolder)
@@ -679,6 +687,82 @@ class TrainingViewModels:
         predictedClass=list(tGen.class_indices.keys())
         modelObj['modelObj']['recoModelObj'].model=modelV1
         return modelObj
+
+    def trainComplicatedDNNObj(self,modelObj,tensorboardLogFolder,scriptOutputPrepro):
+
+        if scriptOutputPrepro=='DATA':
+            dataObj=modelObj['modelObj']['preprocessing']()
+        else:
+            pass
+
+
+        if modelObj['modelObj']['modelArchType']=='SKLModel':
+            # modelToTrain=modelObj['modelObj']['recoModelObj']
+            # datHyperPara=modelObj['modelObj']['hyperparameters']
+            # listOfMetrics=datHyperPara['listOfMetrics']
+        modelV1=modelObj['modelObj']['recoModelObj'].model
+        print(">>>>>>>>>>>>>>SimpleDNN")
+        # print('pathofdata>>>>>',dataFolder)
+        predictedClass=None
+        targetColumnName = 'target'
+        # df = dataObj
+        indevar=list(df.columns)
+        indevar.remove('target')
+        targetCol = df[targetColumnName]
+        if datHyperPara['problemType']=='classification':
+            lb=preprocessing.LabelBinarizer()
+            y=lb.fit_transform(targetCol)
+            predictedClass = list(targetCol.unique())
+        else:
+            y=df[targetColumnName]
+            predictedClass=None
+        ##### Split data into test and validation set for training#################################
+        trainDataX,testDataX,trainDataY,testDataY=model_selection.train_test_split(df[indevar],y,
+                                                        test_size=datHyperPara['testSize'])
+        stepsPerEpochT=int(len(trainDataX)/datHyperPara['batchSize'])
+        stepsPerEpochV=int(len(testDataX)/datHyperPara['batchSize'])
+        kerasUtilities.updateStatusOfTraining(self.statusFile,'Data split in Train validation part')
+
+        # modelObj = self.generateAndCompileModel(datHyperPara['lossType'],datHyperPara['optimizerName'],datHyperPara['learningRate'],listOfMetrics)
+        # if modelObj.__class__.__name__ == 'dict':
+        #     return
+        # model = modelObj.model
+        tensor_board = self.startTensorBoard(tensorboardLogFolder)
+        try:
+            # print ('Came here 1'*5 )
+            model_graph = modelObj['modelObj']['model_graph']
+            tf_session = modelObj['modelObj']['tf_session']
+            with model_graph.as_default():
+                with tf_session.as_default():
+                    
+                    if 'f1' in listOfMetrics:
+                        listOfMetrics.remove('f1')
+                        optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'],metrics=listOfMetrics+[self.f1])
+                        import tensorflow as tf
+                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                        with tf.device(gpuCPUSelect(selDev)):
+                            modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                        validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+                    else:
+                        optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'], metrics=listOfMetrics)
+                        import tensorflow as tf
+                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                        with tf.device(gpuCPUSelect(selDev)):
+                           modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                        validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+
+                        print ('9'*500)
+        except Exception as e:
+            print ('Came here 2'*5 )
+            data_details=self.upDateStatus()
+            self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+
+        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
+        modelObj['modelObj']['recoModelObj'].model=modelV1
+        return modelObj
+
     def trainModel(self,idforData,pmmlFile,tensorboardLogFolder):
         global PMMLMODELSTORAGE
         pmmlFileObj=pathlib.Path(pmmlFile)
