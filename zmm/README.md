@@ -1,7 +1,7 @@
-# **ZMM App** - ASPNET Core 2.2 / Angular 7+ project development setup
+# **ZMM App** - ASPNET Core 3.0.100 / Angular 7+ project development setup
 [License](http://irepo.eur.ad.sag/projects/AIAN/repos/zmm/browse/LICENSE)
 
-A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an end-to-end login (keycloak integration), data, models, code and tasks implementation.
+A startup **ASP.NET Core 3.0.100 / Angular 7** (Ubuntu 18.04) **project** with an end-to-end login (keycloak integration), data, models, code and tasks implementation.
 
 ## INTRODUCING ZMM App
 *   Overview [iWiki](https://iwiki.eur.ad.sag/pages/viewpage.action?pageId=551011559)
@@ -13,7 +13,7 @@ A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an en
 ## This application consists of:
 
 *   Pages using Angular7.1.1 and TypeScript
-*   RESTful API Backend using ASP.NET Core 2.2 MVC Web API
+*   RESTful API Backend using ASP.NET Core 3.0.100 MVC Web API
 *   Authentication based on OpenID Connect/OAuth 2.0 using KeyCloak
 *   API Documentation using Swagger
 *   Angular CLI for managing client-side libraries
@@ -23,7 +23,7 @@ A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an en
 ## Gettting started for Development
 
 *   Clone the [iRepo](http://irepo.eur.ad.sag/projects/AIAN/repos/zmm/browse) on Ubuntu 18.04.
-*   Install .Net Core 2.2 from [here](https://www.microsoft.com/net/download/dotnet-core/2.2)
+*   Install .Net Core 3.0.100 from [here](https://www.microsoft.com/net/download/dotnet-core)
 *   Install your favorite IDE Visual Studio 2017 or Visual Studio Code.
 *   If you are using Visual Studio Code then install extension like [C# extension](https://marketplace.visualstudio.com/items?itemName=jchannon.csharpextensions) and [C# Project Solution](https://marketplace.visualstudio.com/items?itemName=fernandoescolar.vscode-solution-explorer)
 *   Open folder which has ZMM.sln file; If everything is setup well in system, You can see projects under **Solution Explorer**
@@ -57,11 +57,11 @@ A startup **ASP.NET Core 2.2 / Angular 7** (Ubuntu 18.04) **project** with an en
     3. run command 'ng serve'
 
 ## Test
-*   Open Browser and go to "http://localhost:5000", If everything is set and up and running then you will see  login screen.
+*   Open Browser and go to "http://localhost:7007", If everything is set and up and running then you will see  login screen.
 *   Get logged in with 
     User        : testuser
     Possword    : test
-*   Once logged in successfully, It redirects to localhost:5000/data page. 
+*   Once logged in successfully, It redirects to localhost:7007/data page. 
 
 
 ## Documentation

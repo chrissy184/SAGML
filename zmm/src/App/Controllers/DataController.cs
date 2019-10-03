@@ -41,7 +41,7 @@ namespace ZMM.App.Controllers
     public class DataController : Controller
     {
         #region Variables
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private IConfiguration Configuration { get; }
         readonly ILogger<DataController> Logger;
         private readonly IPyAutoMLServiceClient _client;
@@ -62,7 +62,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #region Constructor...
-        public DataController(IHostingEnvironment environment, IConfiguration configuration, ILogger<DataController> log, IPyAutoMLServiceClient srv, IPyNNServiceClient nnsrv, IZSModelPredictionClient _zsClient,
+        public DataController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<DataController> log, IPyAutoMLServiceClient srv, IPyNNServiceClient nnsrv, IZSModelPredictionClient _zsClient,
             IBaseImageForWielding _baseImageClient)
         {
             this._client = srv;

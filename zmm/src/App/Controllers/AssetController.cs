@@ -27,7 +27,7 @@ namespace ZMM.App.Controllers
     public class AssetController : Controller
     {
         #region Variables
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         readonly ILogger<AssetController> Logger;
         public IConfiguration Configuration { get; }
         private readonly IPyJupyterServiceClient jupyterClient;
@@ -36,7 +36,7 @@ namespace ZMM.App.Controllers
         #endregion
         
         #region Constructor
-        public AssetController(IHostingEnvironment environment, IConfiguration configuration, ILogger<AssetController> log, IPyJupyterServiceClient _jupyterClient, IPyTensorServiceClient _tbClient)
+        public AssetController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<AssetController> log, IPyJupyterServiceClient _jupyterClient, IPyTensorServiceClient _tbClient)
         {
             //update 
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));

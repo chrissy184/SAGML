@@ -33,7 +33,7 @@ namespace ZMM.App.Controllers
     {
         #region Variables 
         private readonly string CURRENT_USER = "";
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         readonly ILogger<ModelController> Logger;
         private IConfiguration Configuration { get; }
         private readonly IPyNNServiceClient nnclient;
@@ -48,7 +48,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #region Constructor
-        public ModelController(IHostingEnvironment environment, IConfiguration configuration, ILogger<ModelController> log, IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, IPyTensorServiceClient tbClientInstance, IScheduler factory)
+        public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log, IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, IPyTensorServiceClient tbClientInstance, IScheduler factory)
         {
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.Configuration = configuration;
