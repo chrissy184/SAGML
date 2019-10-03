@@ -745,8 +745,8 @@ class TrainingViewModels:
             if modObjeCom == 'train':
                 for echMod in toExportDict:
                     if echMod in tempDict[modObjeCom]:
-                        print ('>>>>>',echMod)
-                        print ('8'*100)
+                        # print ('>>>>>',echMod)
+                        # print ('8'*100)
                         # print (tempDict[modObjeCom][echMod]['modelObj']['model_graph'])
                         if tempDict[modObjeCom][echMod]['modelObj']['modelArchType']=='NNModel':
                         #                     print (tempDict[modObjeCom][echMod]['modelObj'])
@@ -782,20 +782,31 @@ class TrainingViewModels:
                         if 'preprocessing_code' in tempDict[modObjeCom][echMod]:
                             toExportDict[echMod]['preProcessingScript']['scripts'].append(tempDict[modObjeCom][echMod]['preprocessing_code'])
                             toExportDict[echMod]['preProcessingScript']['scriptpurpose'].append(modObjeCom)
+                            toExportDict[echMod]['preProcessingScript']['scriptOutput'].append(tempDict[modObjeCom][echMod]['scriptOutput'])
                         if 'postprocessing_code' in tempDict[modObjeCom][echMod]:
                             toExportDict[echMod]['postProcessingScript']['scripts'].append(tempDict[modObjeCom][echMod]['postprocessing_code'])
                             toExportDict[echMod]['postProcessingScript']['scriptpurpose'].append(modObjeCom)
+                            toExportDict[echMod]['postProcessingScript']['scriptOutput'].append(tempDict[modObjeCom][echMod]['scriptOutput'])
                         toExportDict[echMod]['taskType']=modObjeCom
                         toExportDict[echMod]['featuresUsed']=tempDict[modObjeCom][echMod]['modelObj']['listOFColumns']
                         toExportDict[echMod]['targetName']=tempDict[modObjeCom][echMod]['modelObj']['targetCol']
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
                         toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
-                        
+      
         for modNa in listOfModelNames:
             if (modNa in tempDict['train']) & (modNa in tempDict['score']):
                 toExportDict[modNa]['taskType']='trainAndscore'
+                # print (tempDict['train'][modNa].keys())
+                # print (tempDict['score'][modNa]['preprocessing_code'][0])
+                if (tempDict['train'][modNa]['scriptOutput']=='DATA') & (tempDict['score'][modNa]['scriptOutput'] == 'DATA'):
+                    print ('Came here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                    toExportDict[modNa]['preProcessingScript']['scriptOutput']=['DATA']
+                    toExportDict[modNa]['preProcessingScript']['scriptpurpose']=['trainAndscore']
+                    print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
+                    toExportDict[modNa]['preProcessingScript']['scripts']=[tempDict['score'][modNa]['preprocessing_code']]
+            # print ("toExportDict[modNa]['preProcessingScript']['script']",toExportDict[modNa]['preProcessingScript']['script'])
             if ((modNa in tempDict['train'] )== False) & (modNa in tempDict['score']):
-                toExportDict[modNa]['taskType']='score'
+                toExportDict[modNa]['taskType']=['score']
 
         tempTa2=list(toExportDict.keys())
         tempTa2.sort()
@@ -806,13 +817,13 @@ class TrainingViewModels:
         toExportDict=toExportReOrdered.copy()
 
         # print ('8'*100)
-        # print (modelInformation['score']['model2'])
+        # print (toExportDict['model1'].keys(),listOfModelNames)
         # print ('8'*100)
 
-        print('*'*100)
+        # print('*'*100)
 
-        print (toExportDict)
-        print('*'*100)
+        # print (toExportDict)
+        # print('*'*100)
         fN=pathlib.Path(pmmlFile).name
         orgfName='../ZMOD/Models/'+fN#+'.pmml'
         fN=fN.replace('.pmml','')
