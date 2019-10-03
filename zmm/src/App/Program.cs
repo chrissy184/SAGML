@@ -32,7 +32,7 @@ namespace ZMM.App
                 logging.AddDebug();
                 logging.AddEventSourceLogger();
             })   
-            .UseStartup(Assembly.GetEntryAssembly().FullName);
-            // .UseUrls("http://*:7007");
+            .UseStartup(Assembly.GetEntryAssembly().FullName)
+            .UseUrls("http://+:7007");
     }
 }

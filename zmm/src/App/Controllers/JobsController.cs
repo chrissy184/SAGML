@@ -32,7 +32,7 @@ namespace ZMM.App.Controllers
     public class JobsController : Controller
     {
         #region Variables... 
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         readonly ILogger<CodeController> Logger;
         public IConfiguration Configuration { get; }
         private List<SchedulerResponse> jobsResponse;
@@ -41,7 +41,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #region Constructor...
-        public JobsController(IHostingEnvironment environment, IConfiguration configuration, ILogger<CodeController> log, IScheduler factory)
+        public JobsController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<CodeController> log, IScheduler factory)
         {
             //update 
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
