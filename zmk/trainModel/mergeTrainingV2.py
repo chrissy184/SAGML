@@ -696,7 +696,7 @@ class TrainingViewModels:
             pass
 
 
-        if modelObj['modelObj']['modelArchType']=='SKLModel':
+        # if modelObj['modelObj']['modelArchType']=='SKLModel':
             # modelToTrain=modelObj['modelObj']['recoModelObj']
             # datHyperPara=modelObj['modelObj']['hyperparameters']
             # listOfMetrics=datHyperPara['listOfMetrics']
