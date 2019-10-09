@@ -126,6 +126,10 @@ namespace ZMM.App
             services.AddSingleton<IPyCompile>(new PyCompile(Configuration));  
             services.AddSingleton(provider => GetScheduler());
             #endregion
+            
+            #region Add Proxy to services
+            services.AddProxy();
+            #endregion
 
             Console.WriteLine("*****************************************");
             Console.WriteLine($"ZMK Dev =====>>> {pySrvLocation}");
@@ -213,6 +217,8 @@ namespace ZMM.App
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseProxy();
 
             #region Endpoints
             app.UseEndpoints(routes =>

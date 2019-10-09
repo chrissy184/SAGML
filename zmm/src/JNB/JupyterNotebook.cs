@@ -144,7 +144,8 @@ namespace ZMM.Tools.JNB
                 {
                     string RelativeNotebookPath = task.GetInput().MetaData["ResourcePath"].Substring(task.GetInput().MetaData["NotebookDir"].Length + 1);
                     int taskPort = int.Parse(task.GetInput().MetaData["Port"]);
-                    string portString = (JupyterNotebook.HostURL.Contains("localhost")) ? ":" + taskPort : string.Empty;
+                    //As It is internally reverse proxy so no need to , Need to find ZMM
+                    string portString = (JupyterNotebook.HostURL.Contains("localhost")) ? ":" + 7007 : string.Empty; 
                     LinkForResource = JupyterNotebook.HostURL + portString + GetLinkPrefix(taskPort) + "/notebooks/" + RelativeNotebookPath + "?token=" + GetToken(task);
                     UpdateTask(resourcePath, task, "ResourceLink", LinkForResource);
                 }

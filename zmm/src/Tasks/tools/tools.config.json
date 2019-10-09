@@ -1,5 +1,5 @@
 {
-  "ContentDir": "",
+  "ContentDir": "/ZMOD",
   "JupyterNotebook": {
     "Path": "jupyter-notebook",
     "Param": "",
@@ -16,7 +16,7 @@
     "Path": "tensorboard",
     "Param": "",
     "Command.0.Name": "Start",
-    "Command.0.Value": "  --logdir={TensorBoardDir} --port {Port}",
+    "Command.0.Value": "  --logdir={TensorBoardDir} --host=localhost --port {Port}",
     "Command.1.Name": "Kill",
     "Command.1.Value": "kill {Pid}"
   },

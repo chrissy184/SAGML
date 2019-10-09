@@ -116,7 +116,7 @@ namespace ZMM.App
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZMOD", Version = "v1" });
             });
-            #endregion
+            #endregion            
             
             #region Initialize clients in singleton service
             var pySrvLocation = Configuration["PyServiceLocation:srvurl"];
@@ -133,6 +133,10 @@ namespace ZMM.App
             services.AddSingleton(provider => GetScheduler());
             #endregion
 
+            #region Add Proxy to services
+            services.AddProxy();
+            #endregion
+            
             Console.WriteLine("*****************************************");
             Console.WriteLine($"ZMM Production initiated...");
             Console.WriteLine($"ZMK =====>>> {pySrvLocation}");
@@ -225,6 +229,8 @@ namespace ZMM.App
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseProxy();
 
             app.UseEndpoints(routes =>
             {
