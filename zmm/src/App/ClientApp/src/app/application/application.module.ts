@@ -33,7 +33,7 @@ import { WeldingConfigFormComponent } from './data/welding-config-form/welding-c
 import { LicenseComponent } from './license/license.component';
 import { ExcuteFormComponent } from './code/excute-form/excute-form.component';
 import { CronEditorModule } from 'cron-editor';
-import { RepositoryComponent } from './repository/repository.component';
+import { RepoComponent } from './repo/repo.component';
 import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
@@ -71,7 +71,7 @@ import { SettingsComponent } from './settings/settings.component';
     WeldingConfigFormComponent,
     LicenseComponent,
     ExcuteFormComponent,
-    RepositoryComponent,
+    RepoComponent,
     SettingsComponent
   ]
 })
