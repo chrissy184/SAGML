@@ -47,6 +47,8 @@ namespace ZMM.App
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment Environment { get; }
 
+        private bool IsDevelopment { get; set; } = false;
+
         private string ContentDir = string.Empty;
 
         private const string XForwardedPathBase = "X-Forwarded-PathBase";
@@ -57,6 +59,7 @@ namespace ZMM.App
             Configuration = configuration;
             Environment = environment;
             Logger = logger;
+            IsDevelopment = environment.EnvironmentName.ToString() == "Development";
             Logger.LogInformation("Initializing " + Configuration["Type"]);
             InitContentDir(ref ContentDir);
         }        
@@ -78,9 +81,9 @@ namespace ZMM.App
             services.AddRazorPages().AddNewtonsoftJson();
             #endregion
 
-            #region Production profile works on Client UI /wwwroot with dotnet 3.0 inbuilt configuration
-            string ClientUIDirectory = Configuration["WebApp:BuildPath"];
-            if(ClientUIDirectory.Equals(string.Empty) || ClientUIDirectory == null) throw new Exception("Error : Please, configure WebApp:BuildPath in appsettings*.json"); 
+            #region Profile works on Client UI /wwwroot with dotnet 3.0 inbuilt configuration
+            string ClientUIDirectory = IsDevelopment ? Configuration["WebApp:SourcePath"] : Configuration["WebApp:BuildPath"];
+            if(ClientUIDirectory.Equals(string.Empty) || ClientUIDirectory == null) throw new Exception("Error : If you are running production environment then make sure you have configure wwwroot folder and if you are in development environment then configure WebApp:SourcePath ClientApp folder in respective appsettings*.json file"); 
             if(!System.IO.Directory.Exists(ClientUIDirectory)) throw new Exception("Error : It seems Client UI folder : " + ClientUIDirectory + " is not present; To resolve this, You need to publish solution once with command : dotnet publish ZMM.sln from ZMM folder.");
             services.AddSpaStaticFiles(configuration =>
             {
@@ -138,7 +141,7 @@ namespace ZMM.App
             #endregion
             
             Console.WriteLine("*****************************************");
-            Console.WriteLine($"ZMM Production initiated...");
+            Console.WriteLine($"ZMM " + (IsDevelopment ? "Development" : "Production") + " initiated...");
             Console.WriteLine($"ZMK =====>>> {pySrvLocation}");
         }
 
@@ -176,8 +179,8 @@ namespace ZMM.App
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {          
-            #region Enable HSTS option for production https enable system 
-            if(!env.EnvironmentName.Equals("Production")) app.UseHsts();
+            #region Enable HSTS option for AWS production system for https 
+            if(IsEnvironmentOtherThanDevelopmentAndProduction()) app.UseHsts();
             #endregion
 
             #region Add Log Factory -> You can update its behaviour from appsettings*.json configuration
@@ -202,14 +205,14 @@ namespace ZMM.App
                 }                
             }); 
             
+            if(IsDevelopment) app.UseDeveloperExceptionPage();
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });              
 
             #region swagger middleware
-
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
@@ -247,6 +250,20 @@ namespace ZMM.App
                     pattern: "{controller}/{action}");               
 
             });
+
+            #region To start ng serve without building client ui
+            string ClientUIDirectory = Configuration["WebApp:SourcePath"];
+            if(ClientUIDirectory.Equals(string.Empty) || ClientUIDirectory == null) throw new Exception("Error : Please, configure WebApp:SourcePath in appsettings.Development.json"); 
+            if(IsDevelopment && !System.IO.Directory.Exists(ClientUIDirectory)) throw new Exception("Error : It seems that Client (Angular UI) Source folder is not present; To resolve this issue, Please, checkout this folder from repository /src/App/ClientApp");
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = ClientUIDirectory;
+                if (IsDevelopment)
+                {
+                    spa.UseAngularCliServer(npmScript: "start");
+                }
+            });
+            #endregion
 
         }
         private void AddLogger(ref ILoggerFactory loggerFactory)
@@ -301,6 +318,11 @@ namespace ZMM.App
             var scheduler = schedulerFactory.GetScheduler().Result;
             scheduler.Start();
             return scheduler;
+        }
+
+        private bool IsEnvironmentOtherThanDevelopmentAndProduction()
+        {
+            return IsDevelopment && !this.Environment.EnvironmentName.Equals("Production");
         }
     }
 }

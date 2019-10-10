@@ -48,7 +48,7 @@ namespace ZMM.Tasks
             string hasWorkingDir = this.configuration["HasWorkingDirectory"];
             this.hasWorkindDirectory = bool.Parse(hasWorkingDir == null ? "false" : hasWorkingDir);
             this.workingDirectory = this.hasWorkindDirectory ? this.configuration["WorkingDirectory"] : string.Empty;
-            Console.WriteLine("Tool initializing " + tempPath);
+            Console.WriteLine("Tool initializing " + toolName + " with configuration : " + this.path);
         }
 
         public string Name { get => name; set => name = value; }
