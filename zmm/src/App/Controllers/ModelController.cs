@@ -444,8 +444,8 @@ namespace ZMM.App.Controllers
                 {
                     //create blank model data for WORKFLOW                    
                     fileContent.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>,@,");
-                    fileContent.Append("<PMML xmlns=\"http://www.dmg.org/PMML-4_3\" version=\"4.3Ext\">,@,");
-                    fileContent.Append("<Header copyright=\"Copyright (c) 2018 Software AG\" description=\"Workflow Model\">,@,");
+                    fileContent.Append("<PMML xmlns=\"http://www.dmg.org/PMML-4_3\" version=\"4.3Ext\" type=\"multi\">,@,");
+                    fileContent.Append("<Header copyright=\"Copyright (c) 2018 Software AG\" description=\"Work Flow\">,@,");
                     fileContent.Append("<Timestamp>" + DateTime.Now.ToString("yyyy-MM-dd H:mm:ss.") + TimeSpan.TicksPerMillisecond + "</Timestamp>,@,");
                     fileContent.Append("</Header>,@,");
                     fileContent.Append("<DeepNetwork>,@,");
