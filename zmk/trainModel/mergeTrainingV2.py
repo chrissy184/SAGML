@@ -689,10 +689,24 @@ class TrainingViewModels:
         return modelObj
 
     def getSKLMOdelObjtoFit(self,modelV1):
-        from sklearn import ensemble
+        from sklearn import ensemble,tree,linear_model
         # print (str(modelV1))
         if 'RandomForestRegressor' in str(modelV1):
             return  ensemble.RandomForestRegressor()
+        elif 'RandomForestClassifier' in str(modelV1):
+            return  ensemble.RandomForestClassifier()
+        elif 'GradientBoostingClassifier' in str(modelV1):
+            return  ensemble.GradientBoostingClassifier()
+        elif 'GradientBoostingRegressor' in str(modelV1):
+            return  ensemble.GradientBoostingRegressor()
+        elif 'ExtraTreesClassifier' in str(modelV1):
+            return  ensemble.ExtraTreesClassifier()
+        elif 'ExtraTreesRegressor' in str(modelV1):
+            return  ensemble.ExtraTreesRegressor()
+        elif 'LinearRegression' in str(modelV1):
+            return  linear_model.LinearRegression()
+        elif 'LogisticRegression' in str(modelV1):
+            return  linear_model.LogisticRegression()
         return modelV1
     def trainComplicatedDNNObj(self,modelObj,tensorboardLogFolder,scriptOutputPrepro):
         # print ('*'*500)
