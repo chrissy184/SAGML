@@ -697,6 +697,8 @@ class NyokaServer:
 
 		allInfo={}
 		for towork in listOfObjectstogetData:
+			if towork=='type_':
+				allInfo['type']=tempObj['type_']
 			if towork=='version':
 				allInfo['Version']=tempObj['version']
 			elif towork=='Header':
@@ -717,6 +719,7 @@ class NyokaServer:
 				allInfo.update(nyokaUtilities.getInfoLinearModel(tempObj))
 			elif towork=='NaiveBayesModel':
 				allInfo.update(nyokaUtilities.getInfoOfNaiveBayesModel(tempObj))
+
 		allInfo=nyokaUtilities.changeStructure(allInfo)
 		# print('response sent')
 		return JsonResponse(allInfo)

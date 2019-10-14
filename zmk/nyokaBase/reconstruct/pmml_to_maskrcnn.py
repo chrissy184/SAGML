@@ -1,5 +1,5 @@
-from nyokaBase.mrcnn import model as modellib
-from nyokaBase.mrcnn import config
+from nyoka.mrcnn import model as modellib
+from nyoka.mrcnn import config
 import sys,os
 import numpy as np
 import functools

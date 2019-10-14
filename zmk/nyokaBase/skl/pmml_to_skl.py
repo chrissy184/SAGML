@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from nyokaBase import PMML43Ext as pml
+from nyoka import PMML43Ext as pml
 # from PMML43Ext import row
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.pipeline import Pipeline,make_pipeline
@@ -18,14 +18,14 @@ from sklearn.ensemble import GradientBoostingRegressor,GradientBoostingClassifie
 from sklearn.cluster import KMeans
 from sklearn.svm import SVR,SVC
 from sklearn.neural_network import MLPClassifier,MLPRegressor
-from nyokaBase.skl.ensemble_tree import reconstruct,Tree
+from nyoka.skl.ensemble_tree import reconstruct,Tree
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier,RandomForestRegressor
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from xgboost import XGBClassifier,XGBRegressor
 from lightgbm import LGBMClassifier,LGBMRegressor
 import unicodedata
-from nyokaBase.skl.text import *
+from nyoka.skl.text import *
 
 import sys
 import re
