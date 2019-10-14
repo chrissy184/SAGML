@@ -403,7 +403,7 @@ class NyokaUtilities:
                 allInfo['fileStatus']='Incomplete'
         if 'type' in mm:
             if mm['type']=='multi':
-                allInfo['modelGeneratedFrom']='Work FLow'
+                allInfo['modelGeneratedFrom']='Workflow'
 
 
         return allInfo
