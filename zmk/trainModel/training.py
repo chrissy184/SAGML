@@ -122,11 +122,13 @@ class Training:
 	# @api_view(['POST'])
 	# @schema(autoMLsendDataSwagger)
 
-	def dataReaderForJson(pathOffile):
-		return dataF
+	
 
 	def autoMLdataprocess(pathOffile):
 
+		def dataReaderForJson(pathOffile):
+			return dataF
+		
 		global DATA_MEMORY_OBJS_SKLEARN
 		# pathOffile=requests.GET['filePath']
 		if '.json' in pathOffile:
