@@ -16,11 +16,15 @@ algorithms={
         'KNeighborsClassifier','LinearSVC','LogisticRegression','XGBClassifier']
 }
 
+
+algoForAnomaly={'models':['IsolationForest','OneClassSVM']}
+
 optionsForDropdown={
       "changedataTypes": ['None',"Continuous", "Categorical"],
       "imputation_methods": ['None',"Mean", "Median", "Mode", "Back fill", "Forward fill"],
       "data_transformation_steps": ["None", "One Hot Encoding", "Label Encoding", "Normalize", "Scaling Standard", "Scaling Min Max", "Scaling Max Absolute"],
-      "algorithmTypes":algorithms
+      "algorithmTypes":algorithms,
+      'anomalyAlgorithms':algoForAnomaly,
     }
 
 processe_short={'Mean':preprocessing.Imputer(strategy="mean"),

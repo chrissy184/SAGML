@@ -121,11 +121,20 @@ class Training:
 	# @csrf_exempt
 	# @api_view(['POST'])
 	# @schema(autoMLsendDataSwagger)
+
+	
+
 	def autoMLdataprocess(pathOffile):
 
+		def dataReaderForJson(pathOffile):
+			return dataF
+		
 		global DATA_MEMORY_OBJS_SKLEARN
 		# pathOffile=requests.GET['filePath']
-		data=pd.read_csv(pathOffile,encoding='latin-1')
+		if '.json' in pathOffile:
+			data=dataReaderForJson(pathOffile)
+		else:
+			data=pd.read_csv(pathOffile,encoding='latin-1')
 		idforData=int(time.time())
 		idforData=str(idforData)+'_autoML'
 		DATA_MEMORY_OBJS_SKLEARN[idforData]=data

@@ -2,3 +2,13 @@
 ZMOD/
 
 zmk/tensorboardLogFolder/
+
+zmk/nyokaBase/__pycache__/
+
+*.pyc
+
+zmk/nyokaBase/skl/__pycache__/
+
+zmk/nyokaBase/xgboost/__pycache__/
+
+zmk/nyokaBase/keras/__pycache__/
