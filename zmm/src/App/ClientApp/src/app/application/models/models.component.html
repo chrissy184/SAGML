@@ -105,8 +105,7 @@
                   (click)="trainPmml('RETRAIN')" matTooltip="Re-train Model">
                   <span class="mdi mdi-settings text-secondary"></span>
                 </button>
-
-                <button *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork'" mat-icon-button (click)="editpmml()"
+                <button *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'" mat-icon-button (click)="editpmml()"
                   matTooltip="Edit Model">
                   <span class="mdi mdi-square-edit-outline  text-secondary"></span>
                 </button>
