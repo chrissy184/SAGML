@@ -8,6 +8,7 @@
   </div>
   <div class="toolbar-mid"></div>
   <div calss="content-toolbar">
+    <mat-slide-toggle class="mr-4" [(ngModel)]="supervised" [labelPosition]="'before'">Supervised</mat-slide-toggle>
     <button mat-stroked-button color="primary" class="mr-2" (click)="build()" [disabled]="!(problem_type && target_variable)">BUILD</button>
   </div>
 </mat-toolbar>

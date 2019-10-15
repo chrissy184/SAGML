@@ -40,7 +40,7 @@ export class EditorComponent implements OnInit, OnChanges {
   ];
   public targetItems: any[] = [];
   public filterConfig: any = {};
-  public isLoading = true;
+  public isLoading = false;
   public showFilter = false;
   public panelOpenState = false;
   public flatLayers: any[] = [];
@@ -837,7 +837,9 @@ export class EditorComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.getLayers();
+    if (this.selectedModel.modelGeneratedFrom !== 'Workflow') {
+      this.getLayers();
+    }
   }
 
 }

@@ -229,5 +229,45 @@ namespace ZMM.App.PyServicesClient
             }
             
         }
+
+        #region automl - anamoly
+        public async Task<string> AnamolyModel(string data)
+        {
+            string jsonResult = string.Empty;
+
+            using(var httpClient = new HttpClient())
+            {
+                httpClient.BaseAddress = new System.Uri(Configuration["PyServiceLocation:srvurl"]);
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                /*
+                //request params
+                var content = new FormUrlEncodedContent(
+                    new List<KeyValuePair<string, string>>
+                    {
+                        new KeyValuePair<string, string>("json", data)
+                    }
+                );   */
+
+                HttpContent _httpContent = new StringContent(data);
+                 _httpContent.Headers.ContentType = new MediaTypeHeaderValue(_contentType); 
+                try
+                {
+                    HttpResponseMessage response = await httpClient.PostAsync("anamoly",_httpContent);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        jsonResult = await response.Content.ReadAsStringAsync();
+                    } 
+                }
+                catch(HttpRequestException ex)
+                {
+                    jsonResult = "{'message': '" + ex.Message + "'}";
+                }            
+            }
+
+            return jsonResult;
+        }  
+        #endregion
     }
 }
