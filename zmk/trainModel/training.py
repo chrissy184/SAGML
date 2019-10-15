@@ -127,7 +127,14 @@ class Training:
 	def autoMLdataprocess(pathOffile):
 
 		def dataReaderForJson(pathOffile):
-			return dataF
+			ww=open(pathOffile,'r')
+			jD=json.loads(ww.read())
+
+			sampeData=pd.DataFrame(jD['values']).transpose()
+			sampeData.columns=[i['name'] for i in jD['series']]
+			for j in sampeData.columns:
+				sampeData[j]=sampeData[j].apply(lambda x: (x['min']+x['max'])/2)
+			return sampeData
 		
 		global DATA_MEMORY_OBJS_SKLEARN
 		# pathOffile=requests.GET['filePath']
