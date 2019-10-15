@@ -45,6 +45,7 @@ export class AutomlComponent implements OnInit {
     target_variable: 'mpg'
   };
   public fromDefaultData: any = {};
+  supervised = true;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   pageSize = 10;
