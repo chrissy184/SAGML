@@ -6,7 +6,7 @@ sys.path.append(BASE_DIR)
 import numpy as np
 import PMML43Ext as pml
 import json
-#import nyoka.skl.skl_to_pmml as skl_to_pmml
+#import nyokaBase.skl.skl_to_pmml as skl_to_pmml
 from skl import pre_process as pp
 from datetime import datetime
 from nyokaBase.skl import skl_to_pmml
