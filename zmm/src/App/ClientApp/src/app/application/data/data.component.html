@@ -70,7 +70,7 @@
               </h2>
               <div class="toolbar-mid"></div>
               <div class="content-toolbar">
-                <button *ngIf="selectedData.type == 'CSV'" mat-icon-button matTooltip="New AutoML"
+                <button *ngIf="selectedData.type == 'CSV' || selectedData.type == 'JSON'" mat-icon-button matTooltip="New AutoML"
                   (click)="newAutoML()">
                   <span class="mdi mdi-file-plus text-secondary"></span>
                 </button>
