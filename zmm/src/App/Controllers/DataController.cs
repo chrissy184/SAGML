@@ -1375,5 +1375,79 @@ namespace ZMM.App.Controllers
         #endregion
 
         #endregion
+    
+        #region automl - anamoly
+        [HttpPost]
+        [Route("{id}/anamoly")]
+        public async Task<IActionResult> AutoMLAnamoly(string id)
+        {
+            string response = string.Empty;
+            string reqBody = string.Empty;
+
+            using (var reader = new StreamReader(Request.Body))
+            {
+                var body = reader.ReadToEnd();
+                reqBody = body.ToString();
+            }
+            try
+            {
+                response = await _client.AnamolyModel(reqBody);
+            }
+            catch (Exception ex)
+            {
+                //TO DO: ILogger
+                string _ex = ex.Message;
+            }
+
+            if (!string.IsNullOrEmpty(response))
+            {
+                var jo = JsonConvert.DeserializeObject<AutoMLResponse>(response);
+                jo.executedAt = DateTime.Now;
+                List<AutoMLResponse> tresp = new List<AutoMLResponse>();
+                tresp.Add(jo);
+                //
+                //add to scheduler payload 
+                //add history
+                JArray jHist = new JArray();
+                foreach (var r in tresp)
+                {
+                    jHist.Add(new JObject(){
+                        {"idforData", r.idforData},
+                        {"status", r.status},
+                        {"executedAt",r.executedAt}
+                    });
+                }
+                SchedulerResponse schJob = new SchedulerResponse()
+                {
+                    CreatedOn = DateTime.Now.ToString(),
+                    CronExpression = "",
+                    DateCreated = DateTime.Now,
+                    EditedOn = DateTime.Now.ToString(),
+                    FilePath = "",
+                    Id = id,
+                    Name = id,
+                    Type = "ANAMOLY",
+                    Url = "",
+                    Recurrence = "ONE_TIME",
+                    StartDate = "",
+                    StartTimeH = "",
+                    StartTimeM = "",
+                    ZMKResponse = tresp.ToList<object>(),
+                    Status = "COMPLETED",
+                    History = jHist.ToList<object>()
+                };
+                SchedulerPayload.Create(schJob);
+
+                //
+                JObject jsonObj = JObject.Parse(response);
+                return Json(jsonObj);
+            }
+            else
+            {
+                return NoContent();
+            }
+
+        }
+        #endregion
     }
 }
