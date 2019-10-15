@@ -33,8 +33,11 @@ export class ModelsComponent implements OnInit {
   public dropzoneConfig: any = {
     openFileBrowser: false,
     url: ApiRoutes.models,
-    acceptedFiles: `.pmml`,
-    acceptedFilesMsg: 'Allowed file type is PMML'
+    acceptedFiles: `
+    .pmml,
+    .onyx
+    `,
+    acceptedFilesMsg: 'Allowed file type are PMML, ONYX'
   };
   public tabSelectedIndex = 0;
 

@@ -43,7 +43,7 @@ namespace ZMM.App.Controllers
         private readonly IPyTensorServiceClient tbClient;
         private List<ModelResponse> responseData;
         private List<DataResponse> dataResponseData;
-        private static string[] extensions = new[] { "pmml" };
+        private static string[] extensions = new[] { "pmml", "onyx" };
         private readonly IScheduler _scheduler;
         #endregion
 
@@ -136,6 +136,10 @@ namespace ZMM.App.Controllers
                         if (fileExt.Contains("pmml"))
                         {
                             type = "PMML";
+                        }
+                        else
+                        {
+                            type = fileExt.ToUpper();
                         }
                         List<Property> _props = new List<Property>();
                         string _url = DirectoryHelper.GetModelUrl(formFile.FileName);
