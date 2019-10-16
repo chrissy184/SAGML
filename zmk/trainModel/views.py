@@ -142,6 +142,27 @@ class TrainAutoMLView(APIView):
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
 		return Training.autoMLtrainModel(userInput)
 
+class TrainAnomalyView(APIView):
+	http_method_names=['post']
+
+	def dispatch(self,requests):
+		if requests.method=='GET':
+			result=self.get(requests)
+		elif requests.method=='POST':
+			result=self.post(requests)
+		else:
+			return JsonResponse({},status=405)
+		return result
+
+
+	def post(self,requests):
+		userInput=requests.body
+		try:
+			userInput=json.loads(userInput)
+		except:
+			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
+		return Training.autoAnomalyModel(userInput)
+
 
 
 class TrainNNView(APIView):
