@@ -25,7 +25,7 @@ from rest_framework.documentation import include_docs_urls
 from nyokaserver.nyokaServerClass import create_lock
 from scoring.scoringClass import create_lockForModel
 from nyokaserver.nyokaServerClass import NyokaServer
-from trainModel.views import RunningTaskView,TrainAutoMLView,RunningTaskNameOperationView,RunningTaskNameOperationViewIdForData,RunningTaskOperationView,TrainNNView, ModelCompileView,MRCNNView
+from trainModel.views import RunningTaskView,TrainAutoMLView,TrainAnomalyView,RunningTaskNameOperationView,RunningTaskNameOperationViewIdForData,RunningTaskOperationView,TrainNNView, ModelCompileView,MRCNNView
 
 from nyokaserver.views import PMMLView,PMMLOpeartionView,PMMLLayerView,PMMLGlobalView
 from scoring.views import ScoreView,ModelsView,ModelOperationView,ScoreViewReturnJson#,ObjDetectionScoreView
@@ -65,6 +65,7 @@ urlpatterns=[
     path(pref+'runningTasks/<taskName>/<idForData>',csrf_exempt(RunningTaskNameOperationViewIdForData.as_view()), name="Running Tasks"),
     # path(pref+'runningTasks/<id_for_task>',csrf_exempt(RunningTaskOperationView.as_view()), name="Running Tasks"),
     path(pref+'trainAutoMLModel',csrf_exempt(TrainAutoMLView.as_view()), name="Train Model"),
+    path(pref+'trainAnomalyModel',csrf_exempt(TrainAnomalyView.as_view()), name="Train Anomaly Model"),
     path(pref+'trainNNModel',csrf_exempt(TrainNNView.as_view()), name="Train Model"),
     path(pref+'objectDetection/train/mrcnn',csrf_exempt(MRCNNView.as_view()), name="Train MRCNN"),
     path(pref+'code',csrf_exempt(CodeUtilityView.as_view()), name="Code Utility"),
