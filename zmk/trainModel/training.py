@@ -287,8 +287,8 @@ class Training:
 
 		
 		autoMLLock=Lock()
-		trainer = trainAutoMLV2.AutoMLTrainer(algorithms=algorithms, problemType=problem_type)
-		train_prc = Process(target=trainer.trainModel,args=(data,logFolder, newPMMLFileName, autoMLLock, userInput))
+		trainer = trainAutoMLV2.AnomalyTrainer(algorithms=algorithms, problemType=problem_type)
+		train_prc = Process(target=trainer.trainAnomalyModel,args=(data,logFolder, newPMMLFileName, autoMLLock, userInput))
 		# train_prc = Process(target=trainAutoMLV2.mainTrainAutoML,args=(data,paramToTrainModel,targetVar,idforData,problem_type,logFolder,newPMMLFileName))
 		train_prc.start()
 		pID=train_prc.ident
