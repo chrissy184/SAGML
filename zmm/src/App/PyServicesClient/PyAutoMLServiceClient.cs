@@ -253,7 +253,7 @@ namespace ZMM.App.PyServicesClient
                  _httpContent.Headers.ContentType = new MediaTypeHeaderValue(_contentType); 
                 try
                 {
-                    HttpResponseMessage response = await httpClient.PostAsync("anamoly",_httpContent);
+                    HttpResponseMessage response = await httpClient.PostAsync("trainAnomalyModel",_httpContent);
 
                     if (response.IsSuccessStatusCode)
                     {
