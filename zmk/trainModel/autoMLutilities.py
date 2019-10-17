@@ -13,18 +13,16 @@ algorithms={
     'Regression': ['All','ExtraTreeRegressor','GradientBoostingRegressor','DecisionTreeRegressor','LinearSVR',\
         'RandomForestRegressor','XGBRegressor','KNeighborsRegressor','LinearRegression'],
     'Classification': ['All','DecisionTreeClassifier','ExtraTreesClassifier','RandomForestClassifier','GradientBoostingClassifier',\
-        'KNeighborsClassifier','LinearSVC','LogisticRegression','XGBClassifier']
+        'KNeighborsClassifier','LinearSVC','LogisticRegression','XGBClassifier'],
+    'Anomaly':['IsolationForest','OneClassSVM']
 }
 
-
-algoForAnomaly={'models':['IsolationForest','OneClassSVM']}
 
 optionsForDropdown={
       "changedataTypes": ['None',"Continuous", "Categorical"],
       "imputation_methods": ['None',"Mean", "Median", "Mode", "Back fill", "Forward fill"],
       "data_transformation_steps": ["None", "One Hot Encoding", "Label Encoding", "Normalize", "Scaling Standard", "Scaling Min Max", "Scaling Max Absolute"],
       "algorithmTypes":algorithms,
-      'anomalyAlgorithms':algoForAnomaly,
     }
 
 processe_short={'Mean':preprocessing.Imputer(strategy="mean"),
@@ -84,8 +82,11 @@ class AutoMLUtilities:
     def createModelData(self,data,mapper1,targetVar):
         pipeline = Pipeline([('feature_mapper', mapper1)])
         dataX=pipeline.fit_transform(data)
-        targetY=data[targetVar]
-        return dataX,targetY
+        if targetVar is not None:
+            targetY=data[targetVar]
+            return dataX,targetY
+        else:
+            return dataX,None
 
 
     def progressOfModel(self,logFolder,idforData):
