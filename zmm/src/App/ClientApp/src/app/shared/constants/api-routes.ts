@@ -11,7 +11,7 @@ export const ApiRoutes = {
     data: 'data',
     dataGet: (id: string) => `data/${id}`,
     dataAutoML: (id: string) => `data/${id}/automl`,
-    dataAutoMLAnomaly: (id: string) => `data/${id}/trainAnomalyModel`,
+    dataAutoMLAnomaly: (id: string) => `data/${id}/anamoly`,
     predictData: `data/predict`,
     scoreData: 'data/score',
     dataDownload: (id: string) => `data/${id}/download`,
