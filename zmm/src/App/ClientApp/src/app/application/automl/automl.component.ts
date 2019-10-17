@@ -71,7 +71,8 @@ export class AutomlComponent implements OnInit {
     const options = {
       body: payload
     };
-    this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.dataAutoML(this.dataSource.selectedData.id), options)
+    const apiEndpoint = this.supervised ? ApiRoutes.dataAutoML(this.dataSource.selectedData.id) : ApiRoutes.dataAutoMLAnomaly(this.dataSource.selectedData.id);
+    this.apiService.request(ApiRoutes.methods.POST, apiEndpoint, options)
       .subscribe(data => {
         console.log(data);
         this.utilService.alert(AlertMessages.AUTOML.train);
@@ -81,6 +82,7 @@ export class AutomlComponent implements OnInit {
   build() {
     this.fromDefaultData = this.dataSource.options;
     this.fromDefaultData.problem_type = this.problem_type;
+    this.fromDefaultData.supervised = this.supervised;
     this.displayAutoMLPrametersForm = true;
   }
 
