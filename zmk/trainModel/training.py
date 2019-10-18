@@ -250,20 +250,15 @@ class Training:
 		idforData=userInput['idforData']
 		data=DATA_MEMORY_OBJS_SKLEARN[idforData]
 		dataPath=userInput['filePath']
-		targetVar=userInput['target_variable']
-		problem_type=userInput['problem_type']
-		# algorithms=userInput['parameters']['algorithm']
 		try:
-			algorithms=userInput['parameters']['algorithm']
-			if algorithms[0]=='All':
-				raise Exception("")
+			targetVar=userInput['target_variable']
 		except:
-			if problem_type =='Regression':
-				algorithms=['ExtraTreeRegressor','GradientBoostingRegressor','DecisionTreeRegressor','LinearSVR',\
-        'RandomForestRegressor','XGBRegressor','KNeighborsRegressor','LinearRegression']
-			else:
-				algorithms=['DecisionTreeClassifier','ExtraTreesClassifier','RandomForestClassifier','GradientBoostingClassifier',\
-        'KNeighborsClassifier','LinearSVC','LogisticRegression','XGBClassifier']
+			targetVar=None
+		try:
+			problem_type=userInput['problem_type']
+		except:
+			problem_type=None
+		algorithms=userInput['parameters']['algorithm']
 		try:
 			newPMMLFileName = userInput['newPMMLFileName']
 			if not newPMMLFileName.endswith('.pmml'):
@@ -275,17 +270,13 @@ class Training:
 		projectName=idforData
 		projectPath=logFolder+projectName
 		dataFolder=projectPath+'/dataFolder/'
-		tpotFolder=projectPath+'/tpotFolder/'
 
 		try:
 		    os.makedirs(projectPath)
 		    os.mkdir(dataFolder)
-		    os.mkdir(tpotFolder)
 		except Exception as e:
 		    print('>>>>>>>>>>>>>>>>', str(e))
 
-
-		
 		autoMLLock=Lock()
 		trainer = trainAutoMLV2.AnomalyTrainer(algorithms=algorithms, problemType=problem_type)
 		train_prc = Process(target=trainer.trainAnomalyModel,args=(data,logFolder, newPMMLFileName, autoMLLock, userInput))

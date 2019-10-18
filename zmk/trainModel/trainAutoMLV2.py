@@ -447,7 +447,10 @@ class AnomalyTrainer:
         paramToTrainModel=kwargs['data']
         idforData=kwargs['idforData']
         dataPath=kwargs['filePath']
-        targetVar=kwargs['target_variable']
+        try:
+            targetVar=kwargs['target_variable']
+        except:
+            targetVar=None
         algorithmToUse=kwargs['parameters']['algorithm'][0]
 
         projectName=idforData
@@ -516,7 +519,7 @@ class AnomalyTrainer:
         with open(statusfileLocation,'w') as filetosave:
             json.dump(data_details, filetosave)
 
-        finalPMMLfile=dataFolder+newPMMLFileName
+        finalPMMLfile='../ZMOD/Models/'+newPMMLFileName
         toExportDict={
                         'model1':{'data':None,'hyperparameters':None,'preProcessingScript':None,
                             'pipelineObj':Pipeline(pipelObj.steps[:-1]),'modelObj':pipelObj.steps[-1][1],
@@ -528,17 +531,20 @@ class AnomalyTrainer:
             from nyokaBase.skl.skl_to_pmml import model_to_pmml
             model_to_pmml(toExportDict, PMMLFileName=finalPMMLfile)
             print ('>>>>>>>>>>>>>>>>>>>>>>> Success')
-            procComp=False
-        except:
-            procComp=True
+        except Exception as e:
+            data_details=upDateStatus()
+            data_details['status']='Training Failed'
+            data_details['errorMessage']='Error while Saving Model >> '+ str(e)
+            data_details['errorTraceback']=traceback.format_exc()
+            with open(statusfileLocation,'w') as filetosave:
+                json.dump(data_details, filetosave)
+            # sys.exit()
+            return
             print ('>>>>>>>>>>>>>>>>>>>>>>> Failed Saving Trying again')
-            
-        model_accuracy=[]
-
-        print ('Came here')
 
         with open(statusfileLocation,'r') as sFile:
             sFileText=sFile.read()
+        model_accuracy=[]
         data_details=json.loads(sFileText)
         data_details['status']='Complete'
         data_details['pmmlFilelocation']=finalPMMLfile
