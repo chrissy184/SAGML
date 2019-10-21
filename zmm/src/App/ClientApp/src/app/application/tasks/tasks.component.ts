@@ -108,6 +108,16 @@ export class TasksComponent implements OnInit {
         });
     }
 
+    public selectTaskHistory(selectedData: any) {
+        console.log(selectedData);
+        this.isContentLoading = true;
+        this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.taskGetHistory(this.selectedTask.id, selectedData.idforData))
+        .pipe(finalize(() => { this.isContentLoading = false; }))
+        .subscribe(response => {
+            console.log(response);
+        });
+    }
+
     public refreshTask() {
         this.selectTask(this.selectedTask);
     }

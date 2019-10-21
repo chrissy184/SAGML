@@ -839,6 +839,15 @@ export class EditorComponent implements OnInit, OnChanges {
   ngOnInit() {
     if (this.selectedModel.modelGeneratedFrom !== 'Workflow') {
       this.getLayers();
+    } else {
+      this.sideBarGeneralItems.push(
+        {
+          'name': 'Model',
+          'icon': 'mdi mdi-xml',
+          'itemType': 'MODEL',
+          'layerId': 'Model',
+          'trainable': true
+        })
     }
   }
 

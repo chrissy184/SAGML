@@ -45,6 +45,7 @@ export const ApiRoutes = {
 
     task: 'task',
     taskGet: (id: number) => `task/${id}`,
+    taskGetHistory: (id: string, historyId: string) => `task/${id}/history/${historyId}`,
     taskSaveModel: (id: number) => `task/${id}/saveModel`,
     taskStop: (id: number) => `task/${id}/stop`,
 
