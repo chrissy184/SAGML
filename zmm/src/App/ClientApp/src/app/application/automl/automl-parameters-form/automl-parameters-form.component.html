@@ -22,12 +22,17 @@
               required>
             <mat-error>required</mat-error>
           </mat-form-field>
-          <mat-form-field class="w-100">
+          <!-- <mat-form-field class="w-100">
             <mat-select [(ngModel)]="formData.algorithm" placeholder="Algorithm" name="algorithm" multiple required>
               <mat-option *ngFor="let option of algorithmOptionsAnomaly" [value]="option">{{option}}</mat-option>
             </mat-select>
             <mat-error>required</mat-error>
-          </mat-form-field>
+          </mat-form-field> -->
+          <label class="mr-4">Algorithm </label>
+          <mat-radio-group [(ngModel)]="formData.algorithm" name="algorithm">
+            <mat-radio-button *ngFor="let option of algorithmOptionsAnomaly" [value]="option" class="mr-3 w-100">{{option}}
+            </mat-radio-button>
+          </mat-radio-group>
         </div>
       </ng-template>
       <ng-template [ngIf]="option.supervised">
