@@ -157,8 +157,8 @@ class Utility:
 		allTaskList=RUNNING_TASK_MEMORY
 		filtListofTask=[i for i in allTaskList if i['taskName']==taskName]
 		filtListofTaskId=[i for i in allTaskList if i['idforData']==idForData]
-		runningTask={'runningTask':filtListofTaskId}
-		return JsonResponse(runningTask,status=200)
+		runningTask=filtListofTaskId[0]
+		return JsonResponse(runningTask,status=200, safe=False)
 
 
 		
