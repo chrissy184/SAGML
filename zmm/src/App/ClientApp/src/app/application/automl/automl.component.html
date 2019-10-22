@@ -12,7 +12,7 @@
     <button mat-stroked-button color="primary" class="mr-2" (click)="build()" [disabled]="!(problem_type && target_variable) && supervised">BUILD</button>
   </div>
 </mat-toolbar>
-
+<app-loader [isLoading]="isLoading" [message]=""></app-loader>
 <table mat-table [dataSource]="dataAutomlSource" matSort class="w-100">
   <!-- Column 1 -->
   <ng-container matColumnDef="position">

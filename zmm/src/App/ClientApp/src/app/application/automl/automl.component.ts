@@ -50,6 +50,7 @@ export class AutomlComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   pageSize = 10;
   pageSizeOptions = [10, 25, 100];
+  isLoading = false;
   constructor(private apiService: HttpService, private router: Router, private utilService: UtilService) { }
 
   ngOnInit() {
@@ -58,6 +59,7 @@ export class AutomlComponent implements OnInit {
 
   onAutoMLTrainingFormDataSubmit(formData: any) {
     this.displayAutoMLPrametersForm = false;
+    this.isLoading = true;
     const payload = {
       data: this.dataSource.data,
       problem_type: this.problem_type,
