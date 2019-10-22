@@ -102,10 +102,14 @@ class Utility:
 
 
 	def runningTaskList(self):
-		print ('RUNNING_TASK_MEMORY RUNNING_TASK_MEMORY',RUNNING_TASK_MEMORY)
+		# print ('RUNNING_TASK_MEMORY RUNNING_TASK_MEMORY',RUNNING_TASK_MEMORY)
 		for num,tempRS in enumerate(RUNNING_TASK_MEMORY):
 			tempStat=RUNNING_TASK_MEMORY[num]
 			data_details=autoMLutilities.readStatusFile(tempRS['idforData'])
+			# print (tempStat.keys())
+			for j in data_details.keys():
+				tempStat[j]=data_details[j]
+			# print ('Status call data_details.keys()',tempStat.keys())
 			try:
 				projectName=tempRS['idforData']
 				logFolder='logs/'
@@ -124,27 +128,28 @@ class Utility:
 			tempStat['status']=statusOfProject
 
 			try:
-				print ('ppppppppppp >>>>>>>>',1)
+				# print ('ppppppppppp >>>>>>>>',1)
 				if tempStat['type']=='NNProject':
 					tempStat['url']=data_details['tensorboardUrl']
-				print ('ppppppppppp >>>>>>>>',3)
+				# print ('ppppppppppp >>>>>>>>',3)
 				if data_details['errorMessage']:
 					tempStat['errorMessage']=data_details['errorMessage']
-				print ('ppppppppppp >>>>>>>>',4)
+				# print ('ppppppppppp >>>>>>>>',4)
 				if tempStat['errorTraceback']:
 					tempStat['errorTraceback']=data_details['errorTraceback']
-				print ('ppppppppppp >>>>>>>>',5)
+				# print ('ppppppppppp >>>>>>>>',5)
 				RUNNING_TASK_MEMORY[num]=tempStat
-				print ('RUNNING_TASK_MEMORY hhaha',RUNNING_TASK_MEMORY)
+				# print ('RUNNING_TASK_MEMORY hhaha',RUNNING_TASK_MEMORY)
 			except:
 				pass
 		runTaskListSorted=sorted(RUNNING_TASK_MEMORY, key=itemgetter('createdOn'),reverse=True)
+		# print (runTaskListSorted[0].keys())
 		runningTask={'runningTask':runTaskListSorted}
 		return JsonResponse(runningTask,status=200)
 
 	def taskUpdateByTaskName(self,taskName):
 		self.runningTaskList()
-		print ('taskName >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ',taskName)
+		# print ('taskName >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ',taskName)
 		allTaskList=RUNNING_TASK_MEMORY
 		filtListofTask=[i for i in allTaskList if i['taskName']==taskName]
 		runningTask={'runningTask':filtListofTask}

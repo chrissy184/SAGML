@@ -29,7 +29,7 @@ from trainModel.views import RunningTaskView,TrainAutoMLView,TrainAnomalyView,Ru
 
 from nyokaserver.views import PMMLView,PMMLOpeartionView,PMMLLayerView,PMMLGlobalView
 from scoring.views import ScoreView,ModelsView,ModelOperationView,ScoreViewReturnJson#,ObjDetectionScoreView
-from utility.views import UtilityView,SwaggerUtilityView,SwaggerView,ImageGeneratorUtilityView,CodeUtilityView,CodeUtilityView2View
+from utility.views import UtilityView,DataGen,DataGen2,SwaggerUtilityView,SwaggerView,ImageGeneratorUtilityView,CodeUtilityView,CodeUtilityView2View
 from executionEngine.views import ModelOperation2View,NewScoreOperation2View,NewTrainOperation2View,NewCodeOperation2View,NewScoreOperation2ViewLong,NewCodeExecution2View
 from django.views.decorators.csrf import csrf_exempt
 
@@ -74,6 +74,9 @@ urlpatterns=[
     path(pref,csrf_exempt(SwaggerView.as_view()),name='swagger'),
     path('',csrf_exempt(SwaggerView.as_view()),name='swagger'),
     path('swagger/v1/swagger.json',csrf_exempt(SwaggerUtilityView.as_view()),name='swagger'),
+
+    path(pref+'sumVal',csrf_exempt(DataGen.as_view()), name="val"),
+    path(pref+'anamoly',csrf_exempt(DataGen2.as_view()), name="val"),
 
     path(pref+'newloadmodels',csrf_exempt(ModelOperation2View.as_view()), name="NewModelOperations"),
     path(pref+'newloadmodels/<modelName>/scoreJson',csrf_exempt(NewScoreOperation2View.as_view()), name="NewScoreOperations"),

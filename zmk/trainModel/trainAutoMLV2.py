@@ -237,7 +237,7 @@ class AutoMLTrainer:
         for algo in algorithms:
             config_dict.update(ALGORITHM_NAME_OBJ_DICT[algo])
         config_dict.update(PREPROCESSINGS)
-        print('config dict contains >>>>',config_dict)
+        # print('config dict contains >>>>',config_dict)
         return config_dict
 
 
@@ -319,7 +319,7 @@ class AutoMLTrainer:
         try:
             featureVar.remove(targetVar)
         except Exception as e:
-            print('errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+            # print('errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
             data_details=upDateStatus()
             data_details['status']='Training Failed'
             data_details['errorMessage']='Target variable is not in the dataset'
@@ -382,17 +382,17 @@ class AutoMLTrainer:
             pipelineList=[('feature_mapper',prePipeline)]
             pipelineList.append(pp[-1])
             
-            statusFile=dataFolder+'status'+'.txt'
-            with open(statusFile,'r') as sFile:
+            # statusFile=dataFolder+'status'+'.txt'
+            with open(statusfileLocation,'r') as sFile:
                 sFileText=sFile.read()
             data_details=json.loads(sFileText)
             data_details['status']='In Progress'
-            with open(statusFile,'w') as filetosave:
+            with open(statusfileLocation,'w') as filetosave:
                 json.dump(data_details, filetosave)
 
             finalPipe=Pipeline(pipelineList)
             finalPipe.fit(data[featureVar],data[targetVar])
-            print ('finalPipe >>>>> ',finalPipe)
+            # print ('finalPipe >>>>> ',finalPipe)
 
             finalPMMLfile=dataFolder+newPMMLFileName
             # finalPMMLfile='../ZMOD/Models/'+newPMMLFileName
@@ -405,7 +405,7 @@ class AutoMLTrainer:
                                 'targetName':targetVar,'postProcessingScript':None,'taskType': 'score'}
                         }
             try:
-                print ('toExportDict >>>>>>>>>>>> ',toExportDict)
+                # print ('toExportDict >>>>>>>>>>>> ',toExportDict)
                 from nyokaBase.skl.skl_to_pmml import model_to_pmml
                 model_to_pmml(toExportDict, PMMLFileName=finalPMMLfile)
                 print ('>>>>>>>>>>>>>>>>>>>>>>> Success')
@@ -416,7 +416,7 @@ class AutoMLTrainer:
             
         model_accuracy=[]
 
-        print ('Came here')
+        # print ('Came here')
 
         for num,i in enumerate(tpot.evaluated_individuals_):
             k= {'modelDetail':i,'modelName':i.split("(")[0],'score':round(tpot.evaluated_individuals_[i]['internal_cv_score'],4),'bestmodel':0}
@@ -424,13 +424,14 @@ class AutoMLTrainer:
         model_accuracy.sort(key=operator.itemgetter('score'),reverse=True)
         model_accuracy[0]['bestmodel']=1
 
-        with open(statusFile,'r') as sFile:
+        with open(statusfileLocation,'r') as sFile:
             sFileText=sFile.read()
         data_details=json.loads(sFileText)
         data_details['status']='Complete'
         data_details['pmmlFilelocation']=finalPMMLfile
         data_details['listOfModelAccuracy']=model_accuracy
-        with open(statusFile,'w') as filetosave:
+        print ('data_details >>>>>>>>>>> ',data_details.keys())
+        with open(statusfileLocation,'w') as filetosave:
             json.dump(data_details, filetosave)
 
 class AnomalyTrainer:

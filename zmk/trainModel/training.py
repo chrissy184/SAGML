@@ -234,7 +234,7 @@ class Training:
 		      'newPMMLFileName': newPMMLFileName.split('/')[-1]
 			  }
 		tempRunMemory['taskName']=data_details['taskName']
-		print ('>>>>>>>>>>>>>>>>>>>>AutoML',tempRunMemory)
+		# print ('>>>>>>>>>>>>>>>>>>>>AutoML',tempRunMemory)
 
 		RUNNING_TASK_MEMORY.append(tempRunMemory)
 

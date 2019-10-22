@@ -75,7 +75,7 @@ class AutoMLUtilities:
                     tempMapperProcess.append(preprocessing.Imputer())
                 dataMapperInner.append(tuple([tempMappercol,tempMapperProcess]))
 
-        print ('$$$$$$$$$$$$$$$',dataMapperInner)
+        # print ('$$$$$$$$$$$$$$$',dataMapperInner)
                 
         return dataMapperInner
 

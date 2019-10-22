@@ -146,3 +146,22 @@ class ImageGeneratorUtilityView(APIView):
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
 		dataGen = DataGenerationUtility()
 		return dataGen.generateImage(userInput)
+
+
+
+class DataGen(APIView):
+	http_method_names = ['get']
+
+	def get(self,requests):
+		import random
+		val=random.randint(1,100)
+		return JsonResponse({'val':val},status=200)
+
+
+class DataGen2(APIView):
+	http_method_names = ['get']
+
+	def get(self,requests):
+		import random
+		val=random.choice([0,100])
+		return JsonResponse({'val':val},status=200)
