@@ -416,7 +416,7 @@ class NyokaUtilities:
 
         if pmmlObj.get_type()=='multi':
             print ('came to Workflow')
-            newarchitecture=[]
+            newarchitecture={}
             return newarchitecture
         else:
             overAll=[]

@@ -575,8 +575,47 @@ class NyokaServer:
 
 	def updatetoWorkflow(payload,projectID):
 
+		def getCodeObjectToProcess(codeVal):
+			d = {}
+			exec(codeVal, None,d)
+			objeCode=d[list(d.keys())[0]]
+			return objeCode
+
 		from nyokaBase.skl.skl_to_pmml import model_to_pmml
 		processTheInput=payload
+		global MEMORY_DICT_ARCHITECTURE
+		try:
+			MEMORY_DICT_ARCHITECTURE[projectID]
+		except:
+			MEMORY_DICT_ARCHITECTURE[projectID]={}
+		tempMem=MEMORY_DICT_ARCHITECTURE[projectID]['architecture']
+		# print ('tempMem,',tempMem)
+		
+		if processTheInput['itemType']=='FOLDING':
+			tempMem[processTheInput['sectionId']]={}
+		elif processTheInput['itemType']=='DATA':
+			tempMem[processTheInput['sectionId']]['data']=processTheInput['filePath']
+		elif processTheInput['itemType']=='CODE':
+			scriptObj=getCodeObjectToProcess(open(processTheInput['filePath'],'r').read())
+			if processTheInput['taskType']=='PREPROCESSING':
+				tempMem[processTheInput['sectionId']]['preProcessingScript']={'scripts':[scriptObj],\
+																			  'scriptpurpose':[processTheInput['scriptPurpose']],\
+																			  'scriptOutput':[processTheInput['scriptOutput']]}
+			elif processTheInput['taskType']=='POSTPROCESSING':
+				tempMem[processTheInput['sectionId']]['postProcessingScript']={'scripts':[scriptObj],\
+																			  'scriptpurpose':[processTheInput['scriptPurpose']],\
+																			  'scriptOutput':[processTheInput['scriptOutput']]}
+			
+		elif processTheInput['itemType']=='MODEL':
+			modelPath=processTheInput['filePath']
+			modelOb=None
+			tempMem[processTheInput['sectionId']]['modelObj']=modelOb
+
+		MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=tempMem.copy()
+
+		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['architecture'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'])
+		print ('processTheInput',processTheInput)
+		print ('MEMORY_DICT_ARCHITECTURE[projectID]',MEMORY_DICT_ARCHITECTURE[projectID])
 		returntoClient={'projectID':projectID,'layerUpdated':processTheInput}
 		return JsonResponse(returntoClient)
 
