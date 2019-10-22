@@ -573,7 +573,17 @@ class NyokaServer:
 			returntoClient={'projectID':projectID,'layerUpdated':processTheInput}
 		return JsonResponse(returntoClient)
 
-	
+	def updatetoWorkflow(payload,projectID):
+
+		from nyokaBase.skl.skl_to_pmml import model_to_pmml
+		processTheInput=payload
+		returntoClient={'projectID':projectID,'layerUpdated':processTheInput}
+		return JsonResponse(returntoClient)
+
+	def deleteWorkflowlayer(payload,projectID):
+		message={'message':'Success'}
+		return JsonResponse(message)
+
 
 	def deletelayer(payload,projectID):
 		global MEMORY_DICT_ARCHITECTURE
@@ -724,4 +734,6 @@ class NyokaServer:
 		# print('response sent')
 		return JsonResponse(allInfo)
 
+
+	
 

@@ -58,6 +58,7 @@ def model_to_pmml(toExportDict, PMMLFileName='from_sklearn.pmml'):
 
         model = toExportDict[model_name]['modelObj']
 
+
         pipelineOnly = toExportDict[model_name]['pipelineObj']
 
         categoric_values = tuple()
@@ -98,8 +99,7 @@ def model_to_pmml(toExportDict, PMMLFileName='from_sklearn.pmml'):
             models_dict['DeepNetwork'].append(model_obj)
             data_dicts.append(KerasPMML.DataDictionary)
 
-
-        else:    
+        elif model != None:    
             #model = pipeline.steps[-1][1]
             #ppln_sans_predictor = pipeline.steps[:-1]
             #derived_col_names,categoric_values,mining_imp_val,trfm_dict_kwargs = get_trfm_dict_kwargs(col_names,pipelineOnly,
@@ -359,7 +359,7 @@ def get_PMML_kwargs(model, derived_col_names, col_names, target_name, mining_imp
     anomaly_model_names = ('OneClassSVM',)
     naive_bayes_model_names = ('GaussianNB',)
     mining_model_names = ('RandomForestRegressor', 'RandomForestClassifier', 'GradientBoostingClassifier',
-                            'GradientBoostingRegressor','IsolationForest','ExtraTreesClassifier')
+                            'GradientBoostingRegressor','IsolationForest','ExtraTreesClassifier','ExtraTreesRegressor')
     neurl_netwk_model_names = ('MLPClassifier', 'MLPRegressor')
     nearest_neighbour_names = ('NeighborsBase',)
     clustering_model_names = ('KMeans',)
@@ -1343,7 +1343,7 @@ def get_multiple_model_method(model):
         return 'sum'
     elif model.__class__.__name__ in ['RandomForestClassifier','ExtraTreesClassifier']:
         return 'majorityVote'
-    elif model.__class__.__name__ in ['RandomForestRegressor','IsolationForest']:
+    elif model.__class__.__name__ in ['RandomForestRegressor','IsolationForest','ExtraTreesRegressor']:
         return 'average'
 
 
