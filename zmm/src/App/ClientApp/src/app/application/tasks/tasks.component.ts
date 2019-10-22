@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ApiRoutes, HttpService, UtilService, AlertMessages } from '../../shared';
-import { timer } from 'rxjs';
-import { finalize, takeWhile } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 //NN, AUTOML, PYTHON, SCORE
@@ -23,17 +22,21 @@ export class TasksComponent implements OnInit {
     public isContentLoading = false;
 
     public listOfTasks: any = [];
-    public dataSource: any = [];
     public selectedTask: any = {};
+    public selectedHistory: any = {};
     public tabSelectedIndex = 0;
-    public displayedColumns: string[] = ['expand', 'modelName', 'score', 'bestmodel'];
     public filter: any = '';
 
-    public dataSourceTaskHistory: any = [];
     public displayedColumnsTaskHistory: string[] = ['expand', 'executedAt', 'status'];
+    public dataSourceTaskHistory: any = [];
+    @ViewChild('taskHistoryMatPaginator') paginator: MatPaginator;
+    @ViewChild('taskHistoryMatSort') sort: MatSort;
 
-    @ViewChild(MatPaginator) paginator: MatPaginator;
-    @ViewChild(MatSort) sort: MatSort;
+    public displayedColumnsGenerationResults: string[] = ['expand', 'modelName', 'score', 'bestmodel'];
+    public dataSourceTaskHistoryGenerationResults: any = [];
+    @ViewChild('generationResultsMatPaginator') paginatorGenerationResults: MatPaginator;
+    @ViewChild('generationResultsMatSort') sortGenerationResults: MatSort;
+
     message = AlertMessages.TASK.deleteConfirmationTask;
     constructor(private apiService: HttpService, private utilService: UtilService) { }
 
@@ -61,61 +64,80 @@ export class TasksComponent implements OnInit {
 
     public selectTask(selectedTaskData: any) {
         this.selectedTask = selectedTaskData;
-        this.dataSource = [];
         this.dataSourceTaskHistory = [];
         this.isContentLoading = true;
         this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.taskGet(this.selectedTask.id))
-        .pipe(finalize(() => { this.isContentLoading = false; }))
-        .subscribe(response => {
-            this.selectedTask = response;
-            this.dataSourceTaskHistory = new MatTableDataSource(response.history);
-            this.dataSourceTaskHistory.paginator = this.paginator;
-            this.dataSourceTaskHistory.sort = this.sort;
-            //     this.dataSource.sort = this.sort;
-            // this.selectedTask.status = response.status;
-            // if (response.errorMessage) {
-            //     this.selectedTask.errorMessage = response.errorMessage;
-            //     this.taskCompleted = true;
-            //     this.utilService.alert(AlertMessages.TASK.taskError);
-            // } else if (this.selectedTask.type === 'NNProject' && response.tensorboardUrl) {
-            //     this.tensorboardUrl = response.tensorboardUrl + '?t=' + Date.now();
-            //     this.selectedTask.tensorboardUrl = response.tensorboardUrl + '?t=' + Date.now();
-            //     this.taskCompleted = true;
-            //     this.iframeLoaded();
-            // } else if (this.selectedTask.type === 'AutoMLProject') {
-            //     this.selectedTask.newPMMLFileName = response.newPMMLFileName;
-            //     this.selectedTask.pmmlFilelocation = response.pmmlFilelocation;
-            //     this.selectedTask.listOfModelAccuracy = response.listOfModelAccuracy;
-            //     if (response.listOfModelAccuracy && response.listOfModelAccuracy.length) {
-            //         this.dataSource = new MatTableDataSource(response.listOfModelAccuracy);
-            //         this.taskCompleted = true;
-            //     } else {
-            //         this.dataSource = new MatTableDataSource(response.generationInfo);
-            //     }
-            //     this.dataSource.paginator = this.paginator;
-            //     this.dataSource.sort = this.sort;
-            // } else if (this.selectedTask.type === 'WeldGen') {
-            //     this.selectedTask.information = response.information;
-            //     if (this.selectedTask.status === 'Completed') {
-            //         this.taskCompleted = true;
-            //     }
-            // } else if (this.selectedTask.type === 'PYTHON') {
-            //     this.selectedTask.information = response.information;
-            //     if (this.selectedTask.status === 'Complete') {
-            //         this.taskCompleted = true;
-            //     }
-            // }
-        });
+            .pipe(finalize(() => { this.isContentLoading = false; }))
+            .subscribe(response => {
+                this.selectedTask = response;
+                this.dataSourceTaskHistory = new MatTableDataSource(response.history);
+                this.dataSourceTaskHistory.paginator = this.paginator;
+                this.dataSourceTaskHistory.sort = this.sort;
+                //     this.dataSource.sort = this.sort;
+                // this.selectedTask.status = response.status;
+                // if (response.errorMessage) {
+                //     this.selectedTask.errorMessage = response.errorMessage;
+                //     this.taskCompleted = true;
+                //     this.utilService.alert(AlertMessages.TASK.taskError);
+                // } else if (this.selectedTask.type === 'NNProject' && response.tensorboardUrl) {
+                //     this.tensorboardUrl = response.tensorboardUrl + '?t=' + Date.now();
+                //     this.selectedTask.tensorboardUrl = response.tensorboardUrl + '?t=' + Date.now();
+                //     this.taskCompleted = true;
+                //     this.iframeLoaded();
+                // } else if (this.selectedTask.type === 'AutoMLProject') {
+                //     this.selectedTask.newPMMLFileName = response.newPMMLFileName;
+                //     this.selectedTask.pmmlFilelocation = response.pmmlFilelocation;
+                //     this.selectedTask.listOfModelAccuracy = response.listOfModelAccuracy;
+                //     if (response.listOfModelAccuracy && response.listOfModelAccuracy.length) {
+                //         this.dataSource = new MatTableDataSource(response.listOfModelAccuracy);
+                //         this.taskCompleted = true;
+                //     } else {
+                //         this.dataSource = new MatTableDataSource(response.generationInfo);
+                //     }
+                //     this.dataSource.paginator = this.paginator;
+                //     this.dataSource.sort = this.sort;
+                // } else if (this.selectedTask.type === 'WeldGen') {
+                //     this.selectedTask.information = response.information;
+                //     if (this.selectedTask.status === 'Completed') {
+                //         this.taskCompleted = true;
+                //     }
+                // } else if (this.selectedTask.type === 'PYTHON') {
+                //     this.selectedTask.information = response.information;
+                //     if (this.selectedTask.status === 'Complete') {
+                //         this.taskCompleted = true;
+                //     }
+                // }
+            });
     }
 
-    public selectTaskHistory(selectedData: any) {
-        console.log(selectedData);
+    public selectTaskHistory(selectedHistory: any) {
+        console.log(selectedHistory);
+        this.selectedHistory = selectedHistory;
+        this.dataSourceTaskHistoryGenerationResults = [];
         this.isContentLoading = true;
-        this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.taskGetHistory(this.selectedTask.id, selectedData.idforData))
-        .pipe(finalize(() => { this.isContentLoading = false; }))
-        .subscribe(response => {
-            console.log(response);
-        });
+        this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.taskGetHistory(this.selectedTask.id, selectedHistory.idforData))
+            .pipe(finalize(() => { this.isContentLoading = false; }))
+            .subscribe(response => {
+                console.log(response);
+                this.selectedTask.status = response.status;
+                if (response.errorMessage) {
+                    this.selectedTask.errorMessage = response.errorMessage;
+                    this.utilService.alert(AlertMessages.TASK.taskError);
+                } else {
+                    if (this.selectedTask.type === 'AUTOML') {
+                        this.dataSourceTaskHistoryGenerationResults = new MatTableDataSource(response.generationInfo);
+                        this.dataSourceTaskHistoryGenerationResults.paginator = this.paginatorGenerationResults;
+                        this.dataSourceTaskHistoryGenerationResults.sort = this.sortGenerationResults;
+                        this.selectedHistory.pmmlFilelocation = response.pmmlFilelocation;
+                        this.selectedHistory.newPMMLFileName = response.newPMMLFileName;
+                    } else if (this.selectedTask.type === 'PYTHON') {
+                        this.selectedTask.information = response.information;
+                    } else if (this.selectedTask.type === 'NN' && response.tensorboardUrl) {
+                        this.selectedTask.tensorboardUrl = response.tensorboardUrl + '?t=' + Date.now();
+                        this.iframeLoaded();
+                    }
+                }
+            });
     }
 
     public refreshTask() {
@@ -123,17 +145,18 @@ export class TasksComponent implements OnInit {
     }
 
     public saveModel() {
+        console.log(this.selectedHistory);
         const options = {
             body: {
-                filePath: this.selectedTask.pmmlFilelocation,
-                fileName: this.selectedTask.newPMMLFileName
+                filePath: this.selectedHistory.pmmlFilelocation,
+                fileName: this.selectedHistory.newPMMLFileName
             }
         };
         this.isContentLoading = true;
-        this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.taskSaveModel(this.selectedTask.idforData), options)
+        this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.taskSaveModel(this.selectedHistory.idforData), options)
             .pipe(finalize(() => { this.isContentLoading = false; }))
             .subscribe(response => {
-                this.utilService.alert(this.selectedTask.newPMMLFileName + AlertMessages.TASK.save);
+                this.utilService.alert(this.selectedHistory.newPMMLFileName + AlertMessages.TASK.save);
             });
     }
 

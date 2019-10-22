@@ -847,7 +847,11 @@ export class EditorComponent implements OnInit, OnChanges {
           'itemType': 'MODEL',
           'layerId': 'Model',
           'trainable': true
-        })
+        });
+      // adding model type key
+      for (let item of this.sideBarGeneralItems) {
+        item.modelType = 'Workflow';
+      }
     }
   }
 
