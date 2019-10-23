@@ -110,7 +110,7 @@ namespace ZMM.App.PyServicesClient
                 );
                 try
                 {
-                    HttpResponseMessage response = await httpClient.PostAsync("newloadmodels", content);
+                    HttpResponseMessage response = await httpClient.PostAsync("models", content);
 
                     if (response.IsSuccessStatusCode)
                     {
