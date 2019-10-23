@@ -452,7 +452,7 @@ class AnomalyTrainer:
             targetVar=kwargs['target_variable']
         except:
             targetVar=None
-        algorithmToUse=kwargs['parameters']['algorithm'][0]
+        algorithmToUse=kwargs['parameters']['algorithm']
 
         projectName=idforData
         projectPath=logFolder+projectName
@@ -484,20 +484,21 @@ class AnomalyTrainer:
         featureVar=list(data.columns)
 
         if algorithmToUse=='IsolationForest':
+            print ('came here')
             from sklearn import ensemble
             modelT=ensemble.IsolationForest()
         elif algorithmToUse == 'OneClassSVM':
             from sklearn import svm
             modelT=svm.OneClassSVM()
-        else:
-            data_details=upDateStatus()
-            data_details['status']='Training Failed'
-            data_details['errorMessage']='Model not supported >> '
-            data_details['errorTraceback']='None'
-            with open(statusfileLocation,'w') as filetosave:
-                json.dump(data_details, filetosave)
-            # sys.exit()
-            return
+        # else:
+        #     data_details=upDateStatus()
+        #     data_details['status']='Training Failed'
+        #     data_details['errorMessage']='Model not supported >> '
+        #     data_details['errorTraceback']='None'
+        #     with open(statusfileLocation,'w') as filetosave:
+        #         json.dump(data_details, filetosave)
+        #     # sys.exit()
+        #     return
 
         try:
             pipeline = Pipeline([('feature_mapper', mapper1),('model',modelT)])
