@@ -581,6 +581,39 @@ class NyokaServer:
 			objeCode=d[list(d.keys())[0]]
 			return objeCode
 
+		def getCOlumDet(pmmlObj):
+			import typing
+			listOfObjectstogetData=[]
+			tempObj=pmmlObj.__dict__
+			for j in tempObj.keys():
+				if (tempObj[j] is None) :
+					pass
+				elif (isinstance(tempObj[j], typing.List)):
+					if (len(tempObj[j])==0):
+						pass
+					else:
+						listOfObjectstogetData.append(j)
+				else:
+					listOfObjectstogetData.append(j)
+			for ob in listOfObjectstogetData:
+				if ob == 'TreeModel':
+					minigFieldList=tempObj['TreeModel'][0].__dict__['MiningSchema'].__dict__['MiningField']
+					break
+				elif ob=='RegressionModel':
+					minigFieldList=tempObj['RegressionModel'][0].__dict__['MiningSchema'].__dict__['MiningField']
+					break
+				else:
+					None
+			targetCol=None
+			colNames=[]
+			for indCol in minigFieldList:
+				if indCol.__dict__['usageType']=='target':
+					targetCol=indCol.__dict__['name']
+				else:
+					colNames.append(indCol.__dict__['name'])
+			return (colNames,targetCol)
+
+
 		from nyokaBase.skl.skl_to_pmml import model_to_pmml
 		processTheInput=payload
 		global MEMORY_DICT_ARCHITECTURE
@@ -611,19 +644,19 @@ class NyokaServer:
 			
 		elif processTheInput['itemType']=='MODEL':
 			modelPath=processTheInput['filePath']
-			from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model,get_data_information
+			from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
 			from sklearn.pipeline import Pipeline
 			from nyokaBase import PMML43Ext as pmmNY
 			pmObj=pmmNY.parse(modelPath,silence=True)
-			colInfo=get_data_information(pmObj)
+			colInfo=getCOlumDet(pmObj)
 			modelOb=generate_skl_model(pmObj)
 			# modelOb=None
 			import sklearn
 			if type(modelOb)==sklearn.pipeline.Pipeline:
 				tempMem[processTheInput['sectionId']]['modelObj']=modelOb.steps[-1][1]
 				tempMem[processTheInput['sectionId']]['pipelineObj']=Pipeline(modelOb.steps[:-1])
-				tempMem[processTheInput['sectionId']]['featuresUsed']=colInfo[1]
-				tempMem[processTheInput['sectionId']]['targetName']=colInfo[2]
+				tempMem[processTheInput['sectionId']]['featuresUsed']=colInfo[0]
+				tempMem[processTheInput['sectionId']]['targetName']=colInfo[1]
 			else:
 				tempMem[processTheInput['sectionId']]['modelObj']=modelOb
 			
