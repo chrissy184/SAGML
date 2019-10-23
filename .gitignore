@@ -12,3 +12,5 @@ zmk/nyokaBase/skl/__pycache__/
 zmk/nyokaBase/xgboost/__pycache__/
 
 zmk/nyokaBase/keras/__pycache__/
+
+zmk/pmmlReg.pmml

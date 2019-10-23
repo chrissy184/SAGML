@@ -723,6 +723,7 @@ def get_data_information(pmml):
     mfs = mining.get_MiningField()
     fields = list()
     classes = list()
+    targetname=None
     for mm in mfs:
         if mm.get_usageType() != 'target':
             fields.append(mm.get_name())
@@ -737,8 +738,10 @@ def get_data_information(pmml):
                             classes.append(int(vv.get_value()))
                         else:
                             classes.append(vv.get_value())
+        if mm.get_usageType =='target':
+            targetname=mm.get_name()
 
-    return classes, fields
+    return classes, fields,targetname
 
 
 def get_tree_model(pmml,*args):

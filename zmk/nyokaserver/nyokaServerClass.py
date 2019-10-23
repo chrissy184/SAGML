@@ -592,11 +592,14 @@ class NyokaServer:
 		# print ('tempMem,',tempMem)
 		
 		if processTheInput['itemType']=='FOLDING':
-			tempMem[processTheInput['sectionId']]={}
+			tempMem[processTheInput['sectionId']]={'data':None,'hyperparameters':None,'preProcessingScript':None,
+                        'pipelineObj':None,'modelObj':None,'featuresUsed':None,'targetName':None,'postProcessingScript':None,
+                      'taskType': None,'predictedClasses':None,'dataSet':None}
 		elif processTheInput['itemType']=='DATA':
 			tempMem[processTheInput['sectionId']]['data']=processTheInput['filePath']
 		elif processTheInput['itemType']=='CODE':
-			scriptObj=getCodeObjectToProcess(open(processTheInput['filePath'],'r').read())
+			scriptObj=open(processTheInput['filePath'],'r').read()
+			# print('scriptObj',scriptObj)
 			if processTheInput['taskType']=='PREPROCESSING':
 				tempMem[processTheInput['sectionId']]['preProcessingScript']={'scripts':[scriptObj],\
 																			  'scriptpurpose':[processTheInput['scriptPurpose']],\
@@ -608,14 +611,32 @@ class NyokaServer:
 			
 		elif processTheInput['itemType']=='MODEL':
 			modelPath=processTheInput['filePath']
-			modelOb=None
-			tempMem[processTheInput['sectionId']]['modelObj']=modelOb
-
+			from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model,get_data_information
+			from sklearn.pipeline import Pipeline
+			from nyokaBase import PMML43Ext as pmmNY
+			pmObj=pmmNY.parse(modelPath,silence=True)
+			colInfo=get_data_information(pmObj)
+			modelOb=generate_skl_model(pmObj)
+			# modelOb=None
+			import sklearn
+			if type(modelOb)==sklearn.pipeline.Pipeline:
+				tempMem[processTheInput['sectionId']]['modelObj']=modelOb.steps[-1][1]
+				tempMem[processTheInput['sectionId']]['pipelineObj']=Pipeline(modelOb.steps[:-1])
+				tempMem[processTheInput['sectionId']]['featuresUsed']=colInfo[1]
+				tempMem[processTheInput['sectionId']]['targetName']=colInfo[2]
+			else:
+				tempMem[processTheInput['sectionId']]['modelObj']=modelOb
+			
+			tempMem[processTheInput['sectionId']]['taskType']=processTheInput['taskType']
+			
+		
 		MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=tempMem.copy()
+
+		print ('tempMem',tempMem)
 
 		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['architecture'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'])
 		print ('processTheInput',processTheInput)
-		print ('MEMORY_DICT_ARCHITECTURE[projectID]',MEMORY_DICT_ARCHITECTURE[projectID])
+		# print ('MEMORY_DICT_ARCHITECTURE[projectID]',MEMORY_DICT_ARCHITECTURE[projectID])
 		returntoClient={'projectID':projectID,'layerUpdated':processTheInput}
 		return JsonResponse(returntoClient)
 
