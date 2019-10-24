@@ -21,7 +21,7 @@ export class SettingsComponent implements OnInit {
         name: 'Cumulocity',
         properties: [
           {
-            key: 'Tanent ID',
+            key: 'Tenant ID',
             value: 'ai'
           },
           {
