@@ -123,6 +123,7 @@ namespace ZMM.App
             
             #region Initialize clients in singleton service
             var pySrvLocation = Configuration["PyServiceLocation:srvurl"];
+            var zadSrvLocation = Configuration["ZS:srvurl"];
             string ToolHostURL = Configuration["Tool:Host"];
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<IPyNNServiceClient>(new PyNNServiceClient(Configuration));
@@ -143,6 +144,7 @@ namespace ZMM.App
             Console.WriteLine("*****************************************");
             Console.WriteLine($"ZMM " + (IsDevelopment ? "Development" : "Production") + " initiated...");
             Console.WriteLine($"ZMK =====>>> {pySrvLocation}");
+            Console.WriteLine($"ZAD =====>>> {zadSrvLocation}");
         }
 
         #region Setup User Identity Provider (KeyCloak) configuration

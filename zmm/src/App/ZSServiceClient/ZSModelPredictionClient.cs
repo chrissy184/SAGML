@@ -35,7 +35,7 @@ namespace ZMM.App.ZSServiceClient
                
                 try
                 {
-                    HttpResponseMessage response = await httpClient.GetAsync("models");
+                    HttpResponseMessage response = await httpClient.GetAsync("service/zementis/models");
                     
                     if (response.IsSuccessStatusCode)
                     {
@@ -119,7 +119,7 @@ namespace ZMM.App.ZSServiceClient
                         }
                         memory.Position = 0;
                         content.Add(new StreamContent(memory), "file", filePath);
-                        HttpResponseMessage response = await httpClient.PostAsync("models", content);
+                        HttpResponseMessage response = await httpClient.PostAsync("service/zementis/model", content);
                         if (response.IsSuccessStatusCode)
                         {
                             jsonResult = await response.Content.ReadAsStringAsync();
