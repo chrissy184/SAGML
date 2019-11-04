@@ -160,6 +160,10 @@
                         showFirstLastButtons></mat-paginator>
                     </ng-template>
 
+                    <ng-template [ngIf]="selectedTask?.type === 'AUTOML' && !selectedHistory?.status === 'Complete'">
+                      <h6 class="p-4 text-muted">Model generated and saved in models section.</h6>
+                    </ng-template>
+
                     <ng-template [ngIf]="selectedTask?.type === 'SCORE' && !selectedTask?.errorMessage">
                       <!-- TO DO as per new change -->
                     </ng-template>

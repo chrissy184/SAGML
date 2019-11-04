@@ -130,6 +130,7 @@ export class TasksComponent implements OnInit {
                         this.dataSourceTaskHistoryGenerationResults.sort = this.sortGenerationResults;
                         this.selectedHistory.pmmlFilelocation = response.pmmlFilelocation;
                         this.selectedHistory.newPMMLFileName = response.newPMMLFileName;
+                        this.selectedHistory.status = response.status;
                     } else if (this.selectedTask.type === 'PYTHON') {
                         this.selectedTask.information = response.information;
                     } else if (this.selectedTask.type === 'NN' && response.tensorboardUrl) {
