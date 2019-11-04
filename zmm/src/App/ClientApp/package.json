@@ -27,7 +27,7 @@
     "@angular/router": "^7.1.1",
     "@angular/service-worker": "^7.1.1",
     "@c8y/client": "^9.16.1-rc.0",
-    "@mdi/font": "^3.4.93",
+    "@mdi/font": "^4.5.95",
     "@ng-bootstrap/ng-bootstrap": "^4.0.0",
     "@swimlane/dragula": "^3.7.3",
     "@swimlane/ngx-dnd": "^6.0.0",
