@@ -7,89 +7,75 @@ import { UtilService } from '../../shared';
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
-
-  public filter: any = '';
-  public listOfSettings: any = [];
-  public selectedSetting: any = {};
   public isLoading = false;
+  public editorOptions: any = {
+    theme: 'vs-light',
+    language: 'json'
+  };
+  public defaultSettingsJSON: any = `{
+    "settings": [{
+      "name": "Cumulocity",
+      "type": "C8Y",
+      "tenantID": "ai",
+      "username": "vran",
+      "password": "Testing@123",
+      "url": "https://ai.eu-latest.cumulocity.com",
+      "selected": true
+    },
+    {
+      "name": "Cumulocity",
+      "type": "C8Y",
+      "tenantID": "ai",
+      "username": "vran",
+      "password": "Testing@123",
+      "url": "https://ai.cumulocity.com",
+      "selected": false
+    },
+    {
+      "name": "Zementis Server",
+      "type": "ZS",
+      "tenantID": "ai",
+      "username": "vran",
+      "password": "Testing@123",
+      "url": "https://ai.eu-latest.cumulocity.com",
+      "selected": ture
+    },
+    {
+      "name": "Zementis Server",
+      "type": "ZS",
+      "tenantID": "zserver",
+      "username": "",
+      "password": "",
+      "url": "https://zserver.zmod.org/adapars/",
+      "selected": false
+    },
+    {
+      "name": "Nyoka Remote",
+      "type": "NR",
+      "tenantID": "dlexp",
+      "username": "",
+      "password": "",
+      "url": "https://dlexp.zmod.org/",
+      "selected": true
+    }
+  ]
+}
+  `;
+  public settingsJSON: any = `{}`;
   constructor(private utilService: UtilService) { }
 
   ngOnInit() {
-    this.listOfSettings = [
-      {
-        id: 'Cumulocity',
-        name: 'Cumulocity',
-        properties: [
-          {
-            key: 'Tenant ID',
-            value: 'ai'
-          },
-          {
-            key: 'User ID',
-            value: 'testuser'
-          },
-          {
-            key: 'Password',
-            value: 'xxxxxx'
-          },
-          {
-            key: 'Url',
-            value: 'https://ai.cumulocity.com/apps/cockpit/index.html'
-          }
-        ]
-      },
-      {
-        id: 'Nyoka Remote',
-        name: 'Nyoka Remote',
-        properties: [
-          {
-            key: 'Tanent ID',
-            value: 'dlexp'
-          },
-          {
-            key: 'User ID',
-            value: 'testuser'
-          },
-          {
-            key: 'Password',
-            value: 'xxxxxx'
-          },
-          {
-            key: 'Url',
-            value: 'https://dlexp.zmod.org/'
-          }
-        ]
-      },
-      {
-        id: 'Zementis Server',
-        name: 'Zementis Server',
-        properties: [
-          {
-            key: 'Tanent ID',
-            value: 'zserver'
-          },
-          {
-            key: 'User ID',
-            value: 'testuser'
-          },
-          {
-            key: 'Password',
-            value: 'xxxxxx'
-          },
-          {
-            key: 'Url',
-            value: 'https://zserver.zmod.org/adapars/'
-          }
-        ]
-      }
-    ];
-    this.selectedSetting = this.listOfSettings[0];
+    this.settingsJSON = localStorage.getItem('settingsJSON');
+    if (!this.settingsJSON) {
+      this.settingsJSON = this.defaultSettingsJSON;
+    }
   }
   public toggleSidebar(action: string) {
     this.utilService.toggleSidebar(action);
   }
-  public selectSetting(item: any) {
-    this.selectedSetting = item;
+  public saveSettings() {
+    localStorage.setItem('settingsJSON', this.settingsJSON);
+    this.utilService.alert('Settings Saved.');
   }
 
 }
