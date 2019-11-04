@@ -38,7 +38,7 @@ export class SettingsComponent implements OnInit {
       "username": "vran",
       "password": "Testing@123",
       "url": "https://ai.eu-latest.cumulocity.com",
-      "selected": ture
+      "selected": true
     },
     {
       "name": "Zementis Server",
