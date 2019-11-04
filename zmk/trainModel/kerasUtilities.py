@@ -260,6 +260,8 @@ class KerasUtilities:
         for miningField_ in main_model.MiningSchema.MiningField:
             if miningField_.usageType == 'target':
                 targetVar = miningField_.name
+            else:
+                targetVar=None
         return targetVar
 
 
