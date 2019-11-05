@@ -400,7 +400,7 @@ class NyokaUtilities:
                 tempDict['property']=j
                 tempDict['value']=mm[j]
                 allInfo['information'].append(tempDict)
-                allInfo['fileStatus']='Incomplete'
+
         if 'type' in mm:
             if mm['type']=='multi':
                 allInfo['modelGeneratedFrom']='Workflow'
