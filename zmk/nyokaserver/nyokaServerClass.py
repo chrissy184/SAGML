@@ -602,6 +602,9 @@ class NyokaServer:
 				elif ob=='RegressionModel':
 					minigFieldList=tempObj['RegressionModel'][0].__dict__['MiningSchema'].__dict__['MiningField']
 					break
+				elif ob=='MiningModel':
+					minigFieldList=tempObj['MiningModel'][0].__dict__['MiningSchema'].__dict__['MiningField']
+					break
 				else:
 					None
 			targetCol=None

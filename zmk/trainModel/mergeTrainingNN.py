@@ -187,7 +187,7 @@ class NeuralNetworkModelTrainer:
 
 
 	def train(self,idforData,pmmlFile,tensorboardLogFolder,hyperParaUser):
-		print (idforData,pmmlFile,tensorboardLogFolder,hyperParaUser)
+		# print (idforData,pmmlFile,tensorboardLogFolder,hyperParaUser)
 		# saveStatus=self.logFolder+idforData+'/'
 		# self.statusFile=saveStatus+'status.txt'
 
