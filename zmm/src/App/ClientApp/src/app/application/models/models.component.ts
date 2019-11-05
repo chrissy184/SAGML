@@ -246,8 +246,7 @@ export class ModelsComponent implements OnInit {
       });
   }
 
-  public trainPmml(action: string) {
-    this.selectedModel.trainModelAction = action;
+  public trainPmml() {
     this.showTrainingFormPanel = true;
   }
 

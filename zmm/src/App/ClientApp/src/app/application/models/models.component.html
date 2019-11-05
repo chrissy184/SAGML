@@ -101,12 +101,13 @@
                 </button>
 
                 <button mat-icon-button
-                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' && selectedModel?.fileStatus !== 'Incomplete'"
-                  (click)="trainPmml('RETRAIN')" matTooltip="Re-train Model">
+                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'"
+                  (click)="trainPmml()" matTooltip="Train Model">
                   <span class="mdi mdi-settings text-secondary"></span>
                 </button>
-                <button *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'" mat-icon-button (click)="editpmml()"
-                  matTooltip="Edit Model">
+                <button
+                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'"
+                  mat-icon-button (click)="editpmml()" matTooltip="Edit Model">
                   <span class="mdi mdi-square-edit-outline  text-secondary"></span>
                 </button>
                 <button mat-icon-button matTooltip="Download" (click)="downloadModel()">
@@ -195,8 +196,8 @@
                 <!-- <button mat-icon-button (click)="compileForm()" matTooltip="Compile">
                   <span class="mdi mdi-play text-secondary"></span>
                 </button> -->
-                <button mat-icon-button *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork'"
-                  (click)="trainPmml('TRAIN')" matTooltip="Train Model">
+                <button mat-icon-button *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'"
+                  (click)="trainPmml()" matTooltip="Train Model">
                   <span class="mdi mdi-settings  text-secondary"></span>
                 </button>
                 <button mat-icon-button matTooltip="Cancel" (click)="closeEditor()">
