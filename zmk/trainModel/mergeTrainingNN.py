@@ -186,8 +186,8 @@ class NeuralNetworkModelTrainer:
 		return modelObj
 
 
-	def train(self,idforData,pmmlFile,tensorboardLogFolder):
-		print (idforData,pmmlFile,tensorboardLogFolder)
+	def train(self,idforData,pmmlFile,tensorboardLogFolder,hyperParaUser):
+		print (idforData,pmmlFile,tensorboardLogFolder,hyperParaUser)
 		# saveStatus=self.logFolder+idforData+'/'
 		# self.statusFile=saveStatus+'status.txt'
 
@@ -323,7 +323,7 @@ class NeuralNetworkModelTrainer:
 			# train_prc = Process(target=target,args=(pmmlFile,self.pathOfData,fileName,tensorboardLogFolder,lossType,\
 			# 	listOfMetrics,batchSize,epoch,idforData,problemType,scriptOutputPrepro,optimizerName,learningRate,
 			# 	datHyperPara,testSize,scrDictObj))
-			train_prc=Process(target=target,args=(idforData,pmmlFile,tensorboardLogFolder))
+			train_prc=Process(target=target,args=(idforData,pmmlFile,tensorboardLogFolder,hyperParaUser))
 			train_prc.start()
 		except Exception as e:
 			data_details=self.upDateStatus()

@@ -517,8 +517,8 @@ class TrainingViewModels:
             scriptOutputPrepro=None
         
         # print ('scriptOutputPrepro',scriptOutputPrepro,dataObj,modelArch)
-
         datHyperPara=modelObj['modelObj']['hyperparameters']
+        
         if modelArch == 'NNModel':
             checkVal=self.verifyHyperparameters(datHyperPara)
             if checkVal == 'done':
@@ -789,7 +789,7 @@ class TrainingViewModels:
         
         return modelObj
 
-    def trainModel(self,idforData,pmmlFile,tensorboardLogFolder):
+    def trainModel(self,idforData,pmmlFile,tensorboardLogFolder,hyperParaUser):
         global PMMLMODELSTORAGE
         pmmlFileObj=pathlib.Path(pmmlFile)
         pmmlFileForKey=pmmlFileObj.name.replace(pmmlFileObj.suffix,'')
@@ -809,6 +809,7 @@ class TrainingViewModels:
         
         modelObjsTrain=list(modelInformation['train'].keys())
         print('model object loaded')
+        # tempDict[taskT][mO]['modelObj']['hyperparameters']
 
         if len(modelObjsTrain)==0:
             data_details=self.upDateStatus()
@@ -822,7 +823,10 @@ class TrainingViewModels:
             # print ('>>>>>>>>>>>>>>>                 ',self.statusFile)
             print('Came in model 1')
             modeScope=modelInformation['train'][modelObjsTrain[0]]
-            # print ('modeScope>>>>>>>>>>> ',modeScope)
+            if hyperParaUser['epoch'] != None:
+                print ('Print to update hyperparp',hyperParaUser['epoch'])
+                modeScope['modelObj']['hyperparameters']=hyperParaUser
+            print ('modeScope>>>>>>>>>>> ',modeScope['modelObj']['hyperparameters'])
             kerasUtilities.updateStatusofProcess(self.statusFile,'Training Model Loaded')
 
             modeScope=self.trainModelObjectDict(modeScope,idforData,tensorboardLogFolder)

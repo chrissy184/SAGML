@@ -59,17 +59,30 @@ class Training:
 	# @api_view(['POST'])
 	# @schema(trainNeuralNetworkModelsSwagger)
 	# @api_view()
+
 	def trainNeuralNetworkModels(requests):
+
+		def getValueFromReq(keyVal,requests):
+			try:
+				return requests.POST.get(keyVal)
+			except:
+				return ''
 		pmmlFile=requests.POST.get('filePath')
-		try:
-			tensorboardUrl=requests.POST.get('tensorboardUrl')
-		except:
-			tensorboardUrl=''
-		try:
-			tensorboardLogFolder=requests.POST.get('tensorboardLogFolder')
-		except:
-			tensorboardLogFolder=''
-		print ('>>>>>>>>   ',pmmlFile,tensorboardUrl,tensorboardLogFolder)
+
+		tensorboardUrl=getValueFromReq('tensorboardUrl',requests)
+		tensorboardLogFolder=getValueFromReq('tensorboardLogFolder',requests)
+		hyperParaUser={}
+		hyperParaUser['batchSize']=getValueFromReq('batchSize',requests)
+		hyperParaUser['optimizerName']=getValueFromReq('optimizerName',requests)
+		hyperParaUser['lossType']=getValueFromReq('lossType',requests)
+		hyperParaUser['listOfMetrics']=getValueFromReq('listOfMetrics',requests)
+		hyperParaUser['epoch']=getValueFromReq('epoch',requests)
+		hyperParaUser['problemType']=getValueFromReq('problemType',requests)
+		hyperParaUser['testSize']=getValueFromReq('testSize',requests)
+		hyperParaUser['learningRate']=getValueFromReq('learningRate',requests)
+		# hyperParaUser['']=getValueFromReq('',requests)
+		# hyperParaUser['']=getValueFromReq('',requests)
+		# print ('>>>>>>>>PPPPPPPPPPPPPPPP   ',pmmlFile,tensorboardUrl,tensorboardLogFolder,hyperParaUser)
 		idforData=int(time.time())
 		idforData=str(idforData)+'_NN'
 		saveStatus=logFolder+idforData+'/'
@@ -87,7 +100,7 @@ class Training:
 			json.dump(data_details, filetosave)
 		nntrainer = mergeTrainingNN.NeuralNetworkModelTrainer()
 
-		pID = nntrainer.train(idforData,pmmlFile,tensorboardLogFolder)
+		pID = nntrainer.train(idforData,pmmlFile,tensorboardLogFolder,hyperParaUser)
 		
 		data_details['pID']=str(pID)
 		saveStatus=logFolder+idforData+'/'
