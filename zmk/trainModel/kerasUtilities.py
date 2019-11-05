@@ -257,6 +257,9 @@ class KerasUtilities:
             main_model=nyoka_pmml_obj.NaiveBayesModel[0]
         elif nyoka_pmml_obj.NearestNeighborModel:
             main_model=nyoka_pmml_obj.NearestNeighborModel[0]
+        elif nyoka_pmml_obj.AnomalyDetectionModel:
+            main_model=nyoka_pmml_obj.AnomalyDetectionModel[0]
+
         for miningField_ in main_model.MiningSchema.MiningField:
             if miningField_.usageType == 'target':
                 targetVar = miningField_.name
