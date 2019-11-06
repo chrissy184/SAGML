@@ -1011,6 +1011,7 @@ namespace ZMM.App.Controllers
                             /* TODO: Add code to call ZMK service to get compatible pmml*/
                             RemoveAttribuesIfPresentInPMMLFileBeforeDeploy(record.FilePath);
                             string zmkResponse = await zmeClient.PostConvertPmmlAsync(record.FilePath, record.FilePath.Replace(id, $"Converted_{id}"));
+                            Logger.LogInformation("PostZSUploadPmmlAsync", "ZMK Response after post " + zmkResponse);
                             if (!string.IsNullOrEmpty(zmkResponse) && !zmkResponse.Contains("Failed"))
                             {
                                 JObject jo = JObject.Parse(zmkResponse);
@@ -1018,6 +1019,7 @@ namespace ZMM.App.Controllers
                             }
                             if (string.IsNullOrEmpty(convertedPath)) return BadRequest(new { message = "Model loading failed.", errorCode = 400, exception = ZMMConstants.ErrorFailed });
                             string zsResponse = await zsClient.UploadPmml(convertedPath);
+                            Logger.LogInformation("PostZSUploadPmmlAsync", "ZS Response on deploy " + zsResponse);
                             //remove file after upload
                             if (System.IO.File.Exists(convertedPath))
                             {
