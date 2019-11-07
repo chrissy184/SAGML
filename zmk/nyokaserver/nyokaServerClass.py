@@ -132,14 +132,14 @@ class NyokaServer:
 			MEMORY_DICT_ARCHITECTURE[projectID]
 		except:
 			MEMORY_DICT_ARCHITECTURE[projectID]={}
-			try:
-				print ('filePath >>>> ',filePath)
-				archFromPMML=nyokaUtilities.pmmlToJson(filePath)
-				print ('pass')
-				MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=archFromPMML
-			except Exception as e:
-				# print('<>>>><<>>>>',str(e))
-				MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=[]
+			# try:
+			print ('filePath >>>> ',filePath)
+			archFromPMML=nyokaUtilities.pmmlToJson(filePath)
+			print ('pass')
+			MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=archFromPMML
+			# except Exception as e:
+			# 	# print('<>>>><<>>>>',str(e))
+			# 	MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=[]
 			#######################################################
 			MEMORY_DICT_ARCHITECTURE[projectID]['filePath']=filePath
 			MEMORY_DICT_ARCHITECTURE[projectID]['projectID']=projectID
@@ -670,7 +670,7 @@ class NyokaServer:
 
 		print ('tempMem',tempMem)
 
-		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['architecture'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'])
+		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['architecture'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
 		print ('processTheInput',processTheInput)
 		# print ('MEMORY_DICT_ARCHITECTURE[projectID]',MEMORY_DICT_ARCHITECTURE[projectID])
 		returntoClient={'projectID':projectID,'layerUpdated':processTheInput}

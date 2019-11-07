@@ -11,7 +11,7 @@ global MEMORY_DICT_ARCHITECTURE,MEMORY_OF_LAYERS
 settingFilePath='./settingFiles/'
 savedModels='./SavedModels/'
 MEMORY_OF_LAYERS={}
-
+from trainModel.mergeTrainingV2 import PMMLMODELSTORAGE
 layerDetail=open(settingFilePath+'listOflayers.json','r')
 MEMORY_OF_LAYERS=json.loads(layerDetail.read())
 #########################################All functions is to write PMML###############################
@@ -414,8 +414,26 @@ class NyokaUtilities:
         pmmlObj=ny.parse(filePath,silence=True)
         pmmlDictObj=pmmlObj.__dict__
 
+        print ('0'*100,pmmlObj.get_type())
+
         if pmmlObj.get_type()=='multi':
             print ('came to Workflow')
+            # print('*'*100)
+
+            # print(PMMLMODELSTORAGE)
+            # print('*'*100)
+            
+            import pathlib
+            from trainModel.mergeTrainingV2 import TrainingViewModels
+            pmmlFileObj=pathlib.Path(filePath)
+            pmmlFileForKey=pmmlFileObj.name.replace(pmmlFileObj.suffix,'')
+            from trainModel.mergeTrainingV2 import  NewModelOperations
+            NewModelOperations().loadExecutionModel(filePath)
+            modelInformation=PMMLMODELSTORAGE[pmmlFileForKey]
+            # print (modelInformation)
+
+            toexportDictN=TrainingViewModels().restructureModelInforForExportDict(modelInformation)
+            print ('toexportDictN >>>>>>>> ',toexportDictN)
             newarchitecture={}
             return newarchitecture
         else:
