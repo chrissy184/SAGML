@@ -1,3 +1,15 @@
+const getC8YObject = function () {
+    const c8y: any = JSON.parse(localStorage.getItem('settingsJSON'));
+    console.log(c8y);
+    const c8ySelectedArray = c8y.settings.filter(function (element, index, array) {
+        return (element.type === 'C8Y' && element.selected === true);
+    });
+    return c8ySelectedArray[0];
+}
+let c8y = getC8YObject();
+if (c8y === undefined) {
+    c8y = { url: '' };
+}
 export const ApiRoutes = {
     methods: {
         POST: 'post',
@@ -52,7 +64,7 @@ export const ApiRoutes = {
     instance: 'instances',
     instanceKill: (id: string) => `instances/${id}`,
 
-    cumulocityGetManagedObjects: (tenant: string) => `https://${tenant}.cumulocity.com/inventory/managedObjects`,
-    cumulocityGetSeries: (tenant: string) => `https://${tenant}.cumulocity.com/measurement/measurements/series`,
-    cumulocityGetFiles: (tenant: string) => `https://${tenant}.cumulocity.com/inventory/binaries`,
+    cumulocityGetManagedObjects: () => `${c8y.url}/inventory/managedObjects`,
+    cumulocityGetSeries: () => `${c8y.url}/measurement/measurements/series`,
+    cumulocityGetFiles: () => `${c8y.url}/inventory/binaries`,
 };

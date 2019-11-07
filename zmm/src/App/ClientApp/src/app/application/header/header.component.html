@@ -1,10 +1,12 @@
 <mat-toolbar class="application-header bg-white">
   <div class="application-brand d-flex align-items-center">
     <button mat-icon-button (click)="navOpen()" class="mr-1">
-      <span class="mdi " [ngClass]="{'mdi-chevron-double-left': isNavOpen, 'mdi-chevron-double-right': !isNavOpen }"></span>
+      <span class="mdi "
+        [ngClass]="{'mdi-chevron-double-left': isNavOpen, 'mdi-chevron-double-right': !isNavOpen }"></span>
     </button>
     <div class="logo">
-      <h3 class="text-capitalize"><img *ngIf="!isNavOpen" alt="" src="assets/logo-zm.png" width="40" class="pb-1 pr-2"> {{ title }}</h3>
+      <h3 class="text-capitalize"><img *ngIf="!isNavOpen" alt="" src="assets/logo-zm.png" width="40" class="pb-1 pr-2">
+        {{ title }}</h3>
     </div>
   </div>
   <span class="toolbar-mid"></span>
@@ -20,10 +22,10 @@
       <span class="mdi mdi-apps"></span>
     </button>
     <mat-menu #appsMenu="matMenu" xPosition="before">
-      <button mat-menu-item (click)="goToUrl('https://ai.cumulocity.com/apps/cockpit')">
+      <button mat-menu-item (click)="goToUrl(urlCockpit)">
         <img alt="" src="/assets/cockpit.png" width="34" height="34" class="mr-2" /> Cockpit
       </button>
-      <button mat-menu-item (click)="goToUrl('https://ai.cumulocity.com/apps/devicemanagement')">
+      <button mat-menu-item (click)="goToUrl(urlDeviceManagment)">
         <img alt="" src="/assets/devices.png" width="34" height="34" class="mr-2" /> Device Management
       </button>
     </mat-menu>

@@ -98,6 +98,14 @@ export class CumulocityComponent implements OnInit {
   public headers: any = {};
   constructor(private apiService: HttpService, private utilService: UtilService) { }
 
+  public getC8YObject() {
+    const c8y: any = JSON.parse(localStorage.getItem('settingsJSON'));
+    console.log(c8y);
+    const c8ySelectedArray = c8y.settings.filter(function (element, index, array) {
+      return (element.type === 'C8Y' && element.selected === true);
+    });
+    return c8ySelectedArray[0];
+  }
   public login(loginData: any) {
     console.log(loginData);
     this.dataSourceDevices = [];
@@ -105,7 +113,10 @@ export class CumulocityComponent implements OnInit {
     this.listDevice = false;
     this.listFile = false;
     if (loginData.valid) {
-      this.headers.Authorization = `Basic ${btoa(`${this.tenant}/${this.username}:${this.password}`)}`;
+      const c8y = this.getC8YObject();
+      if (c8y !== undefined) {
+      this.headers.Authorization = `Basic ${btoa(`${c8y.tenantID}/${c8y.username}:${c8y.password}`)}`;
+      }
       this.listDevices();
     }
   }
@@ -122,7 +133,7 @@ export class CumulocityComponent implements OnInit {
       headers: this.headers
     };
     this.isContentLoading = true;
-    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.cumulocityGetManagedObjects(this.tenant), options)
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.cumulocityGetManagedObjects(), options)
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(response => {
         console.log(response);
@@ -144,7 +155,7 @@ export class CumulocityComponent implements OnInit {
       headers: this.headers
     };
     this.isContentLoading = true;
-    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.cumulocityGetFiles(this.tenant), options)
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.cumulocityGetFiles(), options)
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(response => {
         console.log(response);
@@ -175,7 +186,7 @@ export class CumulocityComponent implements OnInit {
       headers: this.headers
     };
     this.isLoading = true;
-    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.cumulocityGetSeries(this.tenant), options)
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.cumulocityGetSeries(), options)
       .pipe(finalize(() => { this.isLoading = false; }))
       .subscribe(response => {
         console.log(response);
@@ -236,7 +247,7 @@ export class CumulocityComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    this.login({valid: true});
   }
 
 }
