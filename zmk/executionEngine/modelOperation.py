@@ -38,7 +38,7 @@ import datetime,shutil
 import skimage,pathlib
 import pandas as pd
 from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
-from nyokaBase.skl.skl_to_pmml_V1 import model_to_pmml
+from nyokaBase.skl.skl_to_pmml import model_to_pmml
 from multiprocessing import Lock, Process
 from threading import Thread
 

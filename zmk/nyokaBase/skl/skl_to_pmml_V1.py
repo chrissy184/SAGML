@@ -10,10 +10,10 @@ from datetime import datetime
 import math
 import metadata
 import inspect
-from nyokaBase.keras.keras_model_to_pmml import KerasToPmml
-from nyokaBase.xgboost.xgboost_to_pmml import xgboost_to_pmml
-from nyokaBase.lgbm.lgb_to_pmml import lgb_to_pmml
-from nyokaBase.lgbm.lgbmTrainingAPI_to_pmml import ExportToPMML as ext
+from nyoka.keras.keras_model_to_pmml import KerasToPmml
+from nyoka.xgboost.xgboost_to_pmml import xgboost_to_pmml
+from nyoka.lgbm.lgb_to_pmml import lgb_to_pmml
+from nyoka.lgbm.lgbmTrainingAPI_to_pmml import ExportToPMML as ext
 
 def model_to_pmml(toExportDict, pmml_f_name='from_sklearn.pmml'):
 
