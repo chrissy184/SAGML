@@ -132,14 +132,14 @@ class NyokaServer:
 			MEMORY_DICT_ARCHITECTURE[projectID]
 		except:
 			MEMORY_DICT_ARCHITECTURE[projectID]={}
-			# try:
-			print ('filePath >>>> ',filePath)
-			archFromPMML=nyokaUtilities.pmmlToJson(filePath)
-			print ('pass')
-			MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=archFromPMML
-			# except Exception as e:
-			# 	# print('<>>>><<>>>>',str(e))
-			# 	MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=[]
+			try:
+				print ('filePath >>>> ',filePath)
+				archFromPMML=nyokaUtilities.pmmlToJson(filePath)
+				# print ('pass',archFromPMML)
+				MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=archFromPMML
+			except Exception as e:
+				print('<>>>><<>>>>',str(e))
+				MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=[]
 			#######################################################
 			MEMORY_DICT_ARCHITECTURE[projectID]['filePath']=filePath
 			MEMORY_DICT_ARCHITECTURE[projectID]['projectID']=projectID
@@ -615,17 +615,16 @@ class NyokaServer:
 				else:
 					colNames.append(indCol.__dict__['name'])
 			return (colNames,targetCol)
-
-
+			
 		from nyokaBase.skl.skl_to_pmml import model_to_pmml
 		processTheInput=payload
 		global MEMORY_DICT_ARCHITECTURE
 		try:
-			MEMORY_DICT_ARCHITECTURE[projectID]
+			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']
 		except:
-			MEMORY_DICT_ARCHITECTURE[projectID]={}
-		tempMem=MEMORY_DICT_ARCHITECTURE[projectID]['architecture']
-		# print ('tempMem,',tempMem)
+			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']={}
+		tempMem=MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']
+		print ('tempMem,',tempMem)
 		
 		if processTheInput['itemType']=='FOLDING':
 			tempMem[processTheInput['sectionId']]={'data':None,'hyperparameters':None,'preProcessingScript':None,
@@ -639,11 +638,13 @@ class NyokaServer:
 			if processTheInput['taskType']=='PREPROCESSING':
 				tempMem[processTheInput['sectionId']]['preProcessingScript']={'scripts':[scriptObj],\
 																			  'scriptpurpose':[processTheInput['scriptPurpose']],\
-																			  'scriptOutput':[processTheInput['scriptOutput']]}
+																			  'scriptOutput':[processTheInput['scriptOutput']],\
+																			'scriptPath':[processTheInput['filePath']]}
 			elif processTheInput['taskType']=='POSTPROCESSING':
 				tempMem[processTheInput['sectionId']]['postProcessingScript']={'scripts':[scriptObj],\
 																			  'scriptpurpose':[processTheInput['scriptPurpose']],\
-																			  'scriptOutput':[processTheInput['scriptOutput']]}
+																			  'scriptOutput':[processTheInput['scriptOutput']],\
+																			  'scriptPath':[processTheInput['filePath']]}
 			
 		elif processTheInput['itemType']=='MODEL':
 			modelPath=processTheInput['filePath']
@@ -662,15 +663,15 @@ class NyokaServer:
 				tempMem[processTheInput['sectionId']]['targetName']=colInfo[1]
 			else:
 				tempMem[processTheInput['sectionId']]['modelObj']=modelOb
-			
+			tempMem[processTheInput['sectionId']]['modelPath']=modelPath
 			tempMem[processTheInput['sectionId']]['taskType']=processTheInput['taskType']
 			
 		
-		MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=tempMem.copy()
+		MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']=tempMem.copy()
 
 		print ('tempMem',tempMem)
 
-		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['architecture'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
+		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
 		print ('processTheInput',processTheInput)
 		# print ('MEMORY_DICT_ARCHITECTURE[projectID]',MEMORY_DICT_ARCHITECTURE[projectID])
 		returntoClient={'projectID':projectID,'layerUpdated':processTheInput}

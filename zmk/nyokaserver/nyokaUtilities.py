@@ -430,12 +430,104 @@ class NyokaUtilities:
             from trainModel.mergeTrainingV2 import  NewModelOperations
             NewModelOperations().loadExecutionModel(filePath)
             modelInformation=PMMLMODELSTORAGE[pmmlFileForKey]
+            # print ('PMMLMODELSTORAGE after >>>>>>>>>>> ',PMMLMODELSTORAGE)
             # print (modelInformation)
 
-            toexportDictN=TrainingViewModels().restructureModelInforForExportDict(modelInformation)
-            print ('toexportDictN >>>>>>>> ',toexportDictN)
-            newarchitecture={}
-            return newarchitecture
+            toexp=TrainingViewModels().restructureModelInforForExportDict(modelInformation)
+            print ('toexportDictN >>>>>>>> ',toexp)
+            
+            import copy,json
+
+            tempSec={"name":"Section", "layerId":"Section",
+            "children":[], "itemType":"FOLDING", "icon":"mdi mdi-group", "class":"wide",
+            "modelType":"Workflow", "id":"id", "sectionId":"modName", "layerIndex":None,'connectionLayerId':None}
+
+            tempData={"name":"Data","icon":"mdi mdi-database-plus","itemType":"DATA","layerId":None,
+            "trainable":False,"modelType":"Workflow","id":None,"layerIndex":None,"connectionLayerId":None,
+            "url":None,"filePath":None}
+
+            tempCode={"name":"Code","icon":"mdi mdi-code-braces","itemType":"CODE","layerId":None,
+            "trainable":False,"modelType":"Workflow","id":"K2PVI4HZ3NBGF","layerIndex":None,"connectionLayerId":None,
+            "url":None,"filePath":None, "taskType":None,"scriptOutput":None,"scriptPurpose":None}
+
+            tempModel={"name":"Model","icon":"mdi mdi-xml","itemType":"MODEL","layerId":None,"trainable":False,
+                    "modelType":"Workflow","id":None,"layerIndex":None,"connectionLayerId":None,
+                    "url":None,"filePath":None,"taskType":None}
+
+            # toexp={'K2PSSUKYFRSMF': {'hyperparameters': None, 
+            #                    'data': 'C:/Users/swsh/Desktop/ZMODGit/ZMOD/ZMOD/Data/newData2', 
+            #                    'preProcessingScript': {'scripts': ['def addVal(x):\n    return x\n'], 'scriptpurpose': ['trainAndscore'], 'scriptOutput': ['DATA'], 'scriptPath': ['C:/Users/swsh/Desktop/ZMODGit/ZMOD/ZMOD/Code/scriptToTest.py']}, 
+            #                    'modelObj': None, 
+            #                    'pipelineObj': None, 
+            #                    'featuresUsed': ['cylinders', 'displacement', 'horsepower', 'weight', 'acceleration'], 
+            #                    'targetName': 'mpg', 
+            #                    'postProcessingScript': {'scripts': [], 'scriptpurpose': [], 'scriptOutput': [], 'scriptPath': []}, 
+            #                    'taskType': 'trainAndscore', 
+            #                    'modelPath': 'C:\\Users\\swsh\\Desktop\\ZMODGit\\ZMOD\\ZMOD\\Models\\autoML2.pmml'}}
+
+
+            workflowArch=[]
+            for modTemp in list(toexp.keys()):
+                temSecCop=tempSec.copy()
+                temSecCop['sectionId']=modTemp
+                temSecCop["layerId"]=modTemp
+                if toexp[modTemp]['data'] != None:
+                    dataInfo=copy.deepcopy(tempData)
+                    import pathlib
+                    fileName=pathlib.Path(toexp[modTemp]['data']).name
+                    dataInfo['layerId']=fileName
+                    dataInfo['url']='/Data/'+fileName
+                    dataInfo['filePath']=toexp[modTemp]['data']
+                    temSecCop['children'].append(dataInfo)
+                for numSc,sC in enumerate(toexp[modTemp]['preProcessingScript']['scriptPath']):
+                    codeInfo=copy.deepcopy(tempCode)
+                    fileName=pathlib.Path(toexp[modTemp]['preProcessingScript']['scriptPath'][numSc]).name
+                    codeInfo['layerId']=fileName
+                    codeInfo['url']='/Code/'+fileName
+                    codeInfo['filePath']=toexp[modTemp]['preProcessingScript']['scriptPath'][numSc]
+                    codeInfo['taskType']='PREPROCESSING'
+                    codeInfo['scriptOutput']=toexp[modTemp]['preProcessingScript']['scriptOutput'][numSc]
+                    codeInfo['scriptPurpose']=toexp[modTemp]['preProcessingScript']['scriptpurpose'][numSc]
+                    temSecCop['children'].append(codeInfo)
+                    
+                
+                modtempC=copy.deepcopy(tempModel)
+                fileName=pathlib.Path(toexp[modTemp]['modelPath']).name
+                modtempC['layerId']=fileName
+                modtempC['url']='/Model/'+fileName
+                modtempC['filePath']=toexp[modTemp]['modelPath']
+                modtempC['taskType']=toexp[modTemp]['taskType']
+                temSecCop['children'].append(modtempC)
+                
+                
+                for numSc,sC in enumerate(toexp[modTemp]['postProcessingScript']['scriptPath']):
+                    codeInfo=copy.deepcopy(tempCode)
+                    fileName=pathlib.Path(toexp[modTemp]['postProcessingScript']['scriptPath'][numSc]).name
+                    codeInfo['layerId']=fileName
+                    codeInfo['url']='/Code/'+fileName
+                    codeInfo['filePath']=toexp[modTemp]['postProcessingScript']['scriptPath'][numSc]
+                    codeInfo['taskType']='POSTPROCESSING'
+                    codeInfo['scriptOutput']=toexp[modTemp]['postProcessingScript']['scriptOutput'][numSc]
+                    codeInfo['scriptPurpose']=toexp[modTemp]['postProcessingScript']['scriptpurpose'][numSc]
+                    temSecCop['children'].append(codeInfo)
+                    
+                workflowArch.append(temSecCop)
+                
+            from random import choice
+            from string import ascii_uppercase
+
+            for num,i in enumerate(workflowArch):
+                if i['itemType']=='FOLDING':
+                    i['layerIndex']=num
+                    i['id']=''.join(choice(ascii_uppercase) for i in range(12))
+                    for num2,j in enumerate(i['children']):
+                        j['layerIndex']=num2
+                        j['id']=''.join(choice(ascii_uppercase) for i in range(12))
+                else:
+                    i['layerIndex']=num
+                    i['id']=''.join(choice(ascii_uppercase) for i in range(12))
+
+            return workflowArch
         else:
             overAll=[]
 
