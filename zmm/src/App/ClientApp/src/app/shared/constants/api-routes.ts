@@ -1,10 +1,13 @@
 const getC8YObject = function () {
     const c8y: any = JSON.parse(localStorage.getItem('settingsJSON'));
-    console.log(c8y);
-    const c8ySelectedArray = c8y.settings.filter(function (element, index, array) {
-        return (element.type === 'C8Y' && element.selected === true);
-    });
-    return c8ySelectedArray[0];
+    if (c8y) {
+        const c8ySelectedArray = c8y.settings.filter(function (element, index, array) {
+            return (element.type === 'C8Y' && element.selected === true);
+        });
+        return c8ySelectedArray[0];
+    } else {
+        return undefined;
+    }
 }
 let c8y = getC8YObject();
 if (c8y === undefined) {

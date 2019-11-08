@@ -100,11 +100,14 @@ export class CumulocityComponent implements OnInit {
 
   public getC8YObject() {
     const c8y: any = JSON.parse(localStorage.getItem('settingsJSON'));
-    console.log(c8y);
-    const c8ySelectedArray = c8y.settings.filter(function (element, index, array) {
-      return (element.type === 'C8Y' && element.selected === true);
-    });
-    return c8ySelectedArray[0];
+    if (c8y) {
+      const c8ySelectedArray = c8y.settings.filter(function (element, index, array) {
+        return (element.type === 'C8Y' && element.selected === true);
+      });
+      return c8ySelectedArray[0];
+    } else {
+      return undefined;
+    }
   }
   public login(loginData: any) {
     console.log(loginData);
@@ -115,7 +118,7 @@ export class CumulocityComponent implements OnInit {
     if (loginData.valid) {
       const c8y = this.getC8YObject();
       if (c8y !== undefined) {
-      this.headers.Authorization = `Basic ${btoa(`${c8y.tenantID}/${c8y.username}:${c8y.password}`)}`;
+        this.headers.Authorization = `Basic ${btoa(`${c8y.tenantID}/${c8y.username}:${c8y.password}`)}`;
       }
       this.listDevices();
     }
@@ -247,7 +250,7 @@ export class CumulocityComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.login({valid: true});
+    this.login({ valid: true });
   }
 
 }
