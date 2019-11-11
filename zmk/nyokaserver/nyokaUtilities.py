@@ -526,7 +526,7 @@ class NyokaUtilities:
                 else:
                     i['layerIndex']=num
                     i['id']=''.join(choice(ascii_uppercase) for i in range(12))
-
+            print ('workflowArch',workflowArch)
             return workflowArch
         else:
             overAll=[]

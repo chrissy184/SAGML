@@ -233,7 +233,7 @@ class NewModelOperations:
                         tempDict[taskT][mO]['modelObj']['hyperparameters']=None
                 elif tempDict[taskT][mO]['modelObj']['modelArchType']=="SKLModel":
                     modelProp=tempDict[taskT][mO]['modelObj']['pmmlNyokaObj']
-                    print (modelProp)
+                    print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp)
                     from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
                     recoModelObj=generate_skl_model(modelProp)
                     if recoModelObj != None:
@@ -250,16 +250,17 @@ class NewModelOperations:
         
         PMMLMODELSTORAGE[pmmlFileForKey]=tempDict
 
-        # print('*'*100)
+        print('*'*100)
 
-        # print(PMMLMODELSTORAGE)
-        # print('*'*100)
+        print(PMMLMODELSTORAGE)
+        print('*'*100)
         if 0 in modelLoadStatus:
             messageToWorld= "Model load failed, please connect with admin"
         else:
             messageToWorld= "Model Loaded Successfully"
 
         resultResp={'message':messageToWorld,'keytoModel':pmmlFileForKey}
+        print (resultResp)
         return JsonResponse(resultResp,status=200)
 
 
@@ -812,7 +813,7 @@ class TrainingViewModels:
         return modelObj
 
     def restructureModelInforForExportDict(self,tempDict):
-        print (tempDict['train']['K2PSSUKYFRSMF'])
+        # print (tempDict['train']['K2PSSUKYFRSMF'])
 
         listOfModelNames=set([k for j in tempDict for k in tempDict[j]])
         toExportDict={}
