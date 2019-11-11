@@ -130,6 +130,14 @@ class NyokaServer:
 		global MEMORY_DICT_ARCHITECTURE
 		try:
 			MEMORY_DICT_ARCHITECTURE[projectID]
+			tempMemRe=MEMORY_DICT_ARCHITECTURE[projectID]
+			print (tempMemRe)
+			if tempMemRe['architecture']==[]:
+				archFromPMML=nyokaUtilities.pmmlToJson(filePath)
+				# print ('pass',archFromPMML)
+				MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=archFromPMML
+				tempMemRe=MEMORY_DICT_ARCHITECTURE[projectID]
+			tempMemRe={'architecture':tempMemRe['architecture'],'filePath':tempMemRe['filePath'],'projectID':tempMemRe['projectID']}
 		except:
 			MEMORY_DICT_ARCHITECTURE[projectID]={}
 			try:
@@ -143,9 +151,10 @@ class NyokaServer:
 			#######################################################
 			MEMORY_DICT_ARCHITECTURE[projectID]['filePath']=filePath
 			MEMORY_DICT_ARCHITECTURE[projectID]['projectID']=projectID
+			tempMemRe=MEMORY_DICT_ARCHITECTURE[projectID]
 			# print(MEMORY_DICT_ARCHITECTURE)
 		# print('response sent')
-		return JsonResponse(MEMORY_DICT_ARCHITECTURE[projectID])
+		return JsonResponse(tempMemRe)
 
 	def updatetoArchitecture(payload, projectID):
 
@@ -624,7 +633,7 @@ class NyokaServer:
 		except:
 			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']={}
 		tempMem=MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']
-		print ('tempMem,',tempMem)
+		# print ('tempMem,',tempMem)
 		
 		if processTheInput['itemType']=='FOLDING':
 			tempMem[processTheInput['sectionId']]={'data':None,'hyperparameters':None,'preProcessingScript':None,
@@ -669,11 +678,12 @@ class NyokaServer:
 		
 		MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']=tempMem.copy()
 
-		print ('tempMem',tempMem)
+		# print ('tempMem',tempMem)
 
 		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
-		print ('processTheInput',processTheInput)
+		# print ('processTheInput',processTheInput)
 		# print ('MEMORY_DICT_ARCHITECTURE[projectID]',MEMORY_DICT_ARCHITECTURE[projectID])
+
 		returntoClient={'projectID':projectID,'layerUpdated':processTheInput}
 		return JsonResponse(returntoClient)
 
@@ -782,6 +792,7 @@ class NyokaServer:
 
 	def getGlobalObject():
 		global MEMORY_DICT_ARCHITECTURE
+		# print (MEMORY_DICT_ARCHITECTURE)
 		return JsonResponse(MEMORY_DICT_ARCHITECTURE)
 
 	def getDetailsOfPMML(filepath):
