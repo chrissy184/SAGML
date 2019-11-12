@@ -76,7 +76,7 @@ namespace ZMM.App.ZSServiceClient
                 //
                 try
                 {
-                    HttpResponseMessage response = await httpClient.DeleteAsync("models/" + modelName);
+                    HttpResponseMessage response = await httpClient.DeleteAsync("service/zementis/model/" + modelName);
                     
                     if (response.IsSuccessStatusCode)
                     {
