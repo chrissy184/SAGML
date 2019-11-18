@@ -140,6 +140,8 @@ class NyokaServer:
 			tempMemRe={'architecture':tempMemRe['architecture'],'filePath':tempMemRe['filePath'],'projectID':tempMemRe['projectID']}
 		except:
 			MEMORY_DICT_ARCHITECTURE[projectID]={}
+			# archFromPMML=nyokaUtilities.pmmlToJson(filePath)
+			# MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=archFromPMML
 			try:
 				print ('filePath >>>> ',filePath)
 				archFromPMML=nyokaUtilities.pmmlToJson(filePath)

@@ -430,10 +430,11 @@ class NyokaUtilities:
             from trainModel.mergeTrainingV2 import  NewModelOperations
             NewModelOperations().loadExecutionModel(filePath)
             modelInformation=PMMLMODELSTORAGE[pmmlFileForKey]
-            # print ('PMMLMODELSTORAGE after >>>>>>>>>>> ',PMMLMODELSTORAGE)
+            print ('PMMLMODELSTORAGE after >>>>>>>>>>> ',PMMLMODELSTORAGE)
             # print (modelInformation)
 
             toexp=TrainingViewModels().restructureModelInforForExportDict(modelInformation)
+            print ('toexp'*20)
             print ('toexportDictN >>>>>>>> ',toexp)
             
             import copy,json
@@ -526,6 +527,7 @@ class NyokaUtilities:
                 else:
                     i['layerIndex']=num
                     i['id']=''.join(choice(ascii_uppercase) for i in range(12))
+            print ('l'*200)
             print ('workflowArch',workflowArch)
             return workflowArch
         else:
