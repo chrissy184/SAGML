@@ -75,8 +75,8 @@
           <mat-form-field class="w-100">
             <mat-select [(value)]="selectedLayer.scriptPurpose" [placeholder]="'Script Purpose'"
               (selectionChange)="onPropertyUpdate()">
-              <mat-option [value]="'TRAIN'">TRAIN</mat-option>
-              <mat-option [value]="'SCORE'">SCORE</mat-option>
+              <mat-option [value]="'train'">TRAIN</mat-option>
+              <mat-option [value]="'score'">SCORE</mat-option>
               <mat-option [value]="'trainAndscore'">TRAIN & SCORE</mat-option>
             </mat-select>
           </mat-form-field>
@@ -85,8 +85,8 @@
           <mat-form-field class="w-100">
             <mat-select [(value)]="selectedLayer.taskType" [placeholder]="'Task Type'"
               (selectionChange)="onPropertyUpdate()">
-              <mat-option [value]="'TRAIN'">TRAIN</mat-option>
-              <mat-option [value]="'SCORE'">SCORE</mat-option>
+              <mat-option [value]="'train'">TRAIN</mat-option>
+              <mat-option [value]="'score'">SCORE</mat-option>
               <mat-option [value]="'trainAndscore'">TRAIN & SCORE</mat-option>
             </mat-select>
           </mat-form-field>
