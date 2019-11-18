@@ -152,11 +152,13 @@ class NewModelOperations:
                 tempDict['train'][sc1.for_][sc1.class_]['codeObj']=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
                 tempDict['train'][sc1.for_][sc1.class_]['scriptOutput']=sc1.scriptOutput
                 tempDict['train'][sc1.for_][sc1.class_]['scriptPath']=sc1.filePath
+                # tempDict['train'][sc1.for_][sc1.class_]['scriptPurpose']=sc1.filePath
                 tempDict['score'][sc1.for_][sc1.class_]={}
                 tempDict['score'][sc1.for_][sc1.class_]['codeCont']=self.getCode(sc1.valueOf_)
                 tempDict['score'][sc1.for_][sc1.class_]['codeObj']=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
                 tempDict['score'][sc1.for_][sc1.class_]['scriptOutput']=sc1.scriptOutput
                 tempDict['score'][sc1.for_][sc1.class_]['scriptPath']=sc1.filePath
+                # tempDict['train'][sc1.for_][sc1.class_]['scriptPurpose']=sc1.filePath
             else:
                 tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]={}
                 tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['codeCont']=self.getCode(sc1.valueOf_)
@@ -164,7 +166,7 @@ class NewModelOperations:
                 tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['scriptOutput']=sc1.scriptOutput
                 tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['scriptPath']=sc1.filePath
 
-        print (tempDict)
+        # print (tempDict)
         print ('print  step LM 4')
 
         taskTypesName=list(tempDict.keys())
@@ -233,7 +235,7 @@ class NewModelOperations:
                         tempDict[taskT][mO]['modelObj']['hyperparameters']=None
                 elif tempDict[taskT][mO]['modelObj']['modelArchType']=="SKLModel":
                     modelProp=tempDict[taskT][mO]['modelObj']['pmmlNyokaObj']
-                    print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp)
+                    # print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp)
                     from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
                     recoModelObj=generate_skl_model(modelProp)
                     if recoModelObj != None:
@@ -250,10 +252,10 @@ class NewModelOperations:
         
         PMMLMODELSTORAGE[pmmlFileForKey]=tempDict
 
-        print('*'*100)
+        # print('*'*100)
 
-        print(PMMLMODELSTORAGE)
-        print('*'*100)
+        # print(PMMLMODELSTORAGE)
+        # print('*'*100)
         if 0 in modelLoadStatus:
             messageToWorld= "Model load failed, please connect with admin"
         else:
@@ -824,13 +826,13 @@ class TrainingViewModels:
                                 'postProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[],'scriptPath':[]},
                                 'taskType': None,'modelPath':None}
         for modObjeCom in tempDict:
-            print ('>>>>>>>>modObj >>>>>> ',modObjeCom)
+            # print ('>>>>>>>>modObj >>>>>> ',modObjeCom)
             if modObjeCom == 'train':
                 for echMod in toExportDict:
                     if echMod in tempDict[modObjeCom]:
                         print ('>>>>>',echMod)
                         print ('8'*100)
-                        # print ('tempDict.keys()',tempDict.keys())
+                        print ('tempDict.keys()',tempDict.keys())
                         # print (tempDict[modObjeCom][echMod]['scriptPath'])
                         if tempDict[modObjeCom][echMod]['modelObj']['modelArchType']=='NNModel':
                         #                     print (tempDict[modObjeCom][echMod]['modelObj'])
@@ -844,7 +846,7 @@ class TrainingViewModels:
                             toExportDict[echMod]['preProcessingScript']['scriptpurpose'].append(modObjeCom)
                             toExportDict[echMod]['preProcessingScript']['scriptOutput'].append(tempDict[modObjeCom][echMod]['preprocessing']['scriptOutput'])
                             toExportDict[echMod]['preProcessingScript']['scriptPath'].append(tempDict[modObjeCom][echMod]['preprocessing']['scriptPath'])
-                        if 'postprocessing_code' in tempDict[modObjeCom][echMod]:
+                        if 'postprocessing' in tempDict[modObjeCom][echMod]:
                             toExportDict[echMod]['postProcessingScript']['scripts'].append(tempDict[modObjeCom][echMod]['postprocessing']['codeCont'])
                             toExportDict[echMod]['postProcessingScript']['scriptpurpose'].append(modObjeCom)
                             toExportDict[echMod]['postProcessingScript']['scriptOutput'].append(tempDict[modObjeCom][echMod]['postprocessing']['scriptOutput'])
@@ -891,48 +893,68 @@ class TrainingViewModels:
                 toExportDict[modNa]['taskType']='trainAndscore'
                 # print (tempDict['train'][modNa].keys())
                 # print (tempDict['score'][modNa]['preprocessing_code'][0])
+                # print ("tempDict['train'][modNa]",tempDict['train'][modNa],tempDict['score'][modNa])
+                print ('p'*100)
                 if ('scriptOutput' in tempDict['train'][modNa]) & ('scriptOutput' in tempDict['score'][modNa]):
-                    if (tempDict['train'][modNa]['scriptOutput']=='DATA') & (tempDict['score'][modNa]['scriptOutput'] == 'DATA'):
+                    if (tempDict['train'][modNa]['scriptOutput']==tempDict['score'][modNa]['scriptOutput']):
                         print ('Came here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',toExportDict[modNa])
                         if  toExportDict[modNa]['preProcessingScript']['scripts'] != None:
-                            toExportDict[modNa]['preProcessingScript']['scriptOutput']=['DATA']
+                            toExportDict[modNa]['preProcessingScript']['scriptOutput']=tempDict['train'][modNa]['scriptOutput']
                             toExportDict[modNa]['preProcessingScript']['scriptpurpose']=['trainAndscore']
                             # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
-                            toExportDict[modNa]['preProcessingScript']['scripts']=[tempDict['score'][modNa]['preprocessing_code']]
+                            toExportDict[modNa]['preProcessingScript']['scripts']=[tempDict['score'][modNa]['preprocessing']['codeCont']]
                             toExportDict[modNa]['preProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
                         elif toExportDict[modNa]['postProcessingScript']['scripts'] != None:
-                            toExportDict[modNa]['postProcessingScript']['scriptOutput']=['DATA']
+                            toExportDict[modNa]['postProcessingScript']['scriptOutput']=tempDict['train'][modNa]['scriptOutput']
                             toExportDict[modNa]['postProcessingScript']['scriptpurpose']=['trainAndscore']
                             # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
-                            toExportDict[modNa]['postProcessingScript']['scripts']=[tempDict['score'][modNa]['postprocessing_code']]
+                            toExportDict[modNa]['postProcessingScript']['scripts']=[tempDict['score'][modNa]['postprocessing']['codeCont']]
                             toExportDict[modNa]['postProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
-                    elif  (tempDict['train'][modNa]['scriptOutput']=='NONE') & (tempDict['score'][modNa]['scriptOutput'] == 'NONE'):
-                        print ('Came here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',toExportDict[modNa])
-                        if  toExportDict[modNa]['preProcessingScript']['scripts'] != None:
-                            toExportDict[modNa]['preProcessingScript']['scriptOutput']=['NONE']
-                            toExportDict[modNa]['preProcessingScript']['scriptpurpose']=['trainAndscore']
-                            # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
-                            toExportDict[modNa]['preProcessingScript']['scripts']=[tempDict['score'][modNa]['preprocessing_code']]
-                            toExportDict[modNa]['preProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
-                        elif toExportDict[modNa]['postProcessingScript']['scripts'] != None:
-                            toExportDict[modNa]['postProcessingScript']['scriptOutput']=['NONE']
-                            toExportDict[modNa]['postProcessingScript']['scriptpurpose']=['trainAndscore']
-                            # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
-                            toExportDict[modNa]['postProcessingScript']['scripts']=[tempDict['score'][modNa]['postprocessing_code']]
-                            toExportDict[modNa]['postProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
+                    # elif  (tempDict['train'][modNa]['scriptOutput']=='NONE') & (tempDict['score'][modNa]['scriptOutput'] == 'NONE'):
+                    #     print ('Came here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',toExportDict[modNa])
+                    #     if  toExportDict[modNa]['preProcessingScript']['scripts'] != None:
+                    #         toExportDict[modNa]['preProcessingScript']['scriptOutput']=['NONE']
+                    #         toExportDict[modNa]['preProcessingScript']['scriptpurpose']=['trainAndscore']
+                    #         # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
+                    #         toExportDict[modNa]['preProcessingScript']['scripts']=[tempDict['score'][modNa]['preprocessing']['codeCont']]
+                    #         toExportDict[modNa]['preProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
+                    #     elif toExportDict[modNa]['postProcessingScript']['scripts'] != None:
+                    #         toExportDict[modNa]['postProcessingScript']['scriptOutput']=['NONE']
+                    #         toExportDict[modNa]['postProcessingScript']['scriptpurpose']=['trainAndscore']
+                    #         # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
+                    #         toExportDict[modNa]['postProcessingScript']['scripts']=[tempDict['score'][modNa]['postprocessing']['codeCont']]
+                    #         toExportDict[modNa]['postProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
             # print ("toExportDict[modNa]['preProcessingScript']['script']",toExportDict[modNa]['preProcessingScript']['script'])
             if ((modNa in tempDict['train'] )== False) & (modNa in tempDict['score']):
                 toExportDict[modNa]['taskType']=['score']
 
-        tempTa2=list(toExportDict.keys())
+        toExportDict2=toExportDict.copy()
+        for modT in toExportDict:
+            print (modT, '>>>>>>>>>>>>>>>>>>>>>>>>>.')
+            if 'preProcessingScript' in toExportDict2[modT]:
+                if len(set(toExportDict2[modT]['preProcessingScript']['scriptPath']))==1:
+                    print ('came here agaa')
+                    toExportDict2[modT]['preProcessingScript']['scriptpurpose']=['trainAndscore']
+                    toExportDict2[modT]['preProcessingScript']['scriptPath']=[toExportDict[modT]['preProcessingScript']['scriptPath'][0]]
+                    toExportDict2[modT]['preProcessingScript']['scripts']=[toExportDict[modT]['preProcessingScript']['scripts'][0]]
+                    toExportDict2[modT]['preProcessingScript']['scriptOutput']=[toExportDict[modT]['preProcessingScript']['scriptOutput'][0]]
+            if 'postProcessingScript' in toExportDict2[modT]:
+                if len(set(toExportDict2[modT]['postProcessingScript']['scriptPath']))==1:
+                    toExportDict2[modT]['postProcessingScript']['scriptpurpose']=['trainAndscore']
+                    toExportDict2[modT]['postProcessingScript']['scriptPath']=[toExportDict[modT]['postProcessingScript']['scriptPath'][0]]
+                    toExportDict2[modT]['postProcessingScript']['scripts']=[toExportDict[modT]['postProcessingScript']['scripts'][0]]
+                    toExportDict2[modT]['postProcessingScript']['scriptOutput']=[toExportDict[modT]['postProcessingScript']['scriptOutput'][0]]
+
+
+        tempTa2=list(toExportDict2.keys())
         tempTa2.sort()
         toExportReOrdered={}
         for taTTemp2 in tempTa2:
-            toExportReOrdered[taTTemp2]=toExportDict[taTTemp2]
+            toExportReOrdered[taTTemp2]=toExportDict2[taTTemp2]
 
-        toExportDict=toExportReOrdered.copy()
+        toExportDict2=toExportReOrdered.copy()
 
-        return toExportDict
+        return toExportDict2
     
     def trainModel(self,idforData,pmmlFile,tensorboardLogFolder,hyperParaUser):
         global PMMLMODELSTORAGE

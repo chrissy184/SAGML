@@ -414,7 +414,7 @@ class NyokaUtilities:
         pmmlObj=ny.parse(filePath,silence=True)
         pmmlDictObj=pmmlObj.__dict__
 
-        print ('0'*100,pmmlObj.get_type())
+        # print ('0'*100,pmmlObj.get_type())
 
         if pmmlObj.get_type()=='multi':
             print ('came to Workflow')
@@ -527,8 +527,8 @@ class NyokaUtilities:
                 else:
                     i['layerIndex']=num
                     i['id']=''.join(choice(ascii_uppercase) for i in range(12))
-            print ('l'*200)
-            print ('workflowArch',workflowArch)
+            # print ('l'*200)
+            # print ('workflowArch',workflowArch)
             return workflowArch
         else:
             overAll=[]
