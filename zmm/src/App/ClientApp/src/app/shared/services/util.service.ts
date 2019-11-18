@@ -93,11 +93,11 @@ export class UtilService {
     const headers = allTextLines[0].split(',');
     const lines = [];
     for (let i = 1; i < allTextLines.length; i++) {
-    const data = allTextLines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+      const data = allTextLines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
       if (data.length === headers.length) {
         const tarr = {};
         for (let j = 0; j < headers.length; j++) {
-          tarr[headers[j]] = data[j].replace(/["]/g , '');
+          tarr[headers[j]] = data[j].replace(/["]/g, '');
         }
         lines.push(tarr);
       }
@@ -107,6 +107,18 @@ export class UtilService {
 
   checkInternetConnection(): Observable<boolean | {}> {
     return merge(of(navigator.onLine), fromEvent(window, 'online').pipe(mapTo(true)), fromEvent(window, 'offline').pipe(mapTo(false)));
+  }
+
+  getSettingsObject(type: string) {
+    const settingsJSON: any = JSON.parse(localStorage.getItem('settingsJSON'));
+    if (settingsJSON) {
+      const selectedArray = settingsJSON.settings.filter(function (element) {
+        return (element.type === type && element.selected === true);
+      });
+      return selectedArray[0];
+    } else {
+      return undefined;
+    }
   }
 
 }

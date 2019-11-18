@@ -53,12 +53,21 @@ export class ApplicationComponent implements OnInit {
       "selected": false
     },
     {
-      "name": "Nyoka Remote",
+      "name": "Nyoka Remote 1",
       "type": "NR",
       "tenantID": "dlexp",
       "username": "",
       "password": "",
       "url": "https://dlexp.zmod.org/",
+      "selected": false
+    },
+    {
+      "name": "Nyoka Remote 2",
+      "type": "NR",
+      "tenantID": "hub",
+      "username": "",
+      "password": "",
+      "url": "https://hub.zmod.org/",
       "selected": true
     }
   ]
