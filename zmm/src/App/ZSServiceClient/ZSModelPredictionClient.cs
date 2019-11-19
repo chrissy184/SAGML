@@ -249,7 +249,7 @@ namespace ZMM.App.ZSServiceClient
                         }
                         memory.Position = 0;
                         content.Add(new StreamContent(memory), "file", filePath);
-                        HttpResponseMessage response = await httpClient.PostAsync($"apply/{modelName}",content);
+                        HttpResponseMessage response = await httpClient.PostAsync($"service/zementis/apply/{modelName}",content);
                         if (response.IsSuccessStatusCode)
                         {
                             jsonResult = await response.Content.ReadAsStringAsync();                        
