@@ -1,6 +1,6 @@
 {
   "name": "zmm",
-  "version": "1.49.8",
+  "version": "1.50.19",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
