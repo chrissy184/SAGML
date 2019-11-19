@@ -469,7 +469,7 @@ class NyokaUtilities:
 
             workflowArch=[]
             for modTemp in list(toexp.keys()):
-                temSecCop=tempSec.copy()
+                temSecCop=copy.deepcopy(tempSec)#.copy()
                 temSecCop['sectionId']=modTemp
                 temSecCop["layerId"]=modTemp
                 if toexp[modTemp]['data'] != None:
