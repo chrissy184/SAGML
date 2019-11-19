@@ -490,6 +490,10 @@ class AnomalyTrainer:
         elif algorithmToUse == 'OneClassSVM':
             from sklearn import svm
             modelT=svm.OneClassSVM()
+        elif algorithmToUse == 'LinearSVR':
+            print ('Came to SVR')
+            from sklearn import svm
+            modelT=svm.LinearSVR()
         # else:
         #     data_details=upDateStatus()
         #     data_details['status']='Training Failed'
@@ -501,8 +505,10 @@ class AnomalyTrainer:
         #     return
 
         try:
+            print ('training started')
             pipeline = Pipeline([('feature_mapper', mapper1),('model',modelT)])
             pipelObj=pipeline.fit(data)
+            print ('training completed')
        
         except Exception as e:
             data_details=upDateStatus()
