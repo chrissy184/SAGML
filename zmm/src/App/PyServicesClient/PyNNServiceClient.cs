@@ -192,15 +192,15 @@ namespace ZMM.App.PyServicesClient
                 httpClient.BaseAddress = new System.Uri(Configuration["PyServiceLocation:srvurl"]);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));               
-                // HttpContent _httpContent = new StringContent(requestBody);
-                HttpContent _httpContent = new StringContent("");
+                HttpContent _httpContent = new StringContent(requestBody);
+                // HttpContent _httpContent = new StringContent("");
                 string _contentType = "application/json";
                  _httpContent.Headers.ContentType = new MediaTypeHeaderValue(_contentType);                
                 //
                 try
                 {
-                    // HttpResponseMessage response = await httpClient.PostAsync($"newtrainmodels/{requestBody}", _httpContent);
-                    HttpResponseMessage response = await httpClient.GetAsync($"trainNNModel/{requestBody}");
+                    HttpResponseMessage response = await httpClient.PostAsync($"trainNNModel/{requestBody}", _httpContent);
+                    // HttpResponseMessage response = await httpClient.GetAsync($"trainNNModel/{requestBody}");
                     if (response.IsSuccessStatusCode)
                     {
                         jsonResult = await response.Content.ReadAsStringAsync();
