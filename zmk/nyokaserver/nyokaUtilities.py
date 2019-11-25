@@ -568,6 +568,7 @@ class NyokaUtilities:
             listOFLayersName=[j['name'] for j in MEMORY_OF_LAYERS['layerinfo'][0]['layers']]
             architecture=[]
             for tempLay in overAll:
+                import copy
                 tempSpace=copy.deepcopy(allLayers[listOFLayersName.index(tempLay['netParam']['layerType'])])
                 
                 layerPARA=tempLay['layerParam']
@@ -595,6 +596,8 @@ class NyokaUtilities:
             tempSection={'children': [],'class': 'wide','icon': 'mdi mdi-group','id': '',
             'itemType': 'FOLDING','layerId': 'Section','layerIndex': '','name': 'Section',
             'sectionId': '',"sectionCollapse":True}
+
+            import copy
 
             newarchitecture=[]
             tempSectionA=copy.deepcopy(tempSection)
@@ -660,6 +663,8 @@ class NyokaUtilities:
                         j['id']=''.join(choice(ascii_uppercase) for i in range(12))
                 else:
                     i['layerIndex']=num
+                    from random import choice
+                    from string import ascii_uppercase
                     i['id']=''.join(choice(ascii_uppercase) for i in range(12))
             
             return newarchitecture

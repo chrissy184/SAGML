@@ -53,7 +53,7 @@ class NewModelOperations:
     def getTargetAndColumnsName(self,modObjToDetect):
         targetCol=None
         listOFColumns=[]
-        if modObjToDetect.__dict__['original_tagname_'] in ['MiningModel','DeepNetwork','RegressionModel']:
+        if modObjToDetect.__dict__['original_tagname_'] in ['MiningModel','DeepNetwork','RegressionModel','AnomalyDetectionModel']:
             for minF in modObjToDetect.get_MiningSchema().__dict__['MiningField']:
                 if minF.__dict__['usageType'] == 'target':
                     targetCol=minF.__dict__['name']
@@ -235,7 +235,7 @@ class NewModelOperations:
                         tempDict[taskT][mO]['modelObj']['hyperparameters']=None
                 elif tempDict[taskT][mO]['modelObj']['modelArchType']=="SKLModel":
                     modelProp=tempDict[taskT][mO]['modelObj']['pmmlNyokaObj']
-                    # print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp)
+                    print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp)
                     from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
                     recoModelObj=generate_skl_model(modelProp)
                     if recoModelObj != None:
