@@ -200,7 +200,7 @@ namespace ZMM.App.PyServicesClient
                 try
                 {
                     // HttpResponseMessage response = await httpClient.PostAsync($"newtrainmodels/{requestBody}", _httpContent);
-                    HttpResponseMessage response = await httpClient.GetAsync($"newtrainmodels/{requestBody}");
+                    HttpResponseMessage response = await httpClient.GetAsync($"trainNNModel/{requestBody}");
                     if (response.IsSuccessStatusCode)
                     {
                         jsonResult = await response.Content.ReadAsStringAsync();
