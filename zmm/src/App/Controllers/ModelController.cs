@@ -806,6 +806,7 @@ namespace ZMM.App.Controllers
                 response = await nnclient.TrainModel(id);
                 //
                 var objresp = JsonConvert.DeserializeObject<TrainingResponse>(response);
+                objresp.executedAt = DateTime.Now;
                 List<TrainingResponse> tresp = new List<TrainingResponse>();
                 tresp.Add(objresp);
                 //
@@ -856,7 +857,7 @@ namespace ZMM.App.Controllers
                             StartDate = cronjson["startDate"].ToString(),
                             StartTimeH = (cronjson["startTimeH"].ToString() == null) ? "" : cronjson["startTimeH"].ToString(),
                             StartTimeM = (cronjson["startTimeM"].ToString() == null) ? "" : cronjson["startTimeM"].ToString(),
-                            ZMKResponse = tresp.ToList<object>(),
+                            History = tresp.ToList<object>(),
                             Status = "Scheduled"
                         };
                         SchedulerPayload.Create(schJob);
@@ -881,8 +882,8 @@ namespace ZMM.App.Controllers
                         StartDate = "",
                         StartTimeH = "",
                         StartTimeM = "",
-                        ZMKResponse = tresp.ToList<object>(),
-                        Status = ""
+                        History = tresp.ToList<object>(),
+                        Status = objresp.status
                     };
                     SchedulerPayload.Create(schJob);
                 }
