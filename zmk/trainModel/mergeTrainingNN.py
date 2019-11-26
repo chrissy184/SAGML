@@ -332,70 +332,71 @@ class NeuralNetworkModelTrainer:
 		return train_prc.ident
 
 
-	def trainImageClassifierNN(self,pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,\
-		batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate,datHyperPara,testSize,scriptObj):
-		print ('Classification data folder at',dataFolder,fileName)
-		try:
-			self.trainFolder=dataFolder+'/'+'train/'
-			self.validationFolder=dataFolder+'/'+'validation/'
-			kerasUtilities.checkCreatePath(self.trainFolder)
-			kerasUtilities.checkCreatePath(self.validationFolder)
-		except Exception as e:
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed','Unable to find train and validation folder >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+	# def trainImageClassifierNN(self,pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,\
+	# 	batchSize,epoch,idforData,problemType,scriptOutput,optimizerName,learningRate,datHyperPara,testSize,scriptObj):
+	# 	print ('Classification data folder at',dataFolder,fileName)
+	# 	try:
+	# 		self.trainFolder=dataFolder+'/'+'train/'
+	# 		self.validationFolder=dataFolder+'/'+'validation/'
+	# 		kerasUtilities.checkCreatePath(self.trainFolder)
+	# 		kerasUtilities.checkCreatePath(self.validationFolder)
+	# 	except Exception as e:
+	# 		data_details=self.upDateStatus()
+	# 		self.updateStatusWithError(data_details,'Training Failed','Unable to find train and validation folder >> '+ str(e),traceback.format_exc(),self.statusFile)
+	# 		return -1
 
-		modelObj = self.generateAndCompileModel(lossType,optimizerName,learningRate,listOfMetrics)
-		if modelObj.__class__.__name__ == 'dict':
-			return
-		model = modelObj.model
+	# 	modelObj = self.generateAndCompileModel(lossType,optimizerName,learningRate,listOfMetrics)
+	# 	if modelObj.__class__.__name__ == 'dict':
+	# 		return
+	# 	model = modelObj.model
 
-		try:
-			img_height, img_width=modelObj.image_input.shape.as_list()[1:3]
-		except Exception as e:
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed','Model input_shape is invalid >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+	# 	try:
+	# 		img_height, img_width=modelObj.image_input.shape.as_list()[1:3]
+	# 	except Exception as e:
+	# 		data_details=self.upDateStatus()
+	# 		self.updateStatusWithError(data_details,'Training Failed','Model input_shape is invalid >> '+ str(e),traceback.format_exc(),self.statusFile)
+	# 		return -1
 
-		try:
-			tGen,vGen,nClass=self.kerasDataPrep(dataFolder,batchSize,img_height,img_width)
-			stepsPerEpochT=tGen.n/tGen.batch_size
-			stepsPerEpochV=vGen.n/vGen.batch_size
-		except Exception as e:
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed','Error while generating data for Keras >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+	# 	try:
+	# 		tGen,vGen,nClass=self.kerasDataPrep(dataFolder,batchSize,img_height,img_width)
+	# 		stepsPerEpochT=tGen.n/tGen.batch_size
+	# 		stepsPerEpochV=vGen.n/vGen.batch_size
+	# 	except Exception as e:
+	# 		data_details=self.upDateStatus()
+	# 		self.updateStatusWithError(data_details,'Training Failed','Error while generating data for Keras >> '+ str(e),traceback.format_exc(),self.statusFile)
+	# 		return -1
 
-		tensor_board = self.startTensorBoard(tensorboardLogFolder)
+	# 	tensor_board = self.startTensorBoard(tensorboardLogFolder)
 
-		kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
-		try:
-			import tensorflow as tf
-			print ('started Trianing')
-			with tf.device(gpuCPUSelect(selDev)):
-				model.fit_generator(tGen,steps_per_epoch=stepsPerEpochT,validation_steps=stepsPerEpochV,epochs=epoch,validation_data=vGen,callbacks=[tensor_board])
-		except Exception as e:
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Training Failed','There is a problem with training parameters >> '+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+	# 	kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+	# 	try:
+	# 		import tensorflow as tf
+	# 		print ('started Trianing')
+	# 		with tf.device(gpuCPUSelect(selDev)):
+	# 			model.fit_generator(tGen,steps_per_epoch=stepsPerEpochT,validation_steps=stepsPerEpochV,epochs=epoch,validation_data=vGen,callbacks=[tensor_board])
+	# 	except Exception as e:
+	# 		data_details=self.upDateStatus()
+	# 		self.updateStatusWithError(data_details,'Training Failed','There is a problem with training parameters >> '+ str(e),traceback.format_exc(),self.statusFile)
+	# 		return -1
 		
-		kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
+	# 	kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
 
-		predictedClass=list(tGen.class_indices.keys())
-		try:
-			toExportDict={
-            'model1':{'data':dataFolder,'hyperparameters':datHyperPara,'preProcessingScript':None,
-			'pipelineObj':None,'modelObj':model,'featuresUsed':None,'targetName':None,'postProcessingScript':None,
-			'taskType': 'trainAndscore','predictedClasses':predictedClass,'dataSet':'image'}
-                        }
-			from nyokaBase.skl.skl_to_pmml import model_to_pmml
-			model_to_pmml(toExportDict, PMMLFileName=fileName)
-			kerasUtilities.updateStatusOfTraining(self.statusFile,'PMML file Successfully Saved')
-			return 'Success'
-		except Exception as e:
-			data_details=self.upDateStatus()
-			self.updateStatusWithError(data_details,'Saving File Failed',' '+ str(e),traceback.format_exc(),self.statusFile)
-			return -1
+	# 	predictedClass=list(tGen.class_indices.keys())
+	# 	print (predictedClass,dataFolder)
+	# 	try:
+	# 		toExportDict={
+    #         'model1':{'data':dataFolder,'hyperparameters':datHyperPara,'preProcessingScript':None,
+	# 		'pipelineObj':None,'modelObj':model,'featuresUsed':None,'targetName':None,'postProcessingScript':None,
+	# 		'taskType': 'trainAndscore','predictedClasses':predictedClass,'dataSet':'image'}
+    #                     }
+	# 		from nyokaBase.skl.skl_to_pmml import model_to_pmml
+	# 		model_to_pmml(toExportDict, PMMLFileName=fileName)
+	# 		kerasUtilities.updateStatusOfTraining(self.statusFile,'PMML file Successfully Saved')
+	# 		return 'Success'
+	# 	except Exception as e:
+	# 		data_details=self.upDateStatus()
+	# 		self.updateStatusWithError(data_details,'Saving File Failed',' '+ str(e),traceback.format_exc(),self.statusFile)
+	# 		return -1
 
 
 

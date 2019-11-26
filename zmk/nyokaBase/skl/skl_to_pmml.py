@@ -77,6 +77,8 @@ def model_to_pmml(toExportDict, PMMLFileName='from_sklearn.pmml',tyP=None):
             print ('Came to keras')
 
             KModelObj=toExportDict[model_name]
+
+            print (KModelObj)
             try:
                 predictedClassesObj=KModelObj['predictedClasses']
             except:

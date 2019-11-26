@@ -723,6 +723,8 @@ class TrainingViewModels:
 
         predictedClass=list(tGen.class_indices.keys())
         modelObj['modelObj']['recoModelObj'].model=modelV1
+        modelObj['modelObj']['predictedClasses']=predictedClass
+        print (modelObj)
         return modelObj
 
     def getSKLMOdelObjtoFit(self,modelV1):
@@ -835,7 +837,7 @@ class TrainingViewModels:
                                 'preProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[],'scriptPath':[]},
                                 'modelObj':None,'pipelineObj':None,'featuresUsed':None,'targetName':None,
                                 'postProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[],'scriptPath':[]},
-                                'taskType': None,'modelPath':None}
+                                'taskType': None,'modelPath':None,'predictedClasses':None}
         for modObjeCom in tempDict:
             # print ('>>>>>>>>modObj >>>>>> ',modObjeCom)
             if modObjeCom == 'train':
@@ -866,6 +868,7 @@ class TrainingViewModels:
                         toExportDict[echMod]['featuresUsed']=tempDict[modObjeCom][echMod]['modelObj']['listOFColumns']
                         toExportDict[echMod]['targetName']=tempDict[modObjeCom][echMod]['modelObj']['targetCol']
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
+                        toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
 
                         if 'Data' in tempDict[modObjeCom][echMod]:
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
@@ -896,6 +899,7 @@ class TrainingViewModels:
                         toExportDict[echMod]['targetName']=tempDict[modObjeCom][echMod]['modelObj']['targetCol']
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
                         toExportDict[echMod]['modelPath']=tempDict[modObjeCom][echMod]['modelObj']['modelPath']
+                        toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
                         if 'Data' in tempDict[modObjeCom][echMod]:
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
     
@@ -1002,9 +1006,9 @@ class TrainingViewModels:
             print('Came in model 1')
             modeScope=modelInformation['train'][modelObjsTrain[0]]
             if hyperParaUser['epoch'] != None:
-                print ('Print to update hyperparp',hyperParaUser['epoch'])
+                # print ('Print to update hyperparp',hyperParaUser['epoch'])
                 modeScope['modelObj']['hyperparameters']=hyperParaUser
-            print ('modeScope>>>>>>>>>>> ',modeScope['modelObj']['hyperparameters'])
+            print ('modeScope>>>>>>>>>>> ',modeScope)
             kerasUtilities.updateStatusofProcess(self.statusFile,'Training Model Loaded')
 
             modeScope=self.trainModelObjectDict(modeScope,idforData,tensorboardLogFolder)
