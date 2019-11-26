@@ -23,6 +23,7 @@ import requests, json,sys,subprocess, typing
 from nyokaserver import nyokaUtilities,nyokaPMMLUtilities
 # from nyokaBase import PMML43Ext as pml
 from scoring.scoringClass import Scoring
+from trainModel.mergeTrainingV2 import NewModelOperations
 
 
 
@@ -50,7 +51,8 @@ class ModelsView(APIView):
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
 		print('filpath >>>>>>>>>>>>>>>> ',filePath)
-		return Scoring().loadModelfile(filePath,idfordata)
+		return NewModelOperations().loadExecutionModel(filePath)
+		# return Scoring().loadModelfile(filePath,idfordata)
 
 
 class ModelOperationView(APIView):

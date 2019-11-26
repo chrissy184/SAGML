@@ -64,6 +64,13 @@ def removeExtraNewLinesFromWeights(pmmlObj):
 
 
 def writePmml(pmmlObj, filepath, lockForPMML):
+	_deepNetworkObj=pmmlObj.DeepNetwork[0]
+	_deepNetworkObj.modelName ='model1'
+	_deepNetworkObj.taskType="trainAndscore"
+
+	pmmlObj.DeepNetwork[0]=_deepNetworkObj
+
+	print ('came to write')
 	try:
 		lockForPMML.acquire()
 		pmmlObj=removeExtraNewLinesFromWeights(pmmlObj)
@@ -131,7 +138,7 @@ class NyokaServer:
 		try:
 			MEMORY_DICT_ARCHITECTURE[projectID]
 			tempMemRe=MEMORY_DICT_ARCHITECTURE[projectID]
-			print (tempMemRe)
+			# print (tempMemRe)
 			if tempMemRe['architecture']==[]:
 				archFromPMML=nyokaUtilities.pmmlToJson(filePath)
 				# print ('pass',archFromPMML)
@@ -298,6 +305,8 @@ class NyokaServer:
 				_NetworkLayersObject=reorderIdsOfPmml(_NetworkLayersObject)
 				_deepNetworkObj.NetworkLayer=_NetworkLayersObject
 				_deepNetworkObj.numberOfLayers=len(_NetworkLayersObject)
+				_deepNetworkObj.modelName ='model1'
+				_deepNetworkObj.taskType="trainAndscore"
 				pmmlObject.DeepNetwork[0]=_deepNetworkObj
 
 			
@@ -308,7 +317,7 @@ class NyokaServer:
 				# if processedOutput['for']:
 				# 	dataTagValues=pml.Data(filePath=dataVal,for_=processedOutput['for'])
 				# else:
-					dataTagValues=pml.Data(filePath=dataUrl,for_='model_1')
+					dataTagValues=pml.Data(filePath=dataUrl,for_='model1')
 					pmmlObject.Data=[dataTagValues]
 					# print ('Data Step 3')
 					# pmmlObject.export(sys.stdout,0)

@@ -177,7 +177,8 @@ class TrainNNView(APIView):
 
 	def post(self,requests):
 		try:
-			requests.POST.get('filePath')
+			requests.body
+			# print (requests.POST.get('filePath'))
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
 		return Training.trainNeuralNetworkModels(requests)

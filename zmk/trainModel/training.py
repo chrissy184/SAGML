@@ -61,25 +61,33 @@ class Training:
 	# @api_view()
 
 	def trainNeuralNetworkModels(requests):
+		
 
-		def getValueFromReq(keyVal,requests):
+		def getValueFromReq(keyVal,bodyVal):
+			# print ('requests',requests.body)
 			try:
-				return requests.POST.get(keyVal)
+				# print (requests.POST.get(keyVal))
+				return bodyVal[keyVal]
 			except:
 				return ''
-		pmmlFile=requests.POST.get('filePath')
+		# pmmlFile=requests.POST.get('filePath')
 
-		tensorboardUrl=getValueFromReq('tensorboardUrl',requests)
-		tensorboardLogFolder=getValueFromReq('tensorboardLogFolder',requests)
+		bodyVal=json.loads(requests.body)
+
+		# print ('came heer 2nd',bodyVal)
+
+		pmmlFile=getValueFromReq('filePath',bodyVal)
+		tensorboardUrl=getValueFromReq('tensorboardUrl',bodyVal)
+		tensorboardLogFolder=getValueFromReq('tensorboardLogFolder',bodyVal)
 		hyperParaUser={}
-		hyperParaUser['batchSize']=getValueFromReq('batchSize',requests)
-		hyperParaUser['optimizerName']=getValueFromReq('optimizerName',requests)
-		hyperParaUser['lossType']=getValueFromReq('lossType',requests)
-		hyperParaUser['listOfMetrics']=getValueFromReq('listOfMetrics',requests)
-		hyperParaUser['epoch']=getValueFromReq('epoch',requests)
-		hyperParaUser['problemType']=getValueFromReq('problemType',requests)
-		hyperParaUser['testSize']=getValueFromReq('testSize',requests)
-		hyperParaUser['learningRate']=getValueFromReq('learningRate',requests)
+		hyperParaUser['batchSize']=getValueFromReq('batchSize',bodyVal)
+		hyperParaUser['optimizer']=getValueFromReq('optimizer',bodyVal)
+		hyperParaUser['loss']=getValueFromReq('loss',bodyVal)
+		hyperParaUser['metrics']=getValueFromReq('metrics',bodyVal)
+		hyperParaUser['epoch']=getValueFromReq('epoch',bodyVal)
+		hyperParaUser['problemType']=getValueFromReq('problemType',bodyVal)
+		hyperParaUser['testSize']=getValueFromReq('testSize',bodyVal)
+		hyperParaUser['learningRate']=getValueFromReq('learningRate',bodyVal)
 		# hyperParaUser['']=getValueFromReq('',requests)
 		# hyperParaUser['']=getValueFromReq('',requests)
 		# print ('>>>>>>>>PPPPPPPPPPPPPPPP   ',pmmlFile,tensorboardUrl,tensorboardLogFolder,hyperParaUser)

@@ -54,17 +54,18 @@ class NewModelOperations:
         targetCol=None
         listOFColumns=[]
         if modObjToDetect.__dict__['original_tagname_'] in ['MiningModel','DeepNetwork','RegressionModel','AnomalyDetectionModel']:
-            for minF in modObjToDetect.get_MiningSchema().__dict__['MiningField']:
-                if minF.__dict__['usageType'] == 'target':
-                    targetCol=minF.__dict__['name']
-                else:
-                    listOFColumns.append(minF.__dict__['name'])
+            try:
+                for minF in modObjToDetect.get_MiningSchema().__dict__['MiningField']:
+                    if minF.__dict__['usageType'] == 'target':
+                        targetCol=minF.__dict__['name']
+                    else:
+                        listOFColumns.append(minF.__dict__['name'])
+            except:
+                pass
             try:
                 modelPath=modObjToDetect.get_filePath()
             except:
                 modelPath=None
-
-            
         else:
             print ('>>>>>>>>>>>>>>>>>>>>>>>>','Add support')
             targetCol=None
@@ -85,17 +86,20 @@ class NewModelOperations:
 
     def loadExecutionModel(self,pmmlFile):
         print ('loadmodel started')
+        print (pmmlFile)
         global PMMLMODELSTORAGE
         pmmlFileObj=pathlib.Path(pmmlFile)
         pmmlFileForKey=pmmlFileObj.name.replace(pmmlFileObj.suffix,'')
         from nyokaBase import PMML43Ext as ny
         pmmlObj=ny.parse(pmmlFile,silence=True)
-
+        print (pmmlObj)
+        print ('load model step 1.0')
         modelObj=[]
         for inMod in modelObjectToCheck:
             if len(pmmlObj.__dict__[inMod]) >0:
                 modPMMLObj=pmmlObj.__dict__[inMod]
                 if inMod == 'DeepNetwork':
+                    print ('load model step 1.0.0')
                     for ininMod in modPMMLObj:
                         colInfo=self.getTargetAndColumnsName(ininMod)
                         modelObj.append({'modelArchType':'NNModel','pmmlModelObject':ininMod,'recoModelObj':None,'listOFColumns':None,'targetCol':colInfo[1],'modelPath':colInfo[2]})
@@ -105,7 +109,7 @@ class NewModelOperations:
         #                 recoModelObj=generateModelfromPMML(ininMod)
                         modelObj.append({'modelArchType':'SKLModel','pmmlModelObject':ininMod,'recoModelObj':None,'listOFColumns':colInfo[0],'targetCol':colInfo[1],'modelPath':colInfo[2]})
         
-        # print ('modelObj',modelObj)
+        print ('load model step 1.1')
         tempDict={}
         tempDict['train']={}
 
@@ -172,10 +176,14 @@ class NewModelOperations:
         taskTypesName=list(tempDict.keys())
         listOfModelNames=set([k for j in tempDict for k in tempDict[j]])
 
-        hyperParDict={}
-        for extObj in pmmlObj.MiningBuildTask.Extension:
-            if extObj.name=='hyperparameters':
-                hyperParDict[extObj.for_]=ast.literal_eval(extObj.value)
+        
+        try:
+            hyperParDict={}
+            for extObj in pmmlObj.MiningBuildTask.Extension:
+                if extObj.name=='hyperparameters':
+                    hyperParDict[extObj.for_]=ast.literal_eval(extObj.value)
+        except:
+            hyperParDict=None
 
         try:
             miningBuildTaskList=pmmlObj.MiningBuildTask.__dict__['Extension']
@@ -470,14 +478,14 @@ class TrainingViewModels:
 
     def verifyHyperparameters(self,datHyperPara):
         try:
-            lossType=datHyperPara['lossType']
+            lossType=datHyperPara['loss']
         except Exception as e:
             self.pathOfData=None
             data_details=self.upDateStatus()
             self.updateStatusWithError(data_details,'Training Failed',"Couldn't find hyperparameters lossType >> "+ str(e),traceback.format_exc(),self.statusFile)
             return -1
         try:
-            listOfMetrics=datHyperPara['listOfMetrics']
+            listOfMetrics=datHyperPara['metrics']
         except Exception as e:
             self.pathOfData=None
             data_details=self.upDateStatus()
@@ -509,7 +517,7 @@ class TrainingViewModels:
             return -1
 
         try:
-            optimizerName=datHyperPara['optimizerName']
+            optimizerName=datHyperPara['optimizer']
         except Exception as e:
             self.pathOfData=None
             data_details=self.upDateStatus()
@@ -530,9 +538,10 @@ class TrainingViewModels:
             testSize=None
         return 'done'
     def trainModelObjectDict(self,modelObj,idforData,tensorboardLogFolder):
-        # print ('modelObj???????????????????',modelObj)
+        print ('modelObj???????????????????',modelObj)
         try:
             dataObj=modelObj['Data']
+            print ('dataObj',dataObj)
         except:
             dataObj=None
         modelArch=modelObj['modelObj']['modelArchType']
@@ -545,6 +554,7 @@ class TrainingViewModels:
         datHyperPara=modelObj['modelObj']['hyperparameters']
         
         if modelArch == 'NNModel':
+            print ('came to final model training')
             checkVal=self.verifyHyperparameters(datHyperPara)
             if checkVal == 'done':
                 pass
@@ -580,7 +590,7 @@ class TrainingViewModels:
         dataFolder=modelObj['Data']
         # modelToCompile=modelObj['modelObj']['recoModelObj']
         datHyperPara=modelObj['modelObj']['hyperparameters']
-        listOfMetrics=datHyperPara['listOfMetrics']
+        listOfMetrics=datHyperPara['metrics']
         modelV1=modelObj['modelObj']['recoModelObj'].model
         print(">>>>>>>>>>>>>>SimpleDNN")
         print('pathofdata>>>>>',dataFolder)
@@ -618,16 +628,16 @@ class TrainingViewModels:
                     
                     if 'f1' in listOfMetrics:
                         listOfMetrics.remove('f1')
-                        optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
-                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'],metrics=listOfMetrics+[self.f1])
+                        optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'],metrics=listOfMetrics+[self.f1])
                         import tensorflow as tf
                         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
                         with tf.device(gpuCPUSelect(selDev)):
                             modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
                                         validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
                     else:
-                        optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
-                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'], metrics=listOfMetrics)
+                        optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics)
                         import tensorflow as tf
                         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
                         with tf.device(gpuCPUSelect(selDev)):
@@ -649,7 +659,8 @@ class TrainingViewModels:
         dataFolder=modelObj['Data']
         # modelToCompile=modelObj['modelObj']['recoModelObj']
         datHyperPara=modelObj['modelObj']['hyperparameters']
-        listOfMetrics=datHyperPara['listOfMetrics']
+        print ('datHyperPara',datHyperPara)
+        listOfMetrics=datHyperPara['metrics']
         modelV1=modelObj['modelObj']['recoModelObj'].model
 
         print ('Classification data folder at',dataFolder)
@@ -682,7 +693,7 @@ class TrainingViewModels:
         tensor_board = self.startTensorBoard(tensorboardLogFolder)
 
         try:
-            # print ('Came here 1'*5 )
+            print ('Came here 1'*5 )
             model_graph = modelObj['modelObj']['model_graph']
             tf_session = modelObj['modelObj']['tf_session']
             with model_graph.as_default():
@@ -690,15 +701,15 @@ class TrainingViewModels:
                     
                     if 'f1' in listOfMetrics:
                         listOfMetrics.remove('f1')
-                        optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
-                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'], metrics=listOfMetrics+[self.f1])
+                        optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics+[self.f1])
                         import tensorflow as tf
                         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
                         with tf.device(gpuCPUSelect(selDev)):
                             modelV1.fit_generator(tGen,steps_per_epoch=stepsPerEpochT,validation_steps=stepsPerEpochV,epochs=datHyperPara['epoch'],validation_data=vGen,callbacks=[tensor_board])
                     else:
-                        optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
-                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'], metrics=listOfMetrics)
+                        optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics)
                         import tensorflow as tf
                         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
                         with tf.device(gpuCPUSelect(selDev)):
@@ -757,7 +768,7 @@ class TrainingViewModels:
             modelObj['modelObj']['recoModelObj']=modelV1
 
         else:
-            listOfMetrics=datHyperPara['listOfMetrics']
+            listOfMetrics=datHyperPara['metrics']
             targetCol = tar
             # print(">>>>>>>>>>>>>>SimpleDNN")
             modelV1=modelObj['modelObj']['recoModelObj'].model
@@ -788,7 +799,7 @@ class TrainingViewModels:
                         
                         if 'f1' in listOfMetrics:
                             listOfMetrics.remove('f1')
-                            optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
+                            optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
                             modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'],metrics=listOfMetrics+[self.f1])
                             import tensorflow as tf
                             kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
@@ -796,7 +807,7 @@ class TrainingViewModels:
                                 modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
                                             validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
                         else:
-                            optiMi=self.setOptimizer(datHyperPara['optimizerName'],datHyperPara['learningRate'])
+                            optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
                             modelV1.compile(optimizer=optiMi, loss=datHyperPara['lossType'], metrics=listOfMetrics)
                             import tensorflow as tf
                             kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
@@ -967,7 +978,7 @@ class TrainingViewModels:
         try:
             NewModelOperations().loadExecutionModel(pmmlFile)
         except Exception as e:
-            print ('Came here')
+            print ('Came here got stuck')
             data_details=self.upDateStatus()
             self.updateStatusWithError(data_details,'Training Failed',"Couldn't load the PMML >> "+ str(e),traceback.format_exc(),self.statusFile)
             return -1
