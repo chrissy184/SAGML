@@ -803,7 +803,7 @@ namespace ZMM.App.Controllers
                 jObjOrig.Remove("cronExpression");
                 /* end */                
                 /* call NN train api */
-                response = await nnclient.TrainModel(id);
+                response = await nnclient.TrainModel(jObjOrig.ToString());
                 //
                 var objresp = JsonConvert.DeserializeObject<TrainingResponse>(response);
                 objresp.executedAt = DateTime.Now;
