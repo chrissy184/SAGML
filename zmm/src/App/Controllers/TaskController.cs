@@ -93,7 +93,9 @@ namespace ZMM.App.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSelectedTaskAysnc(string id)
         {
+            // var history = SchedulerPayload.Get();
             var taskData = SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault();
+
             if (!string.IsNullOrEmpty(taskData.Id))
             {
                 var resp = await nnclient.GetRunningTaskByTaskName(id);
@@ -103,7 +105,7 @@ namespace ZMM.App.Controllers
                 //
                 foreach(var i in jArr.Children())
                 {
-                    foreach (var j in taskData.ZMKResponse)
+                    foreach (var j in taskData.History)
                     {
                         string _type = j.GetType().ToString();
                         if (_type.Contains("ExecuteCodeResponse"))
@@ -135,8 +137,11 @@ namespace ZMM.App.Controllers
                     }
                 }
                 //
-                taskData.History = jHist.ToList<object>();
-                SchedulerPayload.Update(taskData);
+                if ((jHist != null) && (jHist.Count > 0))
+                {
+                    taskData.History = jHist.ToList<object>();
+                    SchedulerPayload.Update(taskData);
+                }
 
                 return Json(SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault());
             }
