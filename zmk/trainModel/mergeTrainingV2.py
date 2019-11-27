@@ -594,7 +594,7 @@ class TrainingViewModels:
         modelV1=modelObj['modelObj']['recoModelObj'].model
         print(">>>>>>>>>>>>>>SimpleDNN")
         print('pathofdata>>>>>',dataFolder)
-        predictedClass=None
+        predictedClasses=None
         targetColumnName = 'target'
         df = dataObj
         indevar=list(df.columns)
@@ -619,39 +619,40 @@ class TrainingViewModels:
         #     return
         # model = modelObj.model
         tensor_board = self.startTensorBoard(tensorboardLogFolder)
-        try:
+        # try:
             # print ('Came here 1'*5 )
-            model_graph = modelObj['modelObj']['model_graph']
-            tf_session = modelObj['modelObj']['tf_session']
-            with model_graph.as_default():
-                with tf_session.as_default():
-                    
-                    if 'f1' in listOfMetrics:
-                        listOfMetrics.remove('f1')
-                        optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
-                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'],metrics=listOfMetrics+[self.f1])
-                        import tensorflow as tf
-                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
-                        with tf.device(gpuCPUSelect(selDev)):
-                            modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
-                                        validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
-                    else:
-                        optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
-                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics)
-                        import tensorflow as tf
-                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
-                        with tf.device(gpuCPUSelect(selDev)):
-                           modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
-                                        validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+        model_graph = modelObj['modelObj']['model_graph']
+        tf_session = modelObj['modelObj']['tf_session']
+        with model_graph.as_default():
+            with tf_session.as_default():
+                
+                if 'f1' in listOfMetrics:
+                    listOfMetrics.remove('f1')
+                    optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                    modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'],metrics=listOfMetrics+[self.f1])
+                    import tensorflow as tf
+                    kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                    with tf.device(gpuCPUSelect(selDev)):
+                        modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                    validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+                else:
+                    optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                    modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics)
+                    import tensorflow as tf
+                    kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                    with tf.device(gpuCPUSelect(selDev)):
+                        modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                    validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
 
                         print ('9'*500)
-        except Exception as e:
-            print ('Came here 2'*5 )
-            data_details=self.upDateStatus()
-            self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+        # except Exception as e:
+        #     print ('Came here 2'*5 )
+        #     data_details=self.upDateStatus()
+        #     self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
 
         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
         modelObj['modelObj']['recoModelObj'].model=modelV1
+        modelObj['modelObj']['predictedClasses']=predictedClass
         return modelObj
 
     def trainImageClassifierNN(self,modelObj,tensorboardLogFolder):
@@ -1032,10 +1033,10 @@ class TrainingViewModels:
         # print (toExportDict)
         # print('*'*100)
         toExportDict=self.restructureModelInforForExportDict(tempDict)
+        fN=pathlib.Path(pmmlFile).name
+        orgfName='../ZMOD/Models/'+fN#+'.pmml'
+        fN=fN.replace('.pmml','')
         if newNameFile==None:
-            fN=pathlib.Path(pmmlFile).name
-            orgfName='../ZMOD/Models/'+fN#+'.pmml'
-            fN=fN.replace('.pmml','')
             copyOrgFName='../ZMOD/Models/'+self.increName(fN)+'.pmml'
             kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Saved in different Version')
         else:
