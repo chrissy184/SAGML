@@ -32,17 +32,43 @@ class Utility:
 	def convertZMKtoZS(inputFile,outputFile=None):
 		with open(inputFile,'r') as ff:
 			zmkFile = ff.read()
+		zmkFile = zmkFile.replace('architectureName="TrainedModel"','architectureName="mobilenet"')
+		zmkFile = zmkFile.replace('paddingType','pad')
+		zmkFile = zmkFile.replace('trainable="true"','')
+		pmml_lines = zmkFile.split("\n")
+		new_lines = []
+		for line in pmml_lines:
+			if "max_value" in line:
+				line = line.replace("max_value=\"6.0\"","")
+				line = line.replace("rectifier","reLU6")
+			if "<Extension" in line and "sectionId" in line:
+				continue
+			if 'units' in line:
+				r = re.findall('units=\"[0-9]+"',line)
+				if len(r) != 0:
+					line = line.replace(r[0],'')
+			if 'modelName' in line:
+				r = re.findall('modelName=\"[a-z 0-9]+"',line)
+				if len(r) != 0:
+					line = line.replace(r[0],'')
+			if "<Data" in line:
+				continue
+			if 'taskType' in line:
+				r = re.findall('taskType=\"[a-z A-Z]+"',line)
+				if len(r) != 0:
+					line = line.replace(r[0],'')
+			new_lines.append(line+"\n")
 
-		zmkFile=re.sub(r'architectureName=\"[A-Za-z\s]+\"','architectureName="mobilenet"',zmkFile)
-		zmkFile=re.sub(r'max_value=\"[0-9\.]+\"','',zmkFile)
-		zmkFile=zmkFile.replace('paddingType','pad')
-		zmkFile=re.sub(r'trainable=\"(true|false)\"','',zmkFile)
-		zmkFile=re.sub(r'units=\"[0-9]+\"','',zmkFile)
+		# zmkFile=re.sub(r'architectureName=\"[A-Za-z\s]+\"','architectureName="mobilenet"',zmkFile)
+		# zmkFile=re.sub(r'max_value=\"[0-9\.]+\"','',zmkFile)
+		# zmkFile=zmkFile.replace('paddingType','pad')
+		# zmkFile=re.sub(r'trainable=\"(true|false)\"','',zmkFile)
+		# zmkFile=re.sub(r'units=\"[0-9]+\"','',zmkFile)
 
 		if not outputFile:
 			outputFile=inputFile
 		with open(outputFile,'w') as ff:
-			ff.write(zmkFile)
+			ff.writelines(new_lines)
 		return JsonResponse({'filePath':outputFile},status=201)
 
 	def downloadPMML(filePath):
