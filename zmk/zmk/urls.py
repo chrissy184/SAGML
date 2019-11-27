@@ -74,10 +74,10 @@ urlpatterns=[
     path(pref,csrf_exempt(SwaggerView.as_view()),name='swagger'),
     path('',csrf_exempt(SwaggerView.as_view()),name='swagger'),
     path('swagger/v1/swagger.json',csrf_exempt(SwaggerUtilityView.as_view()),name='swagger'),
-    path(pref+'newloadmodels',csrf_exempt(ModelOperation2View.as_view()), name="NewModelOperations"),
-    path(pref+'newloadmodels/<modelName>/scoreJson',csrf_exempt(NewScoreOperation2View.as_view()), name="NewScoreOperations"),
-    path(pref+'newloadmodels/<modelName>/scoreJsonLongProcess',csrf_exempt(NewScoreOperation2ViewLong.as_view()), name="NewScoreOperations"),
-    path(pref+'newtrainmodels/<modelName>',csrf_exempt(NewTrainOperation2View.as_view()), name="NewTrainingView"),
+    # path(pref+'newloadmodels',csrf_exempt(ModelOperation2View.as_view()), name="NewModelOperations"),
+    # path(pref+'newloadmodels/<modelName>/scoreJson',csrf_exempt(NewScoreOperation2View.as_view()), name="NewScoreOperations"),
+    # path(pref+'newloadmodels/<modelName>/scoreJsonLongProcess',csrf_exempt(NewScoreOperation2ViewLong.as_view()), name="NewScoreOperations"),
+    # path(pref+'newtrainmodels/<modelName>',csrf_exempt(NewTrainOperation2View.as_view()), name="NewTrainingView"),
 
     # path(pref+'codeLoad',csrf_exempt(NewCodeOperation2View.as_view()), name="Code Utility"),
     

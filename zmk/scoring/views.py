@@ -22,7 +22,7 @@ import requests, json,sys,subprocess, typing
 
 from nyokaserver import nyokaUtilities,nyokaPMMLUtilities
 # from nyokaBase import PMML43Ext as pml
-from scoring.scoringClass import Scoring
+from scoring.scoringClass import Scoring,NewScoringView
 from trainModel.mergeTrainingV2 import NewModelOperations
 
 
@@ -90,18 +90,20 @@ class ScoreView(APIView):
 				raise Exception("Invalid Request Parameter")
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return Scoring().predictTestDataWithModification(None,modelName,jsonData)
+		return NewScoringView().wrapperForNewLogic(modelName,jsonData,None)
 
 
 	def post(self,requests,modelName):
-		# print (modelName)
+		modelName=modelName[:-5]
+		print (modelName)
 		try:
 			filePath=requests.POST.get('filePath')
+			# print (filePath*3)
 			if not filePath:
 				raise Exception("Invalid Request Parameter")
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return Scoring().predictTestDataWithModification(filePath,modelName,None)
+		return NewScoringView().wrapperForNewLogic(modelName,None,filePath)
 
 
 # class ObjDetectionScoreView(APIView):

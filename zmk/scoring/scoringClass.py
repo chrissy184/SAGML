@@ -34,11 +34,12 @@ def create_lockForModel():
 # 									unloadModelSwagger,
 #                                     )
 from trainModel import kerasUtilities
-from trainModel.kerasUtilities import PMMLMODELSTORAGE
+from trainModel.mergeTrainingV2 import PMMLMODELSTORAGE
+from trainModel.mergeTrainingV2 import NewModelOperations
 kerasUtilities = kerasUtilities.KerasUtilities()
 
 
-# global PMMLMODELSTORAGE
+global PMMLMODELSTORAGE
 
 
 
@@ -46,6 +47,7 @@ class Scoring:
     
 	def getListOfModelinMemory():
 		global PMMLMODELSTORAGE
+		# print ('PMMLMODELSTORAGE',PMMLMODELSTORAGE)
 		moreDetails=[]
 		for j in PMMLMODELSTORAGE:
 			temp_dict={}
@@ -105,7 +107,7 @@ class Scoring:
 		except:
 			data_details={'message':'Not able to locate, make sure the model was loaded'}
 			statusCode = 500
-		# print(data_details)
+		print(data_details)
 		return JsonResponse(data_details,status= statusCode)
 
 	def predicttestdata(self,filpath,modelName,jsonData=None):
@@ -350,3 +352,155 @@ class Scoring:
 			lockForModelLoad.release()
 			return scoredOutput
 			
+
+
+class NewScoringDataView:
+
+    global PMMLMODELSTORAGE
+
+    def scoreJsonRecordsLongProcess(self,modelName,jsonData):
+        scoreModelObj=NewScoringView()
+        train_prc = Thread(target=scoreModelObj.wrapperForNewLogic,args=(modelName,jsonData,))
+        train_prc.start()
+        resa={'message':'Scoring Started'}
+        return JsonResponse(resa)
+
+class NewScoringView:
+
+	def wrapperForNewLogic(self,modelName,jsonData,filePath):
+		global PMMLMODELSTORAGE
+		if jsonData != None:
+			return JsonResponse({'Result':'Please add support'})
+			# if modelName in PMMLMODELSTORAGE:
+			# 	scoredOutput=self.scoreJsonData(modelName,jsonData)
+			# else:
+			# 	pmmlFile='../ZMOD/Models/'+modelName+'.pmml'
+			# 	NewModelOperations().loadExecutionModel(pmmlFile)
+
+			# 	scoredOutput=self.scoreFileData(modelName,jsonData)
+		elif filePath != None:
+			if modelName in PMMLMODELSTORAGE:
+				scoredOutput=self.scoreFileData(modelName,filePath)
+			else:
+				pmmlFile='../ZMOD/Models/'+modelName+'.pmml'
+				NewModelOperations().loadExecutionModel(pmmlFile)
+				scoredOutput=self.scoreFileData(modelName,filePath)
+
+		return scoredOutput
+
+
+	# def scoreRouter(self,modelName,filePath):
+	# 	global PMMLMODELSTORAGE
+	# 	print (PMMLMODELSTORAGE[modelName])
+
+	def checkCreatePath(self,folderPath):
+		try:
+			if os.path.exists(folderPath):
+				return ('path exist')
+			else:
+				os.makedirs(folderPath)
+				return ('path created')
+		except:
+			os.makedirs(folderPath)
+			return ('path created')
+
+	def scoreFileData(self,modelName,filePath):
+		target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+		self.checkCreatePath(target_path)
+		global PMMLMODELSTORAGE
+		# print (PMMLMODELSTORAGE[modelName])
+		modelInformation =PMMLMODELSTORAGE[modelName]
+		modelObjs=list(modelInformation['score'].keys())
+		if pathlib.Path(filePath).suffix =='.csv':
+			testData=pd.read_csv(filePath)
+			print (testData.shape)
+		else:
+			testData=None
+
+		if len(modelObjs)==0:
+			resultResp={'result':'Model not for scoring'}
+		elif len(modelObjs) ==1:
+			modeScope=modelInformation['score'][modelObjs[0]]
+			if 'preprocessing' in modeScope:
+				# print (modeScope['preprocessing'])
+				testData=modeScope['preprocessing'](testData)
+				XVarForModel=modeScope['modelObj']['listOFColumns']
+				testData=testData[XVarForModel]
+			else:
+				testData=testData
+			if modeScope['modelObj']['modelArchType']=='NNModel':
+				rowsIn=testData.shape[0]
+				colsIn=testData.shape[1]
+				testData=testData.values.reshape(rowsIn,1,colsIn)
+				model_graph = modeScope['modelObj']['model_graph']
+				tf_session = modeScope['modelObj']['tf_session']
+				with model_graph.as_default():
+					with tf_session.as_default():
+						modelToUse=modeScope['modelObj']['recoModelObj'].model
+						resultData=modelToUse.predict(testData)
+			else:
+				resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
+				if pathlib.Path(filePath).suffix =='.csv':
+					testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
+					print (testData.shape)
+					resafile=target_path+'result.csv'
+					testData.to_csv(resafile, index=False)
+					# # print('result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',targetResult)
+					# with open(resafile,'w') as fila:
+					# 	json.dump(targetResult,fila)
+
+			
+			resultData=resultData.tolist()
+			
+
+			# resultData={'result':'Add support'}
+		elif len(modelObjs) ==2:
+			modeScope=modelInformation['score'][modelObjs[0]]
+			if 'preprocessing' in modeScope:
+				# print (modeScope['preprocessing'])
+				testData=modeScope['preprocessing'](jsonData)
+				XVarForModel=modeScope['modelObj']['listOFColumns']
+				testData=testData[XVarForModel]
+			else:
+				testData=pd.DataFrame([jsonData])
+			if modeScope['modelObj']['modelArchType']=='NNModel':
+				rowsIn=testData.shape[0]
+				colsIn=testData.shape[1]
+				testData=testData.values.reshape(rowsIn,1,colsIn)
+				model_graph = modeScope['modelObj']['model_graph']
+				tf_session = modeScope['modelObj']['tf_session']
+				with model_graph.as_default():
+					with tf_session.as_default():
+						modelToUse=modeScope['modelObj']['recoModelObj'].model
+						resultData=modelToUse.predict(testData)
+			else:
+				resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
+			#resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
+
+			modeScope2=modelInformation['score'][modelObjs[1]]
+			# print ('modeScope2  >>>>>>>>>   ',modeScope2)
+			if 'preprocessing' in modeScope2:
+				testData=modeScope2['preprocessing'](testData,resultData)
+			
+			# print('*'*100)
+			# print('testData shape',testData.shape)
+
+			if modeScope2['modelObj']['modelArchType']=='NNModel':
+				rowsIn=testData.shape[0]
+				colsIn=testData.shape[1]
+				testData=testData.values.reshape(rowsIn,1,colsIn)
+				model_graph = modeScope2['modelObj']['model_graph']
+				tf_session = modeScope2['modelObj']['tf_session']
+				with model_graph.as_default():
+					with tf_session.as_default():
+						modelToUse=modeScope2['modelObj']['recoModelObj'].model
+						resultData=modelToUse.predict(testData)
+			else:
+				resultData=modeScope2['modelObj']['recoModelObj'].predict(testData)
+			if 'postprocessing' in modeScope2:
+				modeScope2['postprocessing'](testData,resultData)
+
+			resultData=resultData.tolist()
+
+		resultResp={'result':resafile}
+		return JsonResponse(resultResp,status=200)
