@@ -254,12 +254,11 @@ export class ModelsComponent implements OnInit {
     this.isContentLoading = true;
     const modelDeployEndPoint = ApiRoutes.modelDeploy(this.selectedModel.id);
     const route = this.selectedModel.deployed ? ApiRoutes.modelDeployUndo(this.selectedModel.id) : modelDeployEndPoint;
-    const method =  this.selectedModel.deployed ? ApiRoutes.methods.GET : ApiRoutes.methods.POST;
     const zsSelectedObj: any = this.utilService.getSettingsObject('ZS');
     const options = {
-      body: zsSelectedObj
+      params: zsSelectedObj
     };
-    this.apiService.request(method, route, options)
+    this.apiService.request(ApiRoutes.methods.GET, route, options)
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(responseData => {
         this.selectedModel.deployed = responseData.deployed;
