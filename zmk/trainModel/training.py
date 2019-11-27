@@ -102,10 +102,11 @@ class Training:
 		data_details['status']='In Progress'
 		fObjScrpt=pathlib.Path(pmmlFile)
 		data_details['taskName']=fObjScrpt.name
-		
+		data_details['createdOn']= str(datetime.datetime.now())
+		data_details['type']= 'NNProject'
+		data_details['problem_type']= hyperParaUser['problemType']
 
-		with open(statusfileLocation,'w') as filetosave:
-			json.dump(data_details, filetosave)
+
 		nntrainer = mergeTrainingNN.NeuralNetworkModelTrainer()
 
 		pID = nntrainer.train(idforData,pmmlFile,tensorboardLogFolder,hyperParaUser)
@@ -113,28 +114,25 @@ class Training:
 		data_details['pID']=str(pID)
 		saveStatus=logFolder+idforData+'/'
 		kerasUtilities.checkCreatePath(saveStatus)
-		statusfileLocation=saveStatus+'status.txt'
+		# statusfileLocation=saveStatus+'status.txt'
+		with open(statusfileLocation,'w') as filetosave:
+			json.dump(data_details, filetosave)
 
 		if pID == -1:
+			# data_details['status']='In Progress'
 			kerasUtilities.updateStatusOfTraining(statusfileLocation,'Training Failed')
 		else:
-			with open(statusfileLocation,'w') as filetosave:
-				json.dump(data_details, filetosave)
-		
+			pass
 
 		runTemp=[i['idforData'] for i in RUNNING_TASK_MEMORY]
 		if data_details['idforData'] not in runTemp:
 			# print ('PPPPPPPPPPPPPPPPPPPP Saved to runningTask')
-			tempRunMemory={'idforData': idforData,
-			'status': 'Training Failed' if pID==-1 else 'In Progress',
-			'createdOn': str(datetime.datetime.now()),
-			'type': 'NNProject',
-			'pid':pID,
-			'newPMMLFileName':fObjScrpt.name.split('/')[-1]}
-			tempRunMemory['taskName']=data_details['taskName']
+			tempRunMemory=data_details
 			RUNNING_TASK_MEMORY.append(tempRunMemory)
 		else:
 			pass
+		print ('P'*200)
+		print ('data_details',data_details)
 
 		return JsonResponse(data_details,status=202)
 
