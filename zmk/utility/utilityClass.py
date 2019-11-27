@@ -43,6 +43,8 @@ class Utility:
 				line = line.replace("rectifier","reLU6")
 			if "<Extension" in line and "sectionId" in line:
 				continue
+			if "<script" in line or "</script" in line or "<Data" in line:
+				continue
 			if 'units' in line:
 				r = re.findall('units=\"[0-9]+"',line)
 				if len(r) != 0:
@@ -51,12 +53,13 @@ class Utility:
 				r = re.findall('modelName=\"[a-z 0-9]+"',line)
 				if len(r) != 0:
 					line = line.replace(r[0],'')
-			if "<Data" in line:
-				continue
 			if 'taskType' in line:
 				r = re.findall('taskType=\"[a-z A-Z]+"',line)
 				if len(r) != 0:
 					line = line.replace(r[0],'')
+			if len(line.lstrip()) != 0:
+				if line.lstrip()[0] != "<" and line.lstrip()[0:4] != "data":
+					continue   
 			new_lines.append(line+"\n")
 
 		# zmkFile=re.sub(r'architectureName=\"[A-Za-z\s]+\"','architectureName="mobilenet"',zmkFile)

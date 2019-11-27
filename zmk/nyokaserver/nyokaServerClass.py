@@ -335,10 +335,11 @@ class NyokaServer:
 					scriptCode=scriptFile.read()
 					scriptCode=scriptCode.replace('<','&lt;')
 					# print (scriptCode)
-					modelVal=processedOutput['modelFor']
-					useFor=processedOutput['useFor']
+					modelVal='model1'
+					taskTypeVal=processedOutput['taskType']
 					scriptPurpose=processedOutput['scriptPurpose']
-					scrp=pml.script(content=scriptCode,for_=modelVal,class_=useFor,scriptPurpose=scriptPurpose,filePath=filePathUrl)
+					scriptOutput=processedOutput['scriptOutput']
+					scrp=pml.script(content=scriptCode,for_=modelVal,class_=taskTypeVal,scriptPurpose=scriptPurpose,scriptOutput=scriptOutput,filePath=filePathUrl)
 					scrp.export(sys.stdout,0)
 					scrptVal.append(scrp)
 					pmmlObject.script=scrptVal
