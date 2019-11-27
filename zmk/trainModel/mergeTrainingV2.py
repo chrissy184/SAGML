@@ -971,7 +971,7 @@ class TrainingViewModels:
 
         return toExportDict2
     
-    def trainModel(self,idforData,pmmlFile,tensorboardLogFolder,hyperParaUser):
+    def trainModel(self,idforData,pmmlFile,tensorboardLogFolder,hyperParaUser,newNameFile):
         global PMMLMODELSTORAGE
         pmmlFileObj=pathlib.Path(pmmlFile)
         pmmlFileForKey=pmmlFileObj.name.replace(pmmlFileObj.suffix,'')
@@ -1032,34 +1032,22 @@ class TrainingViewModels:
         # print (toExportDict)
         # print('*'*100)
         toExportDict=self.restructureModelInforForExportDict(tempDict)
-        fN=pathlib.Path(pmmlFile).name
-        orgfName='../ZMOD/Models/'+fN#+'.pmml'
-        fN=fN.replace('.pmml','')
-        copyOrgFName='../ZMOD/Models/'+self.increName(fN)+'.pmml'
+        if newNameFile==None:
+            fN=pathlib.Path(pmmlFile).name
+            orgfName='../ZMOD/Models/'+fN#+'.pmml'
+            fN=fN.replace('.pmml','')
+            copyOrgFName='../ZMOD/Models/'+self.increName(fN)+'.pmml'
+            kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Saved in different Version')
+        else:
+            copyOrgFName=newNameFile
+            kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Saved')
         import shutil
         from nyokaBase.skl.skl_to_pmml import model_to_pmml
         shutil.copy2(orgfName,copyOrgFName)
         model_to_pmml(toExportDict, PMMLFileName=copyOrgFName)
         NewModelOperations().loadExecutionModel(orgfName)
         # data_details['status']='Model Saved in different Version'
-        kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Saved in different Version')
+        
         data_details=self.upDateStatus()
 
         return JsonResponse(data_details)
-
-
-
-        # try:
-        #     toExportDict={
-        #     'model1':{'data':dataFolder,'hyperparameters':datHyperPara,'preProcessingScript':None,
-        #     'pipelineObj':None,'modelObj':model,'featuresUsed':None,'targetName':None,'postProcessingScript':None,
-        #     'taskType': 'trainAndscore','predictedClasses':predictedClass,'dataSet':'image'}
-        #                 }
-        #     from nyokaBase.skl.skl_to_pmml import model_to_pmml
-        #     model_to_pmml(toExportDict, PMMLFileName=fileName)
-        #     kerasUtilities.updateStatusOfTraining(self.statusFile,'Complete')
-        #     return 'Success'
-        # except Exception as e:
-        #     data_details=self.upDateStatus()
-        #     self.updateStatusWithError(data_details,'Saving File Failed',' '+ str(e),traceback.format_exc(),self.statusFile)
-        #     return -1

@@ -105,11 +105,12 @@ class Training:
 		data_details['createdOn']= str(datetime.datetime.now())
 		data_details['type']= 'NNProject'
 		data_details['problem_type']= hyperParaUser['problemType']
+		data_details["newPMMLFileName"]=pmmlFile
 
 
 		nntrainer = mergeTrainingNN.NeuralNetworkModelTrainer()
 
-		pID = nntrainer.train(idforData,pmmlFile,tensorboardLogFolder,hyperParaUser)
+		pID = nntrainer.train(idforData,pmmlFile,tensorboardLogFolder,hyperParaUser,pmmlFile)
 		
 		data_details['pID']=str(pID)
 		saveStatus=logFolder+idforData+'/'
