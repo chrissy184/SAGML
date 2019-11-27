@@ -20,7 +20,7 @@ algorithms={
 
 optionsForDropdown={
       "changedataTypes": ['None',"Continuous", "Categorical"],
-      "imputation_methods": ['None',"Mean", "Median", "Mode", "Back fill", "Forward fill"],
+      "imputation_methods": ['None',"Mean", "Median", "Mode"],# "Back fill", "Forward fill"],
       "data_transformation_steps": ["None", "One Hot Encoding", "Label Encoding", "Normalize", "Scaling Standard", "Scaling Min Max", "Scaling Max Absolute"],
       "algorithmTypes":algorithms,
     }
