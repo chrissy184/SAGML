@@ -295,20 +295,10 @@ export class DataComponent implements OnInit {
 
   public predictData(server: String) {
     this.showFilterPanel = true;
-
-    if (server === 'ZMK') {
-      this.filterConfig = {
-        route: ApiRoutes.modelLoaded,
-        params: { server: server }
-      };
-    } else {
-      const zsSelectedObj: any = this.utilService.getSettingsObject('ZS');
-      this.filterConfig = {
-        route: ApiRoutes.modelDeployed,
-        params: zsSelectedObj
-      };
-      this.filterConfig.params.server = server;
-    }
+    this.filterConfig = {
+      route: (server === 'ZMK') ? ApiRoutes.modelLoaded : ApiRoutes.modelDeployed,
+      params: { server: server }
+    };
   }
 
   public closeFilter() {
@@ -322,14 +312,9 @@ export class DataComponent implements OnInit {
       params: {
         dataId: this.selectedData.id,
         modelID: selectedModel.id,
+
       }
     };
-    if (selectedModel.server === 'ZS') {
-      const zsSelectedObj: any = this.utilService.getSettingsObject('ZS');
-      options.params = zsSelectedObj
-      options.params.dataId = this.selectedData.id;
-      options.params.modelID = selectedModel.id;
-    }
     const api = (selectedModel.server === 'ZMK') ? ApiRoutes.predictData : ApiRoutes.scoreData;
     this.apiService.request(ApiRoutes.methods.GET, api, options)
       .pipe(finalize(() => { this.isContentLoading = false; }))
