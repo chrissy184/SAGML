@@ -387,6 +387,7 @@ namespace ZMM.App.Controllers
         {
             string response = string.Empty;
             string reqBody = string.Empty;
+            string userModelName="";
 
             using (var reader = new StreamReader(Request.Body))
             {
@@ -395,6 +396,10 @@ namespace ZMM.App.Controllers
             }
             try
             {
+                //find model name
+                JObject rB = JObject.Parse(reqBody);
+                userModelName = (string)rB["parameters"]["model_name"];
+                //
                 response = await _client.PostProcessingForm(reqBody);
             }
             catch (Exception ex)
@@ -429,7 +434,7 @@ namespace ZMM.App.Controllers
                     EditedOn = DateTime.Now.ToString(),
                     FilePath = "",
                     Id = id,
-                    Name = id,
+                    Name = userModelName,
                     Type = "AUTOML",
                     Url = "",
                     Recurrence = "ONE_TIME",
