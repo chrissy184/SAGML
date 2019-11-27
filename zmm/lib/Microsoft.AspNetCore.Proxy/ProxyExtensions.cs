@@ -86,6 +86,7 @@ namespace Microsoft.AspNetCore.Builder
 
             if (context.WebSockets.IsWebSocketRequest)
             {
+                Console.WriteLine(">> Proxy Extension Going for WebSocket connection " + destinationUri.ToWebSocketScheme().AbsolutePath + "  " + destinationUri.Host + " " + destinationUri.Port);
                 await context.AcceptProxyWebSocketRequest(destinationUri.ToWebSocketScheme());
             }
             else
