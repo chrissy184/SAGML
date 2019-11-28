@@ -816,6 +816,16 @@ class NyokaServer:
 		# print ('Enter this world')
 		pmmlObj=pml.parse(filepath,silence=True)
 		tempObj=pmmlObj.__dict__
+
+		layerList=[]
+		for kk in tempObj['DeepNetwork'][0].NetworkLayer:
+			layerList.append(kk.get_layerType())
+
+		if (len(tempObj['script']) >=1) or ('LSTM' in layerList):
+			deployInfo=False
+		else:
+			deployInfo=True
+
 		
 		listOfObjectstogetData=[]
 		for j in tempObj.keys():
@@ -856,7 +866,9 @@ class NyokaServer:
 				allInfo.update(nyokaUtilities.getInfoOfNaiveBayesModel(tempObj))
 
 		allInfo=nyokaUtilities.changeStructure(allInfo)
-		# print('response sent')
+		allInfo['information'].append({'property': 'Deployable to ZAD', 'value': deployInfo})
+		
+		# print('response sent',allInfo)
 		return JsonResponse(allInfo)
 
 
