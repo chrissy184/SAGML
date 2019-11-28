@@ -220,7 +220,7 @@ namespace ZMM.App.Controllers
                     Created_on = DateTime.Now.ToString(),
                     Deployed = false,
                     Edited_on = DateTime.Now.ToString(),
-                    Extension = ".pmml",
+                    Extension = "pmml",
                     FilePath = _filePath,
                     Id = newFile.Replace($".pmml", ""),
                     Loaded = false,

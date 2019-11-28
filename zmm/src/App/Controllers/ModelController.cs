@@ -27,7 +27,7 @@ using Quartz.Impl;
 
 namespace ZMM.App.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     public class ModelController : Controller
     {
