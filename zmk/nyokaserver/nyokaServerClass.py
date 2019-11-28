@@ -70,7 +70,7 @@ def writePmml(pmmlObj, filepath, lockForPMML):
 
 	pmmlObj.DeepNetwork[0]=_deepNetworkObj
 
-	print ('came to write')
+	# print ('came to write')
 	try:
 		lockForPMML.acquire()
 		pmmlObj=removeExtraNewLinesFromWeights(pmmlObj)
@@ -82,6 +82,7 @@ def writePmml(pmmlObj, filepath, lockForPMML):
 				modelVal=sc.for_
 				classVal=sc.class_
 				filePathUrl=sc.filePath
+				scriptOutput=sc.scriptOutput
 
 				code=None
 				scripCode=sc.get_valueOf_()
@@ -93,7 +94,8 @@ def writePmml(pmmlObj, filepath, lockForPMML):
 					lines.append(line[leading_spaces:])
 				code = '\n'.join(lines)
 				scriptCode=code.replace('<','&lt;')
-				scrp=pml.script(content=scriptCode,for_=modelVal,class_=classVal,scriptPurpose=scriptPurpose,filePath=filePathUrl)
+				# scrp=pml.script(content=scriptCode,for_=modelVal,class_=taskTypeVal,scriptPurpose=scriptPurpose,scriptOutput=scriptOutput,filePath=filePathUrl)
+				scrp=pml.script(content=scriptCode,for_=modelVal,class_=classVal,scriptPurpose=scriptPurpose,scriptOutput=scriptOutput,filePath=filePathUrl)
 				scrptVal2.append(scrp)
 		pmmlObj.script=scrptVal2
 		# print ('Code Step 10.1')
@@ -326,7 +328,7 @@ class NyokaServer:
 
 			elif processedOutput['itemType']=='CODE':
 				print ("CODE layer came")
-				print ('processedOutput',processedOutput)
+				# print ('processedOutput',processedOutput)
 				try:
 					scrptVal=pmmlObject.script
 					urlOfScript=processedOutput['url']
@@ -814,6 +816,23 @@ class NyokaServer:
 		# print ('Enter this world')
 		pmmlObj=pml.parse(filepath,silence=True)
 		tempObj=pmmlObj.__dict__
+
+		if len(tempObj['DeepNetwork']) >0:
+			layerList=[]
+			for kk in tempObj['DeepNetwork'][0].NetworkLayer:
+				layerList.append(kk.get_layerType())
+
+			if (len(tempObj['script']) >=1) or ('LSTM' in layerList) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
+				deployInfo=False
+			else:
+				deployInfo=True
+		else:
+			if (len(tempObj['script']) >=1) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
+				deployInfo=False
+			else:
+				deployInfo=True
+
+
 		
 		listOfObjectstogetData=[]
 		for j in tempObj.keys():
@@ -854,7 +873,9 @@ class NyokaServer:
 				allInfo.update(nyokaUtilities.getInfoOfNaiveBayesModel(tempObj))
 
 		allInfo=nyokaUtilities.changeStructure(allInfo)
-		# print('response sent')
+		allInfo['information'].append({'property': 'Deployable to ZAD', 'value': deployInfo})
+		
+		# print('response sent',allInfo)
 		return JsonResponse(allInfo)
 
 

@@ -546,11 +546,11 @@ class TrainingViewModels:
             dataObj=None
         modelArch=modelObj['modelObj']['modelArchType']
         try:
-            scriptOutputPrepro=modelObj['scriptOutput']
+            scriptOutputPrepro=modelObj['preprocessing']['scriptOutput']
         except:
             scriptOutputPrepro=None
         
-        # print ('scriptOutputPrepro',scriptOutputPrepro,dataObj,modelArch)
+        print ('scriptOutputPrepro',scriptOutputPrepro,dataObj,modelArch)
         datHyperPara=modelObj['modelObj']['hyperparameters']
         
         if modelArch == 'NNModel':
@@ -577,8 +577,9 @@ class TrainingViewModels:
         elif (pathlib.Path(dataObj).suffix == '.csv') & (scriptOutputPrepro!=None) :
             dataObjPd=pd.read_csv(modelObj['Data'])
             print (dataObjPd.shape)
-            modelObjTrained=self.trainSimpleDNNObj(modelObj,tensorboardLogFolder,dataObjPd)
             print('Simple DNN with preprocessing')
+            modelObjTrained=self.trainSimpleDNNObjWithPrepro(modelObj,tensorboardLogFolder,dataObjPd)
+            
         else:
             data_details=self.upDateStatus()
             self.updateStatusWithError(data_details,'Training Failed',"Not supported >> ",'No traceback',self.statusFile)
@@ -609,6 +610,79 @@ class TrainingViewModels:
             predictedClass=None
         ##### Split data into test and validation set for training#################################
         trainDataX,testDataX,trainDataY,testDataY=model_selection.train_test_split(df[indevar],y,
+                                                        test_size=datHyperPara['testSize'])
+        stepsPerEpochT=int(len(trainDataX)/datHyperPara['batchSize'])
+        stepsPerEpochV=int(len(testDataX)/datHyperPara['batchSize'])
+        kerasUtilities.updateStatusOfTraining(self.statusFile,'Data split in Train validation part')
+
+        # modelObj = self.generateAndCompileModel(datHyperPara['lossType'],datHyperPara['optimizerName'],datHyperPara['learningRate'],listOfMetrics)
+        # if modelObj.__class__.__name__ == 'dict':
+        #     return
+        # model = modelObj.model
+        tensor_board = self.startTensorBoard(tensorboardLogFolder)
+        # try:
+            # print ('Came here 1'*5 )
+        model_graph = modelObj['modelObj']['model_graph']
+        tf_session = modelObj['modelObj']['tf_session']
+        with model_graph.as_default():
+            with tf_session.as_default():
+                
+                if 'f1' in listOfMetrics:
+                    listOfMetrics.remove('f1')
+                    optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                    modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'],metrics=listOfMetrics+[self.f1])
+                    import tensorflow as tf
+                    kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                    with tf.device(gpuCPUSelect(selDev)):
+                        modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                    validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+                else:
+                    optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                    modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics)
+                    import tensorflow as tf
+                    kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                    with tf.device(gpuCPUSelect(selDev)):
+                        modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                    validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+
+                        print ('9'*500)
+        # except Exception as e:
+        #     print ('Came here 2'*5 )
+        #     data_details=self.upDateStatus()
+        #     self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+
+        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
+        modelObj['modelObj']['recoModelObj'].model=modelV1
+        modelObj['modelObj']['predictedClasses']=predictedClass
+        return modelObj
+
+    def trainSimpleDNNObjWithPrepro(self,modelObj,tensorboardLogFolder,dataObj):
+        dataFolder=modelObj['Data']
+        # modelToCompile=modelObj['modelObj']['recoModelObj']
+        datHyperPara=modelObj['modelObj']['hyperparameters']
+        listOfMetrics=datHyperPara['metrics']
+        modelV1=modelObj['modelObj']['recoModelObj'].model
+        print(">>>>>>>>>>>>>>SimpleDNN")
+        print('pathofdata>>>>>',dataFolder)
+        predictedClasses=None
+        targetColumnName = 'target'
+        # df = dataObj
+
+        scriptCode=modelObj['preprocessing']['codeObj']
+        dfX,dfY=scriptCode(dataObj)
+
+        indevar=list(dfX.columns)
+        # indevar.remove('target')
+        targetCol = list(dfY.columns)[0]
+        if datHyperPara['problemType']=='classification':
+            lb=preprocessing.LabelBinarizer()
+            y=lb.fit_transform(targetCol)
+            predictedClass = list(targetCol.unique())
+        else:
+            y=dfY[targetCol]
+            predictedClass=None
+        ##### Split data into test and validation set for training#################################
+        trainDataX,testDataX,trainDataY,testDataY=model_selection.train_test_split(dfX,dfY,
                                                         test_size=datHyperPara['testSize'])
         stepsPerEpochT=int(len(trainDataX)/datHyperPara['batchSize'])
         stepsPerEpochV=int(len(testDataX)/datHyperPara['batchSize'])
@@ -1009,7 +1083,7 @@ class TrainingViewModels:
             if hyperParaUser['epoch'] != None:
                 # print ('Print to update hyperparp',hyperParaUser['epoch'])
                 modeScope['modelObj']['hyperparameters']=hyperParaUser
-            print ('modeScope>>>>>>>>>>> ',modeScope)
+            # print ('modeScope>>>>>>>>>>> ',modeScope)
             kerasUtilities.updateStatusofProcess(self.statusFile,'Training Model Loaded')
 
             modeScope=self.trainModelObjectDict(modeScope,idforData,tensorboardLogFolder)
@@ -1044,7 +1118,10 @@ class TrainingViewModels:
             kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Saved')
         import shutil
         from nyokaBase.skl.skl_to_pmml import model_to_pmml
-        shutil.copy2(orgfName,copyOrgFName)
+        try:
+            shutil.copy2(orgfName,copyOrgFName)
+        except:
+            pass
         model_to_pmml(toExportDict, PMMLFileName=copyOrgFName)
         NewModelOperations().loadExecutionModel(orgfName)
         # data_details['status']='Model Saved in different Version'
