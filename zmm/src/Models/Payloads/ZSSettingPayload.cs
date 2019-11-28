@@ -9,10 +9,23 @@ namespace ZMM.Models.Payloads
 {
     public static class ZSSettingPayload
     {
-        #region Create
-        public static ZSSettingResponse Create(ZSSettingResponse newRecord)
+        #region CreateOrUpdate
+        public static ZSSettingResponse CreateOrUpdate(ZSSettingResponse newRecord)
         {
-            GlobalStorage.ZSSettingStorage.TryAdd(newRecord.ZmodId, newRecord);
+            var existingSettings = GetSettingsByUser(newRecord.ZmodId);
+            ZSSettingResponse response = new ZSSettingResponse();
+            if(existingSettings.Count > 0)
+            {
+                //update
+                bool result = GlobalStorage.ZSSettingStorage.TryRemove(newRecord.ZmodId, out response);
+                if (result)  GlobalStorage.ZSSettingStorage.TryAdd(newRecord.ZmodId, newRecord);
+            }
+            else
+            {
+                //add new
+                GlobalStorage.ZSSettingStorage.TryAdd(newRecord.ZmodId, newRecord);  
+            }
+                      
             return newRecord;
         }
         #endregion
@@ -31,8 +44,8 @@ namespace ZMM.Models.Payloads
                     }
                 }
             }
-            var sortDesc = _settings.OrderBy(d => d.name);
-            return sortDesc.ToList();
+            
+            return _settings;
         }
         #endregion
 
