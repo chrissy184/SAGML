@@ -328,7 +328,7 @@ class NyokaServer:
 
 			elif processedOutput['itemType']=='CODE':
 				print ("CODE layer came")
-				print ('processedOutput',processedOutput)
+				# print ('processedOutput',processedOutput)
 				try:
 					scrptVal=pmmlObject.script
 					urlOfScript=processedOutput['url']
@@ -817,14 +817,21 @@ class NyokaServer:
 		pmmlObj=pml.parse(filepath,silence=True)
 		tempObj=pmmlObj.__dict__
 
-		layerList=[]
-		for kk in tempObj['DeepNetwork'][0].NetworkLayer:
-			layerList.append(kk.get_layerType())
+		if len(tempObj['DeepNetwork']) >0:
+			layerList=[]
+			for kk in tempObj['DeepNetwork'][0].NetworkLayer:
+				layerList.append(kk.get_layerType())
 
-		if (len(tempObj['script']) >=1) or ('LSTM' in layerList) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
-			deployInfo=False
+			if (len(tempObj['script']) >=1) or ('LSTM' in layerList) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
+				deployInfo=False
+			else:
+				deployInfo=True
 		else:
-			deployInfo=True
+			if (len(tempObj['script']) >=1) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
+				deployInfo=False
+			else:
+				deployInfo=True
+
 
 		
 		listOfObjectstogetData=[]
