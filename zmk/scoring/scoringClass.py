@@ -421,35 +421,37 @@ class NewScoringView:
 			resultResp={'result':'Model not for scoring'}
 		elif len(modelObjs) ==1:
 			modeScope=modelInformation['score'][modelObjs[0]]
+			print ('modeScope',modeScope)
 			if 'preprocessing' in modeScope:
-				# print (modeScope['preprocessing'])
-				testData=modeScope['preprocessing'](testData)
-				XVarForModel=modeScope['modelObj']['listOFColumns']
-				testData=testData[XVarForModel]
+				print ("modeScope['preprocessing']")
+				testData=modeScope['preprocessing']['codeObj'](testData)
+				
+				print (testData.shape,'new')
 			else:
 				testData=testData
 			if modeScope['modelObj']['modelArchType']=='NNModel':
 				rowsIn=testData.shape[0]
 				colsIn=testData.shape[1]
-				testData=testData.values.reshape(rowsIn,1,colsIn)
 				model_graph = modeScope['modelObj']['model_graph']
 				tf_session = modeScope['modelObj']['tf_session']
 				with model_graph.as_default():
 					with tf_session.as_default():
 						modelToUse=modeScope['modelObj']['recoModelObj'].model
-						resultData=modelToUse.predict(testData)
-			else:
-				resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
-				if pathlib.Path(filePath).suffix =='.csv':
-					testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
-					print (testData.shape)
-					resafile=target_path+'result.csv'
-					testData.to_csv(resafile, index=False)
-					# # print('result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',targetResult)
-					# with open(resafile,'w') as fila:
-					# 	json.dump(targetResult,fila)
+						try:
+							resultData=modelToUse.predict(testData.values)
+						except:
+							testData=testData.values.reshape(rowsIn,1,colsIn)
+							resultData=modelToUse.predict(testData)
 
-			
+			else:
+				XVarForModel=modeScope['modelObj']['listOFColumns']
+				testData=testData[XVarForModel]
+				resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
+			if pathlib.Path(filePath).suffix =='.csv':
+				testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
+				print (testData.shape)
+				resafile=target_path+'result.csv'
+				testData.to_csv(resafile, index=False)
 			resultData=resultData.tolist()
 			
 
