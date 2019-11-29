@@ -72,15 +72,8 @@ namespace ZMM.App.Controllers
             string zmodId = "";// ZSSettingPayload.GetUserNameOrEmail(HttpContext);
             await Task.FromResult(0);
             var settings = ZSSettingPayload.GetSettingsByUser(zmodId);
-            // //mask uname and pass with *
-            // foreach (var record in settings)
-            // {
-            //     foreach (var s in record.Settings)
-            //     {
-            //         s.username = "********";
-            //         s.password = "********";
-            //     }
-            // }
+             List<SettingProperty> settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();           
+            
 
             if(settings.Count == 0)
             {
@@ -91,7 +84,7 @@ namespace ZMM.App.Controllers
                 });
             }
 
-            return Json(settings);
+            return Json(settingProperties);
         }
         #endregion
 
