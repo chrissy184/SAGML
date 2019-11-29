@@ -11,9 +11,9 @@ logFolder='./logs/'
 
 algorithms={
     'Regression': ['All','ExtraTreeRegressor','GradientBoostingRegressor','DecisionTreeRegressor','LinearSVR',\
-        'RandomForestRegressor','XGBRegressor','KNeighborsRegressor','LinearRegression'],
+        'RandomForestRegressor','XGBRegressor','KNeighborsRegressor','LinearRegression','LGBMRegressor'],
     'Classification': ['All','DecisionTreeClassifier','ExtraTreesClassifier','RandomForestClassifier','GradientBoostingClassifier',\
-        'KNeighborsClassifier','LinearSVC','LogisticRegression','XGBClassifier'],
+        'KNeighborsClassifier','LinearSVC','LogisticRegression','XGBClassifier','LGBMClassifier'],
     'Anomaly':['IsolationForest','OneClassSVM']
 }
 
