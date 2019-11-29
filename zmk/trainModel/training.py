@@ -193,10 +193,10 @@ class Training:
 		except:
 			if problem_type =='Regression':
 				algorithms=['ExtraTreeRegressor','GradientBoostingRegressor','DecisionTreeRegressor','LinearSVR',\
-        'RandomForestRegressor','XGBRegressor','KNeighborsRegressor','LinearRegression']
+        'RandomForestRegressor','XGBRegressor','KNeighborsRegressor','LinearRegression','LGBMRegressor']
 			else:
 				algorithms=['DecisionTreeClassifier','ExtraTreesClassifier','RandomForestClassifier','GradientBoostingClassifier',\
-        'KNeighborsClassifier','LinearSVC','LogisticRegression','XGBClassifier']
+        'KNeighborsClassifier','LinearSVC','LogisticRegression','XGBClassifier','LGBMClassifier']
 		try:
 			newPMMLFileName = userInput['newPMMLFileName']
 			if not newPMMLFileName.endswith('.pmml'):

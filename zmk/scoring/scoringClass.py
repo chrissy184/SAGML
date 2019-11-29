@@ -443,16 +443,27 @@ class NewScoringView:
 							testData=testData.values.reshape(rowsIn,1,colsIn)
 							resultData=modelToUse.predict(testData)
 
+				if modeScope['modelObj']['hyperparameters']['problemType']=='classification':
+					import numpy as np
+					resultData=[np.argmax(j) for j in resultData]
+				else:
+					pass
+
+				if modeScope['modelObj']['predictedClasses'] != None:
+					resultData=[modeScope['modelObj']['predictedClasses'][i] for i in resultData]
+
 			else:
 				XVarForModel=modeScope['modelObj']['listOFColumns']
 				testData=testData[XVarForModel]
 				resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
+				resultData=resultData.tolist()
+			# print (resultData)
 			if pathlib.Path(filePath).suffix =='.csv':
 				testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
 				print (testData.shape)
 				resafile=target_path+'result.csv'
 				testData.to_csv(resafile, index=False)
-			resultData=resultData.tolist()
+			
 			
 
 			# resultData={'result':'Add support'}

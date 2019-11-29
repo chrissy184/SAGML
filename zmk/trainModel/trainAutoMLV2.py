@@ -152,6 +152,28 @@ ALGORITHM_NAME_OBJ_DICT = {
             'min_child_weight': range(1, 21),
             'nthread': [1]
         }
+    },
+    'LGBMRegressor': {
+        'lightgbm.LGBMRegressor': {
+            'boosting_type': ['gbdt', 'dart'],
+            'subsample': np.arange(0.05, 1.01, 0.05),
+            # 'min_child_samples': [1, 5, 7, 10, 15, 20, 35, 50, 100, 200, 500, 1000],
+            # 'num_leaves': [2, 4, 7, 10, 15, 20, 25, 30, 35, 40, 50, 65, 80, 100, 125, 150, 200, 250, 500], 
+            # 'colsample_bytree': [0.7, 0.9, 1.0],
+            'learning_rate': [1e-3, 1e-2, 1e-1, 0.5, 1.],
+            'n_estimators': [100]
+        }
+    },
+    'LGBMClassifier': {
+        'lightgbm.LGBMClassifier': {
+            'boosting_type': ['gbdt', 'dart'],
+            'subsample': np.arange(0.05, 1.01, 0.05),
+            # 'min_child_samples': [1, 5, 7, 10, 15, 20, 35, 50, 100, 200, 500, 1000],
+            # 'num_leaves': [2, 4, 7, 10, 15, 20, 25, 30, 35, 40, 50, 65, 80, 100, 125, 150, 200, 250, 500], 
+            # 'colsample_bytree': [0.7, 0.9, 1.0],
+            'learning_rate': [1e-3, 1e-2, 1e-1, 0.5, 1.],
+            'n_estimators': [100]
+        }
     }
 
 }
