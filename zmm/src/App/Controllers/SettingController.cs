@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using ZMM.Models.ResponseMessages;
 using ZMM.Models.Payloads;
+using Newtonsoft.Json;
 
 namespace ZMM.App.Controllers
 {
@@ -58,9 +59,8 @@ namespace ZMM.App.Controllers
                 ZmodId = zmodId,
                 Settings = setList
             };
-            ZSSettingPayload.CreateOrUpdate(newRecord);
-
-            return Json(ZSSettingPayload.GetSettingsByUser(zmodId));
+            ZSSettingPayload.CreateOrUpdate(newRecord);            
+            return Json(JObject.Parse(jsonBody));
         }
         #endregion
 
@@ -69,15 +69,14 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> GetSettingsAsync()
         {
             //get the zmodId
-            string zmodId = "";// ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            string zmodId = "testdk";// ZSSettingPayload.GetUserNameOrEmail(HttpContext);
             await Task.FromResult(0);
             var settings = ZSSettingPayload.GetSettingsByUser(zmodId);
-             List<SettingProperty> settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();           
+            List<SettingProperty> settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();           
             
 
             if(settings.Count == 0)
-            {
-                
+            {                
                 return Json(new List<SettingProperty>{
                     new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="",password="",url="",selected=false },
                     new SettingProperty{ name="Zementis Server",type="ZS",tenantID="ai", username="",password="",url="",selected=false }
