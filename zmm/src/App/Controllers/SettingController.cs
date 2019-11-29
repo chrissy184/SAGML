@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using ZMM.Models.ResponseMessages;
 using ZMM.Models.Payloads;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace ZMM.App.Controllers
 {
@@ -70,20 +71,34 @@ namespace ZMM.App.Controllers
         {
             //get the zmodId
             string zmodId = "testdk";// ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            JObject jObj = new JObject();
             await Task.FromResult(0);
             var settings = ZSSettingPayload.GetSettingsByUser(zmodId);
-            List<SettingProperty> settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();           
-            
-
+            List<SettingProperty> settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();
+            //
             if(settings.Count == 0)
-            {                
-                return Json(new List<SettingProperty>{
+            {     
+                var template = new ZSSettingResponse
+                {    
+                    ZmodId = zmodId,                
+                    Settings = new List<SettingProperty> {
                     new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="",password="",url="",selected=false },
                     new SettingProperty{ name="Zementis Server",type="ZS",tenantID="ai", username="",password="",url="",selected=false }
-                });
+                    }
+                };
+                jObj = JObject.Parse(JsonConvert.SerializeObject(template));               
             }
-
-            return Json(settingProperties);
+            else
+            {
+                var template = new ZSSettingResponse
+                {    
+                    ZmodId = zmodId,                
+                    Settings = settingProperties
+                };
+                jObj = JObject.Parse(JsonConvert.SerializeObject(template));  
+            }            
+            jObj.Remove("zmodId");
+            return Json(jObj);
         }
         #endregion
 
