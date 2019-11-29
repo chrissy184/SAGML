@@ -84,6 +84,18 @@ class NewModelOperations:
             nyokaObj=None
         return nyokaObj
 
+    def getPredictionClassName(self,pmmlObj):
+        try:
+            predClasses=[]
+            for j in pmmlObj.__dict__['DataDictionary'].__dict__['DataField']:
+                if j.get_name()=='predictions':
+                    print (j)
+                    for k in j.get_Value():
+                        predClasses.append(k.__dict__['value'])
+                    return predClasses
+        except:
+            return None
+
     def loadExecutionModel(self,pmmlFile):
         print ('loadmodel started')
         print (pmmlFile)
@@ -121,15 +133,18 @@ class NewModelOperations:
                 tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
                 tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
                 tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
+                tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
                 tempDict['score'][singMod['pmmlModelObject'].modelName]={}
                 tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
                 tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
-                tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
+                tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
+                tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
             else:
                 tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]={}
                 tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
                 tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
                 tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
+                tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
         print ('print  step LM 2')
         tempDict2={}
         for taType in tempDict:
@@ -562,25 +577,30 @@ class TrainingViewModels:
                 data_details=self.upDateStatus()
                 self.updateStatusWithError(data_details,'Training Failed',"Some issue with hyperparameters >> ",'No info',self.statusFile)
                 return -1
-		
-        if (dataObj == None) & (scriptOutputPrepro != None):
-            print ('To complicated 1')
-            modelObjTrained=self.trainComplicatedDNNObj(modelObj,tensorboardLogFolder,scriptOutputPrepro)
-        elif (os.path.isdir(dataObj)) & (scriptOutputPrepro==None):
-            print ('Came to Image classifier')
-            modelObjTrained=self.trainImageClassifierNN(modelObj,tensorboardLogFolder)
-        elif (pathlib.Path(dataObj).suffix == '.csv') & (scriptOutputPrepro==None) :
-            print('Simple DNN')
-            dataObjPd=pd.read_csv(modelObj['Data'])
-            print (dataObjPd.shape)
-            modelObjTrained=self.trainSimpleDNNObj(modelObj,tensorboardLogFolder,dataObjPd)
-        elif (pathlib.Path(dataObj).suffix == '.csv') & (scriptOutputPrepro!=None) :
-            dataObjPd=pd.read_csv(modelObj['Data'])
-            print (dataObjPd.shape)
-            print('Simple DNN with preprocessing')
-            modelObjTrained=self.trainSimpleDNNObjWithPrepro(modelObj,tensorboardLogFolder,dataObjPd)
-            
-        else:
+
+        try:
+            if (dataObj == None) & (scriptOutputPrepro != None):
+                print ('To complicated 1')
+                modelObjTrained=self.trainComplicatedDNNObj(modelObj,tensorboardLogFolder,scriptOutputPrepro)
+            elif (os.path.isdir(dataObj)) & (scriptOutputPrepro==None):
+                print ('Came to Image classifier')
+                modelObjTrained=self.trainImageClassifierNN(modelObj,tensorboardLogFolder)
+            elif (pathlib.Path(dataObj).suffix == '.csv') & (scriptOutputPrepro==None) :
+                print('Simple DNN')
+                dataObjPd=pd.read_csv(modelObj['Data'])
+                print (dataObjPd.shape)
+                modelObjTrained=self.trainSimpleDNNObj(modelObj,tensorboardLogFolder,dataObjPd)
+            elif (pathlib.Path(dataObj).suffix == '.csv') & (scriptOutputPrepro!=None) :
+                dataObjPd=pd.read_csv(modelObj['Data'])
+                print (dataObjPd.shape)
+                print('Simple DNN with preprocessing')
+                modelObjTrained=self.trainSimpleDNNObjWithPrepro(modelObj,tensorboardLogFolder,dataObjPd)
+                
+            else:
+                data_details=self.upDateStatus()
+                self.updateStatusWithError(data_details,'Training Failed',"Not supported >> ",'No traceback',self.statusFile)
+                return -1
+        except:
             data_details=self.upDateStatus()
             self.updateStatusWithError(data_details,'Training Failed',"Not supported >> ",'No traceback',self.statusFile)
             return -1
