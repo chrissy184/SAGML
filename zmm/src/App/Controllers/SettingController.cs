@@ -16,7 +16,7 @@ using System.Text;
 
 namespace ZMM.App.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     public class SettingController : Controller
     {
@@ -42,14 +42,14 @@ namespace ZMM.App.Controllers
         [HttpPost]
         public async Task<IActionResult> AddSettingAsync()
         {
-            string jsonBody = "", zmodId = "testdk";
+            string jsonBody = "", zmodId = "";
             //read from body
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = await reader.ReadToEndAsync();
                 jsonBody = body.ToString();
             }
-            // zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
             //parse
             JObject jObj = JObject.Parse(jsonBody);
             JArray jArr = (JArray)jObj["settings"];
@@ -60,7 +60,7 @@ namespace ZMM.App.Controllers
                 ZmodId = zmodId,
                 Settings = setList
             };
-            ZSSettingPayload.CreateOrUpdate(newRecord);            
+            ZSSettingPayload.CreateOrUpdate(newRecord);          
             return Json(JObject.Parse(jsonBody));
         }
         #endregion
@@ -70,7 +70,7 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> GetSettingsAsync()
         {
             //get the zmodId
-            string zmodId = "testdk";// ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
             JObject jObj = new JObject();
             await Task.FromResult(0);
             var settings = ZSSettingPayload.GetSettingsByUser(zmodId);
