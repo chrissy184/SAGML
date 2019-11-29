@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using ZMM.Helpers.Common;
+using ZMM.Models.Payloads;
 
 namespace ZMM.App.ZSServiceClient
 {
@@ -21,14 +22,15 @@ namespace ZMM.App.ZSServiceClient
         }
 
         #region GetModels - [GET] http://dcindgo01:8083/adapars/models
-        public async Task<string> GetModels()
+        public async Task<string> GetModels(string zmodId)
         {
-            string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            string jsonResult = string.Empty;            
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using(var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.Authorization = auth; 

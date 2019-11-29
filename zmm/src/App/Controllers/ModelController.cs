@@ -907,8 +907,8 @@ namespace ZMM.App.Controllers
         {
             string zsResponse = string.Empty;
             try
-            {
-                zsResponse = await zsClient.GetModels();
+            {                
+                zsResponse = await zsClient.GetModels(ZSSettingPayload.GetUserNameOrEmail(HttpContext));
                 await Task.FromResult(0);
             }
             catch (Exception ex)
@@ -1112,7 +1112,7 @@ namespace ZMM.App.Controllers
             //try-catch block
             try
             {
-                zsResponse = await zsClient.GetModels();
+                zsResponse = await zsClient.GetModels(ZSSettingPayload.GetUserNameOrEmail(HttpContext));
                 if (!string.IsNullOrEmpty(zsResponse) && !zsResponse.Contains(ZMMConstants.ErrorFailed))
                 {
                     JObject jo = JObject.Parse(zsResponse);
