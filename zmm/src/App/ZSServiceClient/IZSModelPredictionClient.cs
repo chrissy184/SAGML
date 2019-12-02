@@ -6,10 +6,10 @@ namespace ZMM.App.ZSServiceClient
     public interface IZSModelPredictionClient
     {
         Task<string> GetModels(string zmodId);
-        Task<string> UploadPmml(string dirFullPath);
-        Task<string> DeletePmml(string modelName);
-        Task<string> SingleScoring(string modelName,string record); 
-        Task<string> MultipleScoring(string modelName,string record); 
-        Task<string> ImageScoring(string modelName,string record);
+        Task<string> UploadPmml(string dirFullPath,string zmodId);
+        Task<string> DeletePmml(string modelName,string zmodId);
+        Task<string> SingleScoring(string modelName,string record,string zmodId); 
+        Task<string> MultipleScoring(string modelName,string record,string zmodId); 
+        Task<string> ImageScoring(string modelName,string record,string zmodId);
     }
 }

@@ -945,7 +945,8 @@ namespace ZMM.App.Controllers
                     {
                         try
                         {
-                            string zsResponse = await zsClient.DeletePmml(record.ModelName);
+                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                            string zsResponse = await zsClient.DeletePmml(record.ModelName, zmodId);
                             if (zsResponse != "fail")
                             {
                                 //
@@ -1019,7 +1020,8 @@ namespace ZMM.App.Controllers
                                 convertedPath = jo["filePath"].ToString();
                             }
                             if (string.IsNullOrEmpty(convertedPath)) return BadRequest(new { message = "Model loading failed.", errorCode = 400, exception = ZMMConstants.ErrorFailed });
-                            string zsResponse = await zsClient.UploadPmml(convertedPath);
+                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                            string zsResponse = await zsClient.UploadPmml(convertedPath, zmodId);
                             Logger.LogInformation("PostZSUploadPmmlAsync ZS Response on deploy " + zsResponse);
                             //remove file after upload
                             if (System.IO.File.Exists(convertedPath))

@@ -40,7 +40,7 @@ namespace ZMM.Models.Payloads
                 {
                     if (item.Key == zmodId)
                     {
-                        _settings.Add(item.Value);
+                        _settings.Add(item.Value);                        
                     }
                 }
             }
@@ -68,6 +68,7 @@ namespace ZMM.Models.Payloads
         }
         #endregion
     
+        #region Get user email
         public static string GetUserNameOrEmail(HttpContext context)
         {
             Dictionary<string,string> Result = new Dictionary<string, string>();            
@@ -79,5 +80,7 @@ namespace ZMM.Models.Payloads
             }
             return Result["email"];
         }
+        #endregion
+
     }
 }

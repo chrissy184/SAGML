@@ -735,7 +735,8 @@ namespace ZMM.App.Controllers
                             }
 
                             #endregion
-                            zsResponse = await zsClient.ImageScoring(modelName, filePath);
+                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                            zsResponse = await zsClient.ImageScoring(modelName, filePath,zmodId);
                             zsResponse = zsResponse.Replace("\n", "");
                             JObject jo = JObject.Parse(zsResponse.Replace("\"", "'"));
                             System.IO.File.WriteAllText(newFilePath, zsResponse);
@@ -830,8 +831,9 @@ namespace ZMM.App.Controllers
                                 }
                             }
                             #endregion
-                            //                  
-                            zsResponse = await zsClient.SingleScoring(modelName, record);
+                            //     
+                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);             
+                            zsResponse = await zsClient.SingleScoring(modelName, record, zmodId);
 
                             zsResponse = zsResponse.Replace("\n", "");
 
@@ -908,8 +910,8 @@ namespace ZMM.App.Controllers
                             }
 
                             #endregion
-
-                            zsResponse = await zsClient.MultipleScoring(modelId, filePath);
+                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                            zsResponse = await zsClient.MultipleScoring(modelId, filePath,zmodId);
                             zsResponse = zsResponse.Replace("\n", "");
                             JObject jo = JObject.Parse(zsResponse.Replace("\"", "'"));
                             string outputs = jo["outputs"].ToString();
@@ -1030,7 +1032,8 @@ namespace ZMM.App.Controllers
                 }
 
                 #endregion
-                zsResponse = await zsClient.MultipleScoring(modelName, filePath);
+                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                zsResponse = await zsClient.MultipleScoring(modelName, filePath,zmodId);
                 zsResponse = zsResponse.Replace("\n", "");
                 JObject jo = JObject.Parse(zsResponse.Replace("\"", "'"));
                 System.IO.File.WriteAllText(newFilePath, zsResponse);
