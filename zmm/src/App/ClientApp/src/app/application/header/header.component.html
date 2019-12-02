@@ -18,7 +18,7 @@
         <h3>SAG Cloud</h3>
       </span>
     </div>
-    <button mat-icon-button matTooltip="Apps" [matMenuTriggerFor]="appsMenu">
+    <button mat-icon-button matTooltip="Apps" [matMenuTriggerFor]="appsMenu" (click)="updateUrl()">
       <span class="mdi mdi-apps"></span>
     </button>
     <mat-menu #appsMenu="matMenu" xPosition="before">
