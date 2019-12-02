@@ -459,7 +459,10 @@ class NewScoringView:
 				resultData=resultData.tolist()
 			# print (resultData)
 			if pathlib.Path(filePath).suffix =='.csv':
-				testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
+				if modeScope['modelObj']['targetCol']==None:
+					testData['predicted']=resultData
+				else:
+					testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
 				print (testData.shape)
 				resafile=target_path+'result.csv'
 				testData.to_csv(resafile, index=False)

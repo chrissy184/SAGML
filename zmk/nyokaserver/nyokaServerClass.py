@@ -871,6 +871,8 @@ class NyokaServer:
 				allInfo.update(nyokaUtilities.getInfoLinearModel(tempObj))
 			elif towork=='NaiveBayesModel':
 				allInfo.update(nyokaUtilities.getInfoOfNaiveBayesModel(tempObj))
+			elif towork=='AnomalyDetectionModel':
+				allInfo.update(nyokaUtilities.getInfoOfAnomalyDetectionModel(tempObj))
 
 		allInfo=nyokaUtilities.changeStructure(allInfo)
 		allInfo['information'].append({'property': 'Deployable to ZAD', 'value': deployInfo})
