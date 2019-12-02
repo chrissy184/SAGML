@@ -379,6 +379,15 @@ class NyokaUtilities:
         tempDict['Model information'].append({'Model Name':temp.modelName})
         return tempDict
     
+    def getInfoOfAnomalyDetectionModel(self,tempObj):
+        temp=tempObj['AnomalyDetectionModel'][0]
+        tempDict={}
+        tempDict['Model information']=[]
+        tempDict['Model information'].append({'Function Type':temp.functionName})
+        tempDict['Model information'].append({'Model Name':temp.modelName})
+        tempDict['Model information'].append({'Algorithm Type':temp.algorithmType})
+        return tempDict
+    
 
     def changeStructure(self,mm):
         allInfo={}
