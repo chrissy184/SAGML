@@ -69,14 +69,24 @@ namespace ZMM.App.Controllers
 
         #region GET Settings
         [HttpGet("~/api/setting")]
-        public async Task<IActionResult> GetSettingsAsync()
+        public async Task<IActionResult> GetSettingsAsync(string type)
         {
             //get the zmodId
             string UserEmailId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
             JObject jObj = new JObject();
             await Task.FromResult(0);
             var settings = ZSSettingPayload.GetSettingsByUser(UserEmailId);
-            List<SettingProperty> settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();
+            List<SettingProperty> settingProperties;
+            if(string.IsNullOrEmpty(type))
+            {
+                settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();
+            }
+            else
+            {
+                settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();
+                settingProperties = settingProperties.Where(c=>c.type == $"{type}").ToList<SettingProperty>();
+            }
+            // var selectedType = settingProperties.Where(c=>c.type == $"{type}").ToList<SettingProperty>();
             //
             if(settings.Count == 0)
             {     
@@ -102,6 +112,7 @@ namespace ZMM.App.Controllers
                     ZmodId = UserEmailId,                
                     Settings = settingProperties
                 };
+
                 jObj = JObject.Parse(JsonConvert.SerializeObject(template));  
             }            
             jObj.Remove("zmodId");
