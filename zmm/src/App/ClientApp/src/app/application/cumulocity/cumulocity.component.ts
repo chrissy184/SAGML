@@ -116,12 +116,12 @@ export class CumulocityComponent implements OnInit {
   }
 
   public login(loginData: any) {
-    console.log(loginData);
     this.dataSourceDevices = [];
     this.dataSourceFiles = [];
     this.listDevice = false;
     this.listFile = false;
     if (loginData.valid) {
+      console.log(this.c8y);
       this.headers.Authorization = `Basic ${btoa(`${this.c8y.tenantID}/${this.c8y.username}:${this.c8y.password}`)}`;
       this.listDevices();
     }
