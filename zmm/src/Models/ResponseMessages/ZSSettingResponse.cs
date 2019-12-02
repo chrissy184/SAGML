@@ -14,7 +14,7 @@ namespace ZMM.Models.ResponseMessages
     {
         [JsonProperty("name")] public string name { get; set; }
         [JsonProperty("type")] public string type { get; set; }
-        [JsonProperty("tenentID")] public string tenantID { get; set; }
+        [JsonProperty("tenantID")] public string tenantID { get; set; }
         [JsonProperty("username")] public string username { get; set; }
         [JsonProperty("password")] public string password { get; set; }
         [JsonProperty("url")] public string url { get; set; }
