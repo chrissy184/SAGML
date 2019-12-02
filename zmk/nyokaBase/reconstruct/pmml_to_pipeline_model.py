@@ -40,6 +40,8 @@ def reconstructPMML(pmml, output = "preProcessingPipelineWithModel"):
 def generate_skl_model(pmml, output = "preProcessingPipelineWithModel"):
     # output = ['modelOnly','preProcessingPipelineWithModel','asDictionary]
 
+    # print ('nyokaBaaae',pmml.__dict__)
+
     if pmml.__class__.__name__ == "PMML":
         pass
     elif pmml.__class__.__name__ == "str":
