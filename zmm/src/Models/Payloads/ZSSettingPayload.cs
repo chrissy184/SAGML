@@ -12,7 +12,7 @@ namespace ZMM.Models.Payloads
     {
         #region CreateOrUpdate
         public static ZSSettingResponse CreateOrUpdate(ZSSettingResponse newRecord)
-        {            
+        {
             var existingSettings = GetSettingsByUser(newRecord.ZmodId);
             ZSSettingResponse response = new ZSSettingResponse();
             if (existingSettings.Count > 0)
@@ -40,7 +40,8 @@ namespace ZMM.Models.Payloads
                 {
                     if (item.Key == zmodId)
                     {
-                        _settings.Add(item.Value);                        
+                        _settings.Add(item.Value);
+                        break;
                     }
                 }
             }
@@ -53,34 +54,42 @@ namespace ZMM.Models.Payloads
         public static Tuple<string, string, string> GetUserInfo(string zmodId)
         {
             string url = "", uname = "", pass = "";
-            var qry = GetSettingsByUser(zmodId)
-            .Where(i => i.Settings.Any(s => s.selected == true && s.type == "ZS"))
-            .SelectMany(col => col.Settings.Select(s => new { s.url, s.username, s.password }));
+            // var qry = GetSettingsByUser(zmodId)
+            // .Where(i => i.Settings.Any(s => s.selected == true))
+            // .SelectMany(col => col.Settings.Select(s => new { s.url, s.username, s.password }));
 
-            foreach (var record in qry)
+            foreach (var _ in GetSettingsByUser(zmodId))
             {
-                url=record.url;
-                uname=record.username;
-                pass=record.password;
+                foreach (var record in _.Settings)
+                {
+                    if ((record.selected == true) && (record.type == "ZS"))
+                    {
+                        url = record.url;
+                        uname = record.username;
+                        pass = record.password;
+                        break;
+                    }
+                }
             }
 
             return new Tuple<string, string, string>(url, uname, pass);
         }
         #endregion
-    
+
         #region Get user email
         public static string GetUserNameOrEmail(HttpContext context)
         {
-            Dictionary<string,string> Result = new Dictionary<string, string>();            
-            foreach(System.Security.Claims.Claim Cl in context.User.Claims)
+            Dictionary<string, string> Result = new Dictionary<string, string>();
+            foreach (System.Security.Claims.Claim Cl in context.User.Claims)
             {
-                if(Cl.Type.Equals("name")) Result["name"] = Cl.Value;
-                else if(Cl.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")) Result["email"] = Cl.Value;
-                else if(Cl.Type.Equals("role")) Result["role"] = Cl.Value;
+                if (Cl.Type.Equals("name")) Result["name"] = Cl.Value;
+                else if (Cl.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")) Result["email"] = Cl.Value;
+                else if (Cl.Type.Equals("role")) Result["role"] = Cl.Value;
             }
             return Result["email"];
         }
         #endregion
+
 
     }
 }
