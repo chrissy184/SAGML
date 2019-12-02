@@ -72,17 +72,17 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> GetSettingsAsync()
         {
             //get the zmodId
-            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            string UserEmailId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
             JObject jObj = new JObject();
             await Task.FromResult(0);
-            var settings = ZSSettingPayload.GetSettingsByUser(zmodId);
+            var settings = ZSSettingPayload.GetSettingsByUser(UserEmailId);
             List<SettingProperty> settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();
             //
             if(settings.Count == 0)
             {     
                 var template = new ZSSettingResponse
                 {    
-                    ZmodId = zmodId,                
+                    ZmodId = UserEmailId,                
                     Settings = new List<SettingProperty> {
                     new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="",password="",url="",selected=false },
                     new SettingProperty{ name="Zementis Server",type="ZS",tenantID="ai", username="",password="",url="",selected=false }
@@ -94,7 +94,7 @@ namespace ZMM.App.Controllers
             {
                 var template = new ZSSettingResponse
                 {    
-                    ZmodId = zmodId,                
+                    ZmodId = UserEmailId,                
                     Settings = settingProperties
                 };
                 jObj = JObject.Parse(JsonConvert.SerializeObject(template));  
