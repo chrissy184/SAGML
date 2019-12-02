@@ -54,7 +54,7 @@ namespace ZMM.Models.Payloads
         {
             string url = "", uname = "", pass = "";
             var qry = GetSettingsByUser(zmodId)
-            .Where(i => i.Settings.Any(s => s.selected == true))
+            .Where(i => i.Settings.Any(s => s.selected == true && s.type == "ZS"))
             .SelectMany(col => col.Settings.Select(s => new { s.url, s.username, s.password }));
 
             foreach (var record in qry)
