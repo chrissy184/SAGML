@@ -109,8 +109,7 @@ export class UtilService {
     return merge(of(navigator.onLine), fromEvent(window, 'online').pipe(mapTo(true)), fromEvent(window, 'offline').pipe(mapTo(false)));
   }
 
-  getSettingsObject(type: string) {
-    const settingsJSON: any = JSON.parse(localStorage.getItem('settingsJSON'));
+  getSettingsObject(type: string, settingsJSON: any) {
     if (settingsJSON) {
       const selectedArray = settingsJSON.settings.filter(function (element) {
         return (element.type === type && element.selected === true);

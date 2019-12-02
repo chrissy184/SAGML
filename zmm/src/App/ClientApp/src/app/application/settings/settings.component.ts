@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { UtilService } from '../../shared';
+import { UtilService, HttpService, ApiRoutes, AlertMessages } from '../../shared';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-settings',
@@ -8,6 +9,7 @@ import { UtilService } from '../../shared';
 })
 export class SettingsComponent implements OnInit {
   public isLoading = false;
+  public isContentLoading = false;
   public editorOptions: any = {
     theme: 'vs-light',
     language: 'json'
@@ -62,13 +64,19 @@ export class SettingsComponent implements OnInit {
 }
   `;
   public settingsJSON: any = `{}`;
-  constructor(private utilService: UtilService) { }
+  constructor(private utilService: UtilService, private apiService: HttpService) { }
 
+  public getSettings() {
+    this.isContentLoading = true;
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.settings)
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(response => {
+        this.settingsJSON = JSON.stringify(response);
+        localStorage.setItem('settingsJSON', this.settingsJSON);
+      });
+  }
   ngOnInit() {
-    this.settingsJSON = localStorage.getItem('settingsJSON');
-    if (!this.settingsJSON) {
-      this.settingsJSON = this.defaultSettingsJSON;
-    }
+    this.getSettings();
   }
   public toggleSidebar(action: string) {
     this.utilService.toggleSidebar(action);
@@ -77,5 +85,4 @@ export class SettingsComponent implements OnInit {
     localStorage.setItem('settingsJSON', this.settingsJSON);
     this.utilService.alert('Settings Saved.');
   }
-
 }

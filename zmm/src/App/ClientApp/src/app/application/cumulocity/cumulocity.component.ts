@@ -96,7 +96,24 @@ export class CumulocityComponent implements OnInit {
   public isLoading = false;
   public isContentLoading = false;
   public headers: any = {};
+  public c8y: any = {};
   constructor(private apiService: HttpService, private utilService: UtilService) { }
+
+  public getSettings() {
+    this.isContentLoading = true;
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.settings)
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(response => {
+        console.log(response);
+        this.c8y = this.utilService.getSettingsObject('C8Y', response);
+        console.log(this.c8y);
+        if (this.c8y && this.c8y.url) {
+          this.login({ valid: true });
+        } else {
+          this.utilService.alert('Cumulocity credentials not defined.');
+        }
+      });
+  }
 
   public login(loginData: any) {
     console.log(loginData);
@@ -105,10 +122,7 @@ export class CumulocityComponent implements OnInit {
     this.listDevice = false;
     this.listFile = false;
     if (loginData.valid) {
-      const c8y = this.utilService.getSettingsObject('C8Y');
-      if (c8y !== undefined) {
-        this.headers.Authorization = `Basic ${btoa(`${c8y.tenantID}/${c8y.username}:${c8y.password}`)}`;
-      }
+      this.headers.Authorization = `Basic ${btoa(`${this.c8y.tenantID}/${this.c8y.username}:${this.c8y.password}`)}`;
       this.listDevices();
     }
   }
@@ -125,7 +139,7 @@ export class CumulocityComponent implements OnInit {
       headers: this.headers
     };
     this.isContentLoading = true;
-    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.cumulocityGetManagedObjects(), options)
+    this.apiService.request(ApiRoutes.methods.GET, `${this.c8y.url}/inventory/managedObjects`, options)
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(response => {
         console.log(response);
@@ -147,7 +161,7 @@ export class CumulocityComponent implements OnInit {
       headers: this.headers
     };
     this.isContentLoading = true;
-    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.cumulocityGetFiles(), options)
+    this.apiService.request(ApiRoutes.methods.GET, `${this.c8y.url}/inventory/binaries`, options)
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(response => {
         console.log(response);
@@ -178,7 +192,7 @@ export class CumulocityComponent implements OnInit {
       headers: this.headers
     };
     this.isLoading = true;
-    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.cumulocityGetSeries(), options)
+    this.apiService.request(ApiRoutes.methods.GET, `${this.c8y.url}/measurement/measurements/series`, options)
       .pipe(finalize(() => { this.isLoading = false; }))
       .subscribe(response => {
         console.log(response);
@@ -239,7 +253,7 @@ export class CumulocityComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.login({ valid: true });
+    this.getSettings();
   }
 
 }
