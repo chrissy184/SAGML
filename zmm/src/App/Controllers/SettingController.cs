@@ -17,7 +17,7 @@ using System.Text;
 namespace ZMM.App.Controllers
 {
     [Authorize]
-    [Route("[controller]/[action]")]
+    [Route("api/[controller]")]
     public class SettingController : Controller
     {
         #region Variables... 
@@ -39,7 +39,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #region Add settings
-        [HttpPost("~/api/addsettingasync")]
+        [HttpPost]
         public async Task<IActionResult> AddSettingAsync()
         {
             string jsonBody = "", zmodId = "";
@@ -66,7 +66,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #region GET Settings
-        [HttpGet("~/api/getsettingsasync")]
+        [HttpGet]
         public async Task<IActionResult> GetSettingsAsync()
         {
             //get the zmodId
