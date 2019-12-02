@@ -82,7 +82,16 @@ export class SettingsComponent implements OnInit {
     this.utilService.toggleSidebar(action);
   }
   public saveSettings() {
-    localStorage.setItem('settingsJSON', this.settingsJSON);
-    this.utilService.alert('Settings Saved.');
+    this.isContentLoading = true;
+    const options = {
+      body: this.settingsJSON
+    };
+    this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.settings, options)
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(response => {
+        this.settingsJSON = JSON.stringify(response);
+        localStorage.setItem('settingsJSON', this.settingsJSON);
+        this.utilService.alert('Settings Saved.');
+      });
   }
 }

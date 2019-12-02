@@ -52,15 +52,24 @@ export class HeaderComponent implements OnInit {
   goToUrl(URL: any) {
     window.location.href = URL;
   }
+  public getSettings() {
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.settings)
+      .subscribe(response => {
+        console.log(response);
+        localStorage.setItem('settingsJSON', JSON.stringify(response));
+        const c8ySelectedObj: any = this.utilService.getSettingsObject('C8Y', response);
+        if (c8ySelectedObj && c8ySelectedObj.url) {
+          this.urlCockpit = `${c8ySelectedObj.url}/apps/cockpit`;
+          this.urlDeviceManagment = `${c8ySelectedObj.url}/apps/devicemanagement`;
+        } else {
+          this.utilService.alert('Cumulocity credentials not defined.');
+        }
+      });
+  }
+
   ngOnInit() {
     this.checkUpdate();
     this.getUserInfo();
-    const c8ySelectedObj: any = this.utilService.getSettingsObject('C8Y');
-    console.log(c8ySelectedObj);
-    if (c8ySelectedObj !== undefined) {
-      this.urlCockpit = `${c8ySelectedObj.url}/apps/cockpit`;
-      this.urlDeviceManagment = `${c8ySelectedObj.url}/apps/devicemanagement`;
-    }
-
+    this.getSettings();
   }
 }
