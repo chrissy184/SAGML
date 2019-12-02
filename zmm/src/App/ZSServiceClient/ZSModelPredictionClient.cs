@@ -57,14 +57,15 @@ namespace ZMM.App.ZSServiceClient
         #endregion
     
         #region Delete Pmml [DELETE] http://dcindgo01:8083/adapars/models/{modelName}
-        public async Task<string> DeletePmml(string modelName)
+        public async Task<string> DeletePmml(string modelName, string zmodId)
         {
             string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using(var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.Authorization = auth;    
@@ -98,15 +99,16 @@ namespace ZMM.App.ZSServiceClient
         #endregion
 
         #region Upload Pmml [POST]
-        public async Task<string> UploadPmml(string filePath)
+        public async Task<string> UploadPmml(string filePath,string zmodId)
         {
             string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
             try
             {
                 using (var httpClient = new HttpClient())
                 {
-                    httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                    httpClient.BaseAddress = new System.Uri(tuple.Item1);
                     httpClient.DefaultRequestHeaders.Accept.Clear();
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     httpClient.DefaultRequestHeaders.Authorization = auth;
@@ -151,14 +153,15 @@ namespace ZMM.App.ZSServiceClient
     
         #region single scoring [GET] /apply/SVM_Model?record={}
         //http://dcindgo01:8083/adapars/apply/SVM_Model?record={"sepal length (cm)":5,"sepal width (cm)":3,"petal length (cm)":1,"petal width (cm)":0}
-        public async Task<string> SingleScoring(string modelName, string record)
+        public async Task<string> SingleScoring(string modelName, string record, string zmodId)
         {
             string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using(var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.Authorization = auth;    
@@ -184,14 +187,15 @@ namespace ZMM.App.ZSServiceClient
         #endregion
 
         #region multiple score
-        public async Task<string> MultipleScoring(string modelName, string filePath)
+        public async Task<string> MultipleScoring(string modelName, string filePath, string zmodId)
         {
             string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using (var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.Authorization = auth;
@@ -227,14 +231,15 @@ namespace ZMM.App.ZSServiceClient
         #endregion
 
         #region Image score
-        public async Task<string> ImageScoring(string modelName,string filePath)
+        public async Task<string> ImageScoring(string modelName,string filePath, string zmodId)
         {
             string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using(var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.Authorization = auth;    
