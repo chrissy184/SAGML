@@ -84,11 +84,16 @@ namespace ZMM.App.Controllers
                 {    
                     ZmodId = UserEmailId,                
                     Settings = new List<SettingProperty> {
-                    new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="",password="",url="",selected=false },
-                    new SettingProperty{ name="Zementis Server",type="ZS",tenantID="ai", username="",password="",url="",selected=false }
+                        new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="vran",password="Testing@123",url="https://ai.eu-latest.cumulocity.com",selected=true },
+                        new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="vran",password="Testing@123",url="https://ai.cumulocity.com",selected=false },
+                        new SettingProperty{ name="Zementis Server",type="ZS",tenantID="zserver", username="vran",password="Testing@123",url="https://ai.eu-latest.cumulocity.com/",selected=true },
+                        new SettingProperty{ name="Zementis Server",type="ZS",tenantID="zserver", username="",password="",url="https://zserver.zmod.org/adapars/",selected=false },
+                        new SettingProperty{ name="Nyoka Remote 1",type="NR",tenantID="dlexp", username="",password="",url="https://dlexp.zmod.org/",selected=false },
+                        new SettingProperty{ name="Nyoka Remote 2",type="NR",tenantID="dlexp", username="",password="",url="https://hub.zmod.org/",selected=true }
                     }
                 };
-                jObj = JObject.Parse(JsonConvert.SerializeObject(template));               
+                jObj = JObject.Parse(JsonConvert.SerializeObject(template)); 
+                ZSSettingPayload.CreateOrUpdate(template);            
             }
             else
             {
