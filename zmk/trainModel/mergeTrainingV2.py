@@ -79,21 +79,21 @@ class NewModelOperations:
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='DeepNetwork':
             nyokaObj=ny.PMML(DataDictionary=pmmlObj.DataDictionary,DeepNetwork=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='RegressionModel':
-            nyokaObj=ny.PMML(DataDictionary=pmmlObj.DataDictionary,RegressionModel=[singMod['pmmlModelObject']])
+            nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,RegressionModel=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='AnomalyDetectionModel':
-            nyokaObj=ny.PMML(DataDictionary=pmmlObj.DataDictionary,AnomalyDetectionModel=[singMod['pmmlModelObject']])
+            nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,AnomalyDetectionModel=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='NeuralNetwork':
-            nyokaObj=ny.PMML(DataDictionary=pmmlObj.DataDictionary,NeuralNetwork=[singMod['pmmlModelObject']])
+            nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,NeuralNetwork=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='SupportVectorMachineModel':
-            nyokaObj=ny.PMML(DataDictionary=pmmlObj.DataDictionary,SupportVectorMachineModel=[singMod['pmmlModelObject']])
+            nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,SupportVectorMachineModel=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='SupportVectorMachineModel':
-            nyokaObj=ny.PMML(DataDictionary=pmmlObj.DataDictionary,ClusteringModel=[singMod['pmmlModelObject']])
+            nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,ClusteringModel=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='ClusteringModel':
-            nyokaObj=ny.PMML(DataDictionary=pmmlObj.DataDictionary,AnomalyDetectionModel=[singMod['pmmlModelObject']])
+            nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,AnomalyDetectionModel=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='NearestNeighborModel':
-            nyokaObj=ny.PMML(DataDictionary=pmmlObj.DataDictionary,NearestNeighborModel=[singMod['pmmlModelObject']])
+            nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,NearestNeighborModel=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='NaiveBayesModel':
-            nyokaObj=ny.PMML(DataDictionary=pmmlObj.DataDictionary,NaiveBayesModel=[singMod['pmmlModelObject']])
+            nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,NaiveBayesModel=[singMod['pmmlModelObject']])
         else:
             nyokaObj=None
         return nyokaObj

@@ -875,7 +875,7 @@ class NyokaServer:
 				allInfo.update(nyokaUtilities.getInfoOfAnomalyDetectionModel(tempObj))
 
 		allInfo=nyokaUtilities.changeStructure(allInfo)
-		allInfo['information'].append({'property': 'Deployable to ZAD', 'value': deployInfo})
+		allInfo['deployableToZAD']= deployInfo
 		
 		# print('response sent',allInfo)
 		return JsonResponse(allInfo)

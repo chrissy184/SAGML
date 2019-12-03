@@ -43,23 +43,27 @@ class Utility:
 				line = line.replace("rectifier","reLU6")
 			if "<Extension" in line and "sectionId" in line:
 				continue
-			if "<script" in line or "</script" in line or "<Data" in line:
+			if "<script" in line or "</script" in line or "<Data=" in line:
 				continue
 			if 'units' in line:
 				r = re.findall('units=\"[0-9]+"',line)
 				if len(r) != 0:
 					line = line.replace(r[0],'')
-			if 'modelName' in line:
-				r = re.findall('modelName=\"[a-z 0-9]+"',line)
+			if 'for' in line:
+				r = re.findall('for=\"[a-z A-Z 0-9]+"',line)
+				if len(r) != 0:
+					line = line.replace(r[0],'')
+			if "AnomalyDetectionModel" not in line and "SupportVectorMachineModel" not in line and 'modelName' in line:
+				r = re.findall('modelName=\"[a-z A-Z 0-9]+"',line)
 				if len(r) != 0:
 					line = line.replace(r[0],'')
 			if 'taskType' in line:
 				r = re.findall('taskType=\"[a-z A-Z]+"',line)
 				if len(r) != 0:
 					line = line.replace(r[0],'')
-			if len(line.lstrip()) != 0:
-				if line.lstrip()[0] != "<" and line.lstrip()[0:4] != "data":
-					continue   
+			# if len(line.lstrip()) != 0:
+			# 	if line.lstrip()[0] != "<" and line.lstrip()[0:4] != "data":
+			# 		continue   
 			new_lines.append(line+"\n")
 
 		# zmkFile=re.sub(r'architectureName=\"[A-Za-z\s]+\"','architectureName="mobilenet"',zmkFile)

@@ -77,7 +77,7 @@
                 <button mat-icon-button matTooltip="Publish Model" (click)="publishModel()">
                   <span class="mdi text-secondary mdi-publish"></span>
                 </button>
-                <button mat-icon-button (click)="deployModel()"
+                <button mat-icon-button (click)="deployModel()" *ngIf="selectedModel.deployableToZAD"
                   [matTooltip]="!selectedModel.deployed ? 'Deploy model to server' : 'Remove model from server'">
                   <span class="mdi mdi-cloud-outline text-secondary"
                     [ngClass]="{'mdi-cloud-outline': !selectedModel.deployed, 'mdi-cloud': selectedModel.deployed}"></span>
