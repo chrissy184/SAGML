@@ -719,6 +719,7 @@ namespace ZMM.App.Controllers
                                     if (item.Id == dataId)
                                     {
                                         filePath = item.FilePath;
+                                        break;
                                     }
                                 }
                             }
@@ -730,6 +731,7 @@ namespace ZMM.App.Controllers
                                     if (item.Id == modelId)
                                     {
                                         modelName = item.ModelName;
+                                        break; 
                                     }
                                 }
                             }
