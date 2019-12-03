@@ -43,14 +43,14 @@ class Utility:
 				line = line.replace("rectifier","reLU6")
 			if "<Extension" in line and "sectionId" in line:
 				continue
-			if "<script" in line or "</script" in line or "<Data" in line:
+			if "<script" in line or "</script" in line or "<Data=" in line:
 				continue
 			if 'units' in line:
 				r = re.findall('units=\"[0-9]+"',line)
 				if len(r) != 0:
 					line = line.replace(r[0],'')
 			if 'modelName' in line:
-				r = re.findall('modelName=\"[a-z 0-9]+"',line)
+				r = re.findall('modelName=\"[a-z A-Z 0-9]+"',line)
 				if len(r) != 0:
 					line = line.replace(r[0],'')
 			if 'taskType' in line:
