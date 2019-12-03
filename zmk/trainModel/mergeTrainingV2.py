@@ -289,10 +289,10 @@ class NewModelOperations:
         
         PMMLMODELSTORAGE[pmmlFileForKey]=tempDict
 
-        print('*'*100)
+        # print('*'*100)
 
-        print(PMMLMODELSTORAGE)
-        print('*'*100)
+        # print(PMMLMODELSTORAGE)
+        # print('*'*100)
         if 0 in modelLoadStatus:
             messageToWorld= "Model load failed, please connect with admin"
         else:
