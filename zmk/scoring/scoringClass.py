@@ -472,13 +472,13 @@ class NewScoringView:
 			# resultData={'result':'Add support'}
 		elif len(modelObjs) ==2:
 			modeScope=modelInformation['score'][modelObjs[0]]
-			if 'preprocessing' in modeScope:
+			if 'preprocessing' in modeScope['modelObj']:
 				# print (modeScope['preprocessing'])
-				testData=modeScope['preprocessing'](jsonData)
+				testData=modeScope['modelObj']['preprocessing'](testData)
 				XVarForModel=modeScope['modelObj']['listOFColumns']
 				testData=testData[XVarForModel]
 			else:
-				testData=pd.DataFrame([jsonData])
+				testData=testData
 			if modeScope['modelObj']['modelArchType']=='NNModel':
 				rowsIn=testData.shape[0]
 				colsIn=testData.shape[1]
@@ -491,12 +491,14 @@ class NewScoringView:
 						resultData=modelToUse.predict(testData)
 			else:
 				resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
+
+			print ('resultData',resultData)
 			#resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
 
 			modeScope2=modelInformation['score'][modelObjs[1]]
-			# print ('modeScope2  >>>>>>>>>   ',modeScope2)
-			if 'preprocessing' in modeScope2:
-				testData=modeScope2['preprocessing'](testData,resultData)
+			print ('modeScope2  >>>>>>>>>   ',modeScope2)
+			if 'preprocessing' in modeScope2['modelObj']:
+				testData=modeScope2['modelObj']['preprocessing'](resultData)
 			
 			# print('*'*100)
 			# print('testData shape',testData.shape)
