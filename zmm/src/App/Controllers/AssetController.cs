@@ -19,6 +19,7 @@ using ZMM.Tools.TB;
 using System.IO;
 using ZMM.Helpers.Common;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace ZMM.App.Controllers
 {
@@ -91,6 +92,11 @@ namespace ZMM.App.Controllers
                         gpuctr++;
                     }
                 }
+                var qry = getAllInstances.Where(x=>x.Type == "ZMK").Count();
+                if(qry == 0)
+                {
+                    getAllInstances.Add(ZMKDockerCmdHelper.GetNonDockerZMK());
+                }
             }
             catch (Exception ex)
             {
@@ -98,6 +104,7 @@ namespace ZMM.App.Controllers
                 getAllInstances.Add(ZMKDockerCmdHelper.GetNonDockerZMK());
                 //return BadRequest(new {message="running instance loading failed.", exception=ex.StackTrace});             
             }
+            
             #endregion
             
             #region ZMK listing
