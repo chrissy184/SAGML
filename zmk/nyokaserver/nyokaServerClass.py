@@ -598,6 +598,8 @@ class NyokaServer:
 
 	def updatetoWorkflow(payload,projectID):
 
+		# print (payload)
+
 		def getCodeObjectToProcess(codeVal):
 			d = {}
 			exec(codeVal, None,d)
@@ -631,6 +633,9 @@ class NyokaServer:
 				elif ob=='AnomalyDetectionModel':
 					minigFieldList=tempObj['AnomalyDetectionModel'][0].__dict__['MiningSchema'].__dict__['MiningField']
 					break
+				elif ob=='DeepNetwork':
+					minigFieldList=tempObj['DeepNetwork'][0].__dict__['MiningSchema'].__dict__['MiningField']
+					break
 				else:
 					None
 			targetCol=None
@@ -649,25 +654,36 @@ class NyokaServer:
 			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']
 		except:
 			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']={}
+		
+		try:
+			MEMORY_DICT_ARCHITECTURE[projectID]['tempSecMem']
+		except:
+			MEMORY_DICT_ARCHITECTURE[projectID]['tempSecMem']={}
+
 		tempMem=MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']
-		# print ('tempMem,',tempMem)
+		tempSecMem=MEMORY_DICT_ARCHITECTURE[projectID]['tempSecMem']
+		# print ('processTheInput,',processTheInput)
 		
 		if processTheInput['itemType']=='FOLDING':
-			tempMem[processTheInput['sectionId']]={'data':None,'hyperparameters':None,'preProcessingScript':None,
+			tempSecMem[processTheInput['sectionId']]=processTheInput['layerId']
+			tempMem[tempSecMem[processTheInput['sectionId']]]={'data':None,'hyperparameters':None,'preProcessingScript':None,
                         'pipelineObj':None,'modelObj':None,'featuresUsed':None,'targetName':None,'postProcessingScript':None,
                       'taskType': None,'predictedClasses':None,'dataSet':None}
+
+			
+			print (tempSecMem)
 		elif processTheInput['itemType']=='DATA':
 			tempMem[processTheInput['sectionId']]['data']=processTheInput['filePath']
 		elif processTheInput['itemType']=='CODE':
 			scriptObj=open(processTheInput['filePath'],'r').read()
 			# print('scriptObj',scriptObj)
-			if processTheInput['taskType']=='PREPROCESSING':
-				tempMem[processTheInput['sectionId']]['preProcessingScript']={'scripts':[scriptObj],\
+			if processTheInput['taskType']=='preprocessing':
+				tempMem[tempSecMem[processTheInput['sectionId']]]['preProcessingScript']={'scripts':[scriptObj],\
 																			  'scriptpurpose':[processTheInput['scriptPurpose']],\
 																			  'scriptOutput':[processTheInput['scriptOutput']],\
 																			'scriptPath':[processTheInput['filePath']]}
-			elif processTheInput['taskType']=='POSTPROCESSING':
-				tempMem[processTheInput['sectionId']]['postProcessingScript']={'scripts':[scriptObj],\
+			elif processTheInput['taskType']=='postprocessing':
+				tempMem[tempSecMem[processTheInput['sectionId']]]['postProcessingScript']={'scripts':[scriptObj],\
 																			  'scriptpurpose':[processTheInput['scriptPurpose']],\
 																			  'scriptOutput':[processTheInput['scriptOutput']],\
 																			  'scriptPath':[processTheInput['filePath']]}
@@ -679,18 +695,38 @@ class NyokaServer:
 			from nyokaBase import PMML43Ext as pmmNY
 			pmObj=pmmNY.parse(modelPath,silence=True)
 			colInfo=getCOlumDet(pmObj)
-			modelOb=generate_skl_model(pmObj)
+			print ('came to reconstruct')
+			if len(pmObj.__dict__['DeepNetwork']) >0:
+				from tensorflow import Graph, Session
+				import tensorflow as tf
+				model_graph = Graph()
+				with model_graph.as_default():
+					tf_session = Session()
+					with tf_session.as_default():
+						print ('step 5')
+						from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
+						print ('step 5.1')
+						modelOb = generate_skl_model(pmObj).model
+						model_graph = tf.get_default_graph()
+						
+			else:
+				modelOb=generate_skl_model(pmObj)
+				model_graph=None
+			print (modelOb)
 			# modelOb=None
 			import sklearn
 			if type(modelOb)==sklearn.pipeline.Pipeline:
-				tempMem[processTheInput['sectionId']]['modelObj']=modelOb.steps[-1][1]
-				tempMem[processTheInput['sectionId']]['pipelineObj']=Pipeline(modelOb.steps[:-1])
-				tempMem[processTheInput['sectionId']]['featuresUsed']=colInfo[0]
-				tempMem[processTheInput['sectionId']]['targetName']=colInfo[1]
+				tempMem[tempSecMem[processTheInput['sectionId']]]['modelObj']=modelOb.steps[-1][1]
+				tempMem[tempSecMem[processTheInput['sectionId']]]['pipelineObj']=Pipeline(modelOb.steps[:-1])
+				tempMem[tempSecMem[processTheInput['sectionId']]]['featuresUsed']=colInfo[0]
+				tempMem[tempSecMem[processTheInput['sectionId']]]['targetName']=colInfo[1]
 			else:
-				tempMem[processTheInput['sectionId']]['modelObj']=modelOb
-			tempMem[processTheInput['sectionId']]['modelPath']=modelPath
-			tempMem[processTheInput['sectionId']]['taskType']=processTheInput['taskType']
+				tempMem[tempSecMem[processTheInput['sectionId']]]['modelObj']=modelOb
+			if model_graph != None:
+				tempMem[tempSecMem[processTheInput['sectionId']]]['model_graph']=model_graph
+				tempMem[tempSecMem[processTheInput['sectionId']]]['tf_session']=tf_session
+			tempMem[tempSecMem[processTheInput['sectionId']]]['modelPath']=modelPath
+			tempMem[tempSecMem[processTheInput['sectionId']]]['taskType']=processTheInput['taskType']
 			
 		
 		MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']=tempMem.copy()
@@ -698,7 +734,7 @@ class NyokaServer:
 		# print ('tempMem',tempMem)
 
 		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
-		# print ('processTheInput',processTheInput)
+		print ('processTheInput',processTheInput)
 		# print ('MEMORY_DICT_ARCHITECTURE[projectID]',MEMORY_DICT_ARCHITECTURE[projectID])
 
 		returntoClient={'projectID':projectID,'layerUpdated':processTheInput}

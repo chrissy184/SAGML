@@ -474,49 +474,81 @@ class NewScoringView:
 			modeScope=modelInformation['score'][modelObjs[0]]
 			if 'preprocessing' in modeScope:
 				# print (modeScope['preprocessing'])
-				testData=modeScope['preprocessing'](jsonData)
+				testData=modeScope['preprocessing']['codeObj'](testData)
 				XVarForModel=modeScope['modelObj']['listOFColumns']
 				testData=testData[XVarForModel]
 			else:
-				testData=pd.DataFrame([jsonData])
+				testData=testData
 			if modeScope['modelObj']['modelArchType']=='NNModel':
 				rowsIn=testData.shape[0]
 				colsIn=testData.shape[1]
-				testData=testData.values.reshape(rowsIn,1,colsIn)
 				model_graph = modeScope['modelObj']['model_graph']
 				tf_session = modeScope['modelObj']['tf_session']
 				with model_graph.as_default():
 					with tf_session.as_default():
 						modelToUse=modeScope['modelObj']['recoModelObj'].model
-						resultData=modelToUse.predict(testData)
+						try:
+							resultData=modelToUse.predict(testData.values)
+						except:
+							testData=testData.values.reshape(rowsIn,1,colsIn)
+							resultData=modelToUse.predict(testData)
+			# if modeScope['modelObj']['modelArchType']=='NNModel':
+			# 	rowsIn=testData.shape[0]
+			# 	colsIn=testData.shape[1]
+			# 	testData=testData.values.reshape(rowsIn,1,colsIn)
+			# 	model_graph = modeScope['modelObj']['model_graph']
+			# 	tf_session = modeScope['modelObj']['tf_session']
+			# 	with model_graph.as_default():
+			# 		with tf_session.as_default():
+			# 			modelToUse=modeScope['modelObj']['recoModelObj'].model
+			# 			resultData=modelToUse.predict(testData)
 			else:
 				resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
+
+			# print ('resultData',resultData)
+			if 'postprocessing' in modeScope:
+				# print (modeScope['preprocessing'])
+				modeScope['postprocessing']['codeObj'](resultData)
 			#resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
 
 			modeScope2=modelInformation['score'][modelObjs[1]]
-			# print ('modeScope2  >>>>>>>>>   ',modeScope2)
+			print ('modeScope2  >>>>>>>>>   ',modeScope2.keys())
 			if 'preprocessing' in modeScope2:
-				testData=modeScope2['preprocessing'](testData,resultData)
+				print ('came here')
+				testData=modeScope2['preprocessing']['codeObj'](testData,resultData)
 			
 			# print('*'*100)
-			# print('testData shape',testData.shape)
+			print('testData shape',testData.shape)
 
 			if modeScope2['modelObj']['modelArchType']=='NNModel':
 				rowsIn=testData.shape[0]
 				colsIn=testData.shape[1]
-				testData=testData.values.reshape(rowsIn,1,colsIn)
 				model_graph = modeScope2['modelObj']['model_graph']
 				tf_session = modeScope2['modelObj']['tf_session']
 				with model_graph.as_default():
 					with tf_session.as_default():
 						modelToUse=modeScope2['modelObj']['recoModelObj'].model
-						resultData=modelToUse.predict(testData)
+						try:
+							resultData=modelToUse.predict(testData.values)
+						except:
+							testData=testData.values.reshape(rowsIn,1,colsIn)
+							resultData=modelToUse.predict(testData)
+							resultData=np.ravel(resultData)
 			else:
 				resultData=modeScope2['modelObj']['recoModelObj'].predict(testData)
 			if 'postprocessing' in modeScope2:
-				modeScope2['postprocessing'](testData,resultData)
+				modeScope2['postprocessing']['codeObj'](resultData)
 
 			resultData=resultData.tolist()
+
+			if pathlib.Path(filePath).suffix =='.csv':
+				if modeScope['modelObj']['targetCol']==None:
+					testData['predicted']=resultData
+				else:
+					testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
+				print (testData.shape)
+				resafile=target_path+'result.csv'
+				testData.to_csv(resafile, index=False)
 
 		resultResp={'result':resafile}
 		return JsonResponse(resultResp,status=200)

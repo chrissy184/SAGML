@@ -111,14 +111,14 @@ class NewModelOperations:
             return None
 
     def loadExecutionModel(self,pmmlFile):
-        print ('loadmodel started')
-        print (pmmlFile)
+        # print ('loadmodel started')
+        # print (pmmlFile)
         global PMMLMODELSTORAGE
         pmmlFileObj=pathlib.Path(pmmlFile)
         pmmlFileForKey=pmmlFileObj.name.replace(pmmlFileObj.suffix,'')
         from nyokaBase import PMML43Ext as ny
         pmmlObj=ny.parse(pmmlFile,silence=True)
-        print (pmmlObj)
+        # print (pmmlObj)
         print ('load model step 1.0')
         modelObj=[]
         for inMod in modelObjectToCheck:
@@ -607,7 +607,7 @@ class TrainingViewModels:
             elif (pathlib.Path(dataObj).suffix == '.csv') & (scriptOutputPrepro!=None) :
                 dataObjPd=pd.read_csv(modelObj['Data'])
                 print (dataObjPd.shape)
-                print('Simple DNN with preprocessing')
+                print('Simple DNN with preprocessing',modelObj,tensorboardLogFolder)
                 modelObjTrained=self.trainSimpleDNNObjWithPrepro(modelObj,tensorboardLogFolder,dataObjPd)
                 
             else:
@@ -696,14 +696,17 @@ class TrainingViewModels:
         datHyperPara=modelObj['modelObj']['hyperparameters']
         listOfMetrics=datHyperPara['metrics']
         modelV1=modelObj['modelObj']['recoModelObj'].model
-        print(">>>>>>>>>>>>>>SimpleDNN")
+        print(">>>>>>>>>>>>>>SimpleDNN with Prepro")
         print('pathofdata>>>>>',dataFolder)
         predictedClasses=None
         targetColumnName = 'target'
         # df = dataObj
+        print (modelObj['preprocessing']['codeObj'])
+        print (dataObj.shape)
 
         scriptCode=modelObj['preprocessing']['codeObj']
         dfX,dfY=scriptCode(dataObj)
+        print ('data prepared',dfX.shape)
 
         indevar=list(dfX.columns)
         # indevar.remove('target')
