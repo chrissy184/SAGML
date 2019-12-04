@@ -734,6 +734,7 @@ namespace ZMM.App.Controllers
                                         break; 
                                     }
                                 }
+                                if(string.IsNullOrEmpty(modelName)) modelName = modelId;
                             }
 
                             #endregion

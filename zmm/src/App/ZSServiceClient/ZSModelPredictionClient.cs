@@ -242,12 +242,12 @@ namespace ZMM.App.ZSServiceClient
                 httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.DefaultRequestHeaders.Authorization = auth;    
+                httpClient.DefaultRequestHeaders.Authorization = auth;
                 // httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("eddie.soong@softwareag.com", "softwareag");   
                 //                                
                 try
                 {
-                   using (var content = new MultipartFormDataContent())
+                    using (var content = new MultipartFormDataContent())
                     {
                         var memory = new MemoryStream();
                         using (var stream = new FileStream(filePath, FileMode.Open))
@@ -256,14 +256,14 @@ namespace ZMM.App.ZSServiceClient
                         }
                         memory.Position = 0;
                         content.Add(new StreamContent(memory), "file", filePath);
-                        HttpResponseMessage response = await httpClient.PostAsync($"service/zementis/apply/{modelName}",content);
+                        HttpResponseMessage response = await httpClient.PostAsync($"service/zementis/apply/{modelName}", content);
                         if (response.IsSuccessStatusCode)
                         {
-                            jsonResult = await response.Content.ReadAsStringAsync();                        
-                        } 
+                            jsonResult = await response.Content.ReadAsStringAsync();
                         }
+                    }
 
-                    } 
+                }
                 catch(HttpRequestException ex)
                 {
                     //add log                    
