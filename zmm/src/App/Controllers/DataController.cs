@@ -426,6 +426,12 @@ namespace ZMM.App.Controllers
                         {"executedAt",r.executedAt}
                     });
                 }
+                string idExisted = SchedulerPayload.GetById(id).Where(i=>i.Type == "AUTOML" && i.Id == id).Select(i=>i.Id).FirstOrDefault();
+                if(idExisted == id)
+                {
+                    id = id + userModelName;
+                }
+
                 SchedulerResponse schJob = new SchedulerResponse()
                 {
                     CreatedOn = DateTime.Now.ToString(),
@@ -444,7 +450,7 @@ namespace ZMM.App.Controllers
                     ZMKResponse = tresp.ToList<object>(),
                     Status = "COMPLETED",
                     History = jHist.ToList<object>()
-                };
+                };                
                 SchedulerPayload.Create(schJob);
 
                 //
