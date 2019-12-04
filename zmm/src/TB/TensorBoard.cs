@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using ZMM.Tasks;
@@ -17,8 +19,6 @@ namespace ZMM.Tools.TB
     }
     public class TensorBoard : Tool
     {
-
-
         protected static string HostURL = "http://localhost";
 
         protected static string DataLogParentDirectory = string.Empty;
@@ -40,21 +40,17 @@ namespace ZMM.Tools.TB
                     ITask tempTask = FindTask(taskName);
                     if (tempTask.IsEmpty())
                     {
-                        int FreePort = GetFreePort();
+                        int FreePort = GetAvailablePort(ListOfAllowedPorts.First(),ListOfAllowedPorts.Last());
                         string LogDirectory = CreateNewLogDir();
                         if (FreePort > 0)
                         {
                             UpdateStartTaskInfo(ref info, FreePort, LogDirectory);
                             tempTask = TaskFactory.Get(taskType, taskName, this, info);
                             tempTask.StartAsync();
-                            if (WaitForTaskToStart(tempTask))
-                            {
-                                AddTask(tempTask.GetName(), tempTask);
-                            }
+                            if (WaitForTaskToStart(tempTask, FreePort)) AddTask(tempTask.GetName(), tempTask);
                             else throw new Exception("Unable to start tensorboard. Please, contact Administrator.");
-
                         }
-                        else throw new Exception("It reaches maximum number of allowed tensorboard instance. Please, stop previous tensorboard from asset or contact Administrator.");
+                        else throw new Exception("It reaches maximum number of allowed tensorboard instance. Please, stop previously running notebook from \"Assets\" or contact Administrator.");
                     }
                     break;
                 default:
@@ -69,25 +65,6 @@ namespace ZMM.Tools.TB
             System.IO.Directory.CreateDirectory(LogDir);
             return LogDir;
         }
-
-        private int GetFreePort()
-        {
-            int FreePort = 0;
-            List<int> ListOfEngagedPorts = new List<int>();
-            List<int> ListOfPorts = new List<int>();
-            foreach (KeyValuePair<string, ITask> taskinfo in GetTasks())
-            {
-                ListOfEngagedPorts.Add(GetPortFromLiveTask(taskinfo.Value));
-            }
-            ListOfPorts.AddRange(ListOfAllowedPorts.Except(ListOfEngagedPorts));
-            if (ListOfPorts.Count > 0)
-            {
-                FreePort = ListOfPorts.First();
-            }
-            return FreePort;
-        }
-
-
 
         private int GetPortFromLiveTask(ITask task)
         {
@@ -109,7 +86,7 @@ namespace ZMM.Tools.TB
         private string GetLinkPrefix(int Port)
         {
             int Index = ListOfAllowedPorts.FindIndex(x => x == Port) + 1;
-            string Prefix = "/tb" + Index.ToString();
+            string Prefix = "/tb" + Index.ToString() + "/";
             return Prefix;
         }
 
@@ -144,18 +121,18 @@ namespace ZMM.Tools.TB
                 List<string> logs = result.GetLog();
                 for (int i = 0; i < logs.Count; i++)
                 {
-                    if (logs[i].Contains("Press CTRL+C to quit"))
+                    if (logs[i].Contains("CTRL+C to quit"))
                     {
                         Found = true;
                         break;
                     }
-                    if (i == 100) break;
+                    if (i == 200) break;
                 }
             }
             return Found;
         }
 
-        private bool WaitForTaskToStart(ITask task)
+        private bool WaitForTaskToStart(ITask task, int TaskPort)
         {
             bool Status = WaitForStartupMessage(task);
             for (int i = 1; i < 20; i++)
@@ -163,11 +140,16 @@ namespace ZMM.Tools.TB
                 if (Status) break;
                 else
                 {
-                    Console.WriteLine("Waiting for token id...");
-                    System.Threading.Thread.Sleep(500);
-                    Status = WaitForStartupMessage(task);
+                    if(IsPortAvailableInRange(TaskPort, ListOfAllowedPorts.First(), ListOfAllowedPorts.Last())) Console.WriteLine("Waiting for task port to start " + TaskPort);
+                    else 
+                    {
+                        Console.WriteLine("Waiting for token id");                        
+                        Status = WaitForStartupMessage(task);
+                    }
+                    System.Threading.Thread.Sleep(1000);
                 }
             }
+            System.Threading.Thread.Sleep(500);
             return Status;
         }
         

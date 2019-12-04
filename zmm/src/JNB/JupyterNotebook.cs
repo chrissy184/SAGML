@@ -53,18 +53,18 @@ namespace ZMM.Tools.JNB
                     ITask tempTask = FindTask(taskName);
                     if (tempTask.IsEmpty())
                     {
-                        int FreePort = GetAvailablePort(8888,8890); 
+                        int FreePort = GetAvailablePort(ListOfAllowedPorts.First(),ListOfAllowedPorts.Last()); 
                         if (FreePort > 0)
                         {
                             UpdateStartTaskInfo(ref info, FreePort);
                             tempTask = TaskFactory.Get(taskType, taskName, this, info);
                             tempTask.StartAsync();
-                            string token = WaitForStartTaskToken(tempTask);
+                            string token = WaitForStartTaskToken(tempTask, FreePort);
                             if(token.Equals(string.Empty)) throw new Exception("Something went wrong. Jupyter notebook cannot be started. Try again.");
                             tempTask.UpdateInput("Token", token);
-                            AddTask(tempTask.GetName(), tempTask);
+                            AddTask(tempTask.GetName(), tempTask);                            
                         }
-                        else throw new Exception("It reaches maximum number of allowed jupyter notebook instance. Please, stop previous notebook or contact Administrator.");
+                        else throw new Exception("It reaches maximum number of allowed jupyter notebook instance. Please, stop previously running notebook from \"Assets\" or contact Administrator.");
                     }
                     break;
                 default:
@@ -73,32 +73,6 @@ namespace ZMM.Tools.JNB
             }
             
         }
-
-        private int GetAvailablePort(int StartingPort, int endPort)
-        {
-            IPEndPoint [] endPoints;
-            List<int> portArray = new List<int>();
-            IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
-            // getting active connections 
-            TcpConnectionInformation[] connections = properties.GetActiveTcpConnections();
-            portArray.AddRange(from n in connections
-                                where n.LocalEndPoint.Port >= StartingPort
-                                select n.LocalEndPoint.Port);
-
-            // getting active tcp listeneres - wcf service Listening in tcp
-            endPoints = properties.GetActiveTcpListeners();
-            portArray.AddRange(from n in endPoints
-                                where n.Port >= StartingPort
-                                select n.Port);
-
-            portArray.Sort();
-            for (int i = StartingPort; i<= endPort; i++)
-                if (!portArray.Contains(i))
-                    return i;
-            
-            return 0;
-        }
-
         
 
         private int GetPortFromLiveTask(ITask task)
@@ -169,26 +143,32 @@ namespace ZMM.Tools.JNB
                         tokenId = logs[i].Substring(logs[i].IndexOf(TokenPattern) + 7);
                         break;
                     }
-                    if (i == 100) break;
+                    if (i == 200) break;
                 }
             }
             return tokenId;
         }
 
-        private string WaitForStartTaskToken(ITask task)
-        {
+        private string WaitForStartTaskToken(ITask task, int TaskPort)
+        {            
             string tokenId = GetToken(task);
-            for (int i = 1; i < 40; i++)
+            for (int i = 1; i < 50; i++)
             {
                 if (tokenId != string.Empty) break;
                 else
                 {
-                    Console.WriteLine("Waiting for token id...");
+                    if(IsPortAvailableInRange(TaskPort, ListOfAllowedPorts.First(), ListOfAllowedPorts.Last())) Console.WriteLine("Waiting for task expected port " + TaskPort + "  to start"); 
+                    else 
+                    {
+                        Console.WriteLine("Waiting for token id...");                        
+                        tokenId = GetToken(task);
+                    }
                     System.Threading.Thread.Sleep(500);
-                    tokenId = GetToken(task);
                 }
             }
+            System.Threading.Thread.Sleep(1000);
             return tokenId;
         }
+        
     }
 }
