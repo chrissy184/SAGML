@@ -102,8 +102,8 @@ namespace ZMM.App.Controllers
                 responseData = DataPayload.Get();
             }
             //
-            string jsonStr = JsonConvert.SerializeObject(responseData, Formatting.None);
-            jsonStr = jsonStr.ToPrettyJsonString();
+            string jsonStr = JsonConvert.SerializeObject(responseData, Formatting.Indented);
+            // jsonStr = jsonStr.ToPrettyJsonString();
             var jsonObj = JsonConvert.DeserializeObject<List<DataResponse>>(jsonStr);
 
             List<DataResponse> _data = new List<DataResponse>();
@@ -734,6 +734,7 @@ namespace ZMM.App.Controllers
                                         break; 
                                     }
                                 }
+                                if(string.IsNullOrEmpty(modelName)) modelName = modelId;
                             }
 
                             #endregion

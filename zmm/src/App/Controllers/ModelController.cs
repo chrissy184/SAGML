@@ -33,6 +33,7 @@ namespace ZMM.App.Controllers
     {
         #region Variables 
         private readonly string CURRENT_USER = "";
+
         private readonly IWebHostEnvironment _environment;
         readonly ILogger<ModelController> Logger;
         private IConfiguration Configuration { get; }
@@ -61,7 +62,7 @@ namespace ZMM.App.Controllers
             try
             {
                 responseData = ModelPayload.Get();
-                dataResponseData = DataPayload.Get();
+                dataResponseData = DataPayload.Get();                
             }
             catch (Exception ex)
             {
@@ -1095,7 +1096,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #region Get deployed models
-        [HttpGet("deployed")]
+        [HttpGet("~/api/model/deployed")]
         public async Task<IActionResult> GetDeployedModelAsync()
         {
             //response formatting
