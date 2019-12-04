@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 import { UtilService } from '../services/util.service';
+import { ApiRoutes } from '../constants/api-routes';
 
 /**
  * Adds a default error handler to all requests.
@@ -33,7 +34,13 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
     } else {
       console.error('Server Side Error => ', response);
       if (response.status === 504 || response.status === 0) {
-        this.utilService.alert(`Unable to connect to server: ${response.statusText}`);
+        if(response.statusText.indexOf('Unknown')==0)
+        {
+          this.utilService.alert(`Redirecting to login page.`);
+          this.goToUrl(ApiRoutes.loginRedirect);
+        }
+        else
+          this.utilService.alert(`Unable to connect to server: ${response.statusText}`);
       } else if (response.status === 400) {
         this.utilService.alert(`Oops! Something went wrong and we could't process your request.`);
       }
@@ -42,5 +49,8 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       this.utilService.alert(response.error.message);
     }
     throw response;
+  }
+  private goToUrl(URL: any) {
+    window.location.href = URL;
   }
 }
