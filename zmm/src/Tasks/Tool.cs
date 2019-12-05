@@ -33,7 +33,7 @@ namespace ZMM.Tasks
         public Tool(ToolTypes name, bool HTTPSConfiguration)
         {
             this.name = name.ToString();
-            WithHTTPSConfiguration = HTTPSConfiguration;
+            WithHTTPSConfiguration = false;
             Init();
         }
 
