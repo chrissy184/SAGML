@@ -673,7 +673,7 @@ class NyokaServer:
 			
 			print (tempSecMem)
 		elif processTheInput['itemType']=='DATA':
-			tempMem[processTheInput['sectionId']]['data']=processTheInput['filePath']
+			tempMem[tempSecMem[processTheInput['sectionId']]]['data']=processTheInput['filePath']
 		elif processTheInput['itemType']=='CODE':
 			scriptObj=open(processTheInput['filePath'],'r').read()
 			# print('scriptObj',scriptObj)

@@ -439,12 +439,12 @@ class NyokaUtilities:
             from trainModel.mergeTrainingV2 import  NewModelOperations
             NewModelOperations().loadExecutionModel(filePath)
             modelInformation=PMMLMODELSTORAGE[pmmlFileForKey]
-            print ('PMMLMODELSTORAGE after >>>>>>>>>>> ',PMMLMODELSTORAGE)
+            # print ('PMMLMODELSTORAGE after >>>>>>>>>>> ',PMMLMODELSTORAGE)
             # print (modelInformation)
 
             toexp=TrainingViewModels().restructureModelInforForExportDict(modelInformation)
-            print ('toexp'*20)
-            print ('toexportDictN >>>>>>>> ',toexp)
+            # print ('toexp'*20)
+            # print ('toexportDictN >>>>>>>> ',toexp)
             
             import copy,json
 

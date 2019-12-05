@@ -940,7 +940,7 @@ class TrainingViewModels:
         return modelObj
 
     def restructureModelInforForExportDict(self,tempDict):
-        # print (tempDict['train']['K2PSSUKYFRSMF'])
+        print ('tempDict',tempDict)
 
         listOfModelNames=set([k for j in tempDict for k in tempDict[j]])
         toExportDict={}
@@ -980,6 +980,7 @@ class TrainingViewModels:
                         toExportDict[echMod]['featuresUsed']=tempDict[modObjeCom][echMod]['modelObj']['listOFColumns']
                         toExportDict[echMod]['targetName']=tempDict[modObjeCom][echMod]['modelObj']['targetCol']
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
+                        toExportDict[echMod]['modelPath']=tempDict[modObjeCom][echMod]['modelObj']['modelPath']
                         toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
 
                         if 'Data' in tempDict[modObjeCom][echMod]:
@@ -1016,27 +1017,74 @@ class TrainingViewModels:
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
     
         for modNa in listOfModelNames:
-            if (modNa in tempDict['train']) & (modNa in tempDict['score']):
-                toExportDict[modNa]['taskType']='trainAndscore'
-                # print (tempDict['train'][modNa].keys())
-                # print (tempDict['score'][modNa]['preprocessing_code'][0])
-                # print ("tempDict['train'][modNa]",tempDict['train'][modNa],tempDict['score'][modNa])
-                print ('p'*100)
-                if ('scriptOutput' in tempDict['train'][modNa]) & ('scriptOutput' in tempDict['score'][modNa]):
-                    if (tempDict['train'][modNa]['scriptOutput']==tempDict['score'][modNa]['scriptOutput']):
+            if ('train' in  list(tempDict.keys())) & ('score' in  list(tempDict.keys())):
+                if (modNa in tempDict['train']) & (modNa in tempDict['score']):
+                    toExportDict[modNa]['taskType']='trainAndscore'
+                    # print (tempDict['train'][modNa].keys())
+                    # print (tempDict['score'][modNa]['preprocessing_code'][0])
+                    # print ("tempDict['train'][modNa]",tempDict['train'][modNa],tempDict['score'][modNa])
+                    print ('p'*100)
+                    if ('scriptOutput' in tempDict['train'][modNa]) & ('scriptOutput' in tempDict['score'][modNa]):
+                        if (tempDict['train'][modNa]['scriptOutput']==tempDict['score'][modNa]['scriptOutput']):
+                            print ('Came here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',toExportDict[modNa])
+                            if  toExportDict[modNa]['preProcessingScript']['scripts'] != None:
+                                toExportDict[modNa]['preProcessingScript']['scriptOutput']=tempDict['train'][modNa]['scriptOutput']
+                                toExportDict[modNa]['preProcessingScript']['scriptpurpose']=['trainAndscore']
+                                # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
+                                toExportDict[modNa]['preProcessingScript']['scripts']=[tempDict['score'][modNa]['preprocessing']['codeCont']]
+                                toExportDict[modNa]['preProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
+                            elif toExportDict[modNa]['postProcessingScript']['scripts'] != None:
+                                toExportDict[modNa]['postProcessingScript']['scriptOutput']=tempDict['train'][modNa]['scriptOutput']
+                                toExportDict[modNa]['postProcessingScript']['scriptpurpose']=['trainAndscore']
+                                # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
+                                toExportDict[modNa]['postProcessingScript']['scripts']=[tempDict['score'][modNa]['postprocessing']['codeCont']]
+                                toExportDict[modNa]['postProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
+
+            elif ('train' not in  list(tempDict.keys())) & ('score' in  list(tempDict.keys())):
+                print ('no train found')
+                if modNa in tempDict['score']:
+                    toExportDict[modNa]['taskType']='score'
+                    # print (tempDict['train'][modNa].keys())
+                    # print (tempDict['score'][modNa]['preprocessing_code'][0])
+                    # print ("tempDict['train'][modNa]",tempDict['train'][modNa],tempDict['score'][modNa])
+                    print ('p'*100)
+                    if 'scriptOutput' in tempDict['score'][modNa]:
                         print ('Came here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',toExportDict[modNa])
                         if  toExportDict[modNa]['preProcessingScript']['scripts'] != None:
-                            toExportDict[modNa]['preProcessingScript']['scriptOutput']=tempDict['train'][modNa]['scriptOutput']
-                            toExportDict[modNa]['preProcessingScript']['scriptpurpose']=['trainAndscore']
+                            toExportDict[modNa]['preProcessingScript']['scriptOutput']=tempDict['score'][modNa]['scriptOutput']
+                            toExportDict[modNa]['preProcessingScript']['scriptpurpose']=['score']
                             # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
                             toExportDict[modNa]['preProcessingScript']['scripts']=[tempDict['score'][modNa]['preprocessing']['codeCont']]
                             toExportDict[modNa]['preProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
                         elif toExportDict[modNa]['postProcessingScript']['scripts'] != None:
-                            toExportDict[modNa]['postProcessingScript']['scriptOutput']=tempDict['train'][modNa]['scriptOutput']
-                            toExportDict[modNa]['postProcessingScript']['scriptpurpose']=['trainAndscore']
+                            toExportDict[modNa]['postProcessingScript']['scriptOutput']=tempDict['score'][modNa]['scriptOutput']
+                            toExportDict[modNa]['postProcessingScript']['scriptpurpose']=['score']
                             # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
                             toExportDict[modNa]['postProcessingScript']['scripts']=[tempDict['score'][modNa]['postprocessing']['codeCont']]
                             toExportDict[modNa]['postProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
+
+            elif ('train'  in  list(tempDict.keys())) & ('score' not in  list(tempDict.keys())):
+                print ('no score found')
+                if modNa in tempDict['train']:
+                    toExportDict[modNa]['taskType']='train'
+                    # print (tempDict['train'][modNa].keys())
+                    # print (tempDict['score'][modNa]['preprocessing_code'][0])
+                    # print ("tempDict['train'][modNa]",tempDict['train'][modNa],tempDict['score'][modNa])
+                    print ('p'*100)
+                    if 'scriptOutput' in tempDict['train'][modNa]:
+                        print ('Came here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',toExportDict[modNa])
+                        if  toExportDict[modNa]['preProcessingScript']['scripts'] != None:
+                            toExportDict[modNa]['preProcessingScript']['scriptOutput']=tempDict['train'][modNa]['scriptOutput']
+                            toExportDict[modNa]['preProcessingScript']['scriptpurpose']=['train']
+                            # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
+                            toExportDict[modNa]['preProcessingScript']['scripts']=[tempDict['train'][modNa]['preprocessing']['codeCont']]
+                            toExportDict[modNa]['preProcessingScript']['scriptPath']=[tempDict['train'][modNa]['scriptPath']]
+                        elif toExportDict[modNa]['postProcessingScript']['scripts'] != None:
+                            toExportDict[modNa]['postProcessingScript']['scriptOutput']=tempDict['train'][modNa]['scriptOutput']
+                            toExportDict[modNa]['postProcessingScript']['scriptpurpose']=['train']
+                            # print( '>>>>>>>>',tempDict['score'][modNa]['preprocessing_code'])
+                            toExportDict[modNa]['postProcessingScript']['scripts']=[tempDict['train'][modNa]['postprocessing']['codeCont']]
+                            toExportDict[modNa]['postProcessingScript']['scriptPath']=[tempDict['train'][modNa]['scriptPath']]
                     # elif  (tempDict['train'][modNa]['scriptOutput']=='NONE') & (tempDict['score'][modNa]['scriptOutput'] == 'NONE'):
                     #     print ('Came here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',toExportDict[modNa])
                     #     if  toExportDict[modNa]['preProcessingScript']['scripts'] != None:
@@ -1052,27 +1100,29 @@ class TrainingViewModels:
                     #         toExportDict[modNa]['postProcessingScript']['scripts']=[tempDict['score'][modNa]['postprocessing']['codeCont']]
                     #         toExportDict[modNa]['postProcessingScript']['scriptPath']=[tempDict['score'][modNa]['scriptPath']]
             # print ("toExportDict[modNa]['preProcessingScript']['script']",toExportDict[modNa]['preProcessingScript']['script'])
-            if ((modNa in tempDict['train'] )== False) & (modNa in tempDict['score']):
-                toExportDict[modNa]['taskType']=['score']
+            if ('train' in  list(tempDict.keys())) & ('score' in  list(tempDict.keys())):
+                if ((modNa in tempDict['train'] )== False) & (modNa in tempDict['score']):
+                    toExportDict[modNa]['taskType']=['score']
 
         toExportDict2=toExportDict.copy()
-        for modT in toExportDict:
-            print (modT, '>>>>>>>>>>>>>>>>>>>>>>>>>.')
-            if 'preProcessingScript' in toExportDict2[modT]:
-                if len(set(toExportDict2[modT]['preProcessingScript']['scriptPath']))==1:
-                    print ('came here agaa')
-                    toExportDict2[modT]['preProcessingScript']['scriptpurpose']=['trainAndscore']
-                    toExportDict2[modT]['preProcessingScript']['scriptPath']=[toExportDict[modT]['preProcessingScript']['scriptPath'][0]]
-                    toExportDict2[modT]['preProcessingScript']['scripts']=[toExportDict[modT]['preProcessingScript']['scripts'][0]]
-                    toExportDict2[modT]['preProcessingScript']['scriptOutput']=[toExportDict[modT]['preProcessingScript']['scriptOutput'][0]]
-            if 'postProcessingScript' in toExportDict2[modT]:
-                if len(set(toExportDict2[modT]['postProcessingScript']['scriptPath']))==1:
-                    toExportDict2[modT]['postProcessingScript']['scriptpurpose']=['trainAndscore']
-                    toExportDict2[modT]['postProcessingScript']['scriptPath']=[toExportDict[modT]['postProcessingScript']['scriptPath'][0]]
-                    toExportDict2[modT]['postProcessingScript']['scripts']=[toExportDict[modT]['postProcessingScript']['scripts'][0]]
-                    toExportDict2[modT]['postProcessingScript']['scriptOutput']=[toExportDict[modT]['postProcessingScript']['scriptOutput'][0]]
+        if ('train' in  list(tempDict.keys())) & ('score' in  list(tempDict.keys())):
+            for modT in toExportDict:
+                print (modT, '>>>>>>>>>>>>>>>>>>>>>>>>>.')
+                if 'preProcessingScript' in toExportDict2[modT]:
+                    if len(set(toExportDict2[modT]['preProcessingScript']['scriptPath']))==1:
+                        print ('came here agaa')
+                        toExportDict2[modT]['preProcessingScript']['scriptpurpose']=['trainAndscore']
+                        toExportDict2[modT]['preProcessingScript']['scriptPath']=[toExportDict[modT]['preProcessingScript']['scriptPath'][0]]
+                        toExportDict2[modT]['preProcessingScript']['scripts']=[toExportDict[modT]['preProcessingScript']['scripts'][0]]
+                        toExportDict2[modT]['preProcessingScript']['scriptOutput']=[toExportDict[modT]['preProcessingScript']['scriptOutput'][0]]
+                if 'postProcessingScript' in toExportDict2[modT]:
+                    if len(set(toExportDict2[modT]['postProcessingScript']['scriptPath']))==1:
+                        toExportDict2[modT]['postProcessingScript']['scriptpurpose']=['trainAndscore']
+                        toExportDict2[modT]['postProcessingScript']['scriptPath']=[toExportDict[modT]['postProcessingScript']['scriptPath'][0]]
+                        toExportDict2[modT]['postProcessingScript']['scripts']=[toExportDict[modT]['postProcessingScript']['scripts'][0]]
+                        toExportDict2[modT]['postProcessingScript']['scriptOutput']=[toExportDict[modT]['postProcessingScript']['scriptOutput'][0]]
 
-
+        print ('compleged to exportdict2  ',toExportDict2)
         tempTa2=list(toExportDict2.keys())
         tempTa2.sort()
         toExportReOrdered={}
