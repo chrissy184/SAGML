@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['lambda-quad','ban-lambda-quad','10.60.24.249','10.140.65.238',
 # Application definition
 
 INSTALLED_APPS = [
+    'sslserver',
     'corsheaders', 
     'django.contrib.admin',
     'django.contrib.auth',
