@@ -671,7 +671,7 @@ class NyokaServer:
                       'taskType': None,'predictedClasses':None,'dataSet':None}
 
 			
-			print (tempSecMem)
+			# print (tempSecMem)
 		elif processTheInput['itemType']=='DATA':
 			tempMem[tempSecMem[processTheInput['sectionId']]]['data']=processTheInput['filePath']
 		elif processTheInput['itemType']=='CODE':
@@ -712,7 +712,7 @@ class NyokaServer:
 			else:
 				modelOb=generate_skl_model(pmObj)
 				model_graph=None
-			print (modelOb)
+			# print (modelOb)
 			# modelOb=None
 			import sklearn
 			if type(modelOb)==sklearn.pipeline.Pipeline:
@@ -734,7 +734,7 @@ class NyokaServer:
 		# print ('tempMem',tempMem)
 
 		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
-		print ('processTheInput',processTheInput)
+		# print ('processTheInput',processTheInput)
 		# print ('MEMORY_DICT_ARCHITECTURE[projectID]',MEMORY_DICT_ARCHITECTURE[projectID])
 
 		returntoClient={'projectID':projectID,'layerUpdated':processTheInput}

@@ -955,9 +955,9 @@ class TrainingViewModels:
             if modObjeCom == 'train':
                 for echMod in toExportDict:
                     if echMod in tempDict[modObjeCom]:
-                        print ('>>>>>',echMod)
-                        print ('8'*100)
-                        print ('tempDict.keys()',tempDict.keys())
+                        # print ('>>>>>',echMod)
+                        # print ('8'*100)
+                        # print ('tempDict.keys()',tempDict.keys())
                         # print (tempDict[modObjeCom][echMod]['scriptPath'])
                         if tempDict[modObjeCom][echMod]['modelObj']['modelArchType']=='NNModel':
                         #                     print (tempDict[modObjeCom][echMod]['modelObj'])
