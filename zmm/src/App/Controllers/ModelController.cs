@@ -798,7 +798,7 @@ namespace ZMM.App.Controllers
 
                 }
                 if (!string.IsNullOrEmpty(dataFolder)) jObjOrig.Add("dataFolder", dataFolder);
-                jObjOrig.Add("filePath", filePath);
+                try{jObjOrig.Add("filePath", filePath);}catch(Exception ex){}
                 /* remove what is not needed to send to zmk api */
                 jObjOrig.Remove("recurrence");
                 jObjOrig.Remove("cronExpression");
