@@ -61,9 +61,9 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
 
 * Pull the docker images in your system by typing the below commands:
 
-    * docker pull store/softwareag/zementis-modeler-nginx:1.38.2
-    * docker pull store/softwareag/zementis-modeler-zmm:1.38.2
-    * docker pull store/softwareag/zementis-modeler-zmk:1.38.2
+    * docker pull store/softwareag/zementis-modeler-nginx:1.38.1
+    * docker pull store/softwareag/zementis-modeler-zmm:1.38.1
+    * docker pull store/softwareag/zementis-modeler-zmk:1.38.1
 
 **Note** - Try prefix sudo with docker commands if you do not see any results or see an error.
 
@@ -126,9 +126,9 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
 
 * Pull the docker images in your system by typing the below commands:
 
-    * docker pull store/softwareag/zementis-modeler-nginx:1.38.2
-    * docker pull store/softwareag/zementis-modeler-zmm:1.38.2
-    * docker pull store/softwareag/zementis-modeler-zmk:1.38.2
+    * docker pull store/softwareag/zementis-modeler-nginx:1.38.1
+    * docker pull store/softwareag/zementis-modeler-zmm:1.38.1
+    * docker pull store/softwareag/zementis-modeler-zmk:1.38.1
 
 ### Run ZMOD in Windows Directly ###
 
@@ -196,9 +196,9 @@ __Note__ : Make sure that you download/copy the tar files to your local drive sy
 
 * Pull the docker images in your system by typing the below commands:
 
-    * docker pull store/softwareag/zementis-modeler-nginx:1.38.2
-    * docker pull store/softwareag/zementis-modeler-zmm:1.38.2
-    * docker pull store/softwareag/zementis-modeler-zmk:1.38.2
+    * docker pull store/softwareag/zementis-modeler-nginx:1.38.1
+    * docker pull store/softwareag/zementis-modeler-zmm:1.38.1
+    * docker pull store/softwareag/zementis-modeler-zmk:1.38.1
 
 **Note** - Try prefix sudo with docker commands if you do not see any results or see an error.
 

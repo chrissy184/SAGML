@@ -28,7 +28,7 @@ ZMK is the Django REST based application which handles all the AI/ML related tra
 
 **To start the ZMK app**: `python manage.py runserver` and other django parameters are supported by default
 
-**To access the ZMK swagger**: `localhost:{port}/` default `localhost:8000/`
+**To access the ZMK swagger**: `localhost:{port}/` default `localhost:8888/`
 
 
 
