@@ -688,6 +688,7 @@ class TrainingViewModels:
         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
         modelObj['modelObj']['recoModelObj'].model=modelV1
         modelObj['modelObj']['predictedClasses']=predictedClass
+        modelObj['modelObj']['dataSet']=None
         return modelObj
 
     def trainSimpleDNNObjWithPrepro(self,modelObj,tensorboardLogFolder,dataObj):
@@ -764,6 +765,7 @@ class TrainingViewModels:
         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
         modelObj['modelObj']['recoModelObj'].model=modelV1
         modelObj['modelObj']['predictedClasses']=predictedClass
+        modelObj['modelObj']['dataSet']=None
         return modelObj
 
     def trainImageClassifierNN(self,modelObj,tensorboardLogFolder):
@@ -836,6 +838,7 @@ class TrainingViewModels:
         predictedClass=list(tGen.class_indices.keys())
         modelObj['modelObj']['recoModelObj'].model=modelV1
         modelObj['modelObj']['predictedClasses']=predictedClass
+        modelObj['modelObj']['dataSet']='image'
         print (modelObj)
         return modelObj
 
@@ -949,7 +952,7 @@ class TrainingViewModels:
                                 'preProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[],'scriptPath':[]},
                                 'modelObj':None,'pipelineObj':None,'featuresUsed':None,'targetName':None,
                                 'postProcessingScript':{'scripts':[], 'scriptpurpose':[],'scriptOutput':[],'scriptPath':[]},
-                                'taskType': None,'modelPath':None,'predictedClasses':None}
+                                'taskType': None,'modelPath':None,'predictedClasses':None,'dataSet':None}
         for modObjeCom in tempDict:
             # print ('>>>>>>>>modObj >>>>>> ',modObjeCom)
             if modObjeCom == 'train':
@@ -982,6 +985,7 @@ class TrainingViewModels:
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
                         toExportDict[echMod]['modelPath']=tempDict[modObjeCom][echMod]['modelObj']['modelPath']
                         toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
+                        toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['modelObj']['dataSet']
 
                         if 'Data' in tempDict[modObjeCom][echMod]:
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
@@ -1013,6 +1017,7 @@ class TrainingViewModels:
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
                         toExportDict[echMod]['modelPath']=tempDict[modObjeCom][echMod]['modelObj']['modelPath']
                         toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
+                        toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['modelObj']['dataSet']
                         if 'Data' in tempDict[modObjeCom][echMod]:
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
     
