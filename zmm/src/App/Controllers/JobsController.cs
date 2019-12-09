@@ -27,7 +27,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace ZMM.App.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     public class JobsController : Controller
     {
