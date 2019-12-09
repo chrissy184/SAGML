@@ -476,8 +476,6 @@ class NewScoringView:
 						else:
 							pass
 
-					
-
 			else:
 				XVarForModel=modeScope['modelObj']['listOFColumns']
 				testData=testData[XVarForModel]
@@ -496,6 +494,10 @@ class NewScoringView:
 				resafile=target_path+'result.txt'
 				with open(resafile,'w') as f:
 					f.write(json.dumps(targetResult))
+
+			if 'postprocessing' in modeScope:
+				# print ("modeScope['preprocessing']")
+				modeScope['postprocessing']['codeObj'](resafile)
 
 			
 			
