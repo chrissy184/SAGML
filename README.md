@@ -1,4 +1,4 @@
-# Cumulocity Predictive Analytics Workbench  (PAW)
+# Cumulocity IOT Predictive Analytics Workbench  (PAW)
 [<img src="https://demo.zmod.org/assets/logo-aw.png" alt="zmod_logo" height="80" style="float:right"/>](https://www.zmod.org/)
 
 [![Build status](https://dev.azure.com/zementis-ai/PredictiveAnalyticsWorkbench/_apis/build/status/ZMOD-CI)](https://dev.azure.com/zementis-ai/PredictiveAnalyticsWorkbench/_build/latest?definitionId=6)
