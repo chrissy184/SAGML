@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_3" version="4.4">
+    <Header copyright="Copyright (c) 2019 Software AG" description="Default Description">
+        <Application name="Nyoka" version="3.0.9rc1"/>
+        <Timestamp>2019-12-09 12:01:43.953458</Timestamp>
+    </Header>
+    <MiningBuildTask>
+        <Extension name="preprocessingPipeline" value="Pipeline(memory=None,
+    steps=[('feature_mapper',DataFrameMapper(default=False,df_out=False,
+	features=[(['cylinders'], [Imputer(axis=0, copy=True, missing_values='NaN', strategy='mean', verbose=0)]),(['displacement'], [Imputer(axis=0, copy=True, missing_values='NaN', strategy='mean', verbose=0)]),(['horsepower'], [Imputer(axis=0, copy=True, missing_values='NaN', strategy='mean', verbose=0)]),(['weight'], [Imputer(axis=0, copy=True, missing_values='NaN', strategy='mean', verbose=0)]),(['acceleration'], [Imputer(axis=0, copy=True, missing_values='NaN', strategy='mean', verbose=0)])],
+	input_df=False,sparse=False)),])" for="model1"/>
+        <Extension name="modelObject" value="LinearRegression(copy_X=True, fit_intercept=True, n_jobs=None,
+         normalize=False)" for="model1"/>
+    </MiningBuildTask>
+    <DataDictionary numberOfFields="6">
+        <DataField name="cylinders" optype="continuous" dataType="double"/>
+        <DataField name="displacement" optype="continuous" dataType="double"/>
+        <DataField name="horsepower" optype="continuous" dataType="double"/>
+        <DataField name="weight" optype="continuous" dataType="double"/>
+        <DataField name="acceleration" optype="continuous" dataType="double"/>
+        <DataField name="mpg" optype="continuous" dataType="double"/>
+    </DataDictionary>
+    <RegressionModel modelName="model1" functionName="regression" taskType="score">
+        <MiningSchema>
+            <MiningField name="cylinders" usageType="active" optype="continuous" missingValueReplacement="5.454773869346734" missingValueTreatment="asMean"/>
+            <MiningField name="displacement" usageType="active" optype="continuous" missingValueReplacement="193.42587939698493" missingValueTreatment="asMean"/>
+            <MiningField name="horsepower" usageType="active" optype="continuous" missingValueReplacement="104.46938775510205" missingValueTreatment="asMean"/>
+            <MiningField name="weight" usageType="active" optype="continuous" missingValueReplacement="2970.424623115578" missingValueTreatment="asMean"/>
+            <MiningField name="acceleration" usageType="active" optype="continuous" missingValueReplacement="15.568090452261307" missingValueTreatment="asMean"/>
+            <MiningField name="mpg" usageType="target" optype="continuous"/>
+        </MiningSchema>
+        <Output>
+            <OutputField name="predicted_mpg" optype="continuous" dataType="double" feature="predictedValue"/>
+        </Output>
+        <RegressionTable intercept="45.8649596639974462">
+            <NumericPredictor name="cylinders" exponent="1" coefficient="-0.3587105438209011"/>
+            <NumericPredictor name="displacement" exponent="1" coefficient="-0.0013923012832012"/>
+            <NumericPredictor name="horsepower" exponent="1" coefficient="-0.0390278025118745"/>
+            <NumericPredictor name="weight" exponent="1" coefficient="-0.0053656108782444"/>
+            <NumericPredictor name="acceleration" exponent="1" coefficient="-0.0070041662586364"/>
+        </RegressionTable>
+    </RegressionModel>
+</PMML>
+
