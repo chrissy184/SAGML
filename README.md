@@ -1,7 +1,5 @@
 # Zementis Modeler (ZMOD)
-
 [<img src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/zmod_logo.png" alt="zmod_logo" height="80" style="float:right"/>](https://www.zmod.org/)
-
 
 [![Build status](https://dev.azure.com/zementis-ai/ZMOD/_apis/build/status/ZMOD-CI)](https://dev.azure.com/zementis-ai/ZMOD/_build/latest?definitionId=6)
 
