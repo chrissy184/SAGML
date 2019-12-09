@@ -73,6 +73,6 @@ A startup **ASP.NET Core 3.0.100 / Angular 7** (Ubuntu 18.04) **project** with a
 
 ## License
 
-Released under the [License](http://irepo.eur.ad.sag/projects/AIAN/repos/zmm/browse/LICENSE).
+Released under the [License](http://irepo.eur.ad.sag/projects/AIAN/repos/zmm/browse/LICENSE)
 
 [Give your feedback](mailto:generic.zmodsupport@softwareag.com) | [Follow us](?)
