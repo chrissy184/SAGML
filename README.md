@@ -2,6 +2,7 @@
 
 [<img src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/zmod_logo.png" alt="zmod_logo" height="80" style="float:right"/>](https://www.zmod.org/)
 
+
 [![Build status](https://dev.azure.com/zementis-ai/ZMOD/_apis/build/status/ZMOD-CI)](https://dev.azure.com/zementis-ai/ZMOD/_build/latest?definitionId=6)
 
 **Zementis modeler** is an open source machine learning and artificial intelligence platform for Data Scientist to solve business problems faster and quicker, build prototypes and convert them to actual project. The modeler helps from data preparation to model building and deployment, the tool supports a large variety of algorithms that can be run without a single line of code. The web based tool has various components which help Data Scientist of different skill levels to perfrom several model building tasks and provides deployment ready PMML files which can be hosted as a REST services.
