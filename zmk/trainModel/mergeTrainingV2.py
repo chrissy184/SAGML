@@ -53,7 +53,7 @@ class NewModelOperations:
     def getTargetAndColumnsName(self,modObjToDetect):
         targetCol=None
         listOFColumns=[]
-        if modObjToDetect.__dict__['original_tagname_'] in ['MiningModel','DeepNetwork','RegressionModel','AnomalyDetectionModel']:
+        if modObjToDetect.__dict__['original_tagname_'] in ['MiningModel','DeepNetwork','RegressionModel','AnomalyDetectionModel','NearestNeighborModel']:
             try:
                 for minF in modObjToDetect.get_MiningSchema().__dict__['MiningField']:
                     if minF.__dict__['usageType'] == 'target':
