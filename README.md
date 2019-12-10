@@ -271,7 +271,7 @@ Zementis Modeler has 5 sections :
 
 ## Support
 
-You can ask questions at:
+You can ask questions at
 
 *	[https://stackoverflow.com](https://stackoverflow.com) by tagging your questions with #pmml, #zmod
 *	You can also post bug reports in [GitHub issues](https://github.com/SoftwareAG/ZMOD/issues) 
