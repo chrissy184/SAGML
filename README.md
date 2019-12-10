@@ -269,7 +269,7 @@ Zementis Modeler has 5 sections :
 [Demo 5 : Python Execution](https://www.zmod.org/learn/Hnu7lvcc0kc)<br/>
 
 
-## Support
+## Support:
 
 You can ask questions at
 
