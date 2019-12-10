@@ -43,7 +43,7 @@ class Utility:
 				line = line.replace("rectifier","reLU6")
 			if "<Extension" in line and "sectionId" in line:
 				continue
-			if "<script" in line or "</script" in line or "<Data=" in line:
+			if "<script" in line or "</script" in line or "<Data filePath=" in line:
 				continue
 			if 'units' in line:
 				r = re.findall('units=\"[0-9]+"',line)
