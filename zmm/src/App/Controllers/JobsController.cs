@@ -328,19 +328,26 @@ namespace ZMM.App.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> StopJobAsync(string id)
         {
-            var filePath = SchedulerPayload.Get().Where(s=>s.Id == id).Select(s=>s.FilePath).FirstOrDefault();                   
-            ISchedulerFactory schfack = new StdSchedulerFactory();
-            IScheduler scheduler = await schfack.GetScheduler();
-            await scheduler.PauseJob(new JobKey(filePath));
-
-            var resp = new
+            if (!string.IsNullOrEmpty(id))
             {
-                id = id, 
-                status = "STOPPED",
-                message = "Scheduled Job is stopped."
-            };
+                var filePath = SchedulerPayload.Get().Where(s => s.Id == id).Select(s => s.FilePath).FirstOrDefault();
+                ISchedulerFactory schfack = new StdSchedulerFactory();
+                IScheduler scheduler = await schfack.GetScheduler();
+                await scheduler.PauseJob(new JobKey(filePath));
 
-            return Json(resp);
+                var resp = new
+                {
+                    id = id,
+                    status = "STOPPED",
+                    message = "Scheduled Job is stopped."
+                };
+
+                return Json(resp);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
         #endregion
         
