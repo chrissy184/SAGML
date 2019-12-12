@@ -394,19 +394,27 @@ namespace ZMM.App.Controllers
                 var body = reader.ReadToEnd();
                 reqBody = body.ToString();
             }
-            try
+            if (!string.IsNullOrEmpty(reqBody))
             {
-                //find model name
-                JObject rB = JObject.Parse(reqBody);
-                userModelName = (string)rB["parameters"]["model_name"];
-                //
-                response = await _client.PostProcessingForm(reqBody);
+                try
+                {
+                    //find model name
+                    JObject rB = JObject.Parse(reqBody);
+                    userModelName = (string)rB["parameters"]["model_name"];
+                    //
+                    response = await _client.PostProcessingForm(reqBody);
+                }
+                catch (Exception ex)
+                {
+                    //TO DO: ILogger
+                    string _ex = ex.Message;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                //TO DO: ILogger
-                string _ex = ex.Message;
+                return NotFound();
             }
+            
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -1291,30 +1299,38 @@ namespace ZMM.App.Controllers
                     var body = reader.ReadToEnd();
                     reqBody = body.ToString();
                 }
-                response = await baseImageClient.PostBaseImage(reqBody);
-                jObjData = JObject.Parse(response);
                 //
-                dirFullpath = DirectoryHelper.GetDataDirectoryPath();
-                if (!string.IsNullOrEmpty(jObjData["filePath"].ToString()))
+                if (!string.IsNullOrEmpty(reqBody))
                 {
-                    fileName = Path.GetFileName(jObjData["filePath"].ToString());
-                    data = await _client.DownloadFile(jObjData["filePath"].ToString(), fileName);
+                    response = await baseImageClient.PostBaseImage(reqBody);
+                    jObjData = JObject.Parse(response);
+                    //
+                    dirFullpath = DirectoryHelper.GetDataDirectoryPath();
+                    if (!string.IsNullOrEmpty(jObjData["filePath"].ToString()))
+                    {
+                        fileName = Path.GetFileName(jObjData["filePath"].ToString());
+                        data = await _client.DownloadFile(jObjData["filePath"].ToString(), fileName);
+                    }
+
+                    string _url = DirectoryHelper.GetDataUrl($"BaseImage/{fileName}");
+                    jObjUrl.Add("url", _url + "?t=" + DateTime.Now);
+                    jObjData.Merge(jObjUrl, new JsonMergeSettings
+                    {
+                        // union array values together to avoid duplicates
+                        MergeArrayHandling = MergeArrayHandling.Union
+                    });
+
+                    return Json(jObjData);
                 }
-
-                string _url = DirectoryHelper.GetDataUrl($"BaseImage/{fileName}");
-                jObjUrl.Add("url", _url+"?t="+DateTime.Now);
-                jObjData.Merge(jObjUrl, new JsonMergeSettings
+                else
                 {
-                    // union array values together to avoid duplicates
-                    MergeArrayHandling = MergeArrayHandling.Union
-                });
-
-                return Json(jObjData);
+                    return NotFound();
+                }
             }
             catch (Exception ex)
             {
                 string err = ex.StackTrace;
-                return BadRequest(new {message="Base image generation failed."});
+                return BadRequest(new { message = "Base image generation failed." });
             }
         }
 
@@ -1326,10 +1342,10 @@ namespace ZMM.App.Controllers
         {
             //variable
             string reqBody = "";
-            string response = "";            
-            string  dirFullpath = DirectoryHelper.GetDataDirectoryPath();
-            string imgFolderPath="";
-            string folderName="";            
+            string response = "";
+            string dirFullpath = DirectoryHelper.GetDataDirectoryPath();
+            string imgFolderPath = "";
+            string folderName = "";
             JObject jObjUrl = new JObject();
             JObject jObjData = new JObject();
             JObject jObjReq = new JObject();
@@ -1343,49 +1359,57 @@ namespace ZMM.App.Controllers
                     reqBody = body.ToString();
                 }
                 //
-                jObjReq = JObject.Parse(reqBody);
-                folderName = jObjReq["folderName"].ToString(); 
-                imgFolderPath = $"{dirFullpath}{folderName}";              
-                jObjReq.TryAdd("folderPath",imgFolderPath);
-                //create dir and delete if already exists
-                if(Directory.Exists(imgFolderPath)) Directory.Delete(imgFolderPath,true);
-                Directory.CreateDirectory(imgFolderPath);
-                //
-                response = await baseImageClient.PostGenerateBaseImage(jObjReq.ToString());
-                jObjData = JObject.Parse(response);
-                //
-                //add properties
-                _props.Add(new Property
+                if (!string.IsNullOrEmpty(reqBody))
                 {
-                    key = "Subdirectories",
-                    value = DirectoryHelper.CountDirectories(imgFolderPath).ToString()
-                });
-                _props.Add(new Property
+                    jObjReq = JObject.Parse(reqBody);
+                    folderName = jObjReq["folderName"].ToString();
+                    imgFolderPath = $"{dirFullpath}{folderName}";
+                    jObjReq.TryAdd("folderPath", imgFolderPath);
+                    //create dir and delete if already exists
+                    if (Directory.Exists(imgFolderPath)) Directory.Delete(imgFolderPath, true);
+                    Directory.CreateDirectory(imgFolderPath);
+                    //
+                    response = await baseImageClient.PostGenerateBaseImage(jObjReq.ToString());
+                    jObjData = JObject.Parse(response);
+                    //
+                    //add properties
+                    _props.Add(new Property
+                    {
+                        key = "Subdirectories",
+                        value = DirectoryHelper.CountDirectories(imgFolderPath).ToString()
+                    });
+                    _props.Add(new Property
+                    {
+                        key = "Files",
+                        value = DirectoryHelper.CountFiles(imgFolderPath).ToString()
+                    });
+                    DataResponse newRecord = new DataResponse()
+                    {
+                        Created_on = DateTime.Now.ToString(),
+                        Edited_on = DateTime.Now.ToString(),
+                        Extension = "",
+                        Type = "FOLDER",
+                        FilePath = imgFolderPath,
+                        Id = folderName,
+                        MimeType = "",
+                        Name = folderName,
+                        Properties = _props,
+                        DateCreated = DateTime.Now
+                    };
+                    //
+                    DataPayload.Create(newRecord);
+                    return Json(jObjReq);
+                }
+                else
                 {
-                    key = "Files",
-                    value = DirectoryHelper.CountFiles(imgFolderPath).ToString()
-                });
-                DataResponse newRecord = new DataResponse()
-                {
-                    Created_on = DateTime.Now.ToString(),
-                    Edited_on = DateTime.Now.ToString(),
-                    Extension = "",
-                    Type = "FOLDER",
-                    FilePath = imgFolderPath,
-                    Id = folderName,
-                    MimeType = "",
-                    Name = folderName,  
-                    Properties = _props,
-                    DateCreated = DateTime.Now
-                };
-                //
-                DataPayload.Create(newRecord);               
-                return Json(jObjReq);
+                    return NotFound();
+                }
+
             }
             catch (Exception ex)
             {
                 string err = ex.StackTrace;
-                return BadRequest(new {message="Base image generation failed."});
+                return BadRequest(new { message = "Base image generation failed." });
             }
         }
 
@@ -1406,15 +1430,22 @@ namespace ZMM.App.Controllers
                 var body = reader.ReadToEnd();
                 reqBody = body.ToString();
             }
-            try
+            if (!string.IsNullOrEmpty(reqBody))
             {
-                response = await _client.AnamolyModel(reqBody);
+                try
+                {
+                    response = await _client.AnamolyModel(reqBody);
+                }
+                catch (Exception ex)
+                {
+                    //TO DO: ILogger
+                    string _ex = ex.Message;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                //TO DO: ILogger
-                string _ex = ex.Message;
-            }
+                return NotFound();
+            }            
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -1463,7 +1494,6 @@ namespace ZMM.App.Controllers
             {
                 return NoContent();
             }
-
         }
         #endregion
     }
