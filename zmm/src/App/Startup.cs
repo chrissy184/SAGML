@@ -182,7 +182,7 @@ namespace ZMM.App
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {          
             #region Enable HSTS option for AWS production system for https 
-            if(IsEnvironmentOtherThanDevelopmentAndProduction()) app.UseHsts();
+            app.UseHsts();
             #endregion
 
             #region Add Log Factory -> You can update its behaviour from appsettings*.json configuration

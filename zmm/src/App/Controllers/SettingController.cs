@@ -51,19 +51,27 @@ namespace ZMM.App.Controllers
                 var body = await reader.ReadToEndAsync();
                 jsonBody = body.ToString();
             }
-            zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-            //parse
-            JObject jObj = JObject.Parse(jsonBody);
-            JArray jArr = (JArray)jObj["settings"];
-            var setList = jArr.ToObject<List<SettingProperty>>();
-            //add to payload
-            var newRecord = new ZSSettingResponse()
+
+            if (!string.IsNullOrEmpty(jsonBody))
             {
-                ZmodId = zmodId,
-                Settings = setList
-            };
-            ZSSettingPayload.CreateOrUpdate(newRecord);          
-            return Json(JObject.Parse(jsonBody));
+                zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                //parse
+                JObject jObj = JObject.Parse(jsonBody);
+                JArray jArr = (JArray)jObj["settings"];
+                var setList = jArr.ToObject<List<SettingProperty>>();
+                //add to payload
+                var newRecord = new ZSSettingResponse()
+                {
+                    ZmodId = zmodId,
+                    Settings = setList
+                };
+                ZSSettingPayload.CreateOrUpdate(newRecord);
+                return Json(JObject.Parse(jsonBody));
+            }
+            else
+            {
+                return NotFound();
+            }
         }
         #endregion
 

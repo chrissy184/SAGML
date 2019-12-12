@@ -35,9 +35,9 @@ export class ModelsComponent implements OnInit {
     url: ApiRoutes.models,
     acceptedFiles: `
     .pmml,
-    .onyx
+    .onnx
     `,
-    acceptedFilesMsg: 'Allowed file type are PMML, ONYX'
+    acceptedFilesMsg: 'Allowed file type are PMML, ONNX'
   };
   public tabSelectedIndex = 0;
 

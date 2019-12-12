@@ -551,29 +551,37 @@ namespace ZMM.App.Controllers
         [HttpGet("{id}/edit")]
         public async Task<IActionResult> EditPmmlAsync(string id)
         {
-            string response = string.Empty;
-            JObject jsonResp = new JObject();
-            string jsonStr = JsonConvert.SerializeObject(responseData, Formatting.None);
-            ModelResponse _data = new ModelResponse();
-            try
+            if (!string.IsNullOrEmpty(id))
             {
-                var jsonObj = JsonConvert.DeserializeObject<List<ModelResponse>>(jsonStr);
-                foreach (var record in responseData)
+                string response = string.Empty;
+                JObject jsonResp = new JObject();
+                string jsonStr = JsonConvert.SerializeObject(responseData, Formatting.None);
+                ModelResponse _data = new ModelResponse();
+                try
                 {
-                    if (record.Id.ToString() == id)
+                    var jsonObj = JsonConvert.DeserializeObject<List<ModelResponse>>(jsonStr);
+                    foreach (var record in responseData)
                     {
-                        _data = record;
+                        if (record.Id.ToString() == id)
+                        {
+                            _data = record;
+                        }
                     }
+                    response = await nnclient.PostEditPmml(id, _data.FilePath);
+                    if (!string.IsNullOrEmpty(response))
+                        jsonResp = JObject.Parse(response);
                 }
-                response = await nnclient.PostEditPmml(id, _data.FilePath);
-                if (!string.IsNullOrEmpty(response))
-                    jsonResp = JObject.Parse(response);
+                catch (Exception ex)
+                {
+                    string message = ex.Message;
+                }
+                return Json(jsonResp);
             }
-            catch (Exception ex)
+            else
             {
-                string message = ex.Message;
+                return NotFound();
             }
-            return Json(jsonResp);
+
         }
         #endregion
 
