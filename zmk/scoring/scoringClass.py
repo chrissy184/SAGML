@@ -103,9 +103,9 @@ class Scoring:
 		global PMMLMODELSTORAGE
 		# modelname=param
 		modelName=modelName.replace('.pmml','')
-		# print('modelname ',modelname)
+		print('modelname ',modelName)
 		try:
-			messNotice=kerasUtilities.deleteLoadedModelfromMemory(modelName)
+			messNotice=NewModelOperations().deleteLoadedModelfromMemory(modelName)
 			data_details={'message':'Model unloaded successfully, now it will not be available for predictions.'}
 			statusCode = 200
 		except:

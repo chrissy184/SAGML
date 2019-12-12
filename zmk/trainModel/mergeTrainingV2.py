@@ -18,10 +18,10 @@ from nyokaBase import PMML43Ext as ny
 from tensorflow import Graph, Session
 import tensorflow as tf
 
+from trainModel.kerasUtilities import PMMLMODELSTORAGE
 global PMMLMODELSTORAGE
 
-PMMLMODELSTORAGE={}
-
+# PMMLMODELSTORAGE={}
 
 modelObjectToCheck=['AssociationModel', 'AnomalyDetectionModel', 'BayesianNetworkModel',
                     'BaselineModel', 'ClusteringModel', 'DeepNetwork', 'GaussianProcessModel',
@@ -110,6 +110,13 @@ class NewModelOperations:
         except:
             return None
 
+    def deleteLoadedModelfromMemory(self,modelname):
+        global PMMLMODELSTORAGE
+        # print (PMMLMODELSTORAGE)
+        # pmmlName=os.path.basename(modelFile).split('.')[0]
+        del PMMLMODELSTORAGE[modelname]
+        return ('Success')
+
     def loadExecutionModel(self,pmmlFile):
         # print ('loadmodel started')
         # print (pmmlFile)
@@ -117,190 +124,202 @@ class NewModelOperations:
         pmmlFileObj=pathlib.Path(pmmlFile)
         pmmlFileForKey=pmmlFileObj.name.replace(pmmlFileObj.suffix,'')
         from nyokaBase import PMML43Ext as ny
-        pmmlObj=ny.parse(pmmlFile,silence=True)
-        # print (pmmlObj)
-        print ('load model step 1.0')
-        modelObj=[]
-        for inMod in modelObjectToCheck:
-            if len(pmmlObj.__dict__[inMod]) >0:
-                modPMMLObj=pmmlObj.__dict__[inMod]
-                if inMod == 'DeepNetwork':
-                    print ('load model step 1.0.0')
-                    for ininMod in modPMMLObj:
-                        colInfo=self.getTargetAndColumnsName(ininMod)
-                        modelObj.append({'modelArchType':'NNModel','pmmlModelObject':ininMod,'recoModelObj':None,'listOFColumns':None,'targetCol':colInfo[1],'modelPath':colInfo[2]})
-                else:
-                    for ininMod in modPMMLObj:
-                        colInfo=self.getTargetAndColumnsName(ininMod)
-        #                 recoModelObj=generateModelfromPMML(ininMod)
-                        modelObj.append({'modelArchType':'SKLModel','pmmlModelObject':ininMod,'recoModelObj':None,'listOFColumns':colInfo[0],'targetCol':colInfo[1],'modelPath':colInfo[2]})
-        
-        print ('load model step 1.1')
-        tempDict={}
-        tempDict['train']={}
-
-        tempDict['score']={}
-        print ('print  step LM 1')
-        for singMod in modelObj:
-            if singMod['pmmlModelObject'].taskType=='trainAndscore':
-                tempDict['train'][singMod['pmmlModelObject'].modelName]={}
-                tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
-                tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
-                tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
-                tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
-                tempDict['score'][singMod['pmmlModelObject'].modelName]={}
-                tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
-                tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
-                tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
-                tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
-            else:
-                tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]={}
-                tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
-                tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
-                tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
-                tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
-        print ('print  step LM 2')
-        tempDict2={}
-        for taType in tempDict:
-            tempTa=list(tempDict[taType].keys())
-            tempTa.sort()
- 
-            for taTTemp in tempTa:
-                if taType in tempDict2:
-                    pass
-                else:
-                    tempDict2[taType]={}
-                tempDict2[taType][taTTemp]=tempDict[taType][taTTemp]
-
-        print ('print  step LM 3')
-
-        tempDict=tempDict2.copy()
-
-        # print (tempDict)
-
-        for sc1 in pmmlObj.script:
-            if sc1.scriptPurpose=='trainAndscore':
-                tempDict['train'][sc1.for_][sc1.class_]={}
-                tempDict['train'][sc1.for_][sc1.class_]['codeCont']=self.getCode(sc1.valueOf_)
-                tempDict['train'][sc1.for_][sc1.class_]['codeObj']=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
-                tempDict['train'][sc1.for_][sc1.class_]['scriptOutput']=sc1.scriptOutput
-                tempDict['train'][sc1.for_][sc1.class_]['scriptPath']=sc1.filePath
-                # tempDict['train'][sc1.for_][sc1.class_]['scriptPurpose']=sc1.filePath
-                tempDict['score'][sc1.for_][sc1.class_]={}
-                tempDict['score'][sc1.for_][sc1.class_]['codeCont']=self.getCode(sc1.valueOf_)
-                tempDict['score'][sc1.for_][sc1.class_]['codeObj']=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
-                tempDict['score'][sc1.for_][sc1.class_]['scriptOutput']=sc1.scriptOutput
-                tempDict['score'][sc1.for_][sc1.class_]['scriptPath']=sc1.filePath
-                # tempDict['train'][sc1.for_][sc1.class_]['scriptPurpose']=sc1.filePath
-            else:
-                tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]={}
-                tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['codeCont']=self.getCode(sc1.valueOf_)
-                tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['codeObj']=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
-                tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['scriptOutput']=sc1.scriptOutput
-                tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['scriptPath']=sc1.filePath
-
-        # print (tempDict)
-        print ('print  step LM 4')
-
-        taskTypesName=list(tempDict.keys())
-        listOfModelNames=set([k for j in tempDict for k in tempDict[j]])
-
-        
         try:
-            hyperParDict={}
-            for extObj in pmmlObj.MiningBuildTask.Extension:
-                if extObj.name=='hyperparameters':
-                    hyperParDict[extObj.for_]=ast.literal_eval(extObj.value)
-        except:
-            hyperParDict=None
+            pmmlObj=ny.parse(pmmlFile,silence=True)
+            # print (pmmlObj)
+            print ('load model step 1.0')
+            modelObj=[]
+            for inMod in modelObjectToCheck:
+                if len(pmmlObj.__dict__[inMod]) >0:
+                    modPMMLObj=pmmlObj.__dict__[inMod]
+                    if inMod == 'DeepNetwork':
+                        print ('load model step 1.0.0')
+                        for ininMod in modPMMLObj:
+                            colInfo=self.getTargetAndColumnsName(ininMod)
+                            modelObj.append({'modelArchType':'NNModel','pmmlModelObject':ininMod,'recoModelObj':None,'listOFColumns':None,'targetCol':colInfo[1],'modelPath':colInfo[2]})
+                    else:
+                        for ininMod in modPMMLObj:
+                            colInfo=self.getTargetAndColumnsName(ininMod)
+            #                 recoModelObj=generateModelfromPMML(ininMod)
+                            modelObj.append({'modelArchType':'SKLModel','pmmlModelObject':ininMod,'recoModelObj':None,'listOFColumns':colInfo[0],'targetCol':colInfo[1],'modelPath':colInfo[2]})
+            
+            print ('load model step 1.1')
+            tempDict={}
+            tempDict['train']={}
 
-        try:
-            miningBuildTaskList=pmmlObj.MiningBuildTask.__dict__['Extension']
-            for bTask in miningBuildTaskList:
-                if bTask.__dict__['for_'] in listOfModelNames:
-                    for tT in taskTypesName:
-                        for modInd in listOfModelNames:
-                            tempDict[tT][modInd]['modelObj']['miningExtension']=bTask
-        except:
-            pass
+            tempDict['score']={}
+            print ('print  step LM 1')
+            for singMod in modelObj:
+                if singMod['pmmlModelObject'].taskType=='trainAndscore':
+                    tempDict['train'][singMod['pmmlModelObject'].modelName]={}
+                    tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
+                    tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
+                    tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
+                    tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
+                    tempDict['score'][singMod['pmmlModelObject'].modelName]={}
+                    tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
+                    tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
+                    tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
+                    tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
+                else:
+                    tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]={}
+                    tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
+                    tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
+                    tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
+                    tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
+            print ('print  step LM 2')
+            tempDict2={}
+            for taType in tempDict:
+                tempTa=list(tempDict[taType].keys())
+                tempTa.sort()
+    
+                for taTTemp in tempTa:
+                    if taType in tempDict2:
+                        pass
+                    else:
+                        tempDict2[taType]={}
+                    tempDict2[taType][taTTemp]=tempDict[taType][taTTemp]
 
-        print ('print  step LM 5')
-        for dO in pmmlObj.Data:
-            for tT in taskTypesName:
-                for modInd in listOfModelNames:
-                    print (tT,modInd)
-                    if dO.for_ == modInd:
+            print ('print  step LM 3')
+
+            tempDict=tempDict2.copy()
+
+            # print (tempDict)
+
+            for sc1 in pmmlObj.script:
+                if sc1.scriptPurpose=='trainAndscore':
+                    tempDict['train'][sc1.for_][sc1.class_]={}
+                    tempDict['train'][sc1.for_][sc1.class_]['codeCont']=self.getCode(sc1.valueOf_)
+                    tempDict['train'][sc1.for_][sc1.class_]['codeObj']=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
+                    tempDict['train'][sc1.for_][sc1.class_]['scriptOutput']=sc1.scriptOutput
+                    tempDict['train'][sc1.for_][sc1.class_]['scriptPath']=sc1.filePath
+                    # tempDict['train'][sc1.for_][sc1.class_]['scriptPurpose']=sc1.filePath
+                    tempDict['score'][sc1.for_][sc1.class_]={}
+                    tempDict['score'][sc1.for_][sc1.class_]['codeCont']=self.getCode(sc1.valueOf_)
+                    tempDict['score'][sc1.for_][sc1.class_]['codeObj']=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
+                    tempDict['score'][sc1.for_][sc1.class_]['scriptOutput']=sc1.scriptOutput
+                    tempDict['score'][sc1.for_][sc1.class_]['scriptPath']=sc1.filePath
+                    # tempDict['train'][sc1.for_][sc1.class_]['scriptPurpose']=sc1.filePath
+                else:
+                    tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]={}
+                    tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['codeCont']=self.getCode(sc1.valueOf_)
+                    tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['codeObj']=self.getCodeObjectToProcess(self.getCode(sc1.valueOf_))
+                    tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['scriptOutput']=sc1.scriptOutput
+                    tempDict[sc1.scriptPurpose][sc1.for_][sc1.class_]['scriptPath']=sc1.filePath
+
+            # print (tempDict)
+            print ('print  step LM 4')
+
+            taskTypesName=list(tempDict.keys())
+            listOfModelNames=set([k for j in tempDict for k in tempDict[j]])
+
+            
+            try:
+                hyperParDict={}
+                for extObj in pmmlObj.MiningBuildTask.Extension:
+                    if extObj.name=='hyperparameters':
+                        hyperParDict[extObj.for_]=ast.literal_eval(extObj.value)
+            except:
+                hyperParDict=None
+
+            try:
+                miningBuildTaskList=pmmlObj.MiningBuildTask.__dict__['Extension']
+                for bTask in miningBuildTaskList:
+                    if bTask.__dict__['for_'] in listOfModelNames:
+                        for tT in taskTypesName:
+                            for modInd in listOfModelNames:
+                                tempDict[tT][modInd]['modelObj']['miningExtension']=bTask
+            except:
+                pass
+
+            print ('print  step LM 5')
+            for dO in pmmlObj.Data:
+                for tT in taskTypesName:
+                    for modInd in listOfModelNames:
+                        print (tT,modInd)
+                        if dO.for_ == modInd:
+                            try:
+                                tempDict[tT][modInd]['Data']=dO.filePath
+                            except:
+                                pass
+
+            modelLoadStatus=[]
+
+            # print ('tempDict  >>>>>>>>>>> ',tempDict)
+
+            for taskT in tempDict:
+                # print (taskT)
+                for mO in tempDict[taskT]:
+                    if tempDict[taskT][mO]['modelObj']['modelArchType']=="NNModel":
+                        modelProp=tempDict[taskT][mO]['modelObj']['pmmlNyokaObj']
+
+                        model_graph = Graph()
+                        with model_graph.as_default():
+                            tf_session = Session()
+                            with tf_session.as_default():
+                                print ('step 5')
+                                from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
+                                print ('step 5.1')
+                                model_net = generate_skl_model(modelProp)
+                                print ('step 5.2')
+                                model = model_net.model
+                                model_graph = tf.get_default_graph()
+                                print ('step 6')
+                        inputShapevals=[inpuShape.value for inpuShape in list(model.input.shape)]
+                        if str(model_net) != 'None':
+                            tempDict[taskT][mO]['modelObj']['recoModelObj']=model_net
+                            tempDict[taskT][mO]['modelObj']['model_graph']=model_graph
+                            tempDict[taskT][mO]['modelObj']['tf_session']=tf_session
+                            tempDict[taskT][mO]['modelObj']['inputShape']=inputShapevals
+                            modelLoadStatus.append(1)
+                        else:
+                            modelLoadStatus.append(0)
                         try:
-                            tempDict[tT][modInd]['Data']=dO.filePath
+                            tempDict[taskT][mO]['modelObj']['hyperparameters']=hyperParDict[mO]
                         except:
-                            pass
+                            tempDict[taskT][mO]['modelObj']['hyperparameters']=None
+                    elif tempDict[taskT][mO]['modelObj']['modelArchType']=="SKLModel":
+                        modelProp=tempDict[taskT][mO]['modelObj']['pmmlNyokaObj']
+                        # print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp)
+                        from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
+                        recoModelObj=generate_skl_model(modelProp)
+                        if recoModelObj != None:
+                            tempDict[taskT][mO]['modelObj']['recoModelObj']=recoModelObj
+                            modelLoadStatus.append(1)
+                        else:
+                            modelLoadStatus.append(0)
+                        try:
+                            tempDict[taskT][mO]['modelObj']['hyperparameters']=hyperParDict[mO]
+                        except:
+                            tempDict[taskT][mO]['modelObj']['hyperparameters']=None
 
-        modelLoadStatus=[]
+            
+            
+            PMMLMODELSTORAGE[pmmlFileForKey]=tempDict
 
-        # print ('tempDict  >>>>>>>>>>> ',tempDict)
+            # print('*'*100)
 
-        for taskT in tempDict:
-            # print (taskT)
-            for mO in tempDict[taskT]:
-                if tempDict[taskT][mO]['modelObj']['modelArchType']=="NNModel":
-                    modelProp=tempDict[taskT][mO]['modelObj']['pmmlNyokaObj']
+            # print(PMMLMODELSTORAGE)
+            # print('*'*100)
+            if 0 in modelLoadStatus:
+                messageToWorld= "Model load failed, please connect with admin"
+                reStat=500
+            else:
+                messageToWorld= "Model Loaded Successfully"
+                reStat=200
 
-                    model_graph = Graph()
-                    with model_graph.as_default():
-                        tf_session = Session()
-                        with tf_session.as_default():
-                            print ('step 5')
-                            from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
-                            print ('step 5.1')
-                            model_net = generate_skl_model(modelProp)
-                            print ('step 5.2')
-                            model = model_net.model
-                            model_graph = tf.get_default_graph()
-                            print ('step 6')
-                    inputShapevals=[inpuShape.value for inpuShape in list(model.input.shape)]
-                    if str(model_net) != 'None':
-                        tempDict[taskT][mO]['modelObj']['recoModelObj']=model_net
-                        tempDict[taskT][mO]['modelObj']['model_graph']=model_graph
-                        tempDict[taskT][mO]['modelObj']['tf_session']=tf_session
-                        tempDict[taskT][mO]['modelObj']['inputShape']=inputShapevals
-                        modelLoadStatus.append(1)
-                    else:
-                        modelLoadStatus.append(0)
-                    try:
-                        tempDict[taskT][mO]['modelObj']['hyperparameters']=hyperParDict[mO]
-                    except:
-                        tempDict[taskT][mO]['modelObj']['hyperparameters']=None
-                elif tempDict[taskT][mO]['modelObj']['modelArchType']=="SKLModel":
-                    modelProp=tempDict[taskT][mO]['modelObj']['pmmlNyokaObj']
-                    # print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp)
-                    from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
-                    recoModelObj=generate_skl_model(modelProp)
-                    if recoModelObj != None:
-                        tempDict[taskT][mO]['modelObj']['recoModelObj']=recoModelObj
-                        modelLoadStatus.append(1)
-                    else:
-                        modelLoadStatus.append(0)
-                    try:
-                        tempDict[taskT][mO]['modelObj']['hyperparameters']=hyperParDict[mO]
-                    except:
-                        tempDict[taskT][mO]['modelObj']['hyperparameters']=None
 
-        
-        
-        PMMLMODELSTORAGE[pmmlFileForKey]=tempDict
-
-        # print('*'*100)
-
-        # print(PMMLMODELSTORAGE)
-        # print('*'*100)
-        if 0 in modelLoadStatus:
-            messageToWorld= "Model load failed, please connect with admin"
-        else:
-            messageToWorld= "Model Loaded Successfully"
+            
+        except:
+            messageToWorld="Model load failed, please connect with admin"
+            pmmlFileForKey=None
+            reStat=500
 
         resultResp={'message':messageToWorld,'keytoModel':pmmlFileForKey}
+
         print (resultResp)
-        return JsonResponse(resultResp,status=200)
+        return JsonResponse(resultResp,status=reStat)
+       
 
 
 class NewTrainingView:

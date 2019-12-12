@@ -270,6 +270,7 @@ class KerasUtilities:
 
     def deleteLoadedModelfromMemory(self,modelname):
         global PMMLMODELSTORAGE
+        print (PMMLMODELSTORAGE)
         # pmmlName=os.path.basename(modelFile).split('.')[0]
         del PMMLMODELSTORAGE[modelname]
         return ('Success')
