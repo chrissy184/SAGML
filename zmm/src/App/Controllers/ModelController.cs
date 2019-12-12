@@ -615,22 +615,31 @@ namespace ZMM.App.Controllers
             string reqBody = string.Empty;
             JObject jsonObj = new JObject();
 
+            if(string.IsNullOrEmpty(id)) return BadRequest();
+
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = reader.ReadToEnd();
                 reqBody = body.ToString();
             }
-            try
+            if (!string.IsNullOrEmpty(reqBody))
             {
-                response = await zmeClient.AddUpdateLayers(id, reqBody);
-                if (!string.IsNullOrEmpty(response)) jsonObj = JObject.Parse(response);
-                return Json(jsonObj);
+                try
+                {
+                    response = await zmeClient.AddUpdateLayers(id, reqBody);
+                    if (!string.IsNullOrEmpty(response)) jsonObj = JObject.Parse(response);
+                    return Json(jsonObj);
+                }
+                catch (Exception ex)
+                {
+                    //TO DO: ILogger
+                    string _ex = ex.Message;
+                    return BadRequest();
+                }
             }
-            catch (Exception ex)
+            else
             {
-                //TO DO: ILogger
-                string _ex = ex.Message;
-                return BadRequest();
+                return NotFound();
             }
 
         }
@@ -643,26 +652,34 @@ namespace ZMM.App.Controllers
             string response = string.Empty;
             string reqBody = string.Empty;
             JObject jsonObj = new JObject();
-
+            if(string.IsNullOrEmpty(id)) return BadRequest();
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = reader.ReadToEnd();
                 reqBody = body.ToString();
             }
-            try
+            if (!string.IsNullOrEmpty(reqBody))
             {
-                response = await zmeClient.DeleteLayers(id, reqBody);
-                if (!string.IsNullOrEmpty(response))
-                    jsonObj = JObject.Parse(response);
+                try
+                {
+                    response = await zmeClient.DeleteLayers(id, reqBody);
+                    if (!string.IsNullOrEmpty(response))
+                        jsonObj = JObject.Parse(response);
 
-                return Json(jsonObj);
+                    return Json(jsonObj);
+                }
+                catch (Exception ex)
+                {
+                    //TO DO: ILogger
+                    string _ex = ex.Message;
+                    return BadRequest();
+                }
             }
-            catch (Exception ex)
+            else
             {
-                //TO DO: ILogger
-                string _ex = ex.Message;
-                return BadRequest();
+                return NotFound();
             }
+            
         }
         #endregion
 
@@ -726,6 +743,7 @@ namespace ZMM.App.Controllers
                 var body = reader.ReadToEnd();
                 reqBody = body.ToString();
             }
+            if(string.IsNullOrEmpty(reqBody)) return NotFound();
             try
             {
                 //get file name
