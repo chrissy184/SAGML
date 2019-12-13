@@ -165,6 +165,7 @@ class Training:
 		idforData=int(time.time())
 		idforData=str(idforData)+'_autoML'
 		DATA_MEMORY_OBJS_SKLEARN[idforData]=data
+		# print ('11111111',DATA_MEMORY_OBJS_SKLEARN)
 
 		# print(data.shape)
 		data_details=autoMLutilities.dataDescription(data)
@@ -181,6 +182,7 @@ class Training:
 		# userInput=json.loads(userInput)
 		paramToTrainModel=userInput['data']
 		idforData=userInput['idforData']
+		# print (DATA_MEMORY_OBJS_SKLEARN)
 		data=DATA_MEMORY_OBJS_SKLEARN[idforData]
 		dataPath=userInput['filePath']
 		targetVar=userInput['target_variable']

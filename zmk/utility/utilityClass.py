@@ -112,7 +112,7 @@ class Utility:
 			response['X-Sendfile'] = smart_str(file_path)
 			return response
 
-	def deleteTaskfromMemory(idforData):
+	def deleteTaskfromMemory(self,idforData):
 		global RUNNING_TASK_MEMORY
 		taskId = idforData
 		try:
