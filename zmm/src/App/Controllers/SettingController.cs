@@ -24,7 +24,7 @@ namespace ZMM.App.Controllers
         private readonly IWebHostEnvironment _environment;
         readonly ILogger<CodeController> Logger;
         public IConfiguration Configuration { get; }
-        private List<ZSSettingResponse> settingsResponse;
+        // private List<ZSSettingResponse> settingsResponse;
 
         public static string ZmodId;
 
