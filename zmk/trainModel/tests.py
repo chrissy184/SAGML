@@ -110,13 +110,6 @@ class TestTrainModel(unittest.TestCase):
 		logging.info("PASSED")
 
 
-	# def test_5_NNTrain(self):
-
-
-
-	
-
-
 # 	def test_6_trainNNModel(self):
 # 		logging.info("Test Case : Train NN model.")
 # 		filePath = 'testUseCase/supportdata/irisNN.pmml'

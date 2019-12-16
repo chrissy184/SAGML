@@ -109,7 +109,7 @@ class TestScoring(unittest.TestCase):
 		print (result)
 		self.assertEqual('result' in result, True)
 		self.assertEqual(result['result'].endswith('.csv'), True)
-	# 	logging.info("PASSED")
+		logging.info("PASSED")
 
 
 	# def test_08_scoreJsonDataWithSKL(self):

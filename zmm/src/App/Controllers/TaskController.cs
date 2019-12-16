@@ -154,7 +154,7 @@ namespace ZMM.App.Controllers
         [HttpGet("{id}/history/{idforData}")]
         public async Task<IActionResult> GetSelectedTaskAysnc(string id, string idforData)
         {
-            if (!string.IsNullOrEmpty(id) && (!string.IsNullOrEmpty(idforData)))
+            if (string.IsNullOrEmpty(id) && (string.IsNullOrEmpty(idforData)))
             {
                 var zmkresp = await nnclient.GetRunningTaskByTaskNameAndId(id, idforData);
                 var jo = JObject.Parse(zmkresp);
