@@ -96,7 +96,12 @@ class PMMLLayerView(APIView):
 				raise Exception("Invalid Request Parameter")
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return NyokaServer.deletelayer(userInput,projectID)
+		
+		if 'modelType' in payload:
+			if payload['modelType']== 'Workflow':
+				return NyokaServer.deleteWorkflowlayer(userInput,projectID)
+		else:
+			return NyokaServer.deletelayer(userInput,projectID)
 
 	def put(self,requests,projectID):
 		userInput = json.loads(requests.body)
@@ -106,7 +111,11 @@ class PMMLLayerView(APIView):
 				raise Exception("Invalid Request Parameter")
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return NyokaServer.updatetoArchitecture(payload,projectID)
+		if 'modelType' in payload:
+			if payload['modelType']== 'Workflow':
+				return NyokaServer.updatetoWorkflow(payload,projectID)
+		else:
+			return NyokaServer.updatetoArchitecture(payload,projectID)
 
 
 			

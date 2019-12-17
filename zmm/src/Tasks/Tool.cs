@@ -29,13 +29,11 @@ namespace ZMM.Tasks
         string param;
         string workingDirectory;
         bool hasWorkindDirectory = false;
-        int toolStartupTimeout = 60;
-        string startupSuccessMessage = string.Empty;
         
         public Tool(ToolTypes name, bool HTTPSConfiguration)
         {
             this.name = name.ToString();
-            WithHTTPSConfiguration = HTTPSConfiguration;
+            WithHTTPSConfiguration = false;
             Init();
         }
 
@@ -53,14 +51,10 @@ namespace ZMM.Tasks
             string hasWorkingDir = this.configuration["HasWorkingDirectory"];
             this.hasWorkindDirectory = bool.Parse(hasWorkingDir == null ? "false" : hasWorkingDir);
             this.workingDirectory = this.hasWorkindDirectory ? this.configuration["WorkingDirectory"] : string.Empty;
-            this.startupSuccessMessage = this.configuration["Startup.SuccessMessage"];
-            this.toolStartupTimeout = int.Parse(this.configuration["Startup.Timeout"]);
-            Console.WriteLine("Tool : " + toolName + " " + tempPath + " is initialized, WorkingDir : " + this.workingDirectory + " Startup Timeout " + this.ToolStartupTimeout + " confirmation message " + this.StartupSuccessMessage);
+            Console.WriteLine("Tool initializing " + toolName + " with configuration : " + this.path);
         }
 
         public string Name { get => name; set => name = value; }
-        public int ToolStartupTimeout { get => toolStartupTimeout; set => toolStartupTimeout = value; }
-        public string StartupSuccessMessage { get => startupSuccessMessage; set => startupSuccessMessage = value; }
 
         public string GetParam()
         {
@@ -172,29 +166,51 @@ namespace ZMM.Tasks
             return this.configuration;
         }
 
-        #region GetAvailablePort
-        public int GetAvailablePort(int MinPort, int MaxPort)
+        public int GetAvailablePort(int StartingPortInRange, int EndingPortInRange)
         {
-            IPEndPoint[] endPoints;
-            List<int> portArray = new List<int>();
-            IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
-            TcpConnectionInformation[] connections = properties.GetActiveTcpConnections();
-            portArray.AddRange(from n in connections
-                               where n.LocalEndPoint.Port >= MinPort
-                               select n.LocalEndPoint.Port);
-            
-            endPoints = properties.GetActiveTcpListeners();
-            portArray.AddRange(from n in endPoints
-                               where n.Port >= MinPort
-                               select n.Port);
-
-            portArray.Sort();
-            for (int i = MinPort; i <= MaxPort; i++)
-                if (!portArray.Contains(i))
+            List<int> PortArray = GetAvailablePortInRange(StartingPortInRange,EndingPortInRange);
+            for (int i = StartingPortInRange; i<= EndingPortInRange; i++)
+            {    
+                if (!PortArray.Contains(i))
                     return i;
-
+            }
             return 0;
         }
-        #endregion
+
+        private List<int> GetAvailablePortInRange(int StartingPortInRange, int EndingPortInRange)
+        {
+            IPEndPoint [] EndPoints;
+            List<int> PortArray = new List<int>();
+            try
+            {
+                IPGlobalProperties Properties = IPGlobalProperties.GetIPGlobalProperties();
+                // getting active connections 
+                TcpConnectionInformation[] Connections = Properties.GetActiveTcpConnections();
+                PortArray.AddRange(from n in Connections
+                                    where n.LocalEndPoint.Port >= StartingPortInRange
+                                    select n.LocalEndPoint.Port);
+
+                // getting active tcp listeneres - wcf service Listening in tcp
+                EndPoints = Properties.GetActiveTcpListeners();
+                PortArray.AddRange(from n in EndPoints
+                                    where n.Port >= StartingPortInRange
+                                    select n.Port);
+
+                PortArray.Sort();
+            }
+            catch(Exception ex)
+            {
+                System.Console.Error.WriteLine(ex.StackTrace);
+            }
+            return PortArray;
+        }
+        public bool IsPortAvailableInRange(int TestPort, int StartingPortInRange, int EndingPortInRange)
+        {
+            bool Status = false;
+            List<int> PortArray = GetAvailablePortInRange(StartingPortInRange,EndingPortInRange);
+            Status = !PortArray.Contains(TestPort);
+            Console.WriteLine("IsPortAvailableInRange " + StartingPortInRange + " , " + EndingPortInRange + "  : " + string.Join(',', PortArray) + "  Out : " + Status);
+            return Status;            
+        }
     }
 }

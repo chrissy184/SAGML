@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using Newtonsoft.Json;
@@ -15,20 +16,20 @@ namespace ZMM.Helpers.ZMMDirectory
         public static bool ScanDirectoryToSeed()
         {
             bool result = false;
-            string fileName, _url, _fullName, fileContent, fileExt = ""; 
+            string fileName, _url, _fullName, fileContent, fileExt = "";
             Console.WriteLine("Dir Loc=" + DirectoryHelper.fileUploadDirectoryPath);
             var zmodDir = new ZmodDirectory(DirectoryHelper.fileUploadDirectoryPath);
 
             //seed data - subdir, csv, img and json
             #region DATA - SUBDIR
-            foreach(var subdir in Directory.GetDirectories(DirectoryHelper.GetDataDirectoryPath()))
+            foreach (var subdir in Directory.GetDirectories(DirectoryHelper.GetDataDirectoryPath()))
             {
-                string folderName = Path.GetFileName(subdir); 
+                string folderName = Path.GetFileName(subdir);
                 string _createdOn = Directory.GetCreationTime(subdir).ToString();
                 List<Property> _props = new List<Property>();
-                 _props.Add(new Property{key="Subdirectories", value=DirectoryHelper.CountDirectories(subdir).ToString()});
-                _props.Add(new Property{key="Files", value=DirectoryHelper.CountFiles(subdir).ToString()});
-               
+                _props.Add(new Property { key = "Subdirectories", value = DirectoryHelper.CountDirectories(subdir).ToString() });
+                _props.Add(new Property { key = "Files", value = DirectoryHelper.CountFiles(subdir).ToString() });
+
                 DataResponse newRecord = new DataResponse()
                 {
                     Created_on = Directory.GetCreationTime(subdir).ToString(),
@@ -38,8 +39,8 @@ namespace ZMM.Helpers.ZMMDirectory
                     FilePath = subdir,
                     Id = folderName,
                     MimeType = "",
-                    Name = folderName,  
-                    Properties = _props,                   
+                    Name = folderName,
+                    Properties = _props,
                     DateCreated = Directory.GetCreationTime(subdir)
                 };
                 //
@@ -90,7 +91,7 @@ namespace ZMM.Helpers.ZMMDirectory
                 fileExt = item.Value.info.Extension.Remove(0, 1);
                 _fullName = item.Value.info.FullName;
                 _fullName = _fullName.Substring(_fullName.IndexOf("Data")).Remove(0, 5);
-                _url = DirectoryHelper.GetDataUrl(_fullName).Replace("\\","/");
+                _url = DirectoryHelper.GetDataUrl(_fullName).Replace("\\", "/");
 
                 //get properties
                 try
@@ -121,7 +122,7 @@ namespace ZMM.Helpers.ZMMDirectory
                     };
                     //
                     DataPayload.Create(newRecord);
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -197,7 +198,7 @@ namespace ZMM.Helpers.ZMMDirectory
 
             #region DATA - MP4
             foreach (var item in zmodDir.VideoFiles)
-            {                
+            {
                 List<Property> _props = new List<Property>();
                 fileName = item.Value.info.Name;
                 fileExt = item.Value.info.Extension.Remove(0, 1);
@@ -207,7 +208,7 @@ namespace ZMM.Helpers.ZMMDirectory
 
                 //get properties
                 try
-                {                    
+                {
                     DataResponse newRecord = new DataResponse()
                     {
                         Created_on = item.Value.info.CreationTime.ToString(),
@@ -231,6 +232,46 @@ namespace ZMM.Helpers.ZMMDirectory
                 {
                     //TODO: logger
                     string err = ex.StackTrace;
+                }
+
+            }
+            #endregion
+
+            #region  DATA - TEXT
+            foreach (var item in zmodDir.TextFiles)
+            {
+                List<Property> _props = new List<Property>();
+                fileName = item.Value.info.Name;
+                fileExt = item.Value.info.Extension.Remove(0, 1);
+                _fullName = item.Value.info.FullName;
+                _fullName = _fullName.Substring(_fullName.IndexOf("Data")).Remove(0, 5);
+                _url = DirectoryHelper.GetDataUrl(_fullName);
+
+                //get properties
+                try
+                {
+                    DataResponse newRecord = new DataResponse()
+                    {
+                        Created_on = item.Value.info.CreationTime.ToString(),
+                        Edited_on = item.Value.info.LastWriteTime.ToString(),
+                        Extension = fileExt,
+                        FilePath = item.Value.info.FullName,
+                        Id = fileName.Replace($".{fileExt}", ""),
+                        MimeType = $"text/plain",
+                        Name = fileName,
+                        Properties = _props,
+                        Size = item.Value.info.Length,
+                        Type = "TEXT",
+                        Url = _url,
+                        User = "",
+                        DateCreated = item.Value.info.CreationTime
+                    };
+                    //
+                    DataPayload.Create(newRecord);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.StackTrace);
                 }
 
             }
@@ -269,7 +310,7 @@ namespace ZMM.Helpers.ZMMDirectory
             foreach (var item in zmodDir.IpynbFiles)
             {
                 fileName = item.Value.info.Name;
-                fileExt = Path.GetExtension(fileName).Remove(0,1);
+                fileExt = Path.GetExtension(fileName).Remove(0, 1);
                 _url = DirectoryHelper.GetCodeUrl(item.Value.info.Name);
 
                 CodeResponse newRecord = new CodeResponse()
@@ -283,6 +324,31 @@ namespace ZMM.Helpers.ZMMDirectory
                     Name = fileName,
                     Size = item.Value.info.Length,
                     Type = "JUPYTER_NOTEBOOK",
+                    Url = _url,
+                    User = "",
+                    DateCreated = item.Value.info.CreationTime
+                };
+                CodePayload.Create(newRecord);
+            }
+            #endregion
+
+            #region  DATA - R
+            foreach (var item in zmodDir.RFiles)
+            {
+                fileName = item.Value.info.Name;
+                fileExt = "r";
+                _url = DirectoryHelper.GetCodeUrl(item.Value.info.Name);
+                CodeResponse newRecord = new CodeResponse()
+                {
+                    Created_on = item.Value.info.CreationTime.ToString(),
+                    Edited_on = item.Value.info.LastWriteTime.ToString(),
+                    Extension = fileExt,
+                    FilePath = item.Value.info.FullName,
+                    Id = Path.GetFileNameWithoutExtension(fileName),
+                    MimeType = "application/octet-stream",
+                    Name = fileName,
+                    Size = item.Value.info.Length,
+                    Type = "R",
                     Url = _url,
                     User = "",
                     DateCreated = item.Value.info.CreationTime
@@ -324,28 +390,28 @@ namespace ZMM.Helpers.ZMMDirectory
 
 
             #endregion
-  
+
             return result;
         }
-    
+
         #region scan Data
         public static bool ScanDataDirectory()
         {
             bool result = false;
-            string fileName, _url, _fullName, fileContent, fileExt = ""; 
+            string fileName, _url, _fullName, fileContent, fileExt = "";
             Console.WriteLine("Dir Loc=" + DirectoryHelper.fileUploadDirectoryPath);
             var zmodDir = new ZmodDirectory(DirectoryHelper.fileUploadDirectoryPath);
 
             //seed data - subdir, csv, img and json
             #region DATA - SUBDIR
-            foreach(var subdir in Directory.GetDirectories(DirectoryHelper.GetDataDirectoryPath()))
+            foreach (var subdir in Directory.GetDirectories(DirectoryHelper.GetDataDirectoryPath()))
             {
-                string folderName = Path.GetFileName(subdir); 
+                string folderName = Path.GetFileName(subdir);
                 string _createdOn = Directory.GetCreationTime(subdir).ToString();
                 List<Property> _props = new List<Property>();
-                 _props.Add(new Property{key="Subdirectories", value=DirectoryHelper.CountDirectories(subdir).ToString()});
-                _props.Add(new Property{key="Files", value=DirectoryHelper.CountFiles(subdir).ToString()});
-               
+                _props.Add(new Property { key = "Subdirectories", value = DirectoryHelper.CountDirectories(subdir).ToString() });
+                _props.Add(new Property { key = "Files", value = DirectoryHelper.CountFiles(subdir).ToString() });
+
                 DataResponse newRecord = new DataResponse()
                 {
                     Created_on = Directory.GetCreationTime(subdir).ToString(),
@@ -355,8 +421,8 @@ namespace ZMM.Helpers.ZMMDirectory
                     FilePath = subdir,
                     Id = folderName,
                     MimeType = "",
-                    Name = folderName,  
-                    Properties = _props,                   
+                    Name = folderName,
+                    Properties = _props,
                     DateCreated = Directory.GetCreationTime(subdir)
                 };
                 //
@@ -406,7 +472,7 @@ namespace ZMM.Helpers.ZMMDirectory
                 fileExt = item.Value.info.Extension.Remove(0, 1);
                 _fullName = item.Value.info.FullName;
                 _fullName = _fullName.Substring(_fullName.IndexOf("Data")).Remove(0, 5);
-                _url = DirectoryHelper.GetDataUrl(_fullName).Replace("\\","/");
+                _url = DirectoryHelper.GetDataUrl(_fullName).Replace("\\", "/");
 
                 //get properties
                 try
@@ -437,7 +503,7 @@ namespace ZMM.Helpers.ZMMDirectory
                     };
                     //
                     DataPayload.Create(newRecord);
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -511,7 +577,7 @@ namespace ZMM.Helpers.ZMMDirectory
             #endregion
             #region DATA - MP4
             foreach (var item in zmodDir.VideoFiles)
-            {                
+            {
                 List<Property> _props = new List<Property>();
                 fileName = item.Value.info.Name;
                 fileExt = item.Value.info.Extension.Remove(0, 1);
@@ -521,7 +587,7 @@ namespace ZMM.Helpers.ZMMDirectory
 
                 //get properties
                 try
-                {                    
+                {
                     DataResponse newRecord = new DataResponse()
                     {
                         Created_on = item.Value.info.CreationTime.ToString(),
@@ -549,18 +615,57 @@ namespace ZMM.Helpers.ZMMDirectory
 
             }
             #endregion
+            #region  DATA - TEXT
+            foreach (var item in zmodDir.TextFiles)
+            {
+                List<Property> _props = new List<Property>();
+                fileName = item.Value.info.Name;
+                fileExt = item.Value.info.Extension.Remove(0, 1);
+                _fullName = item.Value.info.FullName;
+                _fullName = _fullName.Substring(_fullName.IndexOf("Data")).Remove(0, 5);
+                _url = DirectoryHelper.GetDataUrl(_fullName);
+
+                //get properties
+                try
+                {
+                    DataResponse newRecord = new DataResponse()
+                    {
+                        Created_on = item.Value.info.CreationTime.ToString(),
+                        Edited_on = item.Value.info.LastWriteTime.ToString(),
+                        Extension = fileExt,
+                        FilePath = item.Value.info.FullName,
+                        Id = fileName.Replace($".{fileExt}", ""),
+                        MimeType = $"text/plain",
+                        Name = fileName,
+                        Properties = _props,
+                        Size = item.Value.info.Length,
+                        Type = "TEXT",
+                        Url = _url,
+                        User = "",
+                        DateCreated = item.Value.info.CreationTime
+                    };
+                    //
+                    DataPayload.Create(newRecord);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.StackTrace);
+                }
+
+            }
+            #endregion
             return result;
         }
         #endregion
-    
+
         #region scan Code
         public static bool ScanCodeDirectory()
         {
             bool result = false;
-            string fileName, _url, fileExt = ""; 
+            string fileName, _url, fileExt = "";
             Console.WriteLine("Dir Loc=" + DirectoryHelper.fileUploadDirectoryPath);
             var zmodDir = new ZmodDirectory(DirectoryHelper.fileUploadDirectoryPath);
-            
+
             //seed code - py and ipynb
             #region  CODE - PY
 
@@ -594,7 +699,7 @@ namespace ZMM.Helpers.ZMMDirectory
             foreach (var item in zmodDir.IpynbFiles)
             {
                 fileName = item.Value.info.Name;
-                fileExt = Path.GetExtension(fileName).Remove(0,1);
+                fileExt = Path.GetExtension(fileName).Remove(0, 1);
                 _url = DirectoryHelper.GetCodeUrl(item.Value.info.Name);
 
                 CodeResponse newRecord = new CodeResponse()
@@ -615,18 +720,18 @@ namespace ZMM.Helpers.ZMMDirectory
                 CodePayload.Create(newRecord);
             }
             #endregion
-  
+
             return result;
         }
         #endregion
-    
+
         #region scan Models
         public static bool ScanModelsDirectory()
         {
             bool result = false;
-            string fileName, _url, fileExt = ""; 
+            string fileName, _url, fileExt = "";
             Console.WriteLine("Dir Loc=" + DirectoryHelper.fileUploadDirectoryPath);
-            var zmodDir = new ZmodDirectory(DirectoryHelper.fileUploadDirectoryPath);            
+            var zmodDir = new ZmodDirectory(DirectoryHelper.fileUploadDirectoryPath);
 
             //loop of model
             #region  CODE - PMML
@@ -661,7 +766,7 @@ namespace ZMM.Helpers.ZMMDirectory
 
 
             #endregion
-  
+
             return result;
         }
         #endregion

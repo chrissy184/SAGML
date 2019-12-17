@@ -1,5 +1,5 @@
 {
-  "ContentDir": "",
+  "ContentDir": "/ZMOD",
   "JupyterNotebook": {
     "Path": "jupyter-notebook",
     "Param": "",
@@ -10,19 +10,15 @@
     "Command.2.Name": "Stop",
     "Command.2.Value": "stop {Port}",
     "Command.3.Name": "Kill",
-    "Command.3.Value": "kill {Pid}",
-    "Startup.Timeout": "60",
-    "Startup.SuccessMessage": "?token="
+    "Command.3.Value": "kill {Pid}"
   },
   "TensorBoard": {
     "Path": "tensorboard",
     "Param": "",
     "Command.0.Name": "Start",
-    "Command.0.Value": "  --logdir={TensorBoardDir} --port {Port}",
+    "Command.0.Value": "  --logdir={TensorBoardDir} --host=localhost --port {Port}",
     "Command.1.Name": "Kill",
-    "Command.1.Value": "kill {Pid}",
-    "Startup.Timeout": "60",
-    "Startup.SuccessMessage": "CTRL+C to quit"
+    "Command.1.Value": "kill {Pid}"
   },
   "Logging": {
     "LogLevel": {

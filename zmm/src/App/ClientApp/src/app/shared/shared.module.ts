@@ -22,6 +22,7 @@ import { HighlightPipe } from './pipes/highlight.pipe';
 import { SearchFilterPipe } from './pipes/searchFilter.pipe';
 import { SafePipe } from './pipes/safe.pipe';
 import { ConfirmationbarComponent } from './confirmationbar/confirmationbar.component';
+import { CronstruePipe } from './pipes/cronstrue.pipe';
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { ConfirmationbarComponent } from './confirmationbar/confirmationbar.comp
     SearchFilterPipe,
     HighlightPipe,
     SafePipe,
-    ConfirmationbarComponent
+    ConfirmationbarComponent,
+    CronstruePipe
   ],
   exports: [
     MaterialModule,
@@ -52,7 +54,8 @@ import { ConfirmationbarComponent } from './confirmationbar/confirmationbar.comp
     SearchFilterPipe,
     HighlightPipe,
     SafePipe,
-    ConfirmationbarComponent
+    ConfirmationbarComponent,
+    CronstruePipe
   ],
   providers: [
     UtilService,

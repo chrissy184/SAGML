@@ -8,10 +8,11 @@
   </div>
   <div class="toolbar-mid"></div>
   <div calss="content-toolbar">
-    <button mat-stroked-button color="primary" class="mr-2" (click)="build()" [disabled]="!(problem_type && target_variable)">BUILD</button>
+    <mat-slide-toggle class="mr-4" [(ngModel)]="supervised" [labelPosition]="'before'">Supervised</mat-slide-toggle>
+    <button mat-stroked-button color="primary" class="mr-2" (click)="build()" [disabled]="!(problem_type && target_variable) && supervised">BUILD</button>
   </div>
 </mat-toolbar>
-
+<app-loader [isLoading]="isLoading" [message]=""></app-loader>
 <table mat-table [dataSource]="dataAutomlSource" matSort class="w-100">
   <!-- Column 1 -->
   <ng-container matColumnDef="position">

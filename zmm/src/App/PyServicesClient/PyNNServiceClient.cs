@@ -193,12 +193,14 @@ namespace ZMM.App.PyServicesClient
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));               
                 HttpContent _httpContent = new StringContent(requestBody);
+                // HttpContent _httpContent = new StringContent("");
                 string _contentType = "application/json";
                  _httpContent.Headers.ContentType = new MediaTypeHeaderValue(_contentType);                
                 //
                 try
                 {
-                    HttpResponseMessage response = await httpClient.PostAsync("trainNNModel", _httpContent);
+                    HttpResponseMessage response = await httpClient.PostAsync($"trainNNModel", _httpContent);
+                    // HttpResponseMessage response = await httpClient.GetAsync($"trainNNModel/{requestBody}");
                     if (response.IsSuccessStatusCode)
                     {
                         jsonResult = await response.Content.ReadAsStringAsync();
@@ -216,7 +218,9 @@ namespace ZMM.App.PyServicesClient
         }
         #endregion
 
-        #region Get tasks...
+        #region Get running tasks...
+
+        #region Get All tasks
         public async Task<string> GetAllRunningTask()
         {
             string jsonResult = string.Empty;
@@ -252,6 +256,83 @@ namespace ZMM.App.PyServicesClient
 
             return jsonResult;
         }
+        #endregion
+        
+        #region get running tasks by id
+        public async Task<string> GetRunningTaskByTaskName(string taskName)
+        {
+            string jsonResult = string.Empty;
+
+            using(var httpClient = new HttpClient())
+            {
+                
+                httpClient.BaseAddress = new System.Uri(Configuration["PyServiceLocation:srvurl"]);
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                //
+                //request params
+                var content = new FormUrlEncodedContent(
+                    new List<KeyValuePair<string, string>>
+                    {
+                        //empty
+                    }
+                );   
+                try
+                {
+                    HttpResponseMessage response = await httpClient.GetAsync($"runningTasks/{taskName}");
+                    Console.WriteLine(httpClient.BaseAddress);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        jsonResult = await response.Content.ReadAsStringAsync();
+                    } 
+                }
+                catch(HttpRequestException ex)
+                {
+                    jsonResult = "{'message': '" + ex.Message + "'}";
+                }            
+            }
+
+            return jsonResult;
+        }
+        #endregion
+        
+        #region get running task details by id
+        public async Task<string> GetRunningTaskByTaskNameAndId(string taskName, string idforData)
+        {            
+            string jsonResult = string.Empty;
+            using(var httpClient = new HttpClient())
+            {                
+                httpClient.BaseAddress = new System.Uri(Configuration["PyServiceLocation:srvurl"]);
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                //
+                //request params
+                var content = new FormUrlEncodedContent(
+                    new List<KeyValuePair<string, string>>
+                    {
+                        //empty
+                    }
+                );   
+                try
+                {
+                    HttpResponseMessage response = await httpClient.GetAsync($"runningTasks/{taskName}/{idforData}");
+                    Console.WriteLine(httpClient.BaseAddress);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        jsonResult = await response.Content.ReadAsStringAsync();
+                    } 
+                }
+                catch(HttpRequestException ex)
+                {
+                    jsonResult = "{'message': '" + ex.Message + "'}";
+                }            
+            }
+
+            return jsonResult;
+
+        }
+
+        #endregion 
         #endregion
     
         #region Edit NN pmml file...

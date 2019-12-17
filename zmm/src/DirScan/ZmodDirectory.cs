@@ -59,6 +59,10 @@ namespace ZMM.DS
             new Dictionary<string, ImageDirInfo>();
         public Dictionary<string, PmmlFileInfo> PmmlFiles { get; set; } =
             new Dictionary<string, PmmlFileInfo>();
+        public Dictionary<string, TextFileInfo> TextFiles { get; set; } =
+            new Dictionary<string, TextFileInfo>();
+        public Dictionary<string, RFileInfo> RFiles { get; set; } =
+            new Dictionary<string, RFileInfo>();
         public void Refresh()
         {
             IpynbFiles = (from _ in Directory.GetFiles(CodeDir, "*.ipynb", SearchOption.AllDirectories)
@@ -78,6 +82,11 @@ namespace ZMM.DS
                     .ToDictionary(x => new RaiFile(x).NameWithExtension, x => new ImageDirInfo(x));
             PmmlFiles = (from _ in Directory.GetFiles(ModelDir, "*.pmml", SearchOption.AllDirectories)
                     select _).ToDictionary(x => new RaiFile(x).NameWithExtension, x => new PmmlFileInfo(x));
+            TextFiles = (from _ in Directory.GetFiles(DataDir, "*.txt", SearchOption.TopDirectoryOnly)
+                    select _).ToDictionary(x => new RaiFile(x).NameWithExtension, x => new TextFileInfo(x));
+            RFiles = (from _ in Directory.GetFiles(CodeDir, "*.r", SearchOption.TopDirectoryOnly)
+                    select _).ToDictionary(x => new RaiFile(x).NameWithExtension, x => new RFileInfo(x));
+            
         }
         public ZmodDirectory(string path)
         {

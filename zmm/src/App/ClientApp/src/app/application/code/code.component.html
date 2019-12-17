@@ -90,6 +90,7 @@
             </div>
           </div>
         </ng-template>
+
       </mat-tab>
 
       <mat-tab label="PYTHON">
@@ -191,3 +192,5 @@
 
   </mat-sidenav-content>
 </mat-sidenav-container>
+<app-excute-form *ngIf="showExcuteFormPanel" [option]="''" (close)="showExcuteFormPanel=false;"
+  (selected)="execute($event)"></app-excute-form>

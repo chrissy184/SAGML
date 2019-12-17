@@ -45,10 +45,12 @@ export class AutomlComponent implements OnInit {
     target_variable: 'mpg'
   };
   public fromDefaultData: any = {};
+  supervised = true;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   pageSize = 10;
   pageSizeOptions = [10, 25, 100];
+  isLoading = false;
   constructor(private apiService: HttpService, private router: Router, private utilService: UtilService) { }
 
   ngOnInit() {
@@ -57,6 +59,7 @@ export class AutomlComponent implements OnInit {
 
   onAutoMLTrainingFormDataSubmit(formData: any) {
     this.displayAutoMLPrametersForm = false;
+    this.isLoading = true;
     const payload = {
       data: this.dataSource.data,
       problem_type: this.problem_type,
@@ -70,7 +73,8 @@ export class AutomlComponent implements OnInit {
     const options = {
       body: payload
     };
-    this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.dataAutoML(this.dataSource.selectedData.id), options)
+    const apiEndpoint = this.supervised ? ApiRoutes.dataAutoML(this.dataSource.selectedData.id) : ApiRoutes.dataAutoMLAnomaly(this.dataSource.selectedData.id);
+    this.apiService.request(ApiRoutes.methods.POST, apiEndpoint, options)
       .subscribe(data => {
         console.log(data);
         this.utilService.alert(AlertMessages.AUTOML.train);
@@ -80,6 +84,7 @@ export class AutomlComponent implements OnInit {
   build() {
     this.fromDefaultData = this.dataSource.options;
     this.fromDefaultData.problem_type = this.problem_type;
+    this.fromDefaultData.supervised = this.supervised;
     this.displayAutoMLPrametersForm = true;
   }
 

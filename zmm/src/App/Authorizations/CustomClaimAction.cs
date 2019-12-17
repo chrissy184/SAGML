@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
@@ -9,11 +10,12 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using System.Text.Json.Serialization;
 
 
 namespace ZMM.Authorizations.Claims
 {
-    public class CustomClaimAction: ClaimAction
+    public class CustomClaimAction: Microsoft.AspNetCore.Authentication.OAuth.Claims.ClaimAction
     {
         /// <summary>
         /// Creates a new CustomClaimAction.
@@ -35,11 +37,13 @@ namespace ZMM.Authorizations.Claims
         public string JsonKey { get; }
         public string DefaultKeyValue { get; }
         
-        public override void Run(JObject userData, ClaimsIdentity identity, string issuer)
+
+        public override void Run(JsonElement userData, ClaimsIdentity identity, string issuer)
         {
             try
             {
-                var values = userData?[JsonKey];
+                JObject temp = new JObject(userData.ToString());
+                var values = temp?[JsonKey];
                 if (!(values is JArray)) return;
 
                 foreach (var value in values)

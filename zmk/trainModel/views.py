@@ -38,7 +38,7 @@ class RunningTaskView(APIView):
 		return result
 
 	def get(self,requests):
-		return Utility.runningTaskList()
+		return Utility().runningTaskList()
 
 class ModelCompileView(APIView):
 	http_method_names=['post']
@@ -82,6 +82,35 @@ class RunningTaskOperationView(APIView):
 	def get(self,requests,id_for_task):
 		return Training.statusOfModel(id_for_task)
 
+class RunningTaskNameOperationView(APIView):
+	http_method_names=['get','delete']
+
+	def dispatch(self,requests,taskName):
+		if requests.method=='GET':
+			result=self.get(requests,taskName)
+		elif requests.method=='DELETE':
+			result=self.delete(requests,taskName)
+		else:
+			return JsonResponse({},status=405)
+		return result
+
+	def get(self,requests,taskName):
+		return Utility().taskUpdateByTaskName(taskName)
+
+class RunningTaskNameOperationViewIdForData(APIView):
+	http_method_names=['get','delete']
+
+	def dispatch(self,requests,taskName,idForData):
+		if requests.method=='GET':
+			result=self.get(requests,taskName,idForData)
+		elif requests.method=='DELETE':
+			result=self.delete(requests,taskName,idForData)
+		else:
+			return JsonResponse({},status=405)
+		return result
+
+	def get(self,requests,taskName,idForData):
+		return Utility().taskUpdateByTaskNameIdForData(taskName,idForData)
 
 
 class TrainAutoMLView(APIView):
@@ -113,6 +142,27 @@ class TrainAutoMLView(APIView):
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
 		return Training.autoMLtrainModel(userInput)
 
+class TrainAnomalyView(APIView):
+	http_method_names=['post']
+
+	def dispatch(self,requests):
+		if requests.method=='GET':
+			result=self.get(requests)
+		elif requests.method=='POST':
+			result=self.post(requests)
+		else:
+			return JsonResponse({},status=405)
+		return result
+
+
+	def post(self,requests):
+		userInput=requests.body
+		try:
+			userInput=json.loads(userInput)
+		except:
+			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
+		return Training.autoAnomalyModel(userInput)
+
 
 
 class TrainNNView(APIView):
@@ -126,12 +176,12 @@ class TrainNNView(APIView):
 		return result
 
 	def post(self,requests):
-		userInput=requests.body
 		try:
-			userInput=json.loads(userInput)
+			requests.body
+			# print (requests.POST.get('filePath'))
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return Training.trainNeuralNetworkModels(userInput)
+		return Training.trainNeuralNetworkModels(requests)
 
 
 class MRCNNView(APIView):

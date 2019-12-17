@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+    #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -270,22 +270,48 @@ class KerasNetworkLayer(ny.NetworkLayer):
 
         """ 
         layer_all_weights = layer.get_weights()
-        layer_weights = layer_biases = biases = None
+        layer_weights = layer_rec_weight = layer_biases = biases = None
         if layer_all_weights:
-            if hasattr(layer, 'use_bias') and layer.use_bias:
+            if hasattr(layer, 'use_bias') and layer.use_bias and (hasattr(layer, 'unit_forget_bias') == False):
                 biases = layer_all_weights[-1]
                 weights, w_shape = self._get_flatten_weights(
                     layer_all_weights[0:-1])
+                # print (weights, w_shape)
                 layer_weights = ny.LayerWeights(content=weights,
                                                 floatsPerLine=0,
                                                 weightsShape=w_shape,
                                                 weightsFlattenAxis="0")
+                # print ('Came here 1')
+            elif hasattr(layer, 'use_bias') and layer.use_bias and layer.unit_forget_bias:
+                biases = layer_all_weights[-1]
+                layer_recurrent_weights=layer_all_weights[-2]
+                weights, w_shape = self._get_flatten_weights(
+                    layer_all_weights[0:-2])
+                layer_weights = ny.LayerWeights(content=weights,
+                                                floatsPerLine=0,
+                                                weightsShape=w_shape,
+                                                weightsFlattenAxis="0")
+                # print ('Came here 2')
+
+                rec_weights, rec_w_shape = self._get_flatten_weights(layer_all_weights[1:-1])
+                layer_rec_weight = ny.LayerRecurrentWeights(content=rec_weights,
+                                                floatsPerLine=0,
+                                                recurrentWeightsShape=rec_w_shape,
+                                                recurrentWeightsFlattenAxis="0")
+                # layer_rec_weight = ny.LayerWeights(content=rec_weights,
+                #                                 floatsPerLine=0,
+                #                                 weightsShape=rec_w_shape,
+                #                                 weightsFlattenAxis="0")
+
             else:
+                # print ('Came here')
                 weights, w_shape = self._get_flatten_weights(layer_all_weights)
+                # print(weights, w_shape)
                 layer_weights = ny.LayerWeights(content=weights,
                                                 floatsPerLine=0,
                                                 weightsShape=w_shape,
-                                                weightsFlattenAxis="0")
+                                                weightsFlattenAxis="0"
+                                               )
 
             if biases is not None:
                 bs_shape = biases.shape
@@ -297,7 +323,8 @@ class KerasNetworkLayer(ny.NetworkLayer):
                                             biasShape=final_bs_shape,
                                             biasFlattenAxis="0",
                                             floatsPerLine=0)
-        return layer_weights, layer_biases
+                
+        return layer_weights, layer_biases,layer_rec_weight
 
     def _get_connection_layer_ids(self, layer):
         """
@@ -317,7 +344,7 @@ class KerasNetworkLayer(ny.NetworkLayer):
         node_config = layer._inbound_nodes[0].get_config()
         if node_config['inbound_layers']:
             inbound_layers = []
-            if layer._inbound_nodes[0].inbound_layers[0].__class__.__name__ == 'Model':
+            if node_config['inbound_layers'][0] == 'rpn_model':
                 replace_by = layer._inbound_nodes[0].input_tensors[0]._op.name.split('/')[1]
                 for i in range(len(node_config['inbound_layers'])):
                     inbound_layers.append(replace_by)
@@ -341,7 +368,7 @@ class KerasNetworkLayer(ny.NetworkLayer):
         old_layer_type = layer_type
         layer_type = KERAS_LAYER_TYPES_MAP.get(layer_type, layer_type)
         layer_params = self._get_layer_params_dict(layer)
-        layer_weights, layer_biases = self._get_layer_weights_n_biases(layer)
+        layer_weights, layer_biases,rec_weights = self._get_layer_weights_n_biases(layer)
         if connection_layer_id:
             connection_layers = self._get_connection_layer_ids(layer)
         if layer_type == "MergeLayer":
@@ -392,6 +419,30 @@ class KerasNetworkLayer(ny.NetworkLayer):
             inner_layer = layer.layer
             layer_type_inner = inner_layer.__class__.__name__
             inner_network_layer = KerasNetworkLayer(inner_layer,dataSet,layer_type_inner,False)
+        elif layer_type == 'LSTM':
+            layer_params['return_sequences'] = layer.return_sequences
+            layer_params['return_state'] = layer.return_state
+            layer_params['go_backwards'] = layer.go_backwards
+            layer_params['unroll'] = str(layer.unroll)
+            layer_params['units'] = str(layer.units)
+            layer_params['recurrent_activation'] = layer.get_config().get('recurrent_activation')
+            layer_params['use_bias'] = layer.use_bias
+            layer_params['unit_forget_bias'] = layer.unit_forget_bias
+            #layer_params['kernel_regularizer'] = layer.kernel_regularizer
+            #layer_params['recurrent_regularizer'] = layer.recurrent_regularizer
+            #layer_params['bias_regularizer'] = layer.bias_regularizer
+            #layer_params['activity_regularizer'] = layer.activity_regularizer
+            #layer_params['kernel_constraint'] = layer.kernel_constraint
+            #layer_params['recurrent_constraint'] = layer.recurrent_constraint
+            #layer_params['bias_constraint'] = layer.bias_constraint
+            layer_params['dropout'] = str(layer.recurrent_dropout)
+            layer_params['recurrent_dropout'] = str(layer.dropout)
+            #layer_params['implementation'] = str(layer.implementation)
+
+            if hasattr(layer, 'batch_input_shape'):
+                layer_params['batch_input_shape'] = str(layer.batch_input_shape)
+
+
         layer_params["trainable"] = str(layer.trainable)
         layer_params["mergeLayerOp"] = merge_layer_op_type
         layer_params["mergeLayerConcatOperationAxes"] = merge_concat_axes
@@ -413,7 +464,7 @@ class KerasNetworkLayer(ny.NetworkLayer):
                                  LayerParameters=ny.LayerParameters(
                                      **layer_params),
                                  LayerWeights=layer_weights,
-                                 LayerBias=layer_biases)
+                                 LayerBias=layer_biases,LayerRecurrentWeights=rec_weights)
 
 
 class KerasDataDictionary(ny.DataDictionary):
@@ -433,6 +484,7 @@ class KerasDataDictionary(ny.DataDictionary):
     """ 
     def __init__(self, dataSet, predictedClasses):
         ny.DataDictionary.__init__(self)
+        print ('dataSet',dataSet,'predictedClasses',predictedClasses)
 
         if dataSet:
             if predictedClasses:
@@ -504,7 +556,7 @@ class KerasMiningSchema(ny.MiningSchema):
     -------
     Nyoka's Mining Schema Object
     """ 
-    def __init__(self, dataSet=None):
+    def __init__(self, dataSet=None,targetVarName=None):
         ny.MiningSchema.__init__(self)
         if dataSet:
             name = dataSet
@@ -517,9 +569,11 @@ class KerasMiningSchema(ny.MiningSchema):
                 name=name, usageType="active",
                 invalidValueTreatment="asIs"))
 
-        ny.MiningSchema.add_MiningField(self, ny.MiningField(
-            name="predictions", usageType="target",
-            invalidValueTreatment="asIs"))
+        if targetVarName:
+            ny.MiningSchema.add_MiningField(self, ny.MiningField(name=targetVarName, usageType="target",invalidValueTreatment="asIs"))
+        else:
+            # print('Came here')
+            ny.MiningSchema.add_MiningField(self, ny.MiningField(name="predictions", usageType="target",invalidValueTreatment="asIs"))
 
 
 class KerasOutput(ny.Output):
@@ -646,11 +700,13 @@ class KerasNetwork(ny.DeepNetwork):
                 input_dims = output_dims = str(tuple(list(in_shape[1:])))  
         node_config = layer._inbound_nodes[0].get_config()
         connection_layers = ", ".join(node_config['inbound_layers'])
+
         input_layer = ny.NetworkLayer(
             inputFieldName=inputField, layerType="Input", layerId=connection_layers,
             connectionLayerId="na",LayerParameters=ny.LayerParameters(
                 inputDimension=input_dims,
                 outputDimension=output_dims))
+                
         return input_layer
 
     def _create_layers(self, keras_model, dataSet):
@@ -683,14 +739,14 @@ class KerasNetwork(ny.DeepNetwork):
                 network_layers.append(net_layer)
         return network_layers
 
-    def __init__(self, keras_model, model_name, dataSet=None, predictedClasses=None):
+    def __init__(self, keras_model, model_name,filePath=None, dataSet=None, predictedClasses=None,targetVarName=None):
         network_layers = self._create_layers(keras_model, dataSet)
         local_trans = None
-        mining_schema = KerasMiningSchema(dataSet)
+        mining_schema = KerasMiningSchema(dataSet,targetVarName)
         if dataSet == 'image':
             local_trans = KerasLocalTransformations(model_name, dataSet)
         function_Name = "classification" if predictedClasses else "regression"
-        ny.DeepNetwork.__init__(self, modelName=model_name,
+        ny.DeepNetwork.__init__(self, modelName=model_name,filePath=filePath,
                                 functionName=function_Name, algorithmName=None,
                                 normalizationMethod="none", numberOfLayers=len(network_layers),
                                 isScorable=True, Extension=None, MiningSchema=mining_schema,
@@ -721,10 +777,10 @@ class KerasToPmml(ny.PMML):
     Creates PMML object, this can be saved in file using export function
     """ 
     def __init__(self, keras_model, model_name="Keras Model",
-                 description="Keras Models in PMML",dataSet=None, predictedClasses=None):
+                 description="Keras Models in PMML",filePath=None,dataSet=None, predictedClasses=None,targetVarName=None):
         data_dict = KerasDataDictionary(dataSet, predictedClasses)
         super(KerasToPmml, self).__init__(
             version="4.3Ext", Header=KerasHeader(description, copyright="Internal User"),
             DataDictionary=data_dict, DeepNetwork=[
-                KerasNetwork(keras_model=keras_model, model_name=model_name,
-                             dataSet=dataSet, predictedClasses=predictedClasses)])
+            KerasNetwork(keras_model=keras_model, model_name=model_name,filePath=filePath,
+                             dataSet=dataSet, predictedClasses=predictedClasses,targetVarName=targetVarName)])

@@ -11,7 +11,7 @@ global MEMORY_DICT_ARCHITECTURE,MEMORY_OF_LAYERS
 settingFilePath='./settingFiles/'
 savedModels='./SavedModels/'
 MEMORY_OF_LAYERS={}
-
+from trainModel.mergeTrainingV2 import PMMLMODELSTORAGE
 layerDetail=open(settingFilePath+'listOflayers.json','r')
 MEMORY_OF_LAYERS=json.loads(layerDetail.read())
 #########################################All functions is to write PMML###############################
@@ -379,6 +379,15 @@ class NyokaUtilities:
         tempDict['Model information'].append({'Model Name':temp.modelName})
         return tempDict
     
+    def getInfoOfAnomalyDetectionModel(self,tempObj):
+        temp=tempObj['AnomalyDetectionModel'][0]
+        tempDict={}
+        tempDict['Model information']=[]
+        tempDict['Model information'].append({'Function Type':temp.functionName})
+        tempDict['Model information'].append({'Model Name':temp.modelName})
+        tempDict['Model information'].append({'Algorithm Type':temp.algorithmType})
+        return tempDict
+    
 
     def changeStructure(self,mm):
         allInfo={}
@@ -386,7 +395,7 @@ class NyokaUtilities:
         for j in mm:
             if j in ['Model information','DeepNetwork information']:
                 if j =='Model information':
-                    allInfo['modelGeneratedFrom']='Sklearn'
+                    allInfo['modelGeneratedFrom']='SKLearn'
                 else:
                     allInfo['modelGeneratedFrom']='DeepNetwork'
                 for k in mm[j]:
@@ -400,168 +409,274 @@ class NyokaUtilities:
                 tempDict['property']=j
                 tempDict['value']=mm[j]
                 allInfo['information'].append(tempDict)
+
+        if 'type' in mm:
+            if mm['type']=='multi':
+                allInfo['modelGeneratedFrom']='Workflow'
+
+
         return allInfo
 
 
 
     def pmmlToJson(self,filePath):
         pmmlObj=ny.parse(filePath,silence=True)
-        # print('parse success 1')
         pmmlDictObj=pmmlObj.__dict__
-        
-        overAll=[]
 
-        deepObject=pmmlDictObj['DeepNetwork'][0]
-        # print('parse success 2')
-        listOfNetworkLayer=deepObject.NetworkLayer
-        for lay in listOfNetworkLayer:
-            networkDict=lay.__dict__
-            tempDict={}
-            tempDict['layerParam']={}
-            tempDict['netParam']={}
-            for j in networkDict:
-                if networkDict[j] is not None:
-                    if j not in [ 'original_tagname_','LayerWeights','LayerParameters','Extension','LayerBias']:
-                        tempDict['netParam'][j]=networkDict[j]
-                    layerDict=networkDict['LayerParameters'].__dict__                    
-                    for kk in layerDict:
-                        if layerDict[kk] is not None:
-                            if kk not in [ 'original_tagname_','Extension']:
-                                try:
-                                    evalVal=list(ast.literal_eval(layerDict[kk]))
-                                except:
-                                    evalVal=layerDict[kk]
-                                tempDict['layerParam'][kk]=evalVal
-                        # tempDict['layerParam']['trainable']=layerDict['layerDict']
-                    # print (layerDict['trainable'])
-                    tempDict['layerParam']['trainable']=False if layerDict['trainable'] == False else True
+        # print ('0'*100,pmmlObj.get_type())
 
-                    if len(networkDict['Extension']) > 0:
-                        ttt=networkDict['Extension'][0]
-                        sectionVal=ttt.get_value()
-                        import ast
-                        tempDict['sectionId']=ast.literal_eval(sectionVal)['sectionId']
-                    else:
-                        tempDict['sectionId']=None
-            # print ('tempDict',tempDict['layerParam']['trainable'])
-            overAll.append(tempDict)
+        if pmmlObj.get_type()=='multi':
+            print ('came to Workflow')
+            # print('*'*100)
 
-        allLayers=MEMORY_OF_LAYERS['layerinfo'][0]['layers']
-        listOFLayersName=[j['name'] for j in MEMORY_OF_LAYERS['layerinfo'][0]['layers']]
-        architecture=[]
-        for tempLay in overAll:
-            tempSpace=copy.deepcopy(allLayers[listOFLayersName.index(tempLay['netParam']['layerType'])])
+            # print(PMMLMODELSTORAGE)
+            # print('*'*100)
             
-            layerPARA=tempLay['layerParam']
-            netWorkPARA=tempLay['netParam']
-            for j in netWorkPARA:
+            import pathlib
+            from trainModel.mergeTrainingV2 import TrainingViewModels
+            pmmlFileObj=pathlib.Path(filePath)
+            pmmlFileForKey=pmmlFileObj.name.replace(pmmlFileObj.suffix,'')
+            from trainModel.mergeTrainingV2 import  NewModelOperations
+            NewModelOperations().loadExecutionModel(filePath)
+            modelInformation=PMMLMODELSTORAGE[pmmlFileForKey]
+            # print ('PMMLMODELSTORAGE after >>>>>>>>>>> ',PMMLMODELSTORAGE)
+            # print (modelInformation)
+
+            toexp=TrainingViewModels().restructureModelInforForExportDict(modelInformation)
+            # print ('toexp'*20)
+            # print ('toexportDictN >>>>>>>> ',toexp)
+            
+            import copy,json
+
+            tempSec={"name":"Section", "layerId":"Section",
+            "children":[], "itemType":"FOLDING", "icon":"mdi mdi-group", "class":"wide",
+            "modelType":"Workflow", "id":"id", "sectionId":"modName", "layerIndex":None,'connectionLayerId':None}
+
+            tempData={"name":"Data","icon":"mdi mdi-database-plus","itemType":"DATA","layerId":None,
+            "trainable":False,"modelType":"Workflow","id":None,"layerIndex":None,"connectionLayerId":None,
+            "url":None,"filePath":None}
+
+            tempCode={"name":"Code","icon":"mdi mdi-code-braces","itemType":"CODE","layerId":None,
+            "trainable":False,"modelType":"Workflow","id":"K2PVI4HZ3NBGF","layerIndex":None,"connectionLayerId":None,
+            "url":None,"filePath":None, "taskType":None,"scriptOutput":None,"scriptPurpose":None}
+
+            tempModel={"name":"Model","icon":"mdi mdi-xml","itemType":"MODEL","layerId":None,"trainable":False,
+                    "modelType":"Workflow","id":None,"layerIndex":None,"connectionLayerId":None,
+                    "url":None,"filePath":None,"taskType":None}
+
+            # toexp={'K2PSSUKYFRSMF': {'hyperparameters': None, 
+            #                    'data': 'C:/Users/swsh/Desktop/ZMODGit/ZMOD/ZMOD/Data/newData2', 
+            #                    'preProcessingScript': {'scripts': ['def addVal(x):\n    return x\n'], 'scriptpurpose': ['trainAndscore'], 'scriptOutput': ['DATA'], 'scriptPath': ['C:/Users/swsh/Desktop/ZMODGit/ZMOD/ZMOD/Code/scriptToTest.py']}, 
+            #                    'modelObj': None, 
+            #                    'pipelineObj': None, 
+            #                    'featuresUsed': ['cylinders', 'displacement', 'horsepower', 'weight', 'acceleration'], 
+            #                    'targetName': 'mpg', 
+            #                    'postProcessingScript': {'scripts': [], 'scriptpurpose': [], 'scriptOutput': [], 'scriptPath': []}, 
+            #                    'taskType': 'trainAndscore', 
+            #                    'modelPath': 'C:\\Users\\swsh\\Desktop\\ZMODGit\\ZMOD\\ZMOD\\Models\\autoML2.pmml'}}
+
+
+            workflowArch=[]
+            for modTemp in list(toexp.keys()):
+                temSecCop=copy.deepcopy(tempSec)#.copy()
+                temSecCop['sectionId']=modTemp
+                temSecCop["layerId"]=modTemp
+                if toexp[modTemp]['data'] != None:
+                    dataInfo=copy.deepcopy(tempData)
+                    import pathlib
+                    fileName=pathlib.Path(toexp[modTemp]['data']).name
+                    dataInfo['layerId']=fileName
+                    dataInfo['url']='/Data/'+fileName
+                    dataInfo['filePath']=toexp[modTemp]['data']
+                    temSecCop['children'].append(dataInfo)
+                for numSc,sC in enumerate(toexp[modTemp]['preProcessingScript']['scriptPath']):
+                    codeInfo=copy.deepcopy(tempCode)
+                    fileName=pathlib.Path(toexp[modTemp]['preProcessingScript']['scriptPath'][numSc]).name
+                    codeInfo['layerId']=fileName
+                    codeInfo['url']='/Code/'+fileName
+                    codeInfo['filePath']=toexp[modTemp]['preProcessingScript']['scriptPath'][numSc]
+                    codeInfo['taskType']='PREPROCESSING'
+                    codeInfo['scriptOutput']=toexp[modTemp]['preProcessingScript']['scriptOutput'][numSc]
+                    codeInfo['scriptPurpose']=toexp[modTemp]['preProcessingScript']['scriptpurpose'][numSc]
+                    temSecCop['children'].append(codeInfo)
+                    
+                
+                modtempC=copy.deepcopy(tempModel)
+                fileName=pathlib.Path(toexp[modTemp]['modelPath']).name
+                modtempC['layerId']=fileName
+                modtempC['url']='/Model/'+fileName
+                modtempC['filePath']=toexp[modTemp]['modelPath']
+                modtempC['taskType']=toexp[modTemp]['taskType']
+                temSecCop['children'].append(modtempC)
+                
+                
+                for numSc,sC in enumerate(toexp[modTemp]['postProcessingScript']['scriptPath']):
+                    codeInfo=copy.deepcopy(tempCode)
+                    fileName=pathlib.Path(toexp[modTemp]['postProcessingScript']['scriptPath'][numSc]).name
+                    codeInfo['layerId']=fileName
+                    codeInfo['url']='/Code/'+fileName
+                    codeInfo['filePath']=toexp[modTemp]['postProcessingScript']['scriptPath'][numSc]
+                    codeInfo['taskType']='POSTPROCESSING'
+                    codeInfo['scriptOutput']=toexp[modTemp]['postProcessingScript']['scriptOutput'][numSc]
+                    codeInfo['scriptPurpose']=toexp[modTemp]['postProcessingScript']['scriptpurpose'][numSc]
+                    temSecCop['children'].append(codeInfo)
+                    
+                workflowArch.append(temSecCop)
+                
+            from random import choice
+            from string import ascii_uppercase
+
+            for num,i in enumerate(workflowArch):
+                if i['itemType']=='FOLDING':
+                    i['layerIndex']=num
+                    i['id']=''.join(choice(ascii_uppercase) for i in range(12))
+                    for num2,j in enumerate(i['children']):
+                        j['layerIndex']=num2
+                        j['id']=''.join(choice(ascii_uppercase) for i in range(12))
+                else:
+                    i['layerIndex']=num
+                    i['id']=''.join(choice(ascii_uppercase) for i in range(12))
+            # print ('l'*200)
+            # print ('workflowArch',workflowArch)
+            return workflowArch
+        else:
+            overAll=[]
+
+            deepObject=pmmlDictObj['DeepNetwork'][0]
+            listOfNetworkLayer=deepObject.NetworkLayer
+            for lay in listOfNetworkLayer:
+                networkDict=lay.__dict__
+                tempDict={}
+                tempDict['layerParam']={}
+                tempDict['netParam']={}
+                for j in networkDict:
+                    if networkDict[j] is not None:
+                        if j not in [ 'original_tagname_','LayerWeights','LayerParameters','Extension','LayerBias']:
+                            tempDict['netParam'][j]=networkDict[j]
+                        layerDict=networkDict['LayerParameters'].__dict__                    
+                        for kk in layerDict:
+                            if layerDict[kk] is not None:
+                                if kk not in [ 'original_tagname_','Extension']:
+                                    try:
+                                        evalVal=list(ast.literal_eval(layerDict[kk]))
+                                    except:
+                                        evalVal=layerDict[kk]
+                                    tempDict['layerParam'][kk]=evalVal
+                        tempDict['layerParam']['trainable']=False if layerDict['trainable'] == False else True
+
+                        if len(networkDict['Extension']) > 0:
+                            ttt=networkDict['Extension'][0]
+                            sectionVal=ttt.get_value()
+                            import ast
+                            tempDict['sectionId']=ast.literal_eval(sectionVal)['sectionId']
+                        else:
+                            tempDict['sectionId']=None
+                overAll.append(tempDict)
+
+            allLayers=MEMORY_OF_LAYERS['layerinfo'][0]['layers']
+            listOFLayersName=[j['name'] for j in MEMORY_OF_LAYERS['layerinfo'][0]['layers']]
+            architecture=[]
+            for tempLay in overAll:
+                import copy
+                tempSpace=copy.deepcopy(allLayers[listOFLayersName.index(tempLay['netParam']['layerType'])])
+                
+                layerPARA=tempLay['layerParam']
+                netWorkPARA=tempLay['netParam']
+                for j in netWorkPARA:
+                    try:
+                        tempSpace[j]=netWorkPARA[j]
+                    except:
+                        pass
+
+                for k in layerPARA:
+                    for k2 in tempSpace['properties']:
+                        if k2['id']==k:
+                            k2['value']=layerPARA[k]
+                            
                 try:
-                    tempSpace[j]=netWorkPARA[j]
+                    tempSpace['sectionId']=tempLay['sectionId']
                 except:
                     pass
-
-            for k in layerPARA:
-                for k2 in tempSpace['properties']:
-                    if k2['id']==k:
-                        k2['value']=layerPARA[k]
-                        
-            try:
-                tempSpace['sectionId']=tempLay['sectionId']
-            except:
-                pass
-            tempSpace['trainable']=layerPARA['trainable']
-            architecture.append(tempSpace)
-
-        # print ('architecture',architecture)
+                tempSpace['trainable']=layerPARA['trainable']
+                architecture.append(tempSpace)
             
-        forLoopSection=[j['sectionId'] for j in architecture]
-        # print ('forLoopSection $$$$$$$$$$$$$$$',forLoopSection)
-        tempSection={'children': [],
-         'class': 'wide',
-         'icon': 'mdi mdi-group',
-         'id': '',
-         'itemType': 'FOLDING',
-         'layerId': 'Section',
-         'layerIndex': '',
-         'name': 'Section',
-         'sectionId': '',
-         "sectionCollapse":True}
+            forLoopSection=[j['sectionId'] for j in architecture]
+            # print ('forLoopSection $$$$$$$$$$$$$$$',forLoopSection)
+            tempSection={'children': [],'class': 'wide','icon': 'mdi mdi-group','id': '',
+            'itemType': 'FOLDING','layerId': 'Section','layerIndex': '','name': 'Section',
+            'sectionId': '',"sectionCollapse":True}
 
-        newarchitecture=[]
-        tempSectionA=copy.deepcopy(tempSection)
-        for num,secInfo in enumerate(forLoopSection):
-            if secInfo is None:
-                newarchitecture.append(architecture[num])
-            else:
-                if (num+1 < len(forLoopSection)) and (forLoopSection[num]==forLoopSection[num+1]):
-                    tempSectionA['children'].append(architecture[num])
+            import copy
+
+            newarchitecture=[]
+            tempSectionA=copy.deepcopy(tempSection)
+            for num,secInfo in enumerate(forLoopSection):
+                if secInfo is None:
+                    newarchitecture.append(architecture[num])
                 else:
-                    tempSectionA['children'].append(architecture[num])
-                    tempSectionA['sectionId']=secInfo
-                    tempSectionA['layerId']='Section_'+str(num)
-                    tempSectionA['name']='Section_'+str(num)
-                    newarchitecture.append(tempSectionA)
-                    tempSectionA=copy.deepcopy(tempSection)
-        
-        hd=pmmlDictObj['Header']
-        scrptVal=pmmlDictObj['script']
-        # print ('Came here')
-        import ast,pathlib
-        try:
-            hf=hd.Extension[0]
-            headerExt=hf.get_value()
-            # print ('headerExtheaderExtheaderExtheaderExtheaderExt',headerExt,type(headerExt))
+                    if (num+1 < len(forLoopSection)) and (forLoopSection[num]==forLoopSection[num+1]):
+                        tempSectionA['children'].append(architecture[num])
+                    else:
+                        tempSectionA['children'].append(architecture[num])
+                        tempSectionA['sectionId']=secInfo
+                        tempSectionA['layerId']='Section_'+str(num)
+                        tempSectionA['name']='Section_'+str(num)
+                        newarchitecture.append(tempSectionA)
+                        tempSectionA=copy.deepcopy(tempSection)
+            
+            hd=pmmlDictObj['Header']
+            scrptVal=pmmlDictObj['script']
+            DataVal=pmmlDictObj['Data']
+            import ast,pathlib
             try:
-                dataUrl=ast.literal_eval(headerExt)
-            except:
-                dataUrl=headerExt
-            # print ('$$$$$$$$$$$$$$$$$$$$$$',dataUrl)
-            fObj=pathlib.Path(dataUrl['dataUrl'])
-            # print ('data URL path>>>>>>>>>>>>',dataUrl)
-            try:
-                print ('DataURL found')
-                dataCon={'icon': 'mdi mdi-database-plus','id': 'NNN',
-                  'itemType': 'DATA','layerId':fObj.name ,'layerIndex': 0,'name': 'Data','url': dataUrl}
-                newarchitecture.insert(0,dataCon)
+                try:
+                    dataUrl=DataVal[0].filePath
+                except:
+                    dataUrl='Some issue'
+                print ('$$$$$$$$$$$$$$$$$$$$$$',dataUrl)
+                if dataUrl !='Some issue':
+                    fObj=pathlib.Path(dataUrl)
+                    dataCon={'icon': 'mdi mdi-database-plus','id': 'NNN',
+                    'itemType': 'DATA','layerId':fObj.name ,'layerIndex': 0,'name': 'Data','url': dataUrl}
+                    newarchitecture.insert(0,dataCon)
 
+                    for counT,sc in enumerate(scrptVal):
+                        import pathlib
+                        scriptPurpose=sc.scriptPurpose
+                        modelVal=sc.for_
+                        classVal=sc.class_
+                        filePathUrl=sc.filePath
+                        fObjScrpt=pathlib.Path(filePathUrl)
+                        scriptCon=  {"name": "Code","icon": "mdi mdi-code-braces","itemType": "CODE","modelFor":modelVal,
+                            "layerId": fObjScrpt.name,"scriptPurpose":scriptPurpose,'url':filePathUrl,"layerIndex": "NA",'useFor':classVal}
+                        newarchitecture.insert(counT+1,scriptCon)
+                else:
+                    pass
+
+            except Exception as e:
                 for counT,sc in enumerate(scrptVal):
-                    import pathlib
                     scriptUrl=sc.class_
-                    useForSc=sc.for_
+                    import pathlib
                     fObjScrpt=pathlib.Path(scriptUrl)
-                    # print ('>>>>>>>>>>>>>>>',scriptUrl)
                     scriptCon=  {"name": "Code","icon": "mdi mdi-code-braces","itemType": "CODE",
-                        "layerId": fObjScrpt.name,'url':scriptUrl,"layerIndex": "NA",'useFor':useForSc}
-                    newarchitecture.insert(counT+1,scriptCon)
-            except:
-                pass
+                        "layerId": fObjScrpt.name,'url':scriptUrl,"layerIndex": "NA"}
+                    newarchitecture.insert(counT,scriptCon)
+                print (e,'some error occured')
 
-        except Exception as e:
-            for counT,sc in enumerate(scrptVal):
-                scriptUrl=sc.class_
-                import pathlib
-                fObjScrpt=pathlib.Path(scriptUrl)
-
-                print ('>>>>>>>>>>>>>>>',scriptUrl)
-                scriptCon=  {"name": "Code","icon": "mdi mdi-code-braces","itemType": "CODE",
-                    "layerId": fObjScrpt.name,'url':scriptUrl,"layerIndex": "NA"}
-                newarchitecture.insert(counT,scriptCon)
-            print (e,'some error occured')
-
-        
-        
-        for num,i in enumerate(newarchitecture):
-            if i['itemType']=='FOLDING':
-                i['layerIndex']=num
-                i['id']=''.join(choice(ascii_uppercase) for i in range(12))
-                for num2,j in enumerate(i['children']):
-                    j['layerIndex']=num2
-                    j['id']=''.join(choice(ascii_uppercase) for i in range(12))
-            else:
-                i['layerIndex']=num
-                i['id']=''.join(choice(ascii_uppercase) for i in range(12))
-        
-        return newarchitecture
+            for num,i in enumerate(newarchitecture):
+                if i['itemType']=='FOLDING':
+                    i['layerIndex']=num
+                    i['id']=''.join(choice(ascii_uppercase) for i in range(12))
+                    for num2,j in enumerate(i['children']):
+                        j['layerIndex']=num2
+                        j['id']=''.join(choice(ascii_uppercase) for i in range(12))
+                else:
+                    i['layerIndex']=num
+                    from random import choice
+                    from string import ascii_uppercase
+                    i['id']=''.join(choice(ascii_uppercase) for i in range(12))
+            
+            return newarchitecture
 
 
     #####################Add Update layer Utility Functions

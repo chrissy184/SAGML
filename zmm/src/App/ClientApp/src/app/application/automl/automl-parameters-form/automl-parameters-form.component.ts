@@ -40,6 +40,7 @@ public scoringOptions = [
   'r2'
 ];
 public algorithmOptions = [];
+public algorithmOptionsAnomaly = [];
 @ViewChild('automlTrainingParamsForm') automlTrainingParamsForm;
 
 constructor() { }
@@ -57,6 +58,7 @@ submit() {
 
 ngOnInit() {
   this.algorithmOptions = this.option.algorithmTypes[this.option.problem_type];
+  this.algorithmOptionsAnomaly = this.option.algorithmTypes['Anomaly'];
   this.formData = {
     generation: 10, // optional
     population_size: 25, // optional

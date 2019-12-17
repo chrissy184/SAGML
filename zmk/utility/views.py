@@ -39,21 +39,32 @@ class CodeUtilityView(APIView):
 			result=self.post(requests)
 		return result
 
-	def get(self,requests):
-		filePath = requests.GET['filePath']
-		return CodeUtilityClass.compileCode(filePath)
-
 	def post(self,requests):
-		userInput = json.loads(requests.body)
-		filePath = userInput['filePath']
-		# print (userInput)
-		# print ('>>>>>>>>>>>>>>>',filePath)
-		import ast
-		try:
-			params = ast.literal_eval(userInput['params'])
-		except:
-			params=userInput['params']
+		filePath = json.loads(requests.body)['filePath']
+		print (filePath)
+		params=[]
 		return CodeUtilityClass.executeCode(filePath,params)
+
+class CodeUtilityView2View(APIView):
+	http_method_names=['post','get']
+
+	def dispatch(self,requests,scriptName):
+		if requests.method=='POST':
+			result=self.post(requests,scriptName)
+		# if requests.method=='GET':
+		# 	result=self.get(requests)
+		else:
+			return JsonResponse({},status=405)
+		return result
+
+	def post(self,requests,scriptName):
+		try:
+			jsonData = json.loads(requests.body)['jsonRecord']
+			if not jsonData:
+				raise Exception("Invalid Request Parameter")
+		except:
+			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
+		return CodeUtilityClass().executeFeatureScript(scriptName,jsonData)
 
 class SwaggerView(APIView):
 	http_method_names=['get']

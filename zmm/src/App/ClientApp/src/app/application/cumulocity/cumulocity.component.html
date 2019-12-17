@@ -1,5 +1,5 @@
 <app-loader [isLoading]="isContentLoading" [message]=""></app-loader>
-<div class="container-fluid py-3 mb-1 mat-elevation-z2">
+<div class="container-fluid py-3 mb-1 mat-elevation-z2" hidden>
   <form #loginForm="ngForm" class="row" (ngSubmit)="login(loginForm)">
     <mat-form-field class="col-sm-2">
       <input matInput placeholder="Tenant ID" name="tenant" [(ngModel)]="tenant" required value="anil">

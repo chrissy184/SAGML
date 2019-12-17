@@ -41,7 +41,7 @@ namespace ZMM.App.Controllers
     public class DataController : Controller
     {
         #region Variables
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private IConfiguration Configuration { get; }
         readonly ILogger<DataController> Logger;
         private readonly IPyAutoMLServiceClient _client;
@@ -53,7 +53,7 @@ namespace ZMM.App.Controllers
         private List<DataResponse> responseData;
         private List<ModelResponse> modelResponseData;
         private List<CodeResponse> codeResponseData;
-        private static string[] extensions = new[] { "csv", "jpg", "jpeg", "png", "json", "webp", "zip", "mp4" };
+        private static string[] extensions = new[] { "csv", "jpg", "jpeg", "png", "json", "webp", "zip", "mp4","txt" };
         string zipOr7zPath = string.Empty;
         string extractPath = string.Empty;
         string fileName = string.Empty;
@@ -62,7 +62,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #region Constructor...
-        public DataController(IHostingEnvironment environment, IConfiguration configuration, ILogger<DataController> log, IPyAutoMLServiceClient srv, IPyNNServiceClient nnsrv, IZSModelPredictionClient _zsClient,
+        public DataController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<DataController> log, IPyAutoMLServiceClient srv, IPyNNServiceClient nnsrv, IZSModelPredictionClient _zsClient,
             IBaseImageForWielding _baseImageClient)
         {
             this._client = srv;
@@ -102,8 +102,8 @@ namespace ZMM.App.Controllers
                 responseData = DataPayload.Get();
             }
             //
-            string jsonStr = JsonConvert.SerializeObject(responseData, Formatting.None);
-            jsonStr = jsonStr.ToPrettyJsonString();
+            string jsonStr = JsonConvert.SerializeObject(responseData, Formatting.Indented);
+            // jsonStr = jsonStr.ToPrettyJsonString();
             var jsonObj = JsonConvert.DeserializeObject<List<DataResponse>>(jsonStr);
 
             List<DataResponse> _data = new List<DataResponse>();
@@ -285,6 +285,10 @@ namespace ZMM.App.Controllers
                             {
                                 type = "VIDEO";
                             }
+                            else if (formFile.ContentType.Contains("text") || fileExt == "txt")
+                            {
+                                type = "TEXT";
+                            }
                             else
                             {
                                 type = "UNRECOGNIZED";
@@ -366,8 +370,9 @@ namespace ZMM.App.Controllers
             {
                 response = await _client.GetPreprocessingForm(filePath);
                 if (!string.IsNullOrEmpty(response))
-                    jsonObj = JObject.Parse(response);
-
+                {
+                   jsonObj = JObject.Parse(response);
+                }
                 return Json(jsonObj);
             }
             catch (Exception ex)
@@ -382,24 +387,81 @@ namespace ZMM.App.Controllers
         {
             string response = string.Empty;
             string reqBody = string.Empty;
+            string userModelName="";
 
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = reader.ReadToEnd();
                 reqBody = body.ToString();
             }
-            try
+            if (!string.IsNullOrEmpty(reqBody))
             {
-                response = await _client.PostProcessingForm(reqBody);
+                try
+                {
+                    //find model name
+                    JObject rB = JObject.Parse(reqBody);
+                    userModelName = (string)rB["parameters"]["model_name"];
+                    //
+                    response = await _client.PostProcessingForm(reqBody);
+                }
+                catch (Exception ex)
+                {
+                    //TO DO: ILogger
+                    string _ex = ex.Message;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                //TO DO: ILogger
-                string _ex = ex.Message;
+                return NotFound();
             }
+            
 
             if (!string.IsNullOrEmpty(response))
             {
+                var jo = JsonConvert.DeserializeObject<AutoMLResponse>(response);
+                jo.executedAt = DateTime.Now;
+                List<AutoMLResponse> tresp = new List<AutoMLResponse>();
+                tresp.Add(jo);
+                //
+                //add to scheduler payload 
+                //add history
+                JArray jHist = new JArray();
+                foreach (var r in tresp)
+                {
+                    jHist.Add(new JObject(){
+                        {"idforData", r.idforData},
+                        {"status", r.status},
+                        {"executedAt",r.executedAt}
+                    });
+                }
+                string idExisted = SchedulerPayload.GetById(id).Where(i=>i.Type == "AUTOML" && i.Id == id).Select(i=>i.Id).FirstOrDefault();
+                if(idExisted == id)
+                {
+                    id = id + userModelName;
+                }
+
+                SchedulerResponse schJob = new SchedulerResponse()
+                {
+                    CreatedOn = DateTime.Now.ToString(),
+                    CronExpression = "",
+                    DateCreated = DateTime.Now,
+                    EditedOn = DateTime.Now.ToString(),
+                    FilePath = "",
+                    Id = id,
+                    Name = userModelName,
+                    Type = "AUTOML",
+                    Url = "",
+                    Recurrence = "ONE_TIME",
+                    StartDate = "",
+                    StartTimeH = "",
+                    StartTimeM = "",
+                    ZMKResponse = tresp.ToList<object>(),
+                    Status = "COMPLETED",
+                    History = jHist.ToList<object>()
+                };                
+                SchedulerPayload.Create(schJob);
+
+                //
                 JObject jsonObj = JObject.Parse(response);
                 return Json(jsonObj);
             }
@@ -671,6 +733,7 @@ namespace ZMM.App.Controllers
                                     if (item.Id == dataId)
                                     {
                                         filePath = item.FilePath;
+                                        break;
                                     }
                                 }
                             }
@@ -682,12 +745,15 @@ namespace ZMM.App.Controllers
                                     if (item.Id == modelId)
                                     {
                                         modelName = item.ModelName;
+                                        break; 
                                     }
                                 }
+                                if(string.IsNullOrEmpty(modelName)) modelName = modelId;
                             }
 
                             #endregion
-                            zsResponse = await zsClient.ImageScoring(modelName, filePath);
+                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                            zsResponse = await zsClient.ImageScoring(modelName, filePath,zmodId);
                             zsResponse = zsResponse.Replace("\n", "");
                             JObject jo = JObject.Parse(zsResponse.Replace("\"", "'"));
                             System.IO.File.WriteAllText(newFilePath, zsResponse);
@@ -782,8 +848,9 @@ namespace ZMM.App.Controllers
                                 }
                             }
                             #endregion
-                            //                  
-                            zsResponse = await zsClient.SingleScoring(modelName, record);
+                            //     
+                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);             
+                            zsResponse = await zsClient.SingleScoring(modelName, record, zmodId);
 
                             zsResponse = zsResponse.Replace("\n", "");
 
@@ -860,8 +927,8 @@ namespace ZMM.App.Controllers
                             }
 
                             #endregion
-
-                            zsResponse = await zsClient.MultipleScoring(modelId, filePath);
+                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                            zsResponse = await zsClient.MultipleScoring(modelId, filePath,zmodId);
                             zsResponse = zsResponse.Replace("\n", "");
                             JObject jo = JObject.Parse(zsResponse.Replace("\"", "'"));
                             string outputs = jo["outputs"].ToString();
@@ -982,7 +1049,8 @@ namespace ZMM.App.Controllers
                 }
 
                 #endregion
-                zsResponse = await zsClient.MultipleScoring(modelName, filePath);
+                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                zsResponse = await zsClient.MultipleScoring(modelName, filePath,zmodId);
                 zsResponse = zsResponse.Replace("\n", "");
                 JObject jo = JObject.Parse(zsResponse.Replace("\"", "'"));
                 System.IO.File.WriteAllText(newFilePath, zsResponse);
@@ -1231,30 +1299,38 @@ namespace ZMM.App.Controllers
                     var body = reader.ReadToEnd();
                     reqBody = body.ToString();
                 }
-                response = await baseImageClient.PostBaseImage(reqBody);
-                jObjData = JObject.Parse(response);
                 //
-                dirFullpath = DirectoryHelper.GetDataDirectoryPath();
-                if (!string.IsNullOrEmpty(jObjData["filePath"].ToString()))
+                if (!string.IsNullOrEmpty(reqBody))
                 {
-                    fileName = Path.GetFileName(jObjData["filePath"].ToString());
-                    data = await _client.DownloadFile(jObjData["filePath"].ToString(), fileName);
+                    response = await baseImageClient.PostBaseImage(reqBody);
+                    jObjData = JObject.Parse(response);
+                    //
+                    dirFullpath = DirectoryHelper.GetDataDirectoryPath();
+                    if (!string.IsNullOrEmpty(jObjData["filePath"].ToString()))
+                    {
+                        fileName = Path.GetFileName(jObjData["filePath"].ToString());
+                        data = await _client.DownloadFile(jObjData["filePath"].ToString(), fileName);
+                    }
+
+                    string _url = DirectoryHelper.GetDataUrl($"BaseImage/{fileName}");
+                    jObjUrl.Add("url", _url + "?t=" + DateTime.Now);
+                    jObjData.Merge(jObjUrl, new JsonMergeSettings
+                    {
+                        // union array values together to avoid duplicates
+                        MergeArrayHandling = MergeArrayHandling.Union
+                    });
+
+                    return Json(jObjData);
                 }
-
-                string _url = DirectoryHelper.GetDataUrl($"BaseImage/{fileName}");
-                jObjUrl.Add("url", _url+"?t="+DateTime.Now);
-                jObjData.Merge(jObjUrl, new JsonMergeSettings
+                else
                 {
-                    // union array values together to avoid duplicates
-                    MergeArrayHandling = MergeArrayHandling.Union
-                });
-
-                return Json(jObjData);
+                    return NotFound();
+                }
             }
             catch (Exception ex)
             {
                 string err = ex.StackTrace;
-                return BadRequest(new {message="Base image generation failed."});
+                return BadRequest(new { message = "Base image generation failed." });
             }
         }
 
@@ -1266,10 +1342,10 @@ namespace ZMM.App.Controllers
         {
             //variable
             string reqBody = "";
-            string response = "";            
-            string  dirFullpath = DirectoryHelper.GetDataDirectoryPath();
-            string imgFolderPath="";
-            string folderName="";            
+            string response = "";
+            string dirFullpath = DirectoryHelper.GetDataDirectoryPath();
+            string imgFolderPath = "";
+            string folderName = "";
             JObject jObjUrl = new JObject();
             JObject jObjData = new JObject();
             JObject jObjReq = new JObject();
@@ -1283,54 +1359,142 @@ namespace ZMM.App.Controllers
                     reqBody = body.ToString();
                 }
                 //
-                jObjReq = JObject.Parse(reqBody);
-                folderName = jObjReq["folderName"].ToString(); 
-                imgFolderPath = $"{dirFullpath}{folderName}";              
-                jObjReq.TryAdd("folderPath",imgFolderPath);
-                //create dir and delete if already exists
-                if(Directory.Exists(imgFolderPath)) Directory.Delete(imgFolderPath,true);
-                Directory.CreateDirectory(imgFolderPath);
-                //
-                response = await baseImageClient.PostGenerateBaseImage(jObjReq.ToString());
-                jObjData = JObject.Parse(response);
-                //
-                //add properties
-                _props.Add(new Property
+                if (!string.IsNullOrEmpty(reqBody))
                 {
-                    key = "Subdirectories",
-                    value = DirectoryHelper.CountDirectories(imgFolderPath).ToString()
-                });
-                _props.Add(new Property
+                    jObjReq = JObject.Parse(reqBody);
+                    folderName = jObjReq["folderName"].ToString();
+                    imgFolderPath = $"{dirFullpath}{folderName}";
+                    jObjReq.TryAdd("folderPath", imgFolderPath);
+                    //create dir and delete if already exists
+                    if (Directory.Exists(imgFolderPath)) Directory.Delete(imgFolderPath, true);
+                    Directory.CreateDirectory(imgFolderPath);
+                    //
+                    response = await baseImageClient.PostGenerateBaseImage(jObjReq.ToString());
+                    jObjData = JObject.Parse(response);
+                    //
+                    //add properties
+                    _props.Add(new Property
+                    {
+                        key = "Subdirectories",
+                        value = DirectoryHelper.CountDirectories(imgFolderPath).ToString()
+                    });
+                    _props.Add(new Property
+                    {
+                        key = "Files",
+                        value = DirectoryHelper.CountFiles(imgFolderPath).ToString()
+                    });
+                    DataResponse newRecord = new DataResponse()
+                    {
+                        Created_on = DateTime.Now.ToString(),
+                        Edited_on = DateTime.Now.ToString(),
+                        Extension = "",
+                        Type = "FOLDER",
+                        FilePath = imgFolderPath,
+                        Id = folderName,
+                        MimeType = "",
+                        Name = folderName,
+                        Properties = _props,
+                        DateCreated = DateTime.Now
+                    };
+                    //
+                    DataPayload.Create(newRecord);
+                    return Json(jObjReq);
+                }
+                else
                 {
-                    key = "Files",
-                    value = DirectoryHelper.CountFiles(imgFolderPath).ToString()
-                });
-                DataResponse newRecord = new DataResponse()
-                {
-                    Created_on = DateTime.Now.ToString(),
-                    Edited_on = DateTime.Now.ToString(),
-                    Extension = "",
-                    Type = "FOLDER",
-                    FilePath = imgFolderPath,
-                    Id = folderName,
-                    MimeType = "",
-                    Name = folderName,  
-                    Properties = _props,
-                    DateCreated = DateTime.Now
-                };
-                //
-                DataPayload.Create(newRecord);               
-                return Json(jObjReq);
+                    return NotFound();
+                }
+
             }
             catch (Exception ex)
             {
                 string err = ex.StackTrace;
-                return BadRequest(new {message="Base image generation failed."});
+                return BadRequest(new { message = "Base image generation failed." });
             }
         }
 
         #endregion
 
+        #endregion
+    
+        #region automl - anamoly
+        [HttpPost]
+        [Route("{id}/anamoly")]
+        public async Task<IActionResult> AutoMLAnamoly(string id)
+        {
+            string response = string.Empty;
+            string reqBody = string.Empty;
+
+            using (var reader = new StreamReader(Request.Body))
+            {
+                var body = reader.ReadToEnd();
+                reqBody = body.ToString();
+            }
+            if (!string.IsNullOrEmpty(reqBody))
+            {
+                try
+                {
+                    response = await _client.AnamolyModel(reqBody);
+                }
+                catch (Exception ex)
+                {
+                    //TO DO: ILogger
+                    string _ex = ex.Message;
+                }
+            }
+            else
+            {
+                return NotFound();
+            }            
+
+            if (!string.IsNullOrEmpty(response))
+            {
+                var jo = JsonConvert.DeserializeObject<AutoMLResponse>(response);
+                jo.executedAt = DateTime.Now;
+                List<AutoMLResponse> tresp = new List<AutoMLResponse>();
+                tresp.Add(jo);
+                //
+                //add to scheduler payload 
+                //add history
+                JArray jHist = new JArray();
+                foreach (var r in tresp)
+                {
+                    jHist.Add(new JObject(){
+                        {"idforData", r.idforData},
+                        {"status", r.status},
+                        {"executedAt",r.executedAt}
+                    });
+                }
+                SchedulerResponse schJob = new SchedulerResponse()
+                {
+                    CreatedOn = DateTime.Now.ToString(),
+                    CronExpression = "",
+                    DateCreated = DateTime.Now,
+                    EditedOn = DateTime.Now.ToString(),
+                    FilePath = "",
+                    Id = id,
+                    Name = id,
+                    Type = "ANAMOLY",
+                    Url = "",
+                    Recurrence = "ONE_TIME",
+                    StartDate = "",
+                    StartTimeH = "",
+                    StartTimeM = "",
+                    ZMKResponse = tresp.ToList<object>(),
+                    Status = "COMPLETED",
+                    History = jHist.ToList<object>()
+                };
+                SchedulerPayload.Create(schJob);
+
+                //
+                JObject jsonObj = JObject.Parse(response);
+                return Json(jsonObj);
+            }
+            else
+            {
+                return NoContent();
+            }
+        }
         #endregion
     }
 }

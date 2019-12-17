@@ -25,7 +25,7 @@ SECRET_KEY = '7=^-pzs!hf^t&yvtagng9!#q2k^s5gq+7ag(x=53yq)r%$+%#^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['lambda-quad','10.140.65.238','localhost','0.0.0.0','demo.zmod.org','172.20.0.4']
+ALLOWED_HOSTS = ['lambda-quad','ban-lambda-quad','10.60.24.249','10.140.65.238','localhost','0.0.0.0','demo.zmod.org','172.20.0.4']
 
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, 'dist'),
@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['lambda-quad','10.140.65.238','localhost','0.0.0.0','demo.zmod.
 # Application definition
 
 INSTALLED_APPS = [
+    'sslserver',
     'corsheaders', 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,7 +48,8 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'trainModel',
     'scoring',
-    'utility'
+    'utility',
+    'executionEngine',
 ]
 
 MIDDLEWARE = [

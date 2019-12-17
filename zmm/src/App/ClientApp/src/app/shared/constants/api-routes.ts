@@ -7,10 +7,12 @@ export const ApiRoutes = {
     },
     accountUserInfo: 'account/userInfo',
     accountLogout: 'account/logout',
+    loginRedirect:'https://accounts.zmod.org/auth/realms/master/protocol/openid-connect/logout?post_logout_redirect_uri=' + location.origin + '&x-client-SKU=ID_NETSTANDARD2_0&x-client-ver=5.5.0.0', 
 
     data: 'data',
     dataGet: (id: string) => `data/${id}`,
     dataAutoML: (id: string) => `data/${id}/automl`,
+    dataAutoMLAnomaly: (id: string) => `data/${id}/anamoly`,
     predictData: `data/predict`,
     scoreData: 'data/score',
     dataDownload: (id: string) => `data/${id}/download`,
@@ -19,7 +21,7 @@ export const ApiRoutes = {
     generateImageForWelding: `data/generateImages`,
 
     models: 'model',
-    modelCreate: 'model/createnn',
+    modelCreate: 'model/create',
     modelGetLayers: `model/layers`,
     modelGet: (id: string) => `model/${id}`,
     modelEdit: (id: string) => `model/${id}/edit`,
@@ -44,12 +46,12 @@ export const ApiRoutes = {
 
     task: 'task',
     taskGet: (id: number) => `task/${id}`,
+    taskGetHistory: (id: string, historyId: string) => `task/${id}/history/${historyId}`,
     taskSaveModel: (id: number) => `task/${id}/saveModel`,
+    taskStop: (id: number) => `task/${id}/stop`,
 
     instance: 'instances',
     instanceKill: (id: string) => `instances/${id}`,
 
-    cumulocityGetManagedObjects: (tenant: string) => `https://${tenant}.cumulocity.com/inventory/managedObjects`,
-    cumulocityGetSeries: (tenant: string) => `https://${tenant}.cumulocity.com/measurement/measurements/series`,
-    cumulocityGetFiles: (tenant: string) => `https://${tenant}.cumulocity.com/inventory/binaries`,
+    settings: 'setting'
 };

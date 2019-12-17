@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ApiRoutes, HttpService, UtilService, AlertMessages } from '../../shared';
+import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -28,8 +29,9 @@ export class CodeComponent implements OnInit {
   public tabSelectedIndex = 0;
   message = AlertMessages.CODE.deleteConfirmationCode;
   public filter: any = '';
+  public showExcuteFormPanel = false;
 
-  constructor(private apiService: HttpService, private utilService: UtilService) { }
+  constructor(private apiService: HttpService, private utilService: UtilService, private router: Router) { }
 
   public changeSelectedIndex(index: number) {
     this.tabSelectedIndex = index;
@@ -153,14 +155,21 @@ export class CodeComponent implements OnInit {
       });
   }
 
-  public execute() {
-    this.isLoading = true;
-    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.codeExecute(this.selectedCode.id))
-      .pipe(finalize(() => { this.isLoading = false; }))
-      .subscribe(response => {
-        console.log(response);
-        this.utilService.alert(AlertMessages.CODE.execute);
-      });
+  public execute(formData: any) {
+    if (this.showExcuteFormPanel) {
+      this.isLoading = true;
+      const options = {
+        body: formData
+      };
+      this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.codeExecute(this.selectedCode.id), options)
+        .pipe(finalize(() => { this.isLoading = false; }))
+        .subscribe(() => {
+          this.utilService.alert(AlertMessages.CODE.execute);
+          this.router.navigate(['tasks']);
+        });
+    } else {
+      this.showExcuteFormPanel = true;
+    }
   }
   public downloadCode() {
     this.isContentLoading = true;

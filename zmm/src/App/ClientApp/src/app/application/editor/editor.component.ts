@@ -40,7 +40,7 @@ export class EditorComponent implements OnInit, OnChanges {
   ];
   public targetItems: any[] = [];
   public filterConfig: any = {};
-  public isLoading = true;
+  public isLoading = false;
   public showFilter = false;
   public panelOpenState = false;
   public flatLayers: any[] = [];
@@ -689,6 +689,12 @@ export class EditorComponent implements OnInit, OnChanges {
     this.getPreviousLayer($event.value);
     if ($event.value.layerId === 'NA') {
       $event.value.layerId = `${$event.value.name}_${this.flatLayers.length}`;
+      if (this.selectedModel.modelGeneratedFrom === 'Workflow' && $event.value.layerId === 'Section_1') {
+        $event.value.layerId = 'model1';
+      }
+      if (this.selectedModel.modelGeneratedFrom === 'Workflow' && $event.value.layerId === 'Section_2') {
+        $event.value.layerId = 'model2';
+      }
     }
     const filteredLayerObj = this.utilService.filterArray(listOfLayers, 'id', $event.value.id);
     if (filteredLayerObj.index !== -1) {
@@ -837,7 +843,22 @@ export class EditorComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.getLayers();
+    if (this.selectedModel.modelGeneratedFrom !== 'Workflow') {
+      this.getLayers();
+    } else {
+      this.sideBarGeneralItems.push(
+        {
+          'name': 'Model',
+          'icon': 'mdi mdi-xml',
+          'itemType': 'MODEL',
+          'layerId': 'Model',
+          'trainable': true
+        });
+      // adding model type key
+      for (let item of this.sideBarGeneralItems) {
+        item.modelType = 'Workflow';
+      }
+    }
   }
 
 }

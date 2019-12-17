@@ -152,6 +152,28 @@ ALGORITHM_NAME_OBJ_DICT = {
             'min_child_weight': range(1, 21),
             'nthread': [1]
         }
+    },
+    'LGBMRegressor': {
+        'lightgbm.LGBMRegressor': {
+            'boosting_type': ['gbdt', 'dart'],
+            'subsample': np.arange(0.05, 1.01, 0.05),
+            # 'min_child_samples': [1, 5, 7, 10, 15, 20, 35, 50, 100, 200, 500, 1000],
+            # 'num_leaves': [2, 4, 7, 10, 15, 20, 25, 30, 35, 40, 50, 65, 80, 100, 125, 150, 200, 250, 500], 
+            # 'colsample_bytree': [0.7, 0.9, 1.0],
+            'learning_rate': [1e-3, 1e-2, 1e-1, 0.5, 1.],
+            'n_estimators': [100]
+        }
+    },
+    'LGBMClassifier': {
+        'lightgbm.LGBMClassifier': {
+            'boosting_type': ['gbdt', 'dart'],
+            'subsample': np.arange(0.05, 1.01, 0.05),
+            # 'min_child_samples': [1, 5, 7, 10, 15, 20, 35, 50, 100, 200, 500, 1000],
+            # 'num_leaves': [2, 4, 7, 10, 15, 20, 25, 30, 35, 40, 50, 65, 80, 100, 125, 150, 200, 250, 500], 
+            # 'colsample_bytree': [0.7, 0.9, 1.0],
+            'learning_rate': [1e-3, 1e-2, 1e-1, 0.5, 1.],
+            'n_estimators': [100]
+        }
     }
 
 }
@@ -237,7 +259,7 @@ class AutoMLTrainer:
         for algo in algorithms:
             config_dict.update(ALGORITHM_NAME_OBJ_DICT[algo])
         config_dict.update(PREPROCESSINGS)
-        print('config dict contains >>>>',config_dict)
+        # print('config dict contains >>>>',config_dict)
         return config_dict
 
 
@@ -319,7 +341,7 @@ class AutoMLTrainer:
         try:
             featureVar.remove(targetVar)
         except Exception as e:
-            print('errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+            # print('errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
             data_details=upDateStatus()
             data_details['status']='Training Failed'
             data_details['errorMessage']='Target variable is not in the dataset'
@@ -378,54 +400,45 @@ class AutoMLTrainer:
                 # sys.exit()
                 return
             joblib.dump(pp,dataFolder+'tpotPipeline.pkl')
-
-
             prePipeline=mapper1
-
             pipelineList=[('feature_mapper',prePipeline)]
             pipelineList.append(pp[-1])
             
-            # print ('pipeline lsit>>>>>>>>>',pipelineList)
-
-
-
-            statusFile=dataFolder+'status'+'.txt'
-            with open(statusFile,'r') as sFile:
+            # statusFile=dataFolder+'status'+'.txt'
+            with open(statusfileLocation,'r') as sFile:
                 sFileText=sFile.read()
             data_details=json.loads(sFileText)
             data_details['status']='In Progress'
-            with open(statusFile,'w') as filetosave:
+            with open(statusfileLocation,'w') as filetosave:
                 json.dump(data_details, filetosave)
 
             finalPipe=Pipeline(pipelineList)
             finalPipe.fit(data[featureVar],data[targetVar])
+            # print ('finalPipe >>>>> ',finalPipe)
+
             finalPMMLfile=dataFolder+newPMMLFileName
+            # finalPMMLfile='../ZMOD/Models/'+newPMMLFileName
             finalpklfile=dataFolder+newPMMLFileName+'.pkl'
             joblib.dump(finalPipe,finalpklfile)
+            toExportDict={
+                            'model1':{'data':None,'hyperparameters':None,'preProcessingScript':None,
+                                'pipelineObj':Pipeline(finalPipe.steps[:-1]),'modelObj':finalPipe.steps[-1][1],
+                                'featuresUsed':featureVar,
+                                'targetName':targetVar,'postProcessingScript':None,'taskType': 'score'}
+                        }
             try:
-                if pp[-1][1].__class__.__name__ in ['XGBClassifier','XGBRegressor']:
-                    from nyokaBase.xgboost.xgboost_to_pmml import xgboost_to_pmml
-                    xgboost_to_pmml(finalPipe,featureVar,targetVar,finalPMMLfile)
-                else:
-                    from nyokaBase.skl.skl_to_pmml import skl_to_pmml
-                    skl_to_pmml(finalPipe, featureVar, targetVar, finalPMMLfile)
-                procComp=False
+                # print ('toExportDict >>>>>>>>>>>> ',toExportDict)
+                from nyokaBase.skl.skl_to_pmml import model_to_pmml
+                model_to_pmml(toExportDict, PMMLFileName=finalPMMLfile)
                 print ('>>>>>>>>>>>>>>>>>>>>>>> Success')
-
-            except Exception as e:
+                procComp=False
+            except:
                 procComp=True
-                print ('>>>>>>>>>>>>>>>>>>>>>>> Some error occcured', str(e))
-                # print(traceback.format_exc())
-
-        # sFile=open(statusFile,'r')
-        # sFileText=sFile.read()
-        # data_details=json.loads(sFileText)
-        # data_details['status']='Complete'
-        # data_details['pmmlFilelocation']=finalPMMLfile
-        # with open(statusFile,'w') as filetosave:
-        #     json.dump(data_details, filetosave)
-
+                print ('>>>>>>>>>>>>>>>>>>>>>>> Failed Saving Trying again')
+            
         model_accuracy=[]
+
+        # print ('Came here')
 
         for num,i in enumerate(tpot.evaluated_individuals_):
             k= {'modelDetail':i,'modelName':i.split("(")[0],'score':round(tpot.evaluated_individuals_[i]['internal_cv_score'],4),'bestmodel':0}
@@ -433,13 +446,138 @@ class AutoMLTrainer:
         model_accuracy.sort(key=operator.itemgetter('score'),reverse=True)
         model_accuracy[0]['bestmodel']=1
 
-        with open(statusFile,'r') as sFile:
+        with open(statusfileLocation,'r') as sFile:
             sFileText=sFile.read()
         data_details=json.loads(sFileText)
         data_details['status']='Complete'
         data_details['pmmlFilelocation']=finalPMMLfile
         data_details['listOfModelAccuracy']=model_accuracy
-        with open(statusFile,'w') as filetosave:
+        print ('data_details >>>>>>>>>>> ',data_details.keys())
+        with open(statusfileLocation,'w') as filetosave:
             json.dump(data_details, filetosave)
 
+class AnomalyTrainer:
 
+    def __init__(self, algorithms, problemType='Classification'):
+        self.problemType = problemType
+    def get_dict(self):
+        dict_ = { key:value for key, value in self.__dict__.items() }
+        return dict_
+
+    def trainAnomalyModel(self, data, logFolder, newPMMLFileName, lock, kwargs):
+
+        print ('here'*20,kwargs)
+        paramToTrainModel=kwargs['data']
+        idforData=kwargs['idforData']
+        dataPath=kwargs['filePath']
+        try:
+            targetVar=kwargs['target_variable']
+        except:
+            targetVar=None
+        algorithmToUse=kwargs['parameters']['algorithm']
+
+        projectName=idforData
+        projectPath=logFolder+projectName
+        dataFolder=projectPath+'/dataFolder/'
+        statusfileLocation=dataFolder+'status'+'.txt'
+
+        def upDateStatus():
+            lock.acquire()
+            sFile=open(statusfileLocation,'r')
+            sFileText=sFile.read()
+            lock.release()
+            data_details=json.loads(sFileText)
+            return data_details
+
+        try:
+            dataMapperInner=autoMLutilities.createDataMapper(paramToTrainModel,targetVar)
+        except Exception as e:
+            data_details=upDateStatus()
+            data_details['status']='Training Failed'
+            data_details['errorMessage']='Error while creating DataFrameMapper >> '+ str(e)
+            data_details['errorTraceback']=traceback.format_exc()
+            with open(statusfileLocation,'w') as filetosave:
+                json.dump(data_details, filetosave)
+            # sys.exit()
+            return
+
+
+        mapper1=DataFrameMapper(dataMapperInner)
+        featureVar=list(data.columns)
+
+        if algorithmToUse=='IsolationForest':
+            print ('came here')
+            from sklearn import ensemble
+            modelT=ensemble.IsolationForest()
+        elif algorithmToUse == 'OneClassSVM':
+            from sklearn import svm
+            modelT=svm.OneClassSVM()
+        elif algorithmToUse == 'LinearSVR':
+            print ('Came to SVR')
+            from sklearn import svm
+            modelT=svm.LinearSVR()
+        # else:
+        #     data_details=upDateStatus()
+        #     data_details['status']='Training Failed'
+        #     data_details['errorMessage']='Model not supported >> '
+        #     data_details['errorTraceback']='None'
+        #     with open(statusfileLocation,'w') as filetosave:
+        #         json.dump(data_details, filetosave)
+        #     # sys.exit()
+        #     return
+
+        try:
+            print ('training started')
+            pipeline = Pipeline([('feature_mapper', mapper1),('model',modelT)])
+            pipelObj=pipeline.fit(data)
+            print ('training completed')
+       
+        except Exception as e:
+            data_details=upDateStatus()
+            data_details['status']='Training Failed'
+            data_details['errorMessage']='Error while preparing Data and training model >> '+ str(e)
+            data_details['errorTraceback']=traceback.format_exc()
+            with open(statusfileLocation,'w') as filetosave:
+                json.dump(data_details, filetosave)
+            # sys.exit()
+            return
+
+        data_details=upDateStatus()
+        data_details['listOfModelAccuracy']=[]
+        data_details['pmmlFilelocation']=''
+
+        with open(statusfileLocation,'w') as filetosave:
+            json.dump(data_details, filetosave)
+
+        finalPMMLfile='../ZMOD/Models/'+newPMMLFileName
+        toExportDict={
+                        'model1':{'data':None,'hyperparameters':None,'preProcessingScript':None,
+                            'pipelineObj':Pipeline(pipelObj.steps[:-1]),'modelObj':pipelObj.steps[-1][1],
+                            'featuresUsed':featureVar,
+                            'targetName':None,'postProcessingScript':None,'taskType': 'score'}
+                    }
+        try:
+            print ('toExportDict >>>>>>>>>>>> ',toExportDict)
+            from nyokaBase.skl.skl_to_pmml import model_to_pmml
+            model_to_pmml(toExportDict, PMMLFileName=finalPMMLfile)
+            print ('>>>>>>>>>>>>>>>>>>>>>>> Success')
+        except Exception as e:
+            data_details=upDateStatus()
+            data_details['status']='Training Failed'
+            data_details['errorMessage']='Error while Saving Model >> '+ str(e)
+            data_details['errorTraceback']=traceback.format_exc()
+            with open(statusfileLocation,'w') as filetosave:
+                json.dump(data_details, filetosave)
+            # sys.exit()
+            return
+            print ('>>>>>>>>>>>>>>>>>>>>>>> Failed Saving Trying again')
+
+        with open(statusfileLocation,'r') as sFile:
+            sFileText=sFile.read()
+        model_accuracy=[]
+        data_details=json.loads(sFileText)
+        data_details['status']='Complete'
+        data_details['pmmlFilelocation']=finalPMMLfile
+        data_details['listOfModelAccuracy']=model_accuracy
+        with open(statusfileLocation,'w') as filetosave:
+            json.dump(data_details, filetosave)

@@ -40,4 +40,12 @@ namespace ZMM.DS
         {
         }
     }
+
+    public class TextFileInfo : ZmodFileInfo
+    {
+        public TextFileInfo(string path)
+        : base(path)
+        {
+        }
+    }
 }

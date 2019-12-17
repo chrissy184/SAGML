@@ -64,6 +64,13 @@ def removeExtraNewLinesFromWeights(pmmlObj):
 
 
 def writePmml(pmmlObj, filepath, lockForPMML):
+	_deepNetworkObj=pmmlObj.DeepNetwork[0]
+	_deepNetworkObj.modelName ='model1'
+	_deepNetworkObj.taskType="trainAndscore"
+
+	pmmlObj.DeepNetwork[0]=_deepNetworkObj
+
+	# print ('came to write')
 	try:
 		lockForPMML.acquire()
 		pmmlObj=removeExtraNewLinesFromWeights(pmmlObj)
@@ -71,8 +78,12 @@ def writePmml(pmmlObj, filepath, lockForPMML):
 		scrptVal=pmmlObj.script
 		if len(scrptVal) > 0:
 			for num,sc in enumerate(scrptVal):
-				urlOfScript=sc.class_
-				useFor=sc.for_
+				scriptPurpose=sc.scriptPurpose
+				modelVal=sc.for_
+				classVal=sc.class_
+				filePathUrl=sc.filePath
+				scriptOutput=sc.scriptOutput
+
 				code=None
 				scripCode=sc.get_valueOf_()
 				code = scripCode.lstrip('\n')
@@ -83,8 +94,8 @@ def writePmml(pmmlObj, filepath, lockForPMML):
 					lines.append(line[leading_spaces:])
 				code = '\n'.join(lines)
 				scriptCode=code.replace('<','&lt;')
-				# print (scriptCode)
-				scrp=pml.script(content=scriptCode,class_=urlOfScript,for_=useFor)
+				# scrp=pml.script(content=scriptCode,for_=modelVal,class_=taskTypeVal,scriptPurpose=scriptPurpose,scriptOutput=scriptOutput,filePath=filePathUrl)
+				scrp=pml.script(content=scriptCode,for_=modelVal,class_=classVal,scriptPurpose=scriptPurpose,scriptOutput=scriptOutput,filePath=filePathUrl)
 				scrptVal2.append(scrp)
 		pmmlObj.script=scrptVal2
 		# print ('Code Step 10.1')
@@ -128,22 +139,33 @@ class NyokaServer:
 		global MEMORY_DICT_ARCHITECTURE
 		try:
 			MEMORY_DICT_ARCHITECTURE[projectID]
+			tempMemRe=MEMORY_DICT_ARCHITECTURE[projectID]
+			# print (tempMemRe)
+			if tempMemRe['architecture']==[]:
+				archFromPMML=nyokaUtilities.pmmlToJson(filePath)
+				# print ('pass',archFromPMML)
+				MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=archFromPMML
+				tempMemRe=MEMORY_DICT_ARCHITECTURE[projectID]
+			tempMemRe={'architecture':tempMemRe['architecture'],'filePath':tempMemRe['filePath'],'projectID':tempMemRe['projectID']}
 		except:
 			MEMORY_DICT_ARCHITECTURE[projectID]={}
+			# archFromPMML=nyokaUtilities.pmmlToJson(filePath)
+			# MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=archFromPMML
 			try:
-				# print ('filePath >>>> ',filePath)
+				print ('filePath >>>> ',filePath)
 				archFromPMML=nyokaUtilities.pmmlToJson(filePath)
-				# print ('pass')
+				# print ('pass',archFromPMML)
 				MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=archFromPMML
 			except Exception as e:
-				# print('<>>>><<>>>>',str(e))
+				print('<>>>><<>>>>',str(e))
 				MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=[]
 			#######################################################
 			MEMORY_DICT_ARCHITECTURE[projectID]['filePath']=filePath
 			MEMORY_DICT_ARCHITECTURE[projectID]['projectID']=projectID
+			tempMemRe=MEMORY_DICT_ARCHITECTURE[projectID]
 			# print(MEMORY_DICT_ARCHITECTURE)
 		# print('response sent')
-		return JsonResponse(MEMORY_DICT_ARCHITECTURE[projectID])
+		return JsonResponse(tempMemRe)
 
 	def updatetoArchitecture(payload, projectID):
 
@@ -285,34 +307,42 @@ class NyokaServer:
 				_NetworkLayersObject=reorderIdsOfPmml(_NetworkLayersObject)
 				_deepNetworkObj.NetworkLayer=_NetworkLayersObject
 				_deepNetworkObj.numberOfLayers=len(_NetworkLayersObject)
+				_deepNetworkObj.modelName ='model1'
+				_deepNetworkObj.taskType="trainAndscore"
 				pmmlObject.DeepNetwork[0]=_deepNetworkObj
 
 			
 			elif processedOutput['itemType']=='DATA':
-				# print ("DATA layer came")
-				extensionInfoForData=[pml.Extension(value=[],anytypeobjs_=[''])]
-				dataVal={}
+				# print ("DATA layer came",processedOutput['filePath'])
 				try:
-					dataVal['dataUrl']=processedOutput['filePath']
-					extensionInfoForData=[pml.Extension(value=dataVal,anytypeobjs_=[''])]
-					pmmlObject.Header.Extension=extensionInfoForData
+					dataUrl=processedOutput['filePath']
+				# if processedOutput['for']:
+				# 	dataTagValues=pml.Data(filePath=dataVal,for_=processedOutput['for'])
+				# else:
+					dataTagValues=pml.Data(filePath=dataUrl,for_='model1')
+					pmmlObject.Data=[dataTagValues]
 					# print ('Data Step 3')
 					# pmmlObject.export(sys.stdout,0)
 				except:
 					pass
 
 			elif processedOutput['itemType']=='CODE':
-				# print ("CODE layer came")
+				print ("CODE layer came")
+				# print ('processedOutput',processedOutput)
 				try:
 					scrptVal=pmmlObject.script
 					urlOfScript=processedOutput['url']
+					filePathUrl=processedOutput['filePath']
 					scriptFile=open(processedOutput['filePath'],'r')
 					scriptCode=scriptFile.read()
 					scriptCode=scriptCode.replace('<','&lt;')
 					# print (scriptCode)
-					useFor=processedOutput['useFor']
-					scrp=pml.script(content=scriptCode,class_=urlOfScript,for_=useFor)
-					# scrp.export(sys.stdout,0)
+					modelVal='model1'
+					taskTypeVal=processedOutput['taskType']
+					scriptPurpose=processedOutput['scriptPurpose']
+					scriptOutput=processedOutput['scriptOutput']
+					scrp=pml.script(content=scriptCode,for_=modelVal,class_=taskTypeVal,scriptPurpose=scriptPurpose,scriptOutput=scriptOutput,filePath=filePathUrl)
+					scrp.export(sys.stdout,0)
 					scrptVal.append(scrp)
 					pmmlObject.script=scrptVal
 					# print ('Code Step 10')
@@ -566,13 +596,156 @@ class NyokaServer:
 			returntoClient={'projectID':projectID,'layerUpdated':processTheInput}
 		return JsonResponse(returntoClient)
 
-	
+	def updatetoWorkflow(payload,projectID):
+
+		# print (payload)
+
+		def getCodeObjectToProcess(codeVal):
+			d = {}
+			exec(codeVal, None,d)
+			objeCode=d[list(d.keys())[0]]
+			return objeCode
+
+		def getCOlumDet(pmmlObj):
+			import typing
+			listOfObjectstogetData=[]
+			tempObj=pmmlObj.__dict__
+			for j in tempObj.keys():
+				if (tempObj[j] is None) :
+					pass
+				elif (isinstance(tempObj[j], typing.List)):
+					if (len(tempObj[j])==0):
+						pass
+					else:
+						listOfObjectstogetData.append(j)
+				else:
+					listOfObjectstogetData.append(j)
+			for ob in listOfObjectstogetData:
+				if ob == 'TreeModel':
+					minigFieldList=tempObj['TreeModel'][0].__dict__['MiningSchema'].__dict__['MiningField']
+					break
+				elif ob=='RegressionModel':
+					minigFieldList=tempObj['RegressionModel'][0].__dict__['MiningSchema'].__dict__['MiningField']
+					break
+				elif ob=='MiningModel':
+					minigFieldList=tempObj['MiningModel'][0].__dict__['MiningSchema'].__dict__['MiningField']
+					break
+				elif ob=='AnomalyDetectionModel':
+					minigFieldList=tempObj['AnomalyDetectionModel'][0].__dict__['MiningSchema'].__dict__['MiningField']
+					break
+				elif ob=='DeepNetwork':
+					minigFieldList=tempObj['DeepNetwork'][0].__dict__['MiningSchema'].__dict__['MiningField']
+					break
+				else:
+					None
+			targetCol=None
+			colNames=[]
+			for indCol in minigFieldList:
+				if indCol.__dict__['usageType']=='target':
+					targetCol=indCol.__dict__['name']
+				else:
+					colNames.append(indCol.__dict__['name'])
+			return (colNames,targetCol)
+			
+		from nyokaBase.skl.skl_to_pmml import model_to_pmml
+		processTheInput=payload
+		global MEMORY_DICT_ARCHITECTURE
+		try:
+			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']
+		except:
+			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']={}
+		
+		try:
+			MEMORY_DICT_ARCHITECTURE[projectID]['tempSecMem']
+		except:
+			MEMORY_DICT_ARCHITECTURE[projectID]['tempSecMem']={}
+
+		tempMem=MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']
+		tempSecMem=MEMORY_DICT_ARCHITECTURE[projectID]['tempSecMem']
+		# print ('processTheInput,',processTheInput)
+		
+		if processTheInput['itemType']=='FOLDING':
+			tempSecMem[processTheInput['sectionId']]=processTheInput['layerId']
+			tempMem[tempSecMem[processTheInput['sectionId']]]={'data':None,'hyperparameters':None,'preProcessingScript':None,
+                        'pipelineObj':None,'modelObj':None,'featuresUsed':None,'targetName':None,'postProcessingScript':None,
+                      'taskType': None,'predictedClasses':None,'dataSet':None}
+
+			
+			# print (tempSecMem)
+		elif processTheInput['itemType']=='DATA':
+			tempMem[tempSecMem[processTheInput['sectionId']]]['data']=processTheInput['filePath']
+		elif processTheInput['itemType']=='CODE':
+			scriptObj=open(processTheInput['filePath'],'r').read()
+			# print('scriptObj',scriptObj)
+			if processTheInput['taskType']=='preprocessing':
+				tempMem[tempSecMem[processTheInput['sectionId']]]['preProcessingScript']={'scripts':[scriptObj],\
+																			  'scriptpurpose':[processTheInput['scriptPurpose']],\
+																			  'scriptOutput':[processTheInput['scriptOutput']],\
+																			'scriptPath':[processTheInput['filePath']]}
+			elif processTheInput['taskType']=='postprocessing':
+				tempMem[tempSecMem[processTheInput['sectionId']]]['postProcessingScript']={'scripts':[scriptObj],\
+																			  'scriptpurpose':[processTheInput['scriptPurpose']],\
+																			  'scriptOutput':[processTheInput['scriptOutput']],\
+																			  'scriptPath':[processTheInput['filePath']]}
+			
+		elif processTheInput['itemType']=='MODEL':
+			modelPath=processTheInput['filePath']
+			from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
+			from sklearn.pipeline import Pipeline
+			from nyokaBase import PMML43Ext as pmmNY
+			pmObj=pmmNY.parse(modelPath,silence=True)
+			colInfo=getCOlumDet(pmObj)
+			print ('came to reconstruct')
+			if len(pmObj.__dict__['DeepNetwork']) >0:
+				from tensorflow import Graph, Session
+				import tensorflow as tf
+				model_graph = Graph()
+				with model_graph.as_default():
+					tf_session = Session()
+					with tf_session.as_default():
+						print ('step 5')
+						from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
+						print ('step 5.1')
+						modelOb = generate_skl_model(pmObj).model
+						model_graph = tf.get_default_graph()
+						
+			else:
+				modelOb=generate_skl_model(pmObj)
+				model_graph=None
+			# print (modelOb)
+			# modelOb=None
+			import sklearn
+			if type(modelOb)==sklearn.pipeline.Pipeline:
+				tempMem[tempSecMem[processTheInput['sectionId']]]['modelObj']=modelOb.steps[-1][1]
+				tempMem[tempSecMem[processTheInput['sectionId']]]['pipelineObj']=Pipeline(modelOb.steps[:-1])
+				tempMem[tempSecMem[processTheInput['sectionId']]]['featuresUsed']=colInfo[0]
+				tempMem[tempSecMem[processTheInput['sectionId']]]['targetName']=colInfo[1]
+			else:
+				tempMem[tempSecMem[processTheInput['sectionId']]]['modelObj']=modelOb
+			if model_graph != None:
+				tempMem[tempSecMem[processTheInput['sectionId']]]['model_graph']=model_graph
+				tempMem[tempSecMem[processTheInput['sectionId']]]['tf_session']=tf_session
+			tempMem[tempSecMem[processTheInput['sectionId']]]['modelPath']=modelPath
+			tempMem[tempSecMem[processTheInput['sectionId']]]['taskType']=processTheInput['taskType']
+			
+		
+		MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']=tempMem.copy()
+
+		# print ('tempMem',tempMem)
+
+		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
+		# print ('processTheInput',processTheInput)
+		# print ('MEMORY_DICT_ARCHITECTURE[projectID]',MEMORY_DICT_ARCHITECTURE[projectID])
+
+		returntoClient={'projectID':projectID,'layerUpdated':processTheInput}
+		return JsonResponse(returntoClient)
+
+	def deleteWorkflowlayer(payload,projectID):
+		message={'message':'Success'}
+		return JsonResponse(message)
+
 
 	def deletelayer(payload,projectID):
-
-		
-
-
 		global MEMORY_DICT_ARCHITECTURE
 		global lockForPMML
 		# print ('>>>>>',userInput)
@@ -672,12 +845,30 @@ class NyokaServer:
 
 	def getGlobalObject():
 		global MEMORY_DICT_ARCHITECTURE
+		# print (MEMORY_DICT_ARCHITECTURE)
 		return JsonResponse(MEMORY_DICT_ARCHITECTURE)
 
 	def getDetailsOfPMML(filepath):
 		# print ('Enter this world')
 		pmmlObj=pml.parse(filepath,silence=True)
 		tempObj=pmmlObj.__dict__
+
+		if len(tempObj['DeepNetwork']) >0:
+			layerList=[]
+			for kk in tempObj['DeepNetwork'][0].NetworkLayer:
+				layerList.append(kk.get_layerType())
+
+			if (len(tempObj['script']) >=1) or ('LSTM' in layerList) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
+				deployInfo=False
+			else:
+				deployInfo=True
+		else:
+			if (len(tempObj['script']) >=1) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
+				deployInfo=False
+			else:
+				deployInfo=True
+
+
 		
 		listOfObjectstogetData=[]
 		for j in tempObj.keys():
@@ -694,6 +885,8 @@ class NyokaServer:
 
 		allInfo={}
 		for towork in listOfObjectstogetData:
+			if towork=='type_':
+				allInfo['type']=tempObj['type_']
 			if towork=='version':
 				allInfo['Version']=tempObj['version']
 			elif towork=='Header':
@@ -714,8 +907,15 @@ class NyokaServer:
 				allInfo.update(nyokaUtilities.getInfoLinearModel(tempObj))
 			elif towork=='NaiveBayesModel':
 				allInfo.update(nyokaUtilities.getInfoOfNaiveBayesModel(tempObj))
+			elif towork=='AnomalyDetectionModel':
+				allInfo.update(nyokaUtilities.getInfoOfAnomalyDetectionModel(tempObj))
+
 		allInfo=nyokaUtilities.changeStructure(allInfo)
-		# print('response sent')
+		allInfo['deployableToZAD']= deployInfo
+		
+		# print('response sent',allInfo)
 		return JsonResponse(allInfo)
 
+
+	
 

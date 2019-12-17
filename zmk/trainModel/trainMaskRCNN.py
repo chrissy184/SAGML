@@ -10,7 +10,7 @@ logFolder='./logs/'
 
 from trainModel import kerasUtilities
 from multiprocessing import Lock, Process
-from trainModel.kerasUtilities import PMMLMODELSTORAGE
+from trainModel.mergeTrainingV2 import PMMLMODELSTORAGE
 kerasUtilities = kerasUtilities.KerasUtilities()
 
 selDev="/device:CPU:0"

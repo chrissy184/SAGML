@@ -11,9 +11,13 @@ kerasUtilities = kerasUtilities.KerasUtilities()
 logFolder='./logs/'
 statusfileLocation = ''
 
+global SCRIPTSTORAGE
+SCRIPTSTORAGE={}
+
 class CodeUtilityClass:
 
     def compileCode(filePath):
+        print ('>>>>>>>>')
         import pathlib
         fullPath=pathlib.Path(filePath)
         filePath_ = fullPath.parent.__str__()
@@ -48,7 +52,7 @@ class CodeUtilityClass:
 
 
         def monitorThread(filePath,args,statusfileLocation):
-            print (args)
+            print ('>>>>>>>>> args',args)
             args = [str(a) for a in args]
             popen = subprocess.Popen([sys.executable,filePath]+args,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
             output,error = popen.communicate()
@@ -68,7 +72,7 @@ class CodeUtilityClass:
         with open(statusfileLocation,'w') as filetosave:
             json.dump({}, filetosave)
 
-        # print ('>>>>>>>>>>>>>>>>',params)
+        print ('>>>>>>>>>>>>>>>> parmas',params)
 
         import threading
         pp = threading.Thread(target=monitorThread,args=(filePath,params,statusfileLocation))
@@ -93,5 +97,57 @@ class CodeUtilityClass:
             json.dump(tempRunMemory, filetosave)
         return JsonResponse(tempRunMemory,status=200)
 
+    global SCRIPTSTORAGE
+
+    def getCodeObjectToProcess(self,codeVal):
+        d = {}
+        exec(codeVal, None,d)
+        objeCode=d[list(d.keys())[0]]
+        return objeCode
+
+    def loadCodeForExec(self,filePath):
+        # print ('came 4')
+        import pathlib
+
+        try:
+            pathObj=pathlib.Path(filePath)
+            # print (pathObj)
+            codeKey=pathObj.name.replace(pathObj.suffix,'')
+
+            filVal=open(filePath,'r').read()
+            codeObj=self.getCodeObjectToProcess(filVal)
+            SCRIPTSTORAGE[codeKey]=codeObj
+            return JsonResponse({'result':'Code Load Success','codeKey':codeKey},status=200)
+        except:
+            return JsonResponse({'result':'Some error occured'},status=500)
 
 
+    def executeFeatureScript(self,scriptName,jsonData):
+        # print ('Came here')
+        global SCRIPTSTORAGE
+
+        # try:
+        if scriptName in SCRIPTSTORAGE:
+            # print ('came here 2')
+            scriptFunction =SCRIPTSTORAGE[scriptName]
+            calcFeatureval=scriptFunction(jsonData)
+            resultResp={'result':calcFeatureval}
+            return JsonResponse(resultResp,status=200)
+        else:
+            # print ('came here 3')
+            # print (scriptName)
+            import os
+            # print (os.curdir)
+            fPath='../ZMOD/Code/'+scriptName+'.py'
+
+            self.loadCodeForExec(fPath)
+            if scriptName in SCRIPTSTORAGE:
+                scriptFunction =SCRIPTSTORAGE[scriptName]
+                calcFeatureval=scriptFunction(jsonData)
+                resultResp={'result':calcFeatureval}
+                return JsonResponse(resultResp,status=200)
+            else:
+                resultResp={'result':'Check if code file exists'}
+                return JsonResponse(resultResp,status=500)
+
+    

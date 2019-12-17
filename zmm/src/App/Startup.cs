@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -26,17 +25,18 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using ZMM.App.PyServicesClient;
 using ZMM.App.ZSServiceClient;
 using ZMM.Authorizations.Claims;
 using ZMM.Helpers.ZMMDirectory;
-//using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.OpenApi.Models;
+using Quartz;
+using System.Collections.Specialized;
+using Quartz.Impl;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace ZMM.App
 {
@@ -45,18 +45,21 @@ namespace ZMM.App
 
         private readonly ILogger Logger;
         public IConfiguration Configuration { get; }
-        public IHostingEnvironment Environment { get; }
+        public IWebHostEnvironment Environment { get; }
+
+        private bool IsDevelopment { get; set; } = false;
 
         private string ContentDir = string.Empty;
 
         private const string XForwardedPathBase = "X-Forwarded-PathBase";
         private const string XForwardedProto = "X-Forwarded-Proto";
 
-        public Startup(IConfiguration configuration, IHostingEnvironment environment,ILogger<Startup> logger)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment,ILogger<Startup> logger)
         {
             Configuration = configuration;
             Environment = environment;
             Logger = logger;
+            IsDevelopment = environment.EnvironmentName.ToString() == "Development";
             Logger.LogInformation("Initializing " + Configuration["Type"]);
             InitContentDir(ref ContentDir);
         }        
@@ -65,14 +68,22 @@ namespace ZMM.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            #region MVC behaviour to specific .net version 2.2
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);     
+
+            #region Allow Synchronous IO to read stream in model and code
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+            #endregion
+            
+            #region Added Controller and Razor Page for Login
+            services.AddControllersWithViews().AddNewtonsoftJson();
+            services.AddRazorPages().AddNewtonsoftJson();
             #endregion
 
-            
-            #region Production profile works on Client UI /wwwroot with dotnet 2.2 inbuilt configuration
-            string ClientUIDirectory = Configuration["WebApp:BuildPath"];
-            if(ClientUIDirectory.Equals(string.Empty) || ClientUIDirectory == null) throw new Exception("Error : Please, configure WebApp:BuildPath in appsettings*.json"); 
+            #region Profile works on Client UI /wwwroot with dotnet 3.0 inbuilt configuration
+            string ClientUIDirectory = IsDevelopment ? Configuration["WebApp:SourcePath"] : Configuration["WebApp:BuildPath"];
+            if(ClientUIDirectory.Equals(string.Empty) || ClientUIDirectory == null) throw new Exception("Error : If you are running production environment then make sure you have configure wwwroot folder and if you are in development environment then configure WebApp:SourcePath ClientApp folder in respective appsettings*.json file"); 
             if(!System.IO.Directory.Exists(ClientUIDirectory)) throw new Exception("Error : It seems Client UI folder : " + ClientUIDirectory + " is not present; To resolve this, You need to publish solution once with command : dotnet publish ZMM.sln from ZMM folder.");
             services.AddSpaStaticFiles(configuration =>
             {
@@ -80,6 +91,7 @@ namespace ZMM.App
             }); 
             #endregion
 
+            
             #region Identity Provider (KeyCloak) Integration
             services.AddAuthentication(options =>
             {
@@ -88,6 +100,7 @@ namespace ZMM.App
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;               
             })
             .AddCookie("Cookies")
+
             .AddOpenIdConnect(options =>
             {   
                 SetOIDCConfiguration(ref options, bool.Parse(Configuration["Authentication:OIDC:IsSecuredHTTP"])); 
@@ -101,15 +114,16 @@ namespace ZMM.App
             });        
             #endregion
             
-            #region Add Swagger
+            #region Register the Swagger generator
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Zementis Modeler", Version = "v1" });
-            }); 
-            #endregion
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZMOD", Version = "v1" });
+            });
+            #endregion            
             
             #region Initialize clients in singleton service
             var pySrvLocation = Configuration["PyServiceLocation:srvurl"];
+            var zadSrvLocation = Configuration["ZS:srvurl"];
             string ToolHostURL = Configuration["Tool:Host"];
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<IPyNNServiceClient>(new PyNNServiceClient(Configuration));
@@ -120,7 +134,17 @@ namespace ZMM.App
             services.AddSingleton<IZSModelPredictionClient>(new ZSModelPredictionClient(Configuration));      
             services.AddSingleton<IPyTensorServiceClient>(new PyTensorServiceClient(ToolHostURL,ContentDir));
             services.AddSingleton<IPyCompile>(new PyCompile(Configuration));  
+            services.AddSingleton(provider => GetScheduler());
             #endregion
+
+            #region Add Proxy to services
+            services.AddProxy();
+            #endregion
+            
+            Console.WriteLine("*****************************************");
+            Console.WriteLine($"ZMM " + (IsDevelopment ? "Development" : "Production") + " initiated...");
+            Console.WriteLine($"ZMK =====>>> {pySrvLocation}");
+            Console.WriteLine($"ZAD =====>>> {zadSrvLocation}");
         }
 
         #region Setup User Identity Provider (KeyCloak) configuration
@@ -155,30 +179,18 @@ namespace ZMM.App
         #endregion
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {          
-            #region Enable HSTS option for production https enable system 
-            if(!env.IsEnvironment("Production")) app.UseHsts();
+            #region Enable HSTS option for AWS production system for https 
+            app.UseHsts();
             #endregion
 
             #region Add Log Factory -> You can update its behaviour from appsettings*.json configuration
             AddLogger(ref loggerFactory);     
             #endregion
 
-          	app.Use((context, next) =>
-            {
-              	if (context.Request.Headers.TryGetValue(XForwardedPathBase, out StringValues pathBase))
-                {
-                    context.Request.PathBase = new PathString(pathBase);
-                    
-                }
-            	if(context.Request.Headers.TryGetValue(XForwardedProto, out StringValues proto))
-                {
-                	context.Request.Scheme = proto;
-                }              	
-              	return next();
-            });
-          	
+          	          
+
             // below is the fix for angular app reload redirections          
             app.Use(async (context, next) =>
             {                
@@ -193,54 +205,67 @@ namespace ZMM.App
                 {                    
                     context.Request.Path = new PathString("/");                    
                 }                
-            });         
-
-            app.Use(async (context, next) =>
-            {
-                context.Features.Get<IHttpMaxRequestBodySizeFeature>()
-                    .MaxRequestBodySize = 5368709120;
-
-                var serverAddressesFeature = app.ServerFeatures.Get<Microsoft.AspNetCore.Hosting.Server.Features.IServerAddressesFeature>();
-                var addresses = string.Join(", ", serverAddressesFeature?.Addresses);
-                await next.Invoke();
-            });
-
-            app.UseExceptionHandler("/Account/Error");           
+            }); 
             
+            if(IsDevelopment) app.UseDeveloperExceptionPage();
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });                                 
+            });              
+
+            #region swagger middleware
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZMOD v1");
+            });      
+
+            #endregion                   
+
 
             app.UseStaticFiles();
 
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(ContentDir),
-                RequestPath = "/data"
-            });       
-                     
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZMM API v1");
-            }); 
-            
+            app.UseRouting();
+           
             app.UseAuthentication();
-            app.UseMvc(routes =>
+
+            app.UseAuthorization();
+
+            app.UseProxy();
+
+            app.UseEndpoints(routes =>
             {
-                routes.MapRoute(
+                routes.MapRazorPages();
+
+                routes.MapControllers();
+
+                routes.MapControllerRoute(
                     name: "default",
-                    template: "{controller}/{action}/{id?}");
+                    pattern: "{controller}/{action}/{id?}");
 
-                routes.MapRoute(
+                routes.MapControllerRoute(
                     name: "train",
-                    template: "{controller}/{action}");
+                    pattern: "{controller}/{action}");               
 
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
-            });           
+            });
+
+            #region To start ng serve without building client ui
+            string ClientUIDirectory = Configuration["WebApp:SourcePath"];
+            if(ClientUIDirectory.Equals(string.Empty) || ClientUIDirectory == null) throw new Exception("Error : Please, configure WebApp:SourcePath in appsettings.Development.json"); 
+            if(IsDevelopment && !System.IO.Directory.Exists(ClientUIDirectory)) throw new Exception("Error : It seems that Client (Angular UI) Source folder is not present; To resolve this issue, Please, checkout this folder from repository /src/App/ClientApp");
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = ClientUIDirectory;
+                if (IsDevelopment)
+                {
+                    spa.UseAngularCliServer(npmScript: "start");
+                }
+            });
+            #endregion
 
         }
         private void AddLogger(ref ILoggerFactory loggerFactory)
@@ -248,7 +273,6 @@ namespace ZMM.App
             var LogFileName = "Logs" + System.IO.Path.DirectorySeparatorChar + "ZMM-{Date}-" + Guid.NewGuid().ToString() + ".log";
             loggerFactory.AddFile(LogFileName);
         }
-
         private void InitContentDir(ref string DirPath)
         {       
             try
@@ -281,6 +305,26 @@ namespace ZMM.App
             {
                 Logger.LogCritical("Initializing ZMOD directory " + ex.StackTrace);
             }
+        }
+
+        private IScheduler GetScheduler()
+        {
+            var properties = new NameValueCollection
+            {
+                ["quartz.scheduler.instanceName"] = "ZMM_JobScheduler",
+                ["quartz.threadPool.type"] = "ZMM.App.ThreadPool, ZMMPool",
+                ["quartz.threadPool.threadCount"] = "10",
+                ["quartz.jobStore.type"] = "ZMM.App.JobStore, ZMMJobStore",
+            };
+            var schedulerFactory = new StdSchedulerFactory();
+            var scheduler = schedulerFactory.GetScheduler().Result;
+            scheduler.Start();
+            return scheduler;
+        }
+
+        private bool IsEnvironmentOtherThanDevelopmentAndProduction()
+        {
+            return IsDevelopment && !this.Environment.EnvironmentName.Equals("Production");
         }
     }
 }

@@ -41,6 +41,24 @@ namespace ZMM.Models.Payloads
             var sortDesc = _inst.OrderBy(d => d.Type).ThenBy(d=>d.Name);
             return sortDesc.ToList();
         }
+
+        public static bool IsInstanceExists(string id)
+        {
+            bool result=false;
+            if (GlobalStorage.InstanceStorage != null)
+            {
+                foreach (var item in GlobalStorage.InstanceStorage)
+                {
+                    if(item.Key == id)
+                    {
+                        result = true;
+                        break;
+                    }                    
+                }
+            }
+            
+            return result;
+        }
         #endregion
 
         #region Delete

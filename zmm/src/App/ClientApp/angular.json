@@ -36,7 +36,9 @@
               "src/styles.scss",
               "src/media.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/cronstrue/dist/cronstrue.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -87,7 +89,9 @@
               "src/styles.scss",
               "src/media.scss"
             ],
-            "scripts": [],
+            "scripts": [
+              "./node_modules/cronstrue/dist/cronstrue.min.js"
+            ],
             "assets": [
               "src/favicon.ico",
               "src/assets",

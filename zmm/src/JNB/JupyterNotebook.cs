@@ -35,6 +35,8 @@ namespace ZMM.Tools.JNB
         
         protected static string HostURL = "http://localhost";
 
+        private const string  TokenPattern = "?token=";
+
         //We can add this to configuration
         private static List<int> ListOfAllowedPorts = new List<int> { 8888, 8889, 8890 };
 
@@ -51,18 +53,18 @@ namespace ZMM.Tools.JNB
                     ITask tempTask = FindTask(taskName);
                     if (tempTask.IsEmpty())
                     {
-                        int FreePort = GetAvailablePort(8888,8890); 
+                        int FreePort = GetAvailablePort(ListOfAllowedPorts.First(),ListOfAllowedPorts.Last()); 
                         if (FreePort > 0)
                         {
                             UpdateStartTaskInfo(ref info, FreePort);
                             tempTask = TaskFactory.Get(taskType, taskName, this, info);
                             tempTask.StartAsync();
-                            string token = WaitForStartTaskToken(tempTask);
+                            string token = WaitForStartTaskToken(tempTask, FreePort);
                             if(token.Equals(string.Empty)) throw new Exception("Something went wrong. Jupyter notebook cannot be started. Try again.");
                             tempTask.UpdateInput("Token", token);
-                            AddTask(tempTask.GetName(), tempTask);
+                            AddTask(tempTask.GetName(), tempTask);                            
                         }
-                        else throw new Exception("It reaches maximum number of allowed jupyter notebook instance. Please, stop previous notebook or contact Administrator.");
+                        else throw new Exception("It reaches maximum number of allowed jupyter notebook instance. Please, stop previously running notebook from \"Assets\" or contact Administrator.");
                     }
                     break;
                 default:
@@ -71,7 +73,6 @@ namespace ZMM.Tools.JNB
             }
             
         }
-
         
 
         private int GetPortFromLiveTask(ITask task)
@@ -117,7 +118,8 @@ namespace ZMM.Tools.JNB
                 {
                     string RelativeNotebookPath = task.GetInput().MetaData["ResourcePath"].Substring(task.GetInput().MetaData["NotebookDir"].Length + 1);
                     int taskPort = int.Parse(task.GetInput().MetaData["Port"]);
-                    string portString = (JupyterNotebook.HostURL.Contains("localhost")) ? ":" + taskPort : string.Empty;
+                    //As It is internally reverse proxy so no need to , Need to find ZMM
+                    string portString = (JupyterNotebook.HostURL.Contains("localhost")) ? ":" + 7007 : string.Empty; 
                     LinkForResource = JupyterNotebook.HostURL + portString + GetLinkPrefix(taskPort) + "/notebooks/" + RelativeNotebookPath + "?token=" + GetToken(task);
                     UpdateTask(resourcePath, task, "ResourceLink", LinkForResource);
                 }
@@ -136,31 +138,37 @@ namespace ZMM.Tools.JNB
                 List<string> logs = result.GetLog();
                 for (int i = 0; i < logs.Count; i++)
                 {
-                    if (logs[i].Contains(StartupSuccessMessage))
+                    if (logs[i].Contains(TokenPattern))
                     {
-                        tokenId = logs[i].Substring(logs[i].IndexOf(StartupSuccessMessage) + 7);
+                        tokenId = logs[i].Substring(logs[i].IndexOf(TokenPattern) + 7);
                         break;
                     }
-                    if (i == 100) break;
+                    if (i == 200) break;
                 }
             }
             return tokenId;
         }
 
-        private string WaitForStartTaskToken(ITask task)
-        {
+        private string WaitForStartTaskToken(ITask task, int TaskPort)
+        {            
             string tokenId = GetToken(task);
-            for (int i = 1; i < ToolStartupTimeout; i++)
+            for (int i = 1; i < 50; i++)
             {
                 if (tokenId != string.Empty) break;
                 else
                 {
-                    tokenId = GetToken(task);
-                    Console.WriteLine("Waiting for token id...");
-                    System.Threading.Thread.Sleep(1000);                    
+                    if(IsPortAvailableInRange(TaskPort, ListOfAllowedPorts.First(), ListOfAllowedPorts.Last())) Console.WriteLine("Waiting for task expected port " + TaskPort + "  to start"); 
+                    else 
+                    {
+                        Console.WriteLine("Waiting for token id...");                        
+                        tokenId = GetToken(task);
+                    }
+                    System.Threading.Thread.Sleep(500);
                 }
             }
+            System.Threading.Thread.Sleep(1000);
             return tokenId;
         }
+        
     }
 }

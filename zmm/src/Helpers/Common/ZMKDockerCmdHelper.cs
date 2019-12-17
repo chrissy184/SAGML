@@ -13,13 +13,13 @@ namespace ZMM.Helpers.Common
     {       
         public static Dictionary<string,string> StartCommands = new Dictionary<string, string>()
             {
-                {"zmk1", "docker run -d --net=global-zmod-net --ip=\"172.20.0.4\" -p 8000:8000 --name=zmk1 --volumes-from zmm zmod_zmk"},
-                {"zmk2", "docker run -d --net=global-zmod-net --ip=\"172.20.0.5\" -p 8001:8000 --name=zmk2 --volumes-from zmm zmod_zmk"},
-                {"zmk3", "docker run -d --net=global-zmod-net --ip=\"172.20.0.6\" -p 8002:8000 --name=zmk3 --volumes-from zmm zmod_zmk"}
+                {"zmk1", "docker run -d --net=global-zmod-net --ip=\"172.20.0.4\" -p 8000:8000 --name=zmk1 --volumes-from zmm store/softwareag/zementis-modeler-zmk:1.38.1"},
+                {"zmk2", "docker run -d --net=global-zmod-net --ip=\"172.20.0.5\" -p 8001:8000 --name=zmk2 --volumes-from zmm store/softwareag/zementis-modeler-zmk:1.38.1"},
+                {"zmk3", "docker run -d --net=global-zmod-net --ip=\"172.20.0.6\" -p 8002:8000 --name=zmk3 --volumes-from zmm store/softwareag/zementis-modeler-zmk:1.38.1"}
             }; 
         public static IList<InstanceResponse> GetAllRunningZMK()
         {
-            string cmd = "docker ps | awk '{if (NR!=1) {print}}' | awk '{print $1, $2, $NF}' | grep 'zmod_zmk'";
+            string cmd = "docker ps | awk '{if (NR!=1) {print}}' | awk '{print $1, $2, $NF}' | grep 'store/softwareag/zementis-modeler-zmk'";
             string output ="";
             IList<InstanceResponse> runningZMK = new List<InstanceResponse>();
             //
@@ -69,7 +69,7 @@ namespace ZMM.Helpers.Common
                 KillZMKInstances("zmk3");
                 //
                 StartCommands["zmk1"].Bash();
-                
+                Console.WriteLine(StartCommands["zmk1"]);                
             }
             catch(Exception ex)
             {
@@ -85,6 +85,7 @@ namespace ZMM.Helpers.Common
             {
                 StartCommands[unassignedZMK].Bash();
                 output = $"docker start {unassignedZMK}".Bash();
+                Console.WriteLine(output);
                 return true;
             }
             catch(Exception ex)
@@ -145,6 +146,21 @@ namespace ZMM.Helpers.Common
             
             return unassigned;
         } 
+    
+        public static InstanceResponse GetNonDockerZMK()
+        {
+           
+            InstanceResponse newRecord = new InstanceResponse()
+            {
+                Id = "zmk1",
+                Name = "ZMK1",
+                Type="ZMK",
+                Processes=""
+            }; 
+            
+
+            return newRecord;
+        }
     
     }
 

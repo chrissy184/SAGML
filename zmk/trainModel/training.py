@@ -59,106 +59,81 @@ class Training:
 	# @api_view(['POST'])
 	# @schema(trainNeuralNetworkModelsSwagger)
 	# @api_view()
-	def trainNeuralNetworkModels(userInput):
-		# userInput=requests.body
-		# userInput=json.loads(userInput)
-		# print (userInput)
-		pmmlFile=userInput['filePath']
-		try:
-			dataFolder=userInput['dataFolder']
-		except:
-			dataFolder='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
-			kerasUtilities.checkCreatePath(dataFolder)
 
-		try:
-			fileName=userInput['filePath']
-		except:
-			fileName=userInput['filePath']
-		try:
-			tensorboardLogFolder=userInput['tensorboardLogFolder']
-			print ('Log folder came correct')
-		except:
-			print ('Log folder has some issue')
-			tensorboardLogFolder=target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
-			# print ('tensorboardLogFolder',tensorboardLogFolder)
-			kerasUtilities.checkCreatePath(tensorboardLogFolder)
+	def trainNeuralNetworkModels(requests):
 		
-		lossType=userInput['loss']
-		listOfMetrics=userInput['metrics']
-		batchSize=userInput['batchSize']
-		epoch=userInput['epoch']
-		stepsPerEpoch=userInput['stepPerEpoch']
-		problemType=userInput['problemType']
-		testSize=userInput['testSize']
-		scriptOutput=userInput['scriptOutput']
-		optimizerName=userInput['optimizer']
-		learningRate=userInput['learningRate']
-		try:
-			tensorboardUrl=userInput['tensorboardUrl']
-		except:
-			tensorboardUrl=''
-		# idforData=pmmlFile.split('/')[-1].replace('.pmml','')
-		idforData=os.path.basename(pmmlFile).replace('.pmml','')
 
+		def getValueFromReq(keyVal,bodyVal):
+			# print ('requests',requests.body)
+			try:
+				# print (requests.POST.get(keyVal))
+				return bodyVal[keyVal]
+			except:
+				return ''
+		# pmmlFile=requests.POST.get('filePath')
+
+		bodyVal=json.loads(requests.body)
+
+		# print ('came heer 2nd',bodyVal)
+
+		pmmlFile=getValueFromReq('filePath',bodyVal)
+		tensorboardUrl=getValueFromReq('tensorboardUrl',bodyVal)
+		tensorboardLogFolder=getValueFromReq('tensorboardLogFolder',bodyVal)
+		hyperParaUser={}
+		hyperParaUser['batchSize']=getValueFromReq('batchSize',bodyVal)
+		hyperParaUser['optimizer']=getValueFromReq('optimizer',bodyVal)
+		hyperParaUser['loss']=getValueFromReq('loss',bodyVal)
+		hyperParaUser['metrics']=getValueFromReq('metrics',bodyVal)
+		hyperParaUser['epoch']=getValueFromReq('epoch',bodyVal)
+		hyperParaUser['problemType']=getValueFromReq('problemType',bodyVal)
+		hyperParaUser['testSize']=getValueFromReq('testSize',bodyVal)
+		hyperParaUser['learningRate']=getValueFromReq('learningRate',bodyVal)
+		# hyperParaUser['']=getValueFromReq('',requests)
+		# hyperParaUser['']=getValueFromReq('',requests)
+		# print ('>>>>>>>>PPPPPPPPPPPPPPPP   ',pmmlFile,tensorboardUrl,tensorboardLogFolder,hyperParaUser)
+		idforData=int(time.time())
+		idforData=str(idforData)+'_NN'
 		saveStatus=logFolder+idforData+'/'
 		kerasUtilities.checkCreatePath(saveStatus)
 		statusfileLocation=saveStatus+'status.txt'
-
-		# print("status file generated")
-
 		data_details={}
-		data_details['pmmlFile']=idforData
-		data_details['dataFolder']=dataFolder
-		data_details['fileName']=fileName
-		data_details['tensorboardLogFolder']=tensorboardLogFolder
 		data_details['tensorboardUrl']=tensorboardUrl
-		data_details['lossType']=lossType
-		data_details['listOfMetrics']=listOfMetrics
-		data_details['batchSize']=batchSize
-		data_details['epoch']=epoch
-		data_details['stepsPerEpoch']=stepsPerEpoch
-		data_details['problemType']=problemType
-		data_details['testSize']=testSize
-		data_details['scriptOutput']=scriptOutput
-		data_details['optimizerName']=optimizerName
-		data_details['learningRate']=learningRate
 		data_details['idforData']=idforData
 		data_details['status']='In Progress'
-		fObjScrpt=pathlib.Path(fileName)
+		fObjScrpt=pathlib.Path(pmmlFile)
 		data_details['taskName']=fObjScrpt.name
+		data_details['createdOn']= str(datetime.datetime.now())
+		data_details['type']= 'NNProject'
+		data_details['problem_type']= hyperParaUser['problemType']
+		data_details["newPMMLFileName"]=pmmlFile
 
-		with open(statusfileLocation,'w') as filetosave:
-			json.dump(data_details, filetosave)
+
 		nntrainer = mergeTrainingNN.NeuralNetworkModelTrainer()
 
-		pID = nntrainer.train(pmmlFile,dataFolder,fileName,tensorboardLogFolder,lossType,listOfMetrics,batchSize,\
-			epoch,stepsPerEpoch,idforData,testSize,problemType,scriptOutput,optimizerName,learningRate)
+		pID = nntrainer.train(idforData,pmmlFile,tensorboardLogFolder,hyperParaUser,pmmlFile)
 		
 		data_details['pID']=str(pID)
 		saveStatus=logFolder+idforData+'/'
 		kerasUtilities.checkCreatePath(saveStatus)
-		statusfileLocation=saveStatus+'status.txt'
+		# statusfileLocation=saveStatus+'status.txt'
+		with open(statusfileLocation,'w') as filetosave:
+			json.dump(data_details, filetosave)
 
 		if pID == -1:
+			# data_details['status']='In Progress'
 			kerasUtilities.updateStatusOfTraining(statusfileLocation,'Training Failed')
 		else:
-			with open(statusfileLocation,'w') as filetosave:
-				json.dump(data_details, filetosave)
-		
+			pass
 
 		runTemp=[i['idforData'] for i in RUNNING_TASK_MEMORY]
 		if data_details['idforData'] not in runTemp:
 			# print ('PPPPPPPPPPPPPPPPPPPP Saved to runningTask')
-			tempRunMemory={'idforData': idforData,
-			'status': 'Training Failed' if pID==-1 else 'In Progress',
-			'createdOn': str(datetime.datetime.now()),
-			'type': 'NNProject',
-			'pid':pID,
-			'newPMMLFileName':fileName.split('/')[-1]}
-			tempRunMemory['taskName']=data_details['taskName']
+			tempRunMemory=data_details
 			RUNNING_TASK_MEMORY.append(tempRunMemory)
 		else:
 			pass
+		print ('P'*200)
+		print ('data_details',data_details)
 
 		return JsonResponse(data_details,status=202)
 
@@ -166,14 +141,31 @@ class Training:
 	# @csrf_exempt
 	# @api_view(['POST'])
 	# @schema(autoMLsendDataSwagger)
+
+	
+
 	def autoMLdataprocess(pathOffile):
 
+		def dataReaderForJson(pathOffile):
+			ww=open(pathOffile,'r')
+			jD=json.loads(ww.read())
+
+			sampeData=pd.DataFrame(jD['values']).transpose()
+			sampeData.columns=[i['name'] for i in jD['series']]
+			for j in sampeData.columns:
+				sampeData[j]=sampeData[j].apply(lambda x: (x['min']+x['max'])/2)
+			return sampeData
+		
 		global DATA_MEMORY_OBJS_SKLEARN
 		# pathOffile=requests.GET['filePath']
-		data=pd.read_csv(pathOffile,encoding='latin-1')
+		if '.json' in pathOffile:
+			data=dataReaderForJson(pathOffile)
+		else:
+			data=pd.read_csv(pathOffile,encoding='latin-1')
 		idforData=int(time.time())
 		idforData=str(idforData)+'_autoML'
 		DATA_MEMORY_OBJS_SKLEARN[idforData]=data
+		# print ('11111111',DATA_MEMORY_OBJS_SKLEARN)
 
 		# print(data.shape)
 		data_details=autoMLutilities.dataDescription(data)
@@ -190,6 +182,7 @@ class Training:
 		# userInput=json.loads(userInput)
 		paramToTrainModel=userInput['data']
 		idforData=userInput['idforData']
+		# print (DATA_MEMORY_OBJS_SKLEARN)
 		data=DATA_MEMORY_OBJS_SKLEARN[idforData]
 		dataPath=userInput['filePath']
 		targetVar=userInput['target_variable']
@@ -202,10 +195,10 @@ class Training:
 		except:
 			if problem_type =='Regression':
 				algorithms=['ExtraTreeRegressor','GradientBoostingRegressor','DecisionTreeRegressor','LinearSVR',\
-        'RandomForestRegressor','XGBRegressor','KNeighborsRegressor','LinearRegression']
+        'RandomForestRegressor','XGBRegressor','KNeighborsRegressor','LinearRegression','LGBMRegressor']
 			else:
 				algorithms=['DecisionTreeClassifier','ExtraTreesClassifier','RandomForestClassifier','GradientBoostingClassifier',\
-        'KNeighborsClassifier','LinearSVC','LogisticRegression','XGBClassifier']
+        'KNeighborsClassifier','LinearSVC','LogisticRegression','XGBClassifier','LGBMClassifier']
 		try:
 			newPMMLFileName = userInput['newPMMLFileName']
 			if not newPMMLFileName.endswith('.pmml'):
@@ -246,7 +239,9 @@ class Training:
 		data_details['problem_type']=problem_type
 		data_details['idforData']=idforData
 		data_details['shape']=data.shape
-		data_details['taskName']=newPMMLFileName.split('/')[-1]
+		import pathlib
+		fVar=pathlib.Path(dataPath)
+		data_details['taskName']=fVar.name.replace(fVar.suffix,'')#newPMMLFileName.split('/')[-1]
 		
 		autoMLLock.acquire()
 		with open(statusFile,'w') as filetosave:
@@ -258,9 +253,10 @@ class Training:
 		      'type': 'AutoMLProject',
 		      'pid': pID,
 		      'createdOn': str(datetime.datetime.now()),
-		      'newPMMLFileName': newPMMLFileName.split('/')[-1]}
-		tempRunMemory['taskName']=tempRunMemory['newPMMLFileName']
-		print ('>>>>>>>>>>>>>>>>>>>>AutoML',tempRunMemory)
+		      'newPMMLFileName': newPMMLFileName.split('/')[-1]
+			  }
+		tempRunMemory['taskName']=data_details['taskName']
+		# print ('>>>>>>>>>>>>>>>>>>>>AutoML',tempRunMemory)
 
 		RUNNING_TASK_MEMORY.append(tempRunMemory)
 
@@ -268,7 +264,83 @@ class Training:
 
 		return JsonResponse(data_details,status=202)
 
+	def autoAnomalyModel(userInput):
+		global DATA_MEMORY_OBJS_SKLEARN	
+		# userInput=requests.body
+		# userInput=json.loads(userInput)
+		paramToTrainModel=userInput['data']
+		idforData=userInput['idforData']
+		data=DATA_MEMORY_OBJS_SKLEARN[idforData]
+		dataPath=userInput['filePath']
+		try:
+			targetVar=userInput['target_variable']
+		except:
+			targetVar=None
+		try:
+			problem_type=userInput['problem_type']
+		except:
+			problem_type=None
+		algorithms=userInput['parameters']['algorithm']
+		try:
+			newPMMLFileName = userInput['newPMMLFileName']
+			if not newPMMLFileName.endswith('.pmml'):
+				newPMMLFileName = newPMMLFileName+'.pmml'
+		except:
+			newPMMLFileName=idforData+'.pmml'
 
+
+		projectName=idforData
+		projectPath=logFolder+projectName
+		dataFolder=projectPath+'/dataFolder/'
+
+		try:
+		    os.makedirs(projectPath)
+		    os.mkdir(dataFolder)
+		except Exception as e:
+		    print('>>>>>>>>>>>>>>>>', str(e))
+
+		autoMLLock=Lock()
+		trainer = trainAutoMLV2.AnomalyTrainer(algorithms=algorithms, problemType=problem_type)
+		train_prc = Process(target=trainer.trainAnomalyModel,args=(data,logFolder, newPMMLFileName, autoMLLock, userInput))
+		# train_prc = Process(target=trainAutoMLV2.mainTrainAutoML,args=(data,paramToTrainModel,targetVar,idforData,problem_type,logFolder,newPMMLFileName))
+		train_prc.start()
+		pID=train_prc.ident
+	 	
+		statusFile=dataFolder+'status'+'.txt'
+		# sFileText=sFile.read()
+		# data_details=json.loads(sFileText)
+		data_details={}
+		data_details['pID']=str(pID)
+		data_details['status']='In Progress'
+		data_details['newPMMLFileName']=newPMMLFileName
+		data_details['targetVar']=targetVar
+		data_details['problem_type']=problem_type
+		data_details['idforData']=idforData
+		data_details['shape']=data.shape
+		import pathlib
+		fVar=pathlib.Path(dataPath)
+		data_details['taskName']=fVar.name.replace(fVar.suffix,'')#newPMMLFileName.split('/')[-1]
+		
+		autoMLLock.acquire()
+		with open(statusFile,'w') as filetosave:
+		    json.dump(data_details, filetosave)
+		autoMLLock.release()
+
+		tempRunMemory={'idforData': projectName,
+		      'status': 'In Progress',
+		      'type': 'AutoMLProject',
+		      'pid': pID,
+		      'createdOn': str(datetime.datetime.now()),
+		      'newPMMLFileName': newPMMLFileName.split('/')[-1]
+			  }
+		tempRunMemory['taskName']=data_details['taskName']
+		print ('>>>>>>>>>>>>>>>>>>>>AutoML',tempRunMemory)
+
+		RUNNING_TASK_MEMORY.append(tempRunMemory)
+
+		# print ('RUNNING_TASK_MEMORY >>>>>>>>>',RUNNING_TASK_MEMORY)
+
+		return JsonResponse(data_details,status=202)
 	
 	def statusOfModel(idforData):
 		try:

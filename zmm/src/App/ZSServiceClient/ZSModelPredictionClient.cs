@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using ZMM.Helpers.Common;
+using ZMM.Models.Payloads;
 
 namespace ZMM.App.ZSServiceClient
 {
@@ -21,21 +22,22 @@ namespace ZMM.App.ZSServiceClient
         }
 
         #region GetModels - [GET] http://dcindgo01:8083/adapars/models
-        public async Task<string> GetModels()
+        public async Task<string> GetModels(string zmodId)
         {
-            string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            string jsonResult = string.Empty;            
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using(var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.Authorization = auth; 
                
                 try
                 {
-                    HttpResponseMessage response = await httpClient.GetAsync("models");
+                    HttpResponseMessage response = await httpClient.GetAsync("service/zementis/models");
                     
                     if (response.IsSuccessStatusCode)
                     {
@@ -55,14 +57,15 @@ namespace ZMM.App.ZSServiceClient
         #endregion
     
         #region Delete Pmml [DELETE] http://dcindgo01:8083/adapars/models/{modelName}
-        public async Task<string> DeletePmml(string modelName)
+        public async Task<string> DeletePmml(string modelName, string zmodId)
         {
             string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using(var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.Authorization = auth;    
@@ -76,7 +79,7 @@ namespace ZMM.App.ZSServiceClient
                 //
                 try
                 {
-                    HttpResponseMessage response = await httpClient.DeleteAsync("models/" + modelName);
+                    HttpResponseMessage response = await httpClient.DeleteAsync("service/zementis/model/" + modelName);
                     
                     if (response.IsSuccessStatusCode)
                     {
@@ -96,15 +99,16 @@ namespace ZMM.App.ZSServiceClient
         #endregion
 
         #region Upload Pmml [POST]
-        public async Task<string> UploadPmml(string filePath)
+        public async Task<string> UploadPmml(string filePath,string zmodId)
         {
             string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
             try
             {
                 using (var httpClient = new HttpClient())
                 {
-                    httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                    httpClient.BaseAddress = new System.Uri(tuple.Item1);
                     httpClient.DefaultRequestHeaders.Accept.Clear();
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     httpClient.DefaultRequestHeaders.Authorization = auth;
@@ -119,7 +123,7 @@ namespace ZMM.App.ZSServiceClient
                         }
                         memory.Position = 0;
                         content.Add(new StreamContent(memory), "file", filePath);
-                        HttpResponseMessage response = await httpClient.PostAsync("models", content);
+                        HttpResponseMessage response = await httpClient.PostAsync("service/zementis/model", content);
                         if (response.IsSuccessStatusCode)
                         {
                             jsonResult = await response.Content.ReadAsStringAsync();
@@ -149,21 +153,22 @@ namespace ZMM.App.ZSServiceClient
     
         #region single scoring [GET] /apply/SVM_Model?record={}
         //http://dcindgo01:8083/adapars/apply/SVM_Model?record={"sepal length (cm)":5,"sepal width (cm)":3,"petal length (cm)":1,"petal width (cm)":0}
-        public async Task<string> SingleScoring(string modelName, string record)
+        public async Task<string> SingleScoring(string modelName, string record, string zmodId)
         {
             string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using(var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.Authorization = auth;    
                 //                                
                 try
                 {
-                    HttpResponseMessage response = await httpClient.GetAsync($"apply/{modelName}?record={record}");
+                    HttpResponseMessage response = await httpClient.GetAsync($"service/zementis/apply/{modelName}?record={record}");
                     
                     if (response.IsSuccessStatusCode)
                     {
@@ -182,14 +187,15 @@ namespace ZMM.App.ZSServiceClient
         #endregion
 
         #region multiple score
-        public async Task<string> MultipleScoring(string modelName, string filePath)
+        public async Task<string> MultipleScoring(string modelName, string filePath, string zmodId)
         {
             string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using (var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.Authorization = auth;
@@ -205,7 +211,7 @@ namespace ZMM.App.ZSServiceClient
                         }
                         memory.Position = 0;
                         content.Add(new StreamContent(memory), "file", filePath);
-                        HttpResponseMessage response = await httpClient.PostAsync($"apply/{modelName}", content);
+                        HttpResponseMessage response = await httpClient.PostAsync($"service/zementis/apply/{modelName}", content);
                         if (response.IsSuccessStatusCode)
                         {
                             jsonResult = await response.Content.ReadAsStringAsync();
@@ -225,22 +231,23 @@ namespace ZMM.App.ZSServiceClient
         #endregion
 
         #region Image score
-        public async Task<string> ImageScoring(string modelName,string filePath)
+        public async Task<string> ImageScoring(string modelName,string filePath, string zmodId)
         {
             string jsonResult = string.Empty;
-            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{configuration["ZS:Username"]}:{configuration["ZS:Password"]}")));
+            var tuple = ZSSettingPayload.GetUserInfo(zmodId);
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using(var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new System.Uri(configuration["ZS:srvurl"]);
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.DefaultRequestHeaders.Authorization = auth;    
+                httpClient.DefaultRequestHeaders.Authorization = auth;
                 // httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("eddie.soong@softwareag.com", "softwareag");   
                 //                                
                 try
                 {
-                   using (var content = new MultipartFormDataContent())
+                    using (var content = new MultipartFormDataContent())
                     {
                         var memory = new MemoryStream();
                         using (var stream = new FileStream(filePath, FileMode.Open))
@@ -249,14 +256,14 @@ namespace ZMM.App.ZSServiceClient
                         }
                         memory.Position = 0;
                         content.Add(new StreamContent(memory), "file", filePath);
-                        HttpResponseMessage response = await httpClient.PostAsync($"apply/{modelName}",content);
+                        HttpResponseMessage response = await httpClient.PostAsync($"service/zementis/apply/{modelName}", content);
                         if (response.IsSuccessStatusCode)
                         {
-                            jsonResult = await response.Content.ReadAsStringAsync();                        
-                        } 
+                            jsonResult = await response.Content.ReadAsStringAsync();
                         }
+                    }
 
-                    } 
+                }
                 catch(HttpRequestException ex)
                 {
                     //add log                    

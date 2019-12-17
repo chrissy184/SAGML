@@ -17,6 +17,7 @@ from random import choice
 from utility.utilityClass import RUNNING_TASK_MEMORY
 import datetime
 import skimage
+import numpy as np
 
 global PMMLMODELSTORAGE
 
@@ -57,14 +58,29 @@ class KerasUtilities:
             json.dump(data_details, filetosave)
         return 'Success'
 
+    def updateStatusofProcess(self,filePath,updatedStatus):
+        sFile=open(filePath,'r')
+        sFileText=sFile.read()
+        sFile.close()
+        data_details=json.loads(sFileText)
+        data_details['status']=updatedStatus
+        if updatedStatus=='Complete':
+                data_details['completedOn']=str(datetime.datetime.now())
+        with open(filePath,'w') as filetosave:
+            json.dump(data_details, filetosave)
+        return 'Success'
+
     def getPredClasses(self,nyoka_pmml_obj):
         targetVar = self.getTargetVariable(nyoka_pmml_obj)
         tempObj=nyoka_pmml_obj.get_DataDictionary()
-        predClasses = list()
-        for dataField in tempObj.get_DataField():
-            if dataField.name == targetVar:
-                for val in dataField.get_Value():
-                    predClasses.append(val.get_value())
+        if str(tempObj) != 'None':
+            predClasses = list()
+            for dataField in tempObj.get_DataField():
+                if dataField.name == targetVar:
+                    for val in dataField.get_Value():
+                        predClasses.append(val.get_value())
+        else:
+            predClasses=[]
         # predClasses=[eleData.get_value() for dataFobj in tempObj.get_DataField() for eleData in dataFobj.get_Value()]
     #     predClasses={j:k for j,k in enumerate(predClasses)}
         return predClasses
@@ -194,15 +210,19 @@ class KerasUtilities:
             #Sklearn Model
             else:
                 print ('Next Step 2 >>>>>>>>>>>>')
-                from nyokaBase.skl.pmml_to_skl import pmml_to_skl
+                from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
                 print ('Next Step 3 >>>>>>>>>>>>')
-                sklModelPipeline=pmml_to_skl(filepath)
+                sklModelPipeline=generate_skl_model(filepath)
                 print ('Next Step 4 >>>>>>>>>>>>')
-                if hasattr(sklModelPipeline.steps[-1][-1],'classes_'):
-                    predClasses=sklModelPipeline.steps[-1][-1].classes_
-                else:
+                # if hasattr(sklModelPipeline.steps[-1][-1],'classes_'):
+                #     print ('sklModelPipeline.steps[-1][-1] >>> ',sklModelPipeline.steps[-1][-1])
+                #     predClasses=sklModelPipeline.steps[-1][-1].classes_
+                # else:
+                try:
+                    predClasses=self.getPredClasses(nyoka_pmml_obj)
+                except:
                     predClasses=[]
-                print ('Next Step >>>>>>>>>>>>')
+                print ('Next Step 5 >>>>>>>>>>>>')
                 targetVar = self.getTargetVariable(nyoka_pmml_obj)
                 PMMLMODELSTORAGE[pmmlName]={}
                 PMMLMODELSTORAGE[pmmlName]['model']=sklModelPipeline
@@ -237,14 +257,20 @@ class KerasUtilities:
             main_model=nyoka_pmml_obj.NaiveBayesModel[0]
         elif nyoka_pmml_obj.NearestNeighborModel:
             main_model=nyoka_pmml_obj.NearestNeighborModel[0]
+        elif nyoka_pmml_obj.AnomalyDetectionModel:
+            main_model=nyoka_pmml_obj.AnomalyDetectionModel[0]
+
         for miningField_ in main_model.MiningSchema.MiningField:
             if miningField_.usageType == 'target':
                 targetVar = miningField_.name
+            else:
+                targetVar=None
         return targetVar
 
 
     def deleteLoadedModelfromMemory(self,modelname):
         global PMMLMODELSTORAGE
+        print (PMMLMODELSTORAGE)
         # pmmlName=os.path.basename(modelFile).split('.')[0]
         del PMMLMODELSTORAGE[modelname]
         return ('Success')
@@ -272,9 +298,11 @@ class KerasUtilities:
         return data_details
 
     def predictImagedata(self,pmmlstoragepointer,testimage):
+        # print ('Came to image prediction')
         global PMMLMODELSTORAGE
 
         pointerObj=PMMLMODELSTORAGE[pmmlstoragepointer]
+        # print ('pointerObj',pointerObj)
         model_graph = pointerObj['model_graph']
         tf_session = pointerObj['tf_session']
         with model_graph.as_default():
@@ -290,6 +318,8 @@ class KerasUtilities:
                 x=x.reshape(1,img_height, img_width,3)
                 predi=model.predict(x)
                 # print(' >>>>>>>>>>>>>>> predi ',predi,predClasses)
+                if len(predClasses)==0:
+                    predClasses=['class_'+str(i) for i in range(len(np.ravel(predi)))]
                 targetResult= {j:str(float(k)) for j,k in zip(predClasses,list(predi[0]))}
 
         target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
@@ -346,12 +376,13 @@ class KerasUtilities:
         return targetResult
 
     def predictFiledata(self,pmmlstoragepointer,testData, modelType=None):
-        # print('$$$$$$$$$$$$$$$$$$ PredictFileData $$$$$$$$$$$$$$$')
+        print('$$$$$$$$$$$$$$$$$$ PredictFileData $$$$$$$$$$$$$$$')
         global PMMLMODELSTORAGE
         pointerObj=PMMLMODELSTORAGE[pmmlstoragepointer]
         target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
         self.checkCreatePath(target_path)
-        if modelType and modelType=="sklearnM":
+        if modelType =="sklearnM":
+            print ('Came to sklearn part')
             model=pointerObj['model']
             predClasses=pointerObj['predClasses']
             targetVar=pointerObj['targetVar']
@@ -398,6 +429,48 @@ class KerasUtilities:
             with open(resafile,'w') as fila:
                 json.dump(targetResult,fila)
         return resafile
+
+
+    def predictFiledataReturnJson(self,pmmlstoragepointer,testData, modelType=None):
+        # print('$$$$$$$$$$$$$$$$$$ PredictFileData $$$$$$$$$$$$$$$')
+        global PMMLMODELSTORAGE
+        pointerObj=PMMLMODELSTORAGE[pmmlstoragepointer]
+        target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+        self.checkCreatePath(target_path)
+        if modelType and modelType=="sklearnM":
+            model=pointerObj['model']
+            predClasses=pointerObj['predClasses']
+            targetVar=pointerObj['targetVar']
+            if len(predClasses) >1:
+                pred=model.predict_proba(testData)
+                seraSera=[]
+                for i in scores:
+                    seraSera.append({k:j for k,j in zip(['1','2'],i)})
+                resaRes={'predictions':seraSera}
+            else:
+                pred=model.predict(testData)
+                resaRes={'predictions':pred.tolist()}
+        
+            
+        else:
+            model_graph = pointerObj['model_graph']
+            tf_session = pointerObj['tf_session']
+            with model_graph.as_default():
+                with tf_session.as_default():
+                    model=PMMLMODELSTORAGE[pmmlstoragepointer]['model']
+                    predClasses=PMMLMODELSTORAGE[pmmlstoragepointer]['predClasses']
+                    inputShapevals=PMMLMODELSTORAGE[pmmlstoragepointer]['inputShape']
+                    pred=model.predict(testData.values)
+
+            if len(predClasses) > 1:
+                seraSera=[]
+                for i in scores:
+                    seraSera.append({k:j for k,j in zip(['1','2'],i)})
+                resaRes={'predictions':seraSera}
+            else:
+                resaRes={'predictions':pred}
+            
+        return resaRes
 
     def predictDataWithPostScript(self,pmmlstoragepointer,filpath,scriptOutput):
 
