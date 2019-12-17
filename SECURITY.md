@@ -4,9 +4,9 @@
 
 Below version(s) are gone through security check and reported known vulnerabilities if present.
 
-| Version         | Supported          |
-| --------------- | ------------------ |
-| 10.5.0 (beta)   | :x:                |
+| Version         | Supported             |
+| --------------- | --------------------- |
+| 10.5.0 (beta)   | :white_check_mark:    |
 
 
 ## Known Vulnerabilities
