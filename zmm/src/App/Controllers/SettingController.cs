@@ -59,6 +59,14 @@ namespace ZMM.App.Controllers
                 JObject jObj = JObject.Parse(jsonBody);
                 JArray jArr = (JArray)jObj["settings"];
                 var setList = jArr.ToObject<List<SettingProperty>>();
+
+                //fetch the original record
+                List<SettingProperty> setListOrig = ZSSettingPayload.GetSettingsByUser(zmodId).SelectMany(b => b.Settings).ToList<SettingProperty>();
+                foreach(var p in setList)
+                {
+                    
+                }
+
                 //add to payload
                 var newRecord = new ZSSettingResponse()
                 {
@@ -124,6 +132,15 @@ namespace ZMM.App.Controllers
                 jObj = JObject.Parse(JsonConvert.SerializeObject(template));  
             }            
             jObj.Remove("zmodId");
+            //
+            foreach(var p in jObj["settings"])
+            {
+                p["username"] = "******";
+                p["password"] = "******";
+            }
+
+            //
+
             return Json(jObj);
         }
         #endregion
