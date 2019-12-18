@@ -64,7 +64,14 @@ namespace ZMM.App.Controllers
                 List<SettingProperty> setListOrig = ZSSettingPayload.GetSettingsByUser(zmodId).SelectMany(b => b.Settings).ToList<SettingProperty>();
                 foreach(var p in setList)
                 {
-                    
+                    if(p.username.Contains("******"))
+                    {
+                        p.username = setListOrig.Where(c => c.url == p.url).Select(c=> c.username).FirstOrDefault().ToString();
+                    }
+                    if(p.password.Contains("******"))
+                    {
+                        p.password = setListOrig.Where(c => c.url == p.url).Select(c=> c.password).FirstOrDefault().ToString();
+                    }
                 }
 
                 //add to payload
