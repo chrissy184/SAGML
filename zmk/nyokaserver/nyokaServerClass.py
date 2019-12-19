@@ -135,6 +135,12 @@ class NyokaServer:
 	# @csrf_exempt
 	# @api_view(['POST'])
 	# @schema(addArchitectureSwagger)
+
+	def removeArch(projectID):
+		del MEMORY_DICT_ARCHITECTURE[projectID]
+		tempMemRe={'status':'removed'}
+		return JsonResponse(tempMemRe)
+
 	def addArchitectureToGlobalMemoryDict(projectID,filePath):
 		global MEMORY_DICT_ARCHITECTURE
 		try:

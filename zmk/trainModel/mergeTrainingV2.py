@@ -94,6 +94,8 @@ class NewModelOperations:
             nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,NearestNeighborModel=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='NaiveBayesModel':
             nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,NaiveBayesModel=[singMod['pmmlModelObject']])
+        elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='TreeModel':
+            nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,TreeModel=[singMod['pmmlModelObject']])
         else:
             nyokaObj=None
         return nyokaObj
