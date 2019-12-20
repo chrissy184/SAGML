@@ -1228,7 +1228,7 @@ class TrainingViewModels:
             kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Saved in different Version')
         else:
             copyOrgFName=newNameFile
-            kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Saved')
+            kerasUtilities.updateStatusOfTraining(self.statusFile,'Complete')
         import shutil
         from nyokaBase.skl.skl_to_pmml import model_to_pmml
         try:

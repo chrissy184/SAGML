@@ -101,7 +101,7 @@ class Training:
 		data_details['idforData']=idforData
 		data_details['status']='In Progress'
 		fObjScrpt=pathlib.Path(pmmlFile)
-		data_details['taskName']=fObjScrpt.name
+		data_details['taskName']=fObjScrpt.name.replace(fObjScrpt.suffix,'')
 		data_details['createdOn']= str(datetime.datetime.now())
 		data_details['type']= 'NNProject'
 		data_details['problem_type']= hyperParaUser['problemType']
