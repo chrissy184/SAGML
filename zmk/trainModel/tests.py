@@ -1,113 +1,137 @@
-# # from django.test import TestCase
-# import unittest
-# import requests, os, json, sys
-# from django.http import JsonResponse
-# from trainModel.training import Training
-# from utility.utilityClass import Utility
-# import logging
+# from django.test import TestCase
+import unittest
+import requests, os, json, sys
+from django.http import JsonResponse
+from trainModel.training import Training
+from utility.utilityClass import Utility
+import logging
 
-# class TestTrainModel(unittest.TestCase):
+class TestTrainModel(unittest.TestCase):
 
-# 	@classmethod
-# 	def setUpClass(self):
-# 		logging.info("******* Running Test Cases for TrainModel Class *******")
+	@classmethod
+	def setUpClass(self):
+		logging.info("******* Running Test Cases for TrainModel Class *******")
 
-# 	def test_1_runningTasksList(self):
-# 		logging.info("Test Case : Get all running tasks.")
-# 		result = Utility().runningTaskList()
-# 		self.assertEqual(result.status_code,200)
-# 		self.assertEqual('runningTask' in json.loads(result.__dict__['_container'][0]), True)
-# 		self.assertEqual(len(json.loads(result.__dict__['_container'][0])['runningTask']),0)
-# 		logging.info("PASSED")
-
-
-# 	def test_2_statusOfRunningTask(self):
-# 		logging.info("Test Case : Get status of a running tasks.")
-# 		idforData = 'id'
-# 		self.assertRaises(FileNotFoundError, Training.statusOfModel, idforData)
-# 		logging.info("PASSED")
+	def test_1_runningTasksList(self):
+		logging.info("Test Case : Get all running tasks.")
+		result = Utility().runningTaskList()
+		self.assertEqual(result.status_code,200)
+		self.assertEqual('runningTask' in json.loads(result.__dict__['_container'][0]), True)
+		self.assertEqual(len(json.loads(result.__dict__['_container'][0])['runningTask']),0)
+		logging.info("PASSED")
 
 
-# 	def test_3_deleteARunningTask(self):
-# 		logging.info("Test Case : Deleting a running tasks.")
-# 		idforData = 'id'
-# 		result = Utility().deleteTaskfromMemory(idforData)
-# 		self.assertEqual('idforData' in json.loads(result.__dict__['_container'][0]), True)
-# 		self.assertEqual('message' in json.loads(result.__dict__['_container'][0]), True)
-# 		self.assertEqual(json.loads(result.__dict__['_container'][0])['idforData'], 'id')
-# 		self.assertEqual(json.loads(result.__dict__['_container'][0])['message'], 'Something went wrong. Please contact Admin')
-# 		logging.info("PASSED")
+	def test_2_statusOfRunningTask(self):
+		logging.info("Test Case : Get status of a running tasks.")
+		idforData = 'id'
+		self.assertRaises(FileNotFoundError, Training.statusOfModel, idforData)
+		logging.info("PASSED")
 
 
-# 	def test_4_AutoMLSendData(self):
-# 		logging.info("Test Case : Send data for AutoML.")
-# 		filePath = os.path.abspath('testUseCase/supportData2/mpg_data_example.csv')
-# 		result = Training.autoMLdataprocess(filePath)
-# 		self.assertEqual('idforData' in json.loads(result.__dict__['_container'][0]), True)
-# 		logging.info("PASSED")
+	def test_3_deleteARunningTask(self):
+		logging.info("Test Case : Deleting a running tasks.")
+		idforData = 'id'
+		result = Utility().deleteTaskfromMemory(idforData)
+		self.assertEqual('idforData' in json.loads(result.__dict__['_container'][0]), True)
+		self.assertEqual('message' in json.loads(result.__dict__['_container'][0]), True)
+		self.assertEqual(json.loads(result.__dict__['_container'][0])['idforData'], 'id')
+		self.assertEqual(json.loads(result.__dict__['_container'][0])['message'], 'Something went wrong. Please contact Admin')
+		logging.info("PASSED")
 
 
-# 	def test_5_AutoMLTrain(self):
-# 		logging.info("Test Case : Perform preprocessing and train AutoML model.")
-# 		filePath = os.path.abspath('testUseCase/supportdata/mpg_data_example2.csv')
-# 		result = Training.autoMLdataprocess(filePath)
-# 		tempa = json.loads(result.__dict__['_container'][0])
-# 		# newPMMLFileName = 'xyz.pmml'
-# 		target_variable = 'mpg'
-# 		true=True
-# 		false=False
-# 		dataPreprocessingsteps={"data":[{"position":1,"variable":"mpg","dtype":"float64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":false},
-# 		{"position":2,"variable":"cylinders","dtype":"int64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":true},
-# 		{"position":3,"variable":"displacement","dtype":"float64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":true},
-# 		{"position":4,"variable":"horsepower","dtype":"float64","missing_val":6,"changedataType":"Continuous","imputation_method":"Mean","data_transformation_step":"None","use_for_model":true},
-# 		{"position":5,"variable":"weight","dtype":"int64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":true},
-# 		{"position":6,"variable":"acceleration","dtype":"float64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":true},
-# 		{"position":7,"variable":"model year","dtype":"int64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":false},
-# 		{"position":8,"variable":"origin","dtype":"int64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":false},
-# 		{"position":9,"variable":"car name","dtype":"object","missing_val":0,"changedataType":"Categorical","imputation_method":"None","data_transformation_step":"None","use_for_model":false}],
-# 		"problem_type":"Regression","target_variable":"mpg","idforData":tempa['idforData'],"newPMMLFileName":"testModelMPGSK","filePath":"/api/data/preview/mpg_data_example.csv",
-# 		"parameters":{"generation":5,"population_size":25,"model_name":"testModelMPGSK","scoring":"neg_median_absolute_error","algorithm":["All"]}}
-# 		result2 = Training.autoMLtrainModel(dataPreprocessingsteps)
-# 		result2 = json.loads(result2.__dict__['_container'][0])
-# 		self.assertEqual('pID' in result2, True)
-# 		self.assertEqual('status' in result2, True)
-# 		self.assertEqual('newPMMLFileName' in result2, True)
-# 		self.assertEqual('targetVar' in result2, True)
-# 		self.assertEqual('problem_type' in result2, True)
-# 		self.assertEqual('idforData' in result2, True)
-# 		self.assertEqual('shape' in result2, True)
-# 		self.assertEqual('taskName' in result2, True)
-# 		self.assertEqual(result2['status'], 'In Progress')
-# 		# self.assertEqual(result2['newPMMLFileName'], newPMMLFileName)
-# 		self.assertEqual(result2['targetVar'], target_variable)
-# 		self.assertEqual(result2['idforData'], tempa['idforData'])
+	def test_4_AutoMLSendData(self):
+		logging.info("Test Case : Send data for AutoML.")
+		filePath = os.path.abspath('testUseCase/supportData2/mpg_data_example.csv')
+		result = Training.autoMLdataprocess(filePath)
+		self.assertEqual('idforData' in json.loads(result.__dict__['_container'][0]), True)
+		logging.info("PASSED")
 
 
-# 		result = Utility().runningTaskList()
-# 		self.assertEqual(result.status_code,200)
-# 		self.assertEqual('runningTask' in json.loads(result.__dict__['_container'][0]), True)
-# 		self.assertEqual(len(json.loads(result.__dict__['_container'][0])['runningTask']),1)
+	def test_5_AutoMLTrain(self):
+		logging.info("Test Case : Perform preprocessing and train AutoML model.")
+		filePath = os.path.abspath('testUseCase/supportdata/mpg_data_example2.csv')
+		result = Training.autoMLdataprocess(filePath)
+		tempa = json.loads(result.__dict__['_container'][0])
+		# newPMMLFileName = 'xyz.pmml'
+		target_variable = 'mpg'
+		true=True
+		false=False
+		dataPreprocessingsteps={"data":[{"position":1,"variable":"mpg","dtype":"float64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":false},
+		{"position":2,"variable":"cylinders","dtype":"int64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":true},
+		{"position":3,"variable":"displacement","dtype":"float64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":true},
+		{"position":4,"variable":"horsepower","dtype":"float64","missing_val":6,"changedataType":"Continuous","imputation_method":"Mean","data_transformation_step":"None","use_for_model":true},
+		{"position":5,"variable":"weight","dtype":"int64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":true},
+		{"position":6,"variable":"acceleration","dtype":"float64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":true},
+		{"position":7,"variable":"model year","dtype":"int64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":false},
+		{"position":8,"variable":"origin","dtype":"int64","missing_val":0,"changedataType":"Continuous","imputation_method":"None","data_transformation_step":"None","use_for_model":false},
+		{"position":9,"variable":"car name","dtype":"object","missing_val":0,"changedataType":"Categorical","imputation_method":"None","data_transformation_step":"None","use_for_model":false}],
+		"problem_type":"Regression","target_variable":"mpg","idforData":tempa['idforData'],"newPMMLFileName":"testModelMPGSK","filePath":"/api/data/preview/mpg_data_example.csv",
+		"parameters":{"generation":5,"population_size":25,"model_name":"testModelMPGSK","scoring":"neg_median_absolute_error","algorithm":["All"]}}
+		result2 = Training.autoMLtrainModel(dataPreprocessingsteps)
+		result2 = json.loads(result2.__dict__['_container'][0])
+		self.assertEqual('pID' in result2, True)
+		self.assertEqual('status' in result2, True)
+		self.assertEqual('newPMMLFileName' in result2, True)
+		self.assertEqual('targetVar' in result2, True)
+		self.assertEqual('problem_type' in result2, True)
+		self.assertEqual('idforData' in result2, True)
+		self.assertEqual('shape' in result2, True)
+		self.assertEqual('taskName' in result2, True)
+		self.assertEqual(result2['status'], 'In Progress')
+		# self.assertEqual(result2['newPMMLFileName'], newPMMLFileName)
+		self.assertEqual(result2['targetVar'], target_variable)
+		self.assertEqual(result2['idforData'], tempa['idforData'])
 
-# 		idforData = tempa['idforData']
-# 		result = Training.statusOfModel(idforData)
-# 		self.assertEqual(result.status_code,200)
-# 		result = json.loads(result.__dict__['_container'][0])
-# 		self.assertEqual('pID' in result, True)
-# 		self.assertEqual('status' in result, True)
-# 		self.assertEqual('idforData' in result, True)
 
-# 		idforData = tempa['idforData']
-# 		result = Utility().deleteTaskfromMemory(idforData)
-# 		self.assertEqual('idforData' in json.loads(result.__dict__['_container'][0]), True)
-# 		self.assertEqual('message' in json.loads(result.__dict__['_container'][0]), True)
-# 		self.assertEqual(json.loads(result.__dict__['_container'][0])['idforData'], tempa['idforData'])
-# 		self.assertEqual(json.loads(result.__dict__['_container'][0])['message'], 'Deleted successfully')
+		result = Utility().runningTaskList()
+		self.assertEqual(result.status_code,200)
+		self.assertEqual('runningTask' in json.loads(result.__dict__['_container'][0]), True)
+		self.assertEqual(len(json.loads(result.__dict__['_container'][0])['runningTask']),1)
 
-# 		result = Utility().runningTaskList()
-# 		self.assertEqual(result.status_code,200)
-# 		self.assertEqual('runningTask' in json.loads(result.__dict__['_container'][0]), True)
-# 		self.assertEqual(len(json.loads(result.__dict__['_container'][0])['runningTask']),0)
-# 		logging.info("PASSED")
+		idforData = tempa['idforData']
+		result = Training.statusOfModel(idforData)
+		self.assertEqual(result.status_code,200)
+		result = json.loads(result.__dict__['_container'][0])
+		self.assertEqual('pID' in result, True)
+		self.assertEqual('status' in result, True)
+		self.assertEqual('idforData' in result, True)
+
+		idforData = tempa['idforData']
+		result = Utility().deleteTaskfromMemory(idforData)
+		self.assertEqual('idforData' in json.loads(result.__dict__['_container'][0]), True)
+		self.assertEqual('message' in json.loads(result.__dict__['_container'][0]), True)
+		self.assertEqual(json.loads(result.__dict__['_container'][0])['idforData'], tempa['idforData'])
+		self.assertEqual(json.loads(result.__dict__['_container'][0])['message'], 'Deleted successfully')
+
+		result = Utility().runningTaskList()
+		self.assertEqual(result.status_code,200)
+		self.assertEqual('runningTask' in json.loads(result.__dict__['_container'][0]), True)
+		self.assertEqual(len(json.loads(result.__dict__['_container'][0])['runningTask']),0)
+		logging.info("PASSED")
+
+
+    # def testtrainDNN(self):
+    #     projectID = 'xyz1'
+
+    #     payLoad={"batchSize":15,"epoch":100,"stepPerEpoch":10,"learningRate":0.001,"loss":"MAE",
+    #     "metrics":["MAE"],"optimizer":"Adam","testSize":0.3,"scriptOutput":"NA","problemType":"regression"}
+    #     # result = Training().trainNeuralNetworkModels(payLoad, projectID)
+    #     nntrainer = mergeTrainingNN.NeuralNetworkModelTrainer()
+
+    #     idforData='12345'
+    #     tensorboardLogFolder=''
+    #     hyperParaUser=payLoad
+    #     pmmlFile=''
+
+
+	# 	nntrainer.train(idforData,pmmlFile,tensorboardLogFolder,hyperParaUser,pmmlFile)
+    #     result = json.loads(result.__dict__['_container'][0])
+    #     # print ("result",result)
+    #     # self.assertEqual(result['filePath'],filePath)
+    #     self.assertEqual(result['status'],'In Progress')
+    #     self.assertEqual(result['taskName'],'In Progress')
+    #     self.assertEqual(result['type'],'NNProject')
+    #     logging.info("PASSED")
 
 
 # # 	def test_6_trainNNModel(self):
