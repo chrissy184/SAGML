@@ -38,6 +38,9 @@ def xgboost_to_pmml(model,derived_col_names,col_names,target_name,mining_imp_val
                                     target_name,
                                     mining_imp_val,
                                     categoric_values,tasktype)
+
+    PMML_kwargs['MiningModel'][0].__dict__['taskType']=tasktype
+    # print (PMML_kwargs['MiningModel'][0].__dict__)
     return PMML_kwargs
 
 def get_PMML_kwargs(model, derived_col_names, col_names, target_name, mining_imp_val,categoric_values,tasktype):

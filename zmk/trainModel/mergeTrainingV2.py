@@ -152,6 +152,7 @@ class NewModelOperations:
             tempDict['score']={}
             print ('print  step LM 1')
             for singMod in modelObj:
+                # print (singMod['pmmlModelObject'].taskType,singMod['pmmlModelObject'].modelName)
                 if singMod['pmmlModelObject'].taskType=='trainAndscore':
                     tempDict['train'][singMod['pmmlModelObject'].modelName]={}
                     tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
@@ -174,7 +175,7 @@ class NewModelOperations:
             for taType in tempDict:
                 tempTa=list(tempDict[taType].keys())
                 tempTa.sort()
-    
+
                 for taTTemp in tempTa:
                     if taType in tempDict2:
                         pass
@@ -309,9 +310,6 @@ class NewModelOperations:
             else:
                 messageToWorld= "Model Loaded Successfully"
                 reStat=200
-
-
-            
         except:
             messageToWorld="Model load failed, please connect with admin"
             pmmlFileForKey=None

@@ -52,6 +52,7 @@ def model_to_pmml(toExportDict, PMMLFileName='from_sklearn.pmml',tyP=None):
         col_names = toExportDict[model_name]['featuresUsed']
         target_name = toExportDict[model_name]['targetName']
         tasktype = toExportDict[model_name]['taskType']
+        print ('>>>>>>>>>>>>>>>>tasktype >>>>>>>>>',tasktype)
         if 'modelPath' in toExportDict[model_name]:
             modelPath = toExportDict[model_name]['modelPath']
         else:
