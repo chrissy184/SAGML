@@ -1051,10 +1051,10 @@ namespace ZMM.App.Controllers
                             string zsResponse = await zsClient.UploadPmml(convertedPath, zmodId);
                             Logger.LogInformation("PostZSUploadPmmlAsync ZS Response on deploy " + zsResponse);
                             //remove file after upload
-                            if (System.IO.File.Exists(convertedPath))
-                            {
-                                System.IO.File.Delete(convertedPath);
-                            }
+                            // if (System.IO.File.Exists(convertedPath))
+                            // {
+                            //     System.IO.File.Delete(convertedPath);
+                            // }
                             if (zsResponse != "Fail" && zsResponse != "FileExists")
                             {
                                 //
