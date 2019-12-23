@@ -179,7 +179,7 @@
                     <ng-template [ngIf]="selectedTask?.type === 'NN'  && !selectedTask?.errorMessage">
                       <iframe *ngIf="selectedTask.tensorboardUrl"
                         [src]="selectedTask.tensorboardUrl | safe:'resourceUrl'" class="iframe" id="tb"
-                        (load)="iframeLoaded()"></iframe>
+                        (load)="iframeLoaded()" style="position: relative; min-height: 700px;"></iframe>
                     </ng-template>
 
                     <ng-template [ngIf]="selectedTask?.type === 'PYTHON' && !row?.errorMessage">
