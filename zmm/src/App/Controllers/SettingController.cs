@@ -149,10 +149,13 @@ namespace ZMM.App.Controllers
                        
             jObj.Remove("zmodId");
             //
-            foreach(var p in jObj["settings"])
+            foreach (var p in jObj["settings"])
             {
-                p["username"] = "******";
-                p["password"] = "******";
+                if (unmask == false)
+                {
+                    p["username"] = "******";
+                    p["password"] = "******";
+                }
             }
             //
 
