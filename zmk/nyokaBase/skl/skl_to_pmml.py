@@ -423,7 +423,7 @@ def get_PMML_kwargs(model, derived_col_names, col_names, target_name, mining_imp
                                                           target_name,
                                                           mining_imp_val,
                                                           categoric_values,
-                                                          tasktype)}
+                                                          tasktype,modelPath)}
     elif any_in(neurl_netwk_model_names, skl_mdl_super_cls_names):
         algo_kwargs = {'NeuralNetwork': get_neural_models(model,
                                                           derived_col_names,
@@ -1238,7 +1238,7 @@ def get_model_name(model):
     elif 'RandomForest' in str(model.__class__):
         return 'RandomForestModel'
 
-def get_ensemble_models(model, derived_col_names, col_names, target_name, mining_imp_val, categoric_values, tasktype):
+def get_ensemble_models(model, derived_col_names, col_names, target_name, mining_imp_val, categoric_values, tasktype,modelPath):
     
     """
     It returns the Mining Model element of the model
@@ -1286,7 +1286,7 @@ def get_ensemble_models(model, derived_col_names, col_names, target_name, mining
     mining_models.append(pml.MiningModel(
         modelName=model.__class__.__name__,
         Segmentation=get_outer_segmentation(model, col_names, col_names, target_name,
-                                            mining_imp_val, categoric_values,tasktype),
+                                            mining_imp_val, categoric_values,tasktype,modelPath),
         taskType=tasktype,
         **model_kwargs
     ))
@@ -1357,7 +1357,7 @@ def get_multiple_model_method(model):
         return 'average'
 
 
-def get_outer_segmentation(model, derived_col_names, col_names, target_name, mining_imp_val, categoric_values,tasktype):
+def get_outer_segmentation(model, derived_col_names, col_names, target_name, mining_imp_val, categoric_values,tasktype,modelPath):
     
     """
     It returns the Segmentation element of the model.
@@ -1385,12 +1385,12 @@ def get_outer_segmentation(model, derived_col_names, col_names, target_name, min
     """
     segmentation = pml.Segmentation(
         multipleModelMethod=get_multiple_model_method(model),
-        Segment=get_segments(model, derived_col_names, col_names, target_name, mining_imp_val, categoric_values,tasktype)
+        Segment=get_segments(model, derived_col_names, col_names, target_name, mining_imp_val, categoric_values,tasktype,modelPath)
     )
     return segmentation
 
 
-def get_segments(model, derived_col_names, col_names, target_name, mining_imp_val, categoric_values,tasktype):
+def get_segments(model, derived_col_names, col_names, target_name, mining_imp_val, categoric_values,tasktype,modelPath):
 
     """
     It returns the Segment element of the model.
@@ -1419,13 +1419,13 @@ def get_segments(model, derived_col_names, col_names, target_name, mining_imp_va
     segments = None
     if 'GradientBoostingClassifier' in str(model.__class__):
         segments = get_segments_for_gbc(model, derived_col_names, col_names, target_name,
-                                        mining_imp_val, categoric_values,tasktype)
+                                        mining_imp_val, categoric_values,tasktype,modelPath)
     else:
         segments = get_inner_segments(model, derived_col_names, col_names, 0)
     return segments
 
 
-def get_segments_for_gbc(model, derived_col_names, col_names, target_name, mining_imp_val, categoric_values,tasktype):
+def get_segments_for_gbc(model, derived_col_names, col_names, target_name, mining_imp_val, categoric_values,tasktype,modelPath):
     
     """
     It returns list of Segments element of the model.
@@ -1542,7 +1542,7 @@ def get_segments_for_gbc(model, derived_col_names, col_names, target_name, minin
                 )
             )
         )
-    reg_model = get_regrs_models(model, out_field_names,out_field_names, target_name, mining_imp_val, categoric_values,tasktype)[0]
+    reg_model = get_regrs_models(model, out_field_names,out_field_names, target_name, mining_imp_val, categoric_values,tasktype,modelPath)[0]
     reg_model.Output = None
     if len(model.classes_) == 2:
         reg_model.normalizationMethod="logit"
