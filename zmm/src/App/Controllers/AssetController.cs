@@ -50,7 +50,7 @@ namespace ZMM.App.Controllers
 
         #region [Get] list of running instances
         [HttpGet]
-        public IActionResult GetRunningInstances()
+        public IActionResult GetRunningInstances(string type)
         {            
             string cmd = "";
             string output = ""; 
@@ -102,6 +102,7 @@ namespace ZMM.App.Controllers
             {
                 string err = ex.StackTrace;
                 getAllInstances.Add(ZMKDockerCmdHelper.GetNonDockerZMK());
+                getAllInstances = getAllInstances.Where(instance=> instance.Type == type).ToList<InstanceResponse>();
                 //return BadRequest(new {message="running instance loading failed.", exception=ex.StackTrace});             
             }
             
@@ -116,10 +117,13 @@ namespace ZMM.App.Controllers
             
             #endregion
             
-            return Json(getAllInstances); 
+            if(!string.IsNullOrEmpty(type))
+                return Json(getAllInstances.Where(instance=> instance.Type == type).ToList<InstanceResponse>());
+            else 
+                return Json(getAllInstances); 
         }
         #endregion
-    
+            
         #region [POST] start instances
         [HttpPost]
         public async Task<IActionResult> StartInstancesAsync()
