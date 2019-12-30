@@ -102,7 +102,7 @@ namespace ZMM.App.Controllers
             {
                 string err = ex.StackTrace;
                 getAllInstances.Add(ZMKDockerCmdHelper.GetNonDockerZMK());
-                getAllInstances = getAllInstances.Where(instance=> instance.Type == type).ToList<InstanceResponse>();
+                if(!string.IsNullOrEmpty(type)) getAllInstances = getAllInstances.Where(instance=> instance.Type == type).ToList<InstanceResponse>();
                 //return BadRequest(new {message="running instance loading failed.", exception=ex.StackTrace});             
             }
             
