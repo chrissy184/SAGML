@@ -101,6 +101,7 @@ namespace ZMM.App.Controllers
             catch (Exception ex)
             {
                 string err = ex.StackTrace;
+                //update for non dockerize
                 getAllInstances.Add(ZMKDockerCmdHelper.GetNonDockerZMK());
                 if(!string.IsNullOrEmpty(type)) getAllInstances = getAllInstances.Where(instance=> instance.Type == type).ToList<InstanceResponse>();
                 //return BadRequest(new {message="running instance loading failed.", exception=ex.StackTrace});             
