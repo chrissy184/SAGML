@@ -133,7 +133,20 @@ namespace ZMM.App.Controllers
                                 });
                                 break;
                             }
-                        }
+                        } 
+                        else
+                        {
+                            string _id = JObject.Parse(j.ToString())["idforData"].ToString();
+                            if (i["idforData"].ToString() == _id)
+                            {
+                                jHist.Add(new JObject(){
+                                    {"idforData", _id},
+                                    {"status", i["status"].ToString()},
+                                    {"executedAt",JObject.Parse(j.ToString())["executedAt"].ToString()}
+                                });
+                                break;
+                            }
+                        }                       
                     }
                 }
                 //
