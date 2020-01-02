@@ -101,7 +101,14 @@ export class CumulocityComponent implements OnInit {
 
   public getSettings() {
     this.isContentLoading = true;
-    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.settings)
+    const options = {
+      params: {
+        type: 'C8Y',
+        selected: true,
+        unmask: true
+      }
+    };
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.settings, options)
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(response => {
         console.log(response);
