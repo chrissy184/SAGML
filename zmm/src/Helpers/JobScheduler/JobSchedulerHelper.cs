@@ -18,11 +18,11 @@ public static class JobSchedulerHelper
         {
             case "ExecuteCode":
                 var objExecute = JsonConvert.DeserializeObject<ExecuteCodeResponse>(resp);
-                schObj.ZMKResponse.Add(objExecute);                
+                schObj.History.Add(objExecute);                
                 break;
             case "Train":
                 var obj = JsonConvert.DeserializeObject<TrainingResponse>(resp);
-                schObj.ZMKResponse.Add(obj);
+                schObj.History.Add(obj);
                 break;
 
         }
