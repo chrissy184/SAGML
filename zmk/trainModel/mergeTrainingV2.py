@@ -586,7 +586,7 @@ class TrainingViewModels:
             testSize=None
         return 'done'
     def trainModelObjectDict(self,modelObj,idforData,tensorboardLogFolder):
-        print ('modelObj???????????????????',modelObj)
+        # print ('modelObj???????????????????',modelObj)
         try:
             dataObj=modelObj['Data']
             print ('dataObj',dataObj)
@@ -598,7 +598,7 @@ class TrainingViewModels:
         except:
             scriptOutputPrepro=None
         
-        print ('scriptOutputPrepro',scriptOutputPrepro,dataObj,modelArch)
+        # print ('scriptOutputPrepro',scriptOutputPrepro,dataObj,modelArch)
         datHyperPara=modelObj['modelObj']['hyperparameters']
         
         if modelArch == 'NNModel':
@@ -1004,9 +1004,9 @@ class TrainingViewModels:
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
                         toExportDict[echMod]['modelPath']=tempDict[modObjeCom][echMod]['modelObj']['modelPath']
                         toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
-                        toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['modelObj']['dataSet']
 
                         if 'Data' in tempDict[modObjeCom][echMod]:
+                            toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['Data']
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
             if modObjeCom == 'score':
                 for echMod in toExportDict:
@@ -1036,8 +1036,8 @@ class TrainingViewModels:
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
                         toExportDict[echMod]['modelPath']=tempDict[modObjeCom][echMod]['modelObj']['modelPath']
                         toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
-                        toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['modelObj']['dataSet']
                         if 'Data' in tempDict[modObjeCom][echMod]:
+                            toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['Data']
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
     
         for modNa in listOfModelNames:
@@ -1131,7 +1131,7 @@ class TrainingViewModels:
         toExportDict2=toExportDict.copy()
         if ('train' in  list(tempDict.keys())) & ('score' in  list(tempDict.keys())):
             for modT in toExportDict:
-                print (modT, '>>>>>>>>>>>>>>>>>>>>>>>>>.')
+                # print (modT, '>>>>>>>>>>>>>>>>>>>>>>>>>.')
                 if 'preProcessingScript' in toExportDict2[modT]:
                     if len(set(toExportDict2[modT]['preProcessingScript']['scriptPath']))==1:
                         print ('came here agaa')
@@ -1146,7 +1146,7 @@ class TrainingViewModels:
                         toExportDict2[modT]['postProcessingScript']['scripts']=[toExportDict[modT]['postProcessingScript']['scripts'][0]]
                         toExportDict2[modT]['postProcessingScript']['scriptOutput']=[toExportDict[modT]['postProcessingScript']['scriptOutput'][0]]
 
-        print ('compleged to exportdict2  ',toExportDict2)
+        # print ('compleged to exportdict2  ',toExportDict2)
         tempTa2=list(toExportDict2.keys())
         tempTa2.sort()
         toExportReOrdered={}

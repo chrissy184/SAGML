@@ -2,7 +2,7 @@
 <PMML xmlns="http://www.dmg.org/PMML-4_3" version="4.4" type="multi">
     <Header copyright="Copyright (c) 2019 Software AG" description="Default Description">
         <Application name="Nyoka" version="3.0.9rc1"/>
-        <Timestamp>2019-12-20 11:28:49.257667</Timestamp>
+        <Timestamp>2020-01-03 11:52:48.670409</Timestamp>
     </Header>
 	<script for="model1" class="postprocessing" scriptPurpose="score" scriptOutput="NONE" filePath="testUseCase/supportData2/postproLinearModel.py">
         def postSriptCode1(scoreFrom1st):
@@ -86,7 +86,7 @@
 	input_df=False,sparse=False)),])" for="model1"/>
         <Extension name="modelObject" value="LinearRegression(copy_X=True, fit_intercept=True, n_jobs=None,
          normalize=False)" for="model1"/>
-        <Extension name="modelObject" value="&lt;keras.engine.training.Model object at 0x00000171E3CB1160&gt;" for="model2"/>
+        <Extension name="modelObject" value="&lt;keras.engine.training.Model object at 0x00000236AF6E6668&gt;" for="model2"/>
     </MiningBuildTask>
     <DataDictionary numberOfFields="8">
         <DataField name="cylinders" optype="continuous" dataType="double"/>
