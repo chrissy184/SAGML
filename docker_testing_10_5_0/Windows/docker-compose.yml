@@ -1,0 +1,51 @@
+version: '3.5'
+
+services:
+
+
+   zmm:
+    image: store/softwareag/zementis-modeler-zmm:10.5.0
+    container_name: zmm
+    command: /bin/bash -c "dotnet App.dll"
+    working_dir: /publish
+    volumes:
+      - shared-content:/ZMOD
+      - ./Code:/ZMOD/Code
+      - ./Data:/ZMOD/Data
+      - ./Models:/ZMOD/Models 
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./zmm/src/App:/publish/zmm/src/App
+
+    ports:
+      - "7007:7007"
+    expose:
+       - "7007"
+       - "8888"
+       - "8889"
+       - "8890"
+       - "6006"
+       - "6007"
+       - "6008"
+       - "8000"
+       - "8001"
+       - "8002"
+
+
+    restart: always
+
+    networks:
+      test:
+        ipv4_address: '172.20.0.3'
+
+
+networks:
+  test:
+    name: global-zmod-net
+    ipam:
+      driver: default
+      config:
+       - subnet: 172.20.0.0/24
+volumes:
+  shared-content:
+
+
