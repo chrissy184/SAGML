@@ -9,7 +9,7 @@ fi
 # echo 2nd argument $2
 set -a
 sed -i '' -e "/^hostdir=/d" ~/.zmod/.env 
-echo hostdir="$hostdir" >> ~/.zmod/.env
+echo hostdir="\"$hostdir\"" >> ~/.zmod/.env
 source ~/.zmod/.env
 # echo after sourcing .sh file $hostdir
 if [[ $1 = "up" || $1 = "" || $1 = "." ]];
