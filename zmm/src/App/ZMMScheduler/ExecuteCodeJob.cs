@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Quartz;
 using ZMM.App.PyServicesClient;
-
+using ZMM.Models.ResponseMessages;
+using System.Runtime.Serialization.Json;
 public class ExecuteCodeJob : IJob
 {
     public Task Execute(IJobExecutionContext context)
@@ -33,13 +34,20 @@ public class ExecuteCodeJob : IJob
                 writer.Close();               
                 var response = (HttpWebResponse) reqObj.GetResponse();
 
-                using(StreamReader rdr = new StreamReader(response.GetResponseStream()))
+               /*  using(StreamReader rdr = new StreamReader(response.GetResponseStream()))
                 {
                     string resp = rdr.ReadToEnd();
                     var jresp = JObject.Parse(resp);
                     jresp.Add("executedAt", DateTime.Now);
                     JobSchedulerHelper.AddZMKResponses(dataMap.GetString("id"),jresp.ToString(),"ExecuteCode");
-                }                
+                }  */ 
+                   using (var rdr = response.GetResponseStream())   
+                   {
+                       DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(ExecuteCodeResponse));  
+                       ExecuteCodeResponse executeCodeResp = (ExecuteCodeResponse)deserializer.ReadObject(rdr);  
+                       executeCodeResp.executedAt = DateTime.Now;
+                       JobSchedulerHelper.AddZMKResponses(dataMap.GetString("id"),executeCodeResp);
+                   }
             }
         }
         catch (Exception ex)

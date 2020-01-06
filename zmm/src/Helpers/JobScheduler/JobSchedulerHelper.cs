@@ -18,7 +18,7 @@ public static class JobSchedulerHelper
         {
             case "ExecuteCode":
                 var objExecute = JsonConvert.DeserializeObject<ExecuteCodeResponse>(resp);
-                schObj.History.Add(objExecute);                
+                schObj.History.Add(objExecute);
                 break;
             case "Train":
                 var obj = JsonConvert.DeserializeObject<TrainingResponse>(resp);
@@ -26,6 +26,17 @@ public static class JobSchedulerHelper
                 break;
 
         }
+        //update payload
+        SchedulerPayload.Update(schObj);
+
+        return result;
+    }
+    public static bool AddZMKResponses(string id, object resp)
+    {
+        bool result = false;
+        var schObj = SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault();
+        schObj.ZMKResponse.Add(resp);
+        schObj.History.Add(resp);
         //update payload
         SchedulerPayload.Update(schObj);
 
