@@ -6,7 +6,7 @@ Making and (re-)training machine learning and deep learning models.
 [![Build status](https://dev.azure.com/zementis-ai/Cumulocity%20IOT%20ML%20Workbench/_apis/build/status/CI-Pipeline%20(ZMOD))](https://dev.azure.com/zementis-ai/Cumulocity%20IOT%20ML%20Workbench/_build/latest?definitionId=6)
 
 <p align="left">
-  <img width="80%" src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/quick-snaps.gif">
+  <img width="100%" src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/quick-snaps.gif">
 </p>
 
 **Cumulocity IOT ML Workbench** is an open source machine learning and artificial intelligence platform for Data Scientist to solve business problems faster and quicker, build prototypes and convert them to actual project. The modeler helps from data preparation to model building and deployment, the tool supports a large variety of algorithms that can be run without a single line of code. The web based tool has various components which help Data Scientist of different skill levels to perfrom several model building tasks and provides deployment ready PMML files which can be hosted as a REST services.
