@@ -35,7 +35,7 @@ public static class JobSchedulerHelper
     {
         bool result = false;
         var schObj = SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault();
-        schObj.ZMKResponse.Add(resp);
+        //schObj.ZMKResponse.Add(resp);
         schObj.History.Add(resp);
         //update payload
         SchedulerPayload.Update(schObj);
