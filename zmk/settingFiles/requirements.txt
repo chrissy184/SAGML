@@ -69,6 +69,6 @@ update-checker==0.16
 uritemplate==3.0.1
 urllib3==1.25.7
 wcwidth==0.1.8
-Werkzeug==0.15.1
+Werkzeug==0.15.3
 wincertstore==0.2
 xgboost==0.81
