@@ -20,7 +20,19 @@ export class CumulocityComponent implements OnInit {
   public tenant = '';
   public dataSourceFiles: any;
   public aggregationOptions: string[] = ['MINUTELY', 'HOURLY', 'DAILY'];
-  public dataPoints: object[] = [];
+  public dataPoints: any[] = [
+    'c8y_Compass.compassY',
+    'c8y_Luxometer.lux',
+    'c8y_Gyroscope.gyroZ',
+    'c8y_Acceleration.accelerationZ',
+    'c8y_Acceleration.accelerationY',
+    'c8y_Compass.compassZ',
+    'c8y_Gyroscope.gyroX',
+    'c8y_Acceleration.accelerationX',
+    'c8y_Gyroscope.gyroY',
+    'c8y_Compass.compassX',
+    'c8y_SignalStrengthWifi.rssi'
+  ];
   @Output() cumulocitySuccess = new EventEmitter<any>();
 
   public seriesFilter: any = {
@@ -191,7 +203,11 @@ export class CumulocityComponent implements OnInit {
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(response => {
         console.log(response);
-        this.dataPoints = response.c8y_SupportedSeries;
+        if (this.selectedDevice.type === 'c8y_SensorPhone') {
+          this.dataPoints = this.dataPoints.concat(response.c8y_SupportedSeries);
+        } else {
+          this.dataPoints = response.c8y_SupportedSeries;
+        }
       }, responseError => {
         console.log(responseError);
       });
