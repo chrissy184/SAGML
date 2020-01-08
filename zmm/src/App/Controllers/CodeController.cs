@@ -311,6 +311,7 @@ namespace ZMM.App.Controllers
         [HttpGet("{id}/jupyter")]
         public async Task<IActionResult> GetJupyterNotebookUrlAsync(string id)
         {
+            //ToDo : $"{this.Request.Scheme}://{this.Request.Host}"
             string response = string.Empty;
             string _jUrl = string.Empty;
             string message = "Notebook is up and running successfully";
@@ -350,7 +351,6 @@ namespace ZMM.App.Controllers
                 };
                 InstancePayload.Create(objJNBInst);
                 notebookLinkURL = notebookLinkURL.Replace(@"//", @"/");
-                //
                 return Ok(new { user = CURRENT_USER, id = id, message = message, url = notebookLinkURL.Replace(notebookLinkURL.Substring(0, notebookLinkURL.IndexOf("jnb")), "") });
             }
             catch (Exception ex)
@@ -612,7 +612,8 @@ namespace ZMM.App.Controllers
                                 StartDate = cronjson["startDate"].ToString(),
                                 StartTimeH = (cronjson["startTimeH"].ToString() == null) ? "" : cronjson["startTimeH"].ToString(),
                                 StartTimeM = (cronjson["startTimeM"].ToString() == null) ? "" : cronjson["startTimeM"].ToString(),
-                                ZMKResponse = tresp.ToList<object>()
+                                ZMKResponse = tresp.ToList<object>(),
+                                History = tresp.ToList<object>()
                             };
                             SchedulerPayload.Create(schJob);
                             #endregion

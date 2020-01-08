@@ -59,6 +59,21 @@ namespace ZMM.App.Controllers
                 JObject jObj = JObject.Parse(jsonBody);
                 JArray jArr = (JArray)jObj["settings"];
                 var setList = jArr.ToObject<List<SettingProperty>>();
+
+                //fetch the original record
+                List<SettingProperty> setListOrig = ZSSettingPayload.GetSettingsByUser(zmodId).SelectMany(b => b.Settings).ToList<SettingProperty>();
+                foreach(var p in setList)
+                {
+                    if(p.username.Contains("******"))
+                    {
+                        p.username = setListOrig.Where(c => c.url == p.url).Select(c=> c.username).FirstOrDefault().ToString();
+                    }
+                    if(p.password.Contains("******"))
+                    {
+                        p.password = setListOrig.Where(c => c.url == p.url).Select(c=> c.password).FirstOrDefault().ToString();
+                    }
+                }
+
                 //add to payload
                 var newRecord = new ZSSettingResponse()
                 {
@@ -77,7 +92,7 @@ namespace ZMM.App.Controllers
 
         #region GET Settings
         [HttpGet("~/api/setting")]
-        public async Task<IActionResult> GetSettingsAsync(string type)
+        public async Task<IActionResult> GetSettingsAsync(string type,bool selected, bool unmask, bool showall)
         {
             //get the zmodId
             string UserEmailId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
@@ -85,17 +100,23 @@ namespace ZMM.App.Controllers
             await Task.FromResult(0);
             var settings = ZSSettingPayload.GetSettingsByUser(UserEmailId);
             List<SettingProperty> settingProperties;
+
             if(string.IsNullOrEmpty(type))
             {
                 settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();
             }
             else
-            {
-                settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();
-                settingProperties = settingProperties.Where(c=>c.type == $"{type}").ToList<SettingProperty>();
+            {                
+                settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>(); 
+
+                if(!string.IsNullOrEmpty(type) && (showall == true)) 
+                    settingProperties = settingProperties.Where(c=>c.type == $"{type}").ToList<SettingProperty>();
+                else
+                    settingProperties = settingProperties.Where(c=>c.type == $"{type}" && c.selected == selected).ToList<SettingProperty>();
             }
             // var selectedType = settingProperties.Where(c=>c.type == $"{type}").ToList<SettingProperty>();
             //
+            #region seed settings
             if(settings.Count == 0)
             {     
                 var template = new ZSSettingResponse
@@ -122,8 +143,22 @@ namespace ZMM.App.Controllers
                 };
 
                 jObj = JObject.Parse(JsonConvert.SerializeObject(template));  
-            }            
+            } 
+
+            #endregion
+                       
             jObj.Remove("zmodId");
+            //
+            foreach (var p in jObj["settings"])
+            {
+                if (unmask == false)
+                {
+                    p["username"] = "******";
+                    p["password"] = "******";
+                }
+            }
+            //
+
             return Json(jObj);
         }
         #endregion

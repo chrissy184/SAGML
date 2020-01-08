@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_3" version="4.3Ext">
+    <Header copyright="Copyright (c) 2018 Software AG" description="Neural Network Model">
+        <Timestamp>2018-11-29 3:06:00.10000</Timestamp>
+    </Header>
+    <Data filePath="C:\Users\swsh\Desktop\ZMODGit\ZMOD\ZMOD\Data\mpgFeatureData.csv" for="model1"/>
+    <DeepNetwork modelName="model1" numberOfLayers="4" taskType="trainAndscore">
+        <NetworkLayer layerType="Input" layerId="Input_2" connectionLayerId="NA" inputFieldName="base64String">
+            <LayerParameters inputDimension="(7, 1)" outputDimension="(7, 1)"/>
+        </NetworkLayer>
+        <NetworkLayer layerType="Dense" layerId="Dense_3" connectionLayerId="Input_2">
+            <LayerParameters activationFunction="rectifier" inputDimension="(7, 1)" outputDimension="(200,1)" units="200"/>
+            <LayerWeights weightsShape="(7,200)" weightsFlattenAxis="0">
+				data:float32;base64,                                    
+            </LayerWeights>
+            <LayerBias>
+				data:float32;base64,                                    
+            </LayerBias>
+        </NetworkLayer>
+        <NetworkLayer layerType="Dense" layerId="Dense_4" connectionLayerId="Dense_3">
+            <LayerParameters activationFunction="rectifier" inputDimension="(200, 1)" outputDimension="(50,1)" units="50"/>
+            <LayerWeights weightsShape="(200,50)" weightsFlattenAxis="0">
+				data:float32;base64,            
+            </LayerWeights>
+            <LayerBias>
+				data:float32;base64,            
+            </LayerBias>
+        </NetworkLayer>
+        <NetworkLayer layerType="Dense" layerId="Dense_5" connectionLayerId="Dense_4">
+            <LayerParameters activationFunction="linear" inputDimension="(50, 1)" outputDimension="(1,1)" units="1"/>
+            <LayerWeights weightsShape="(50,1)" weightsFlattenAxis="0">
+				data:float32;base64,
+            </LayerWeights>
+            <LayerBias>
+				data:float32;base64,
+            </LayerBias>
+        </NetworkLayer>
+    </DeepNetwork>
+</PMML>

@@ -3,6 +3,8 @@ import unittest
 import requests, os, json,sys
 from django.http import JsonResponse
 from utility.utilityClass import Utility
+from utility.codeUtilityClass import CodeUtilityClass
+
 import logging
 
 class TestUtility(unittest.TestCase):
@@ -11,6 +13,25 @@ class TestUtility(unittest.TestCase):
 	def setUpClass(self):
 		logging.info("******* Running Test Cases for Utility Class *******")
 
+	def test_4_CodeExecution(self):
+		logging.info("Test Case : Test Code execution.")
+		filePath = os.path.abspath('testUseCase/supportdata/testScriptSimple.py')
+		result = CodeUtilityClass.executeCode(filePath,[])
+		import json
+		self.assertEqual(json.loads(result.__dict__['_container'][0])['status'], "In Progress")
+		self.assertEqual(result.status_code, 200)
+		import time
+		time.sleep(3)
+		idForCheck=json.loads(result.__dict__['_container'][0])['idforData']
+		result2 = Utility().runningTaskList()
+		jLoad=json.loads(result2.__dict__['_container'][0])['runningTask']
+		# print(jLoad)#=result2.__dict__['_container']
+		for en in jLoad:
+		    if en['idforData']==idForCheck:
+		        checkval=True
+		        break
+		self.assertEqual(checkval, True)
+		logging.info("PASSED")
 
 	def test_1_downloadJSONFile(self):
 		logging.info("Test Case : Test download file for json file.")
@@ -55,7 +76,6 @@ class TestUtility(unittest.TestCase):
 		self.assertEqual(result.__dict__['_headers']['content-type'][1], 'application/xml')
 		os.remove('testUseCase/supportdata/test.pmml')
 		logging.info("PASSED")
-
 	
 	@classmethod
 	def tearDownClass(self):

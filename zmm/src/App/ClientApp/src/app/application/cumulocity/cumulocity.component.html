@@ -6,7 +6,8 @@
       <mat-error>required</mat-error>
     </mat-form-field>
     <mat-form-field class="col-sm-4">
-      <input matInput placeholder="Username" name="username" [(ngModel)]="username" required value="AnilKumar.Vuppala@softwareag.com">
+      <input matInput placeholder="Username" name="username" [(ngModel)]="username" required
+        value="AnilKumar.Vuppala@softwareag.com">
       <mat-error>required</mat-error>
     </mat-form-field>
     <mat-form-field class="col-sm-4">
@@ -20,8 +21,8 @@
     </div>
   </form>
 </div>
-<mat-button-toggle-group #group="matButtonToggleGroup" appearance='legacy' color='primary' *ngIf="listDevice || listFile"
-  value="listDevices">
+<mat-button-toggle-group #group="matButtonToggleGroup" appearance='legacy' color='primary'
+  *ngIf="listDevice || listFile" value="listDevices">
   <mat-button-toggle value="listDevices" (click)="listDevices()">Devices</mat-button-toggle>
   <mat-button-toggle value="listFiles" (click)="listFiles()">Files</mat-button-toggle>
 </mat-button-toggle-group>
@@ -31,26 +32,26 @@
   <ng-container matColumnDef="id">
     <th mat-header-cell *matHeaderCellDef> ID </th>
     <td mat-cell *matCellDef="let element" [ngClass]="{'mat-cell-selected': element.id === selectedDevice.id}">
-      {{element.id}} </td>
+      {{element?.id}} </td>
   </ng-container>
 
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef> Device Name </th>
     <td mat-cell *matCellDef="let element" [ngClass]="{'mat-cell-selected': element.id === selectedDevice.id}">
-      {{element.name }} </td>
+      {{element?.name }} </td>
   </ng-container>
 
   <ng-container matColumnDef="model">
     <th mat-header-cell *matHeaderCellDef> Model </th>
     <td mat-cell *matCellDef="let element" [ngClass]="{'mat-cell-selected': element.id === selectedDevice.id}">
-      {{element.c8y_Hardware.model }} </td>
+      {{element?.c8y_Hardware?.model }} </td>
   </ng-container>
 
   <!-- Weight Column -->
   <ng-container matColumnDef="status">
     <th mat-header-cell *matHeaderCellDef> Status </th>
     <td mat-cell *matCellDef="let element" [ngClass]="{'mat-cell-selected': element.id === selectedDevice.id}">
-      {{element.c8y_Connection.status }} </td>
+      {{element?.c8y_Connection?.status }} </td>
   </ng-container>
 
   <!-- Symbol Column -->
@@ -128,12 +129,13 @@
     <form class="p-3" #seriesForm="ngForm">
 
       <mat-form-field class="w-100 pr-1">
-        <input matInput [(ngModel)]="seriesFilter.fileName" placeholder="File Name" name="fileName" type="text" required>
+        <input matInput [(ngModel)]="seriesFilter.fileName" placeholder="File Name" name="fileName" type="text"
+          required>
       </mat-form-field>
 
       <mat-form-field class="w-50 pr-2">
-        <input matInput (click)="pickerDateFrom.open()" [(ngModel)]="seriesFilter.dateFrom" [max]="seriesFilter.dateTo" [matDatepicker]="pickerDateFrom"
-          placeholder="Date From" name="dateFrom" readonly>
+        <input matInput (click)="pickerDateFrom.open()" [(ngModel)]="seriesFilter.dateFrom" [max]="seriesFilter.dateTo"
+          [matDatepicker]="pickerDateFrom" placeholder="Date From" name="dateFrom" readonly>
         <mat-datepicker-toggle matSuffix [for]="pickerDateFrom"></mat-datepicker-toggle>
         <mat-datepicker #pickerDateFrom></mat-datepicker>
       </mat-form-field>
@@ -146,8 +148,8 @@
       </mat-form-field>
 
       <mat-form-field class="w-50 pr-2">
-        <input matInput (click)="pickerDateTo.open()" [(ngModel)]="seriesFilter.dateTo" [min]="seriesFilter.dateFrom" [matDatepicker]="pickerDateTo"
-          placeholder="Date To" name="dateTo" readonly>
+        <input matInput (click)="pickerDateTo.open()" [(ngModel)]="seriesFilter.dateTo" [min]="seriesFilter.dateFrom"
+          [matDatepicker]="pickerDateTo" placeholder="Date To" name="dateTo" readonly>
         <mat-datepicker-toggle matSuffix [for]="pickerDateTo"></mat-datepicker-toggle>
         <mat-datepicker #pickerDateTo></mat-datepicker>
       </mat-form-field>
@@ -168,8 +170,7 @@
       </mat-form-field>
       <mat-form-field class="w-100">
         <mat-select [(ngModel)]="seriesFilter.series" placeholder="Data Points" name="series" multiple required>
-          <mat-option *ngFor="let option of dataPoints" [value]="option.type+'.'+option.name">{{option.type}} =>
-            {{option.name}}</mat-option>
+          <mat-option *ngFor="let option of dataPoints" [value]="option">{{option}}</mat-option>
         </mat-select>
         <mat-error>required</mat-error>
       </mat-form-field>

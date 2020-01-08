@@ -1037,8 +1037,6 @@ namespace ZMM.App.Controllers
                     {
                         try
                         {
-                            /* TODO: Add code to call ZMK service to get compatible pmml*/
-                            RemoveAttribuesIfPresentInPMMLFileBeforeDeploy(record.FilePath);
                             string zmkResponse = await zmeClient.PostConvertPmmlAsync(record.FilePath, record.FilePath.Replace(id, $"Converted_{id}"));
                             Logger.LogInformation("PostZSUploadPmmlAsync ZMK Response after post " + zmkResponse);
                             if (!string.IsNullOrEmpty(zmkResponse) && !zmkResponse.Contains("Failed"))
@@ -1105,21 +1103,6 @@ namespace ZMM.App.Controllers
 
         #endregion
         
-        #region Work around for anomaly detection in pmml as suggested by Vinay, this should be removed or re-factored
-        //It removes attribute for=model1 and score
-        private void RemoveAttribuesIfPresentInPMMLFileBeforeDeploy(string PMMLModel)
-        {
-            FileInfo FInfo = new FileInfo(PMMLModel);
-            string Contents = string.Empty;
-            if(FInfo.Extension.ToLower().Equals(".pmml"))
-            {
-                Contents = System.IO.File.ReadAllText(PMMLModel);
-                Contents = Contents.Replace("for=\"model1\"/>", "/>");
-                Contents = Contents.Replace("taskType=\"score\">", ">");
-                System.IO.File.WriteAllText(PMMLModel, Contents);
-            }            
-        }
-        #endregion
 
         #region Get deployed models
         [HttpGet("~/api/model/deployed")]

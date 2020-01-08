@@ -30,6 +30,8 @@ autoMLutilities = autoMLutilities.AutoMLUtilities()
 class Utility:
 
 	def convertZMKtoZS(inputFile,outputFile=None):
+
+		# print (inputFile,outputFile)
 		with open(inputFile,'r') as ff:
 			zmkFile = ff.read()
 		zmkFile = zmkFile.replace('architectureName="TrainedModel"','architectureName="mobilenet"')
@@ -74,8 +76,8 @@ class Utility:
 
 		if not outputFile:
 			outputFile=inputFile
-		with open(outputFile,'w') as ff:
-			ff.writelines(new_lines)
+		with open(outputFile,'w') as kk:
+			kk.writelines(new_lines)
 		return JsonResponse({'filePath':outputFile},status=201)
 
 	def downloadPMML(filePath):

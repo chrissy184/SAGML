@@ -20,63 +20,7 @@ export class CumulocityComponent implements OnInit {
   public tenant = '';
   public dataSourceFiles: any;
   public aggregationOptions: string[] = ['MINUTELY', 'HOURLY', 'DAILY'];
-  public dataPoints: object[] = [
-    {
-      'unit': 'uT',
-      'name': 'compassY',
-      'type': 'c8y_Compass'
-    },
-    {
-      'unit': 'lux',
-      'name': 'lux',
-      'type': 'c8y_Luxometer'
-    },
-    {
-      'unit': '°/s',
-      'name': 'gyroZ',
-      'type': 'c8y_Gyroscope'
-    },
-    {
-      'unit': 'G',
-      'name': 'accelerationZ',
-      'type': 'c8y_Acceleration'
-    },
-    {
-      'unit': 'G',
-      'name': 'accelerationY',
-      'type': 'c8y_Acceleration'
-    },
-    {
-      'unit': 'uT',
-      'name': 'compassZ',
-      'type': 'c8y_Compass'
-    },
-    {
-      'unit': '°/s',
-      'name': 'gyroX',
-      'type': 'c8y_Gyroscope'
-    },
-    {
-      'unit': 'G',
-      'name': 'accelerationX',
-      'type': 'c8y_Acceleration'
-    },
-    {
-      'unit': '°/s',
-      'name': 'gyroY',
-      'type': 'c8y_Gyroscope'
-    },
-    {
-      'unit': 'uT',
-      'name': 'compassX',
-      'type': 'c8y_Compass'
-    },
-    {
-      'unit': 'dBm',
-      'name': 'rssi',
-      'type': 'c8y_SignalStrengthWifi'
-    }
-  ];
+  public dataPoints: object[] = [];
   @Output() cumulocitySuccess = new EventEmitter<any>();
 
   public seriesFilter: any = {
@@ -101,7 +45,14 @@ export class CumulocityComponent implements OnInit {
 
   public getSettings() {
     this.isContentLoading = true;
-    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.settings)
+    const options = {
+      params: {
+        type: 'C8Y',
+        selected: true,
+        unmask: true
+      }
+    };
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.settings, options)
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(response => {
         console.log(response);
@@ -134,7 +85,9 @@ export class CumulocityComponent implements OnInit {
       params: {
         pageSize: 100,
         withTotalPages: true,
-        type: 'c8y_SensorPhone'
+        // type: 'c8y_SensorPhone'
+        q: '',
+        withGroups: true
       },
       headers: this.headers
     };
@@ -144,6 +97,7 @@ export class CumulocityComponent implements OnInit {
       .subscribe(response => {
         console.log(response);
         this.dataSourceDevices = response.managedObjects;
+        console.log(this.dataSourceDevices);
       }, responseError => {
         console.log(responseError);
       });
@@ -229,6 +183,19 @@ export class CumulocityComponent implements OnInit {
     this.seriesFilter.source = this.selectedDevice.id;
     console.log(device);
     this.seriesFilter.fileName = '';
+    const options = {
+      headers: this.headers
+    };
+    this.isContentLoading = true;
+    this.apiService.request(ApiRoutes.methods.GET, `${this.c8y.url}/inventory/managedObjects/${this.selectedDevice.id}/supportedSeries`, options)
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(response => {
+        console.log(response);
+        this.dataPoints = response.c8y_SupportedSeries;
+      }, responseError => {
+        console.log(responseError);
+      });
+    //https://ai.eu-latest.cumulocity.com/inventory/managedObjects/12522/supportedSeries
   }
 
   public submitSeriesParameters() {

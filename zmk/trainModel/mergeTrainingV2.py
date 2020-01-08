@@ -94,6 +94,8 @@ class NewModelOperations:
             nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,NearestNeighborModel=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='NaiveBayesModel':
             nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,NaiveBayesModel=[singMod['pmmlModelObject']])
+        elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='TreeModel':
+            nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,TreeModel=[singMod['pmmlModelObject']])
         else:
             nyokaObj=None
         return nyokaObj
@@ -150,6 +152,7 @@ class NewModelOperations:
             tempDict['score']={}
             print ('print  step LM 1')
             for singMod in modelObj:
+                # print (singMod['pmmlModelObject'].taskType,singMod['pmmlModelObject'].modelName)
                 if singMod['pmmlModelObject'].taskType=='trainAndscore':
                     tempDict['train'][singMod['pmmlModelObject'].modelName]={}
                     tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
@@ -172,7 +175,7 @@ class NewModelOperations:
             for taType in tempDict:
                 tempTa=list(tempDict[taType].keys())
                 tempTa.sort()
-    
+
                 for taTTemp in tempTa:
                     if taType in tempDict2:
                         pass
@@ -307,9 +310,6 @@ class NewModelOperations:
             else:
                 messageToWorld= "Model Loaded Successfully"
                 reStat=200
-
-
-            
         except:
             messageToWorld="Model load failed, please connect with admin"
             pmmlFileForKey=None
@@ -586,7 +586,7 @@ class TrainingViewModels:
             testSize=None
         return 'done'
     def trainModelObjectDict(self,modelObj,idforData,tensorboardLogFolder):
-        print ('modelObj???????????????????',modelObj)
+        # print ('modelObj???????????????????',modelObj)
         try:
             dataObj=modelObj['Data']
             print ('dataObj',dataObj)
@@ -598,7 +598,7 @@ class TrainingViewModels:
         except:
             scriptOutputPrepro=None
         
-        print ('scriptOutputPrepro',scriptOutputPrepro,dataObj,modelArch)
+        # print ('scriptOutputPrepro',scriptOutputPrepro,dataObj,modelArch)
         datHyperPara=modelObj['modelObj']['hyperparameters']
         
         if modelArch == 'NNModel':
@@ -1004,9 +1004,9 @@ class TrainingViewModels:
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
                         toExportDict[echMod]['modelPath']=tempDict[modObjeCom][echMod]['modelObj']['modelPath']
                         toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
-                        toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['modelObj']['dataSet']
 
                         if 'Data' in tempDict[modObjeCom][echMod]:
+                            toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['Data']
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
             if modObjeCom == 'score':
                 for echMod in toExportDict:
@@ -1036,8 +1036,8 @@ class TrainingViewModels:
                         toExportDict[echMod]['hyperparameters']=tempDict[modObjeCom][echMod]['modelObj']['hyperparameters']
                         toExportDict[echMod]['modelPath']=tempDict[modObjeCom][echMod]['modelObj']['modelPath']
                         toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
-                        toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['modelObj']['dataSet']
                         if 'Data' in tempDict[modObjeCom][echMod]:
+                            toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['Data']
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
     
         for modNa in listOfModelNames:
@@ -1131,7 +1131,7 @@ class TrainingViewModels:
         toExportDict2=toExportDict.copy()
         if ('train' in  list(tempDict.keys())) & ('score' in  list(tempDict.keys())):
             for modT in toExportDict:
-                print (modT, '>>>>>>>>>>>>>>>>>>>>>>>>>.')
+                # print (modT, '>>>>>>>>>>>>>>>>>>>>>>>>>.')
                 if 'preProcessingScript' in toExportDict2[modT]:
                     if len(set(toExportDict2[modT]['preProcessingScript']['scriptPath']))==1:
                         print ('came here agaa')
@@ -1146,7 +1146,7 @@ class TrainingViewModels:
                         toExportDict2[modT]['postProcessingScript']['scripts']=[toExportDict[modT]['postProcessingScript']['scripts'][0]]
                         toExportDict2[modT]['postProcessingScript']['scriptOutput']=[toExportDict[modT]['postProcessingScript']['scriptOutput'][0]]
 
-        print ('compleged to exportdict2  ',toExportDict2)
+        # print ('compleged to exportdict2  ',toExportDict2)
         tempTa2=list(toExportDict2.keys())
         tempTa2.sort()
         toExportReOrdered={}
@@ -1226,7 +1226,7 @@ class TrainingViewModels:
             kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Saved in different Version')
         else:
             copyOrgFName=newNameFile
-            kerasUtilities.updateStatusOfTraining(self.statusFile,'Model Saved')
+            kerasUtilities.updateStatusOfTraining(self.statusFile,'Complete')
         import shutil
         from nyokaBase.skl.skl_to_pmml import model_to_pmml
         try:

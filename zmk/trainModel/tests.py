@@ -110,66 +110,90 @@ class TestTrainModel(unittest.TestCase):
 		logging.info("PASSED")
 
 
-# 	def test_6_trainNNModel(self):
-# 		logging.info("Test Case : Train NN model.")
-# 		filePath = 'testUseCase/supportdata/irisNN.pmml'
-# 		logFolder = 'testUseCase/supportdata/logs'
-# 		payload={"batchSize":15,
-#             "epoch":10,
-#             "stepPerEpoch":10,
-#             "learningRate":0.001,
-#             "loss":"categorical_crossentropy",
-#             "metrics":["accuracy"],
-#             "optimizer":"Adam",
-#             "testSize":0.3,
-#             "scriptOutput":"NA",
-#             "problemType":"classification",
-#             "filePath":os.path.abspath(filePath),
-#             "tensorboardLogFolder":os.path.abspath(logFolder),
-#             "tensorboardUrl":'',
-#             'dataFolder':''}
-# 		result = Training.trainNeuralNetworkModels(payload)
-# 		result = json.loads(result.__dict__['_container'][0])
-# 		self.assertEqual(result['pmmlFile'], filePath.split('/')[-1].replace('.pmml',''))
-# 		self.assertEqual(result['idforData'], filePath.split('/')[-1].replace('.pmml',''))
-# 		self.assertEqual(result['status'], 'In Progress')
-# 		self.assertEqual('pID' in result, True)
-# 		Utility.deleteTaskfromMemory(result['idforData'])
-# 		logging.info("PASSED")
+    # def testtrainDNN(self):
+    #     projectID = 'xyz1'
+
+    #     payLoad={"batchSize":15,"epoch":100,"stepPerEpoch":10,"learningRate":0.001,"loss":"MAE",
+    #     "metrics":["MAE"],"optimizer":"Adam","testSize":0.3,"scriptOutput":"NA","problemType":"regression"}
+    #     # result = Training().trainNeuralNetworkModels(payLoad, projectID)
+    #     nntrainer = mergeTrainingNN.NeuralNetworkModelTrainer()
+
+    #     idforData='12345'
+    #     tensorboardLogFolder=''
+    #     hyperParaUser=payLoad
+    #     pmmlFile=''
 
 
-# 	def test_7_compileModel(self):
-# 		logging.info("Test Case : Compile a model.(1)")
-# 		filePath = 'testUseCase/supportdata/irisNN.pmml'
-# 		from nyokaBase import PMML43Ext as ny
-# 		pmmlObj = ny.parse(open(filePath,'r'),silence=True)
-# 		from trainModel.mergeTrainingNN import NeuralNetworkModelTrainer
-# 		nn = NeuralNetworkModelTrainer()
-# 		nn.pmmlfileObj = pmmlObj
-# 		returnVal = nn.generateAndCompileModel('mean_squared_error','adam',0.1,['accuracy','f1'],compileTestOnly=True)
-# 		self.assertEqual('nyoka_pmml' in returnVal.__dict__, True)
-# 		self.assertEqual('model' in returnVal.__dict__, True)
-# 		self.assertEqual(returnVal.nyoka_pmml.__class__.__name__, 'PMML')
-# 		self.assertEqual(returnVal.__class__.__name__,'GenerateKerasModel')
+	# 	nntrainer.train(idforData,pmmlFile,tensorboardLogFolder,hyperParaUser,pmmlFile)
+    #     result = json.loads(result.__dict__['_container'][0])
+    #     # print ("result",result)
+    #     # self.assertEqual(result['filePath'],filePath)
+    #     self.assertEqual(result['status'],'In Progress')
+    #     self.assertEqual(result['taskName'],'In Progress')
+    #     self.assertEqual(result['type'],'NNProject')
+    #     logging.info("PASSED")
 
 
-# 	def test_8_compileModel(self):
-# 		logging.info("Test Case : Compile a model.(2)")
-# 		filePath = 'testUseCase/supportdata/from_sklearn.pmml'
-# 		from nyokaBase import PMML43Ext as ny
-# 		pmmlObj = ny.parse(open(filePath,'r'),silence=True)
-# 		from trainModel.mergeTrainingNN import NeuralNetworkModelTrainer
-# 		nn = NeuralNetworkModelTrainer()
-# 		nn.pmmlfileObj = pmmlObj
-# 		returnVal = nn.generateAndCompileModel('mean_squared_error','adam',0.1,['accuracy','f1'],compileTestOnly=True)
-# 		self.assertEqual('status' in returnVal, True)
-# 		self.assertEqual('errorMessage' in returnVal, True)
-# 		self.assertEqual('errorTraceback' in returnVal, True)
-# 		self.assertEqual(returnVal['status'],'Model Compilation Failed')
+# # 	def test_6_trainNNModel(self):
+# # 		logging.info("Test Case : Train NN model.")
+# # 		filePath = 'testUseCase/supportdata/irisNN.pmml'
+# # 		logFolder = 'testUseCase/supportdata/logs'
+# # 		payload={"batchSize":15,
+# #             "epoch":10,
+# #             "stepPerEpoch":10,
+# #             "learningRate":0.001,
+# #             "loss":"categorical_crossentropy",
+# #             "metrics":["accuracy"],
+# #             "optimizer":"Adam",
+# #             "testSize":0.3,
+# #             "scriptOutput":"NA",
+# #             "problemType":"classification",
+# #             "filePath":os.path.abspath(filePath),
+# #             "tensorboardLogFolder":os.path.abspath(logFolder),
+# #             "tensorboardUrl":'',
+# #             'dataFolder':''}
+# # 		result = Training.trainNeuralNetworkModels(payload)
+# # 		result = json.loads(result.__dict__['_container'][0])
+# # 		self.assertEqual(result['pmmlFile'], filePath.split('/')[-1].replace('.pmml',''))
+# # 		self.assertEqual(result['idforData'], filePath.split('/')[-1].replace('.pmml',''))
+# # 		self.assertEqual(result['status'], 'In Progress')
+# # 		self.assertEqual('pID' in result, True)
+# # 		Utility.deleteTaskfromMemory(result['idforData'])
+# # 		logging.info("PASSED")
 
 
-# 	@classmethod
-# 	def tearDownClass(self):
-# 		logging.info("******* Finished Test Cases for Train Model Class *******\n")
+# # 	def test_7_compileModel(self):
+# # 		logging.info("Test Case : Compile a model.(1)")
+# # 		filePath = 'testUseCase/supportdata/irisNN.pmml'
+# # 		from nyokaBase import PMML43Ext as ny
+# # 		pmmlObj = ny.parse(open(filePath,'r'),silence=True)
+# # 		from trainModel.mergeTrainingNN import NeuralNetworkModelTrainer
+# # 		nn = NeuralNetworkModelTrainer()
+# # 		nn.pmmlfileObj = pmmlObj
+# # 		returnVal = nn.generateAndCompileModel('mean_squared_error','adam',0.1,['accuracy','f1'],compileTestOnly=True)
+# # 		self.assertEqual('nyoka_pmml' in returnVal.__dict__, True)
+# # 		self.assertEqual('model' in returnVal.__dict__, True)
+# # 		self.assertEqual(returnVal.nyoka_pmml.__class__.__name__, 'PMML')
+# # 		self.assertEqual(returnVal.__class__.__name__,'GenerateKerasModel')
+
+
+# # 	def test_8_compileModel(self):
+# # 		logging.info("Test Case : Compile a model.(2)")
+# # 		filePath = 'testUseCase/supportdata/from_sklearn.pmml'
+# # 		from nyokaBase import PMML43Ext as ny
+# # 		pmmlObj = ny.parse(open(filePath,'r'),silence=True)
+# # 		from trainModel.mergeTrainingNN import NeuralNetworkModelTrainer
+# # 		nn = NeuralNetworkModelTrainer()
+# # 		nn.pmmlfileObj = pmmlObj
+# # 		returnVal = nn.generateAndCompileModel('mean_squared_error','adam',0.1,['accuracy','f1'],compileTestOnly=True)
+# # 		self.assertEqual('status' in returnVal, True)
+# # 		self.assertEqual('errorMessage' in returnVal, True)
+# # 		self.assertEqual('errorTraceback' in returnVal, True)
+# # 		self.assertEqual(returnVal['status'],'Model Compilation Failed')
+
+
+# # 	@classmethod
+# # 	def tearDownClass(self):
+# # 		logging.info("******* Finished Test Cases for Train Model Class *******\n")
 
 		

@@ -135,6 +135,12 @@ class NyokaServer:
 	# @csrf_exempt
 	# @api_view(['POST'])
 	# @schema(addArchitectureSwagger)
+
+	def removeArch(projectID):
+		del MEMORY_DICT_ARCHITECTURE[projectID]
+		tempMemRe={'status':'removed'}
+		return JsonResponse(tempMemRe)
+
 	def addArchitectureToGlobalMemoryDict(projectID,filePath):
 		global MEMORY_DICT_ARCHITECTURE
 		try:
@@ -597,6 +603,7 @@ class NyokaServer:
 		return JsonResponse(returntoClient)
 
 	def updatetoWorkflow(payload,projectID):
+		global MEMORY_DICT_ARCHITECTURE
 
 		# print (payload)
 
@@ -741,7 +748,40 @@ class NyokaServer:
 		return JsonResponse(returntoClient)
 
 	def deleteWorkflowlayer(payload,projectID):
-		message={'message':'Success'}
+		# print ('/npayload',payload)
+		global MEMORY_DICT_ARCHITECTURE
+		if 'toExportDict' in MEMORY_DICT_ARCHITECTURE[projectID]:
+			tempMemoryToReplace=MEMORY_DICT_ARCHITECTURE[projectID]#['toExportDict']
+			toExportDictExist=tempMemoryToReplace['toExportDict']
+			tempSecMemModelInfo=tempMemoryToReplace['tempSecMem']
+			# print (toExportDictExist)
+
+			modelFromWhereToDelete=tempSecMemModelInfo[payload['layerDelete']['sectionId']]
+
+			if payload['layerDelete']['name']=='Code':
+				if payload['layerDelete']['taskType']=='postprocessing':
+					toExportDictExist[modelFromWhereToDelete]['postProcessingScript']=None
+				elif payload['layerDelete']['taskType']=='preprocessing':
+					toExportDictExist[modelFromWhereToDelete]['preProcessingScript']=None
+
+			if payload['layerDelete']['name']=='Data':
+				toExportDictExist[modelFromWhereToDelete]['data']=None
+
+			if payload['layerDelete']['name']=='Model':
+				toExportDictExist[modelFromWhereToDelete]['modelObj']=None
+
+
+			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']=toExportDictExist
+
+			from nyokaBase.skl.skl_to_pmml import model_to_pmml
+			model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
+
+
+			# print ('/n  ************************* ',MEMORY_DICT_ARCHITECTURE[projectID])
+			
+			message={'message':'Success'}
+		else:
+			message={'message':'Failure'}
 		return JsonResponse(message)
 
 
