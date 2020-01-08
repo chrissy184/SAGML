@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
@@ -168,49 +169,38 @@ namespace ZMM.Tasks
 
         public int GetAvailablePort(int StartingPortInRange, int EndingPortInRange)
         {
-            List<int> PortArray = GetAvailablePortInRange(StartingPortInRange,EndingPortInRange);
-            for (int i = StartingPortInRange; i<= EndingPortInRange; i++)
-            {    
-                if (!PortArray.Contains(i))
-                    return i;
-            }
-            return 0;
+            List<int> PortArray = GetListOfFreePortInRange(StartingPortInRange,EndingPortInRange);
+            if(PortArray.Count > 0) return PortArray.First();
+            else return 0;
         }
 
-        private List<int> GetAvailablePortInRange(int StartingPortInRange, int EndingPortInRange)
+        public static List<int> GetListOfFreePortInRange(int StartingPortInRange, int EndingPortInRange)
         {
-            IPEndPoint [] EndPoints;
             List<int> PortArray = new List<int>();
-            try
+            bool isPortFree = false;
+            TcpClient TempClient;
+            for(int i=StartingPortInRange; i<=EndingPortInRange; i++)
             {
-                IPGlobalProperties Properties = IPGlobalProperties.GetIPGlobalProperties();
-                // getting active connections 
-                TcpConnectionInformation[] Connections = Properties.GetActiveTcpConnections();
-                PortArray.AddRange(from n in Connections
-                                    where n.LocalEndPoint.Port >= StartingPortInRange
-                                    select n.LocalEndPoint.Port);
-
-                // getting active tcp listeneres - wcf service Listening in tcp
-                EndPoints = Properties.GetActiveTcpListeners();
-                PortArray.AddRange(from n in EndPoints
-                                    where n.Port >= StartingPortInRange
-                                    select n.Port);
-
-                PortArray.Sort();
-            }
-            catch(Exception ex)
-            {
-                System.Console.Error.WriteLine(ex.StackTrace);
-            }
+                isPortFree = true;
+                try
+                {                    
+                    TempClient = new TcpClient("localhost", i);   
+                    isPortFree = !TempClient.Connected;                
+                }
+                catch(Exception ex){Console.WriteLine(">> Looking for busy port " + i + " ex " + ex.Message + "  portisfree " + isPortFree);}
+                if(isPortFree) PortArray.Add(i);
+            }            
             return PortArray;
         }
-        public bool IsPortAvailableInRange(int TestPort, int StartingPortInRange, int EndingPortInRange)
+
+        public bool IsPortBusyInRange(int TestPort, int StartingPortInRange, int EndingPortInRange)
         {
             bool Status = false;
-            List<int> PortArray = GetAvailablePortInRange(StartingPortInRange,EndingPortInRange);
+            List<int> PortArray = GetListOfFreePortInRange(StartingPortInRange,EndingPortInRange);
             Status = !PortArray.Contains(TestPort);
-            Console.WriteLine("IsPortAvailableInRange " + StartingPortInRange + " , " + EndingPortInRange + "  : " + string.Join(',', PortArray) + "  Out : " + Status);
+            Console.WriteLine(">> IsPortBusyInRange updated " + StartingPortInRange + " , " + EndingPortInRange + "  : " + string.Join(',', PortArray) + "  Out : " + Status);
             return Status;            
         }
+
     }
 }
