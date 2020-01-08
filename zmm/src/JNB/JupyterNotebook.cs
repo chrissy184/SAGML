@@ -157,12 +157,12 @@ namespace ZMM.Tools.JNB
                 if (tokenId != string.Empty) break;
                 else
                 {
-                    if(IsPortAvailableInRange(TaskPort, ListOfAllowedPorts.First(), ListOfAllowedPorts.Last())) Console.WriteLine("Waiting for task expected port " + TaskPort + "  to start"); 
-                    else 
+                    if(IsPortBusyInRange(TaskPort, ListOfAllowedPorts.First(), ListOfAllowedPorts.Last())) 
                     {
                         Console.WriteLine("Waiting for token id...");                        
                         tokenId = GetToken(task);
                     }
+                    else Console.WriteLine("Waiting for task expected port " + TaskPort + "  to start");
                     System.Threading.Thread.Sleep(500);
                 }
             }
