@@ -2,7 +2,7 @@
 
 
 import sys, os
-import nyokaBase.PMML43Ext as pml
+import nyoka.PMML43Ext as pml
 import ast
 import numpy as np
 from datetime import datetime

@@ -18,7 +18,7 @@ from rest_framework.decorators import api_view,schema
 import requests, json,sys,subprocess, typing
 
 from nyokaserver import nyokaUtilities,nyokaPMMLUtilities
-from nyokaBase import PMML43Ext as pml
+from nyoka import PMML43Ext as pml
 from nyokaserver.nyokaServerClass import NyokaServer
 
 

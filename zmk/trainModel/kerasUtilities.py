@@ -1,8 +1,8 @@
 # utilities.py
 
-# from nyokaBase.keras.keras_model_to_pmml import KerasToPmml
-from nyokaBase.keras.pmml_to_keras_model import GenerateKerasModel 
-from nyokaBase import PMML43Ext as ny
+# from nyoka.keras.keras_model_to_pmml import KerasToPmml
+from nyoka.keras.pmml_to_keras_model import GenerateKerasModel 
+from nyoka import PMML43Ext as ny
 from keras.preprocessing.image import ImageDataGenerator
 
 from keras.preprocessing import image
@@ -121,8 +121,8 @@ class KerasUtilities:
                 checkMRCNN=False
             #MaskRcnn model
             if (nyoka_pmml_obj.DeepNetwork)  and (checkMRCNN==True):
-                from nyokaBase.mrcnn import pmml_to_maskrcnn
-                from nyokaBase.mrcnn import model as modellib
+                from nyoka.mrcnn import pmml_to_maskrcnn
+                from nyoka.mrcnn import model as modellib
                 predClasses=self.getPredClasses(nyoka_pmml_obj)
                 modelFolder='./logs/MaskRCNNWei_'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
                 self.checkCreatePath(modelFolder)
@@ -178,7 +178,7 @@ class KerasUtilities:
                     tf_session = Session()
                     with tf_session.as_default():
                         print ('step 5')
-                        from nyokaBase.keras.pmml_to_keras_model import GenerateKerasModel
+                        from nyoka.keras.pmml_to_keras_model import GenerateKerasModel
                         print ('step 5.1')
                         model_net = GenerateKerasModel(nyoka_pmml_obj)
                         print ('step 5.2')
@@ -210,7 +210,7 @@ class KerasUtilities:
             #Sklearn Model
             else:
                 print ('Next Step 2 >>>>>>>>>>>>')
-                from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
+                from nyoka.reconstruct.pmml_to_pipeline_model import generate_skl_model
                 print ('Next Step 3 >>>>>>>>>>>>')
                 sklModelPipeline=generate_skl_model(filepath)
                 print ('Next Step 4 >>>>>>>>>>>>')

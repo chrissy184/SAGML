@@ -428,7 +428,7 @@ class AutoMLTrainer:
                         }
             try:
                 # print ('toExportDict >>>>>>>>>>>> ',toExportDict)
-                from nyokaBase.skl.skl_to_pmml import model_to_pmml
+                from nyoka.skl.skl_to_pmml import model_to_pmml
                 model_to_pmml(toExportDict, PMMLFileName=finalPMMLfile)
                 print ('>>>>>>>>>>>>>>>>>>>>>>> Success')
                 procComp=False
@@ -558,7 +558,7 @@ class AnomalyTrainer:
                     }
         try:
             print ('toExportDict >>>>>>>>>>>> ',toExportDict)
-            from nyokaBase.skl.skl_to_pmml import model_to_pmml
+            from nyoka.skl.skl_to_pmml import model_to_pmml
             model_to_pmml(toExportDict, PMMLFileName=finalPMMLfile)
             print ('>>>>>>>>>>>>>>>>>>>>>>> Success')
         except Exception as e:
