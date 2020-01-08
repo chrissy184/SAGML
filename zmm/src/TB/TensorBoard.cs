@@ -140,12 +140,12 @@ namespace ZMM.Tools.TB
                 if (Status) break;
                 else
                 {
-                    if(IsPortAvailableInRange(TaskPort, ListOfAllowedPorts.First(), ListOfAllowedPorts.Last())) Console.WriteLine("Waiting for task port to start " + TaskPort);
-                    else 
+                    if(IsPortBusyInRange(TaskPort, ListOfAllowedPorts.First(), ListOfAllowedPorts.Last())) 
                     {
                         Console.WriteLine("Waiting for token id");                        
                         Status = WaitForStartupMessage(task);
                     }
+                    else Console.WriteLine("Waiting for task port to start " + TaskPort);
                     System.Threading.Thread.Sleep(1000);
                 }
             }
