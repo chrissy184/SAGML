@@ -53,5 +53,6 @@ export const ApiRoutes = {
     instance: 'instances',
     instanceKill: (id: string) => `instances/${id}`,
 
-    settings: 'setting'
+    settings: 'setting',
+    datahub: 'datahub'
 };
