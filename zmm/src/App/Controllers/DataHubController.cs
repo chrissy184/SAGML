@@ -60,7 +60,7 @@ namespace ZMM.App.Controllers
                 reqBody = reader.ReadToEnd().ToString();
             }
             JObject jsonBody = JObject.Parse(reqBody);
-            reqSql = jsonBody["sql"].ToString();
+            reqSql = jsonBody["sql"].ToString().Replace("'","\"");                     
             //
 
 
