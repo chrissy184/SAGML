@@ -1,5 +1,5 @@
 # Cumulocity IOT ML Workbench
-[<img src="https://demo.zmod.org/assets/logo-aw.png" alt="zmod_logo" height="80" style="float:right"/>](https://www.zmod.org/)
+[<img src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/logo.png" alt="zmod_logo" height="100" style="float:right"/>](https://www.zmod.org/)
 
 Making and (re-)training machine learning and deep learning models.
 
