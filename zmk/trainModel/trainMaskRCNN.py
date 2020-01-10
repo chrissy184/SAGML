@@ -191,7 +191,7 @@ class ObjectDetetctionModels():
 
 		
 
-		from nyokaBase.mrcnn import maskrcnn_to_pmml
+		from nyoka.mrcnn import maskrcnn_to_pmml
 		pmmlObj=maskrcnn_to_pmml.MaskrcnnToPMML(model,classes=dataset_train.class_names)
 		pmmlObj.export(modelPathName)
 		kerasUtilities.updateStatusOfTraining(statusfileLocation,'PMML file Successfully Saved')
