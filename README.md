@@ -1,5 +1,5 @@
 # Cumulocity IOT ML Workbench
-[<img src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/logo.png" alt="zmod_logo" height="100" style="float:right"/>](https://www.zmod.org/)
+[<img src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/logo.png" alt="zmod_logo" height="50" style="float:right"/>](https://www.zmod.org/)
 
 Making and (re-)training machine learning and deep learning models.
 
@@ -20,8 +20,17 @@ Cumulocity IOT ML Workbench allows it's user to cover a wide variety of algorith
 * **REST API Support** :  It has REST APIs to use as deployment tool.
 
 ## Getting Started
+1. Visit live instance of [Cumulocity IOT ML Workbench](https://www.zmod.org/)
+2. Use your github account or register with us.   
 
 ## Feature(s)
+1. AutoML.
+2. Support for Nueral Network and Workflow for ai projects.
+2. Integration with Cumulocity to import data.
+3. User Interface to drag and drop, edit, train or load model in memory.
+3. Integration with Data Scientist's Tools such as JupyterNotebook and Tensorboard.
+4. Repo (UMOYA CLI) as model management framework for versioning models and its resource (data and code) dependencies.
+5. User specific configurations to connect various tanents.
 
 ## Getting familiar with Cumulocity IOT ML Workbench :
 It has 6 sections : 
@@ -54,7 +63,7 @@ It has 6 sections :
 ## Issues ?
 If you have an idea or found a bug, open an issue to discuss it.
 
-## Quick Walk-Throught on couple of Use Case(s) :
+## Quick Walk-Through on couple of Use Case(s) :
 
 [Demo 1 : Distracted Driver Use Case](https://www.zmod.org/learn/0SZHvRSJwyc)<br/>
 [Demo 2 : AutoML](https://www.zmod.org/learn/6RUJ0Nk52u8)<br/>
