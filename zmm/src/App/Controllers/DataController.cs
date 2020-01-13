@@ -34,6 +34,7 @@ using xml = System.Xml;
 using System.Data;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization.Json;
+
 namespace ZMM.App.Controllers
 {
     [Authorize]
@@ -380,6 +381,7 @@ namespace ZMM.App.Controllers
                 return BadRequest(ex.StackTrace);
             }
         }
+
         [HttpPost]
         [Route("{id}/automl")]
         public async Task<IActionResult> PostAutoML(string id)
@@ -394,9 +396,6 @@ namespace ZMM.App.Controllers
             {
                 try
                 {
-                    //find model name
-                    userModelName = id;
-                    //
                     reqBody = JsonConvert.SerializeObject(autoMLResp);
                     response = await _client.PostProcessingForm(reqBody);
                 }
@@ -410,11 +409,15 @@ namespace ZMM.App.Controllers
             {
                 return NotFound();
             }
+
             if (!string.IsNullOrEmpty(response))
             {
                 autoMLResp.executedAt = DateTime.Now;
                 List<AutoMLResponse> tresp = new List<AutoMLResponse>();
                 tresp.Add(autoMLResp);
+                //
+                //add to scheduler payload 
+                //add history
                 JArray jHist = new JArray();
                 foreach (var r in tresp)
                 {
@@ -459,7 +462,6 @@ namespace ZMM.App.Controllers
             {
                 return NoContent();
             }
-
         }
         #endregion   
 
@@ -1133,13 +1135,14 @@ namespace ZMM.App.Controllers
             try
             {
                 //read request body
-                using (var reader = new StreamReader(Request.Body))
-                {
-                    var body = reader.ReadToEnd();
-                    reqBody = body.ToString();
-                }
-                //get new filename
-                if (!string.IsNullOrEmpty(reqBody))
+                  using (var reader = new StreamReader(Request.Body))
+                 {
+                     var body = reader.ReadToEnd();
+                     reqBody = body.ToString();
+                 }
+                 //get new filename
+                 if (!string.IsNullOrEmpty(reqBody)) 
+
                 {
                     var content = JObject.Parse(reqBody);
                     newFileName = (string)content["newName"];
@@ -1415,15 +1418,13 @@ namespace ZMM.App.Controllers
             string response = string.Empty;
             string reqBody = string.Empty;
 
-            using (var reader = new StreamReader(Request.Body))
-            {
-                var body = reader.ReadToEnd();
-                reqBody = body.ToString();
-            }
-            if (!string.IsNullOrEmpty(reqBody))
+            DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(AutoMLResponse));
+            AutoMLResponse autoMLResp = (AutoMLResponse)deserializer.ReadObject(Request.Body);
+            if (autoMLResp != null)
             {
                 try
                 {
+                    reqBody = JsonConvert.SerializeObject(autoMLResp);
                     response = await _client.AnamolyModel(reqBody);
                 }
                 catch (Exception ex)
@@ -1439,10 +1440,9 @@ namespace ZMM.App.Controllers
 
             if (!string.IsNullOrEmpty(response))
             {
-                var jo = JsonConvert.DeserializeObject<AutoMLResponse>(response);
-                jo.executedAt = DateTime.Now;
+                autoMLResp.executedAt = DateTime.Now;
                 List<AutoMLResponse> tresp = new List<AutoMLResponse>();
-                tresp.Add(jo);
+                tresp.Add(autoMLResp);
                 //
                 //add to scheduler payload 
                 //add history
