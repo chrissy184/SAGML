@@ -44,10 +44,11 @@ namespace ZMM.App.Controllers
         [HttpPost]
         public async Task<IActionResult> PostSqlAsync()
         {
+            DataResponse newRecord = new DataResponse();
             string reqBody = "";
             string reqSql = "";
             string dirFullpath = $"{DirectoryHelper.GetDataDirectoryPath()}";
-            string newFile = "DataHub_" + DateTime.Now.Ticks.ToString()+".csv";
+            string newFile = "DataHub_" + DateTime.Now.Ticks.ToString() + ".csv";
             string _filePath = Path.Combine(dirFullpath, newFile);
             long fileSize = 0L;
             List<string> resultRows = new List<string>();
@@ -60,13 +61,15 @@ namespace ZMM.App.Controllers
                 reqBody = reader.ReadToEnd().ToString();
             }
             JObject jsonBody = JObject.Parse(reqBody);
-            reqSql = jsonBody["sql"].ToString().Replace("'","\"");                     
+            // reqSql = jsonBody["sql"].ToString().Replace("''","@"); 
+            // reqSql = jsonBody["sql"].ToString().Replace("'","\"");  
+            // reqSql = jsonBody["sql"].ToString().Replace("@","'");                
             //
-
+            reqSql = jsonBody["sql"].ToString();
 
             #region ODBC
 
-            using (OdbcConnection connection = new OdbcConnection("Driver=Dremio Connector;ConnectionType=Direct;HOST=dremio-demo.westeurope.cloudapp.azure.com;PORT=31010;AuthenticationType=Plain;UID=;PWD="))
+            using (OdbcConnection connection = new OdbcConnection("Driver=Dremio Connector;ConnectionType=Direct;HOST=dremio-demo.westeurope.cloudapp.azure.com;PORT=31010;AuthenticationType=Plain;UID=demo;PWD=iug2019#riga"))
             {
                 try
                 {
@@ -106,50 +109,51 @@ namespace ZMM.App.Controllers
                         }
                         resultRows.Add(csvBuilder.ToString());
                     }
+
+                    using (StreamWriter writer = new StreamWriter(_filePath))
+                    {
+                        foreach (var line in resultRows)
+                            writer.WriteLine(line);
+
+                        writer.Flush();
+                        fileSize = writer.BaseStream.Length;
+                    }
+                    string _url = DirectoryHelper.GetDataUrl(newFile);
+                    await Task.FromResult(0);
+                    //
+                    string type = "CSV";
+                    //get properties row and column count
+                    int[] csvProps = CsvHelper.GetCsvRowColumnCount(dirFullpath + @"/" + newFile);
+                    _props.Add(new Property { key = "Number of rows", value = resultRows.Count().ToString() });
+                    _props.Add(new Property { key = "Number of columns", value = numberOfColumns.ToString() });
+
+                    newRecord = new DataResponse()
+                    {
+                        Created_on = DateTime.Now.ToString(),
+                        Edited_on = DateTime.Now.ToString(),
+                        Extension = "CSV",
+                        FilePath = _filePath,
+                        Id = newFile,
+                        MimeType = "text/csv",
+                        Name = newFile.Replace(".CSV", ""),
+                        Properties = _props,
+                        Size = fileSize,
+                        Type = type,
+                        Url = _url,
+                        DateCreated = DateTime.Now
+                    };
+                    DataPayload.Create(newRecord);
                 }
                 catch (Exception e)
                 {
                     // return error message
                     Console.WriteLine("DataHub ERROR:>>>>" + e.Message);
+                    //cleanup the file created
+
                 }
             }
 
             #endregion
-
-
-            using (StreamWriter writer = new StreamWriter(_filePath))
-            {
-                foreach (var line in resultRows)
-                    writer.WriteLine(line);
-
-                writer.Flush();
-                fileSize = writer.BaseStream.Length;
-            }
-            string _url = DirectoryHelper.GetDataUrl(newFile);
-            await Task.FromResult(0);
-            //
-            string type = "CSV";
-            //get properties row and column count
-            int[] csvProps = CsvHelper.GetCsvRowColumnCount(dirFullpath + @"/" + newFile);
-            _props.Add(new Property { key = "Number of rows", value = resultRows.Count().ToString() });
-            _props.Add(new Property { key = "Number of columns", value = numberOfColumns.ToString() });
-
-            DataResponse newRecord = new DataResponse()
-            {
-                Created_on = DateTime.Now.ToString(),
-                Edited_on = DateTime.Now.ToString(),
-                Extension = "CSV",
-                FilePath = _filePath,
-                Id = newFile,
-                MimeType = "text/csv",
-                Name = newFile.Replace(".CSV", ""),
-                Properties = _props,
-                Size = fileSize,
-                Type = type,
-                Url = _url,
-                DateCreated = DateTime.Now
-            };
-            DataPayload.Create(newRecord);
             //
             return Json(newRecord);
         }
