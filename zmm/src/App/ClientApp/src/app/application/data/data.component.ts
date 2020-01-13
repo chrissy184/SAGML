@@ -436,7 +436,7 @@ export class DataComponent implements OnInit {
       };
       this.isContentLoading = true;
       this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.datahub, options)
-        .pipe(finalize(() => { this.isContentLoading = false; }))
+        .pipe(finalize(() => { this.isContentLoading = false;this.dataHubFormData = {}; }))
         .subscribe(response => {
           console.log(response);
           this.refresh();
