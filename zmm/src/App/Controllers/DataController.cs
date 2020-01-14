@@ -33,6 +33,7 @@ using Helpers.CustomAttributes;
 using xml = System.Xml;
 using System.Data;
 using System.Text.RegularExpressions;
+using System.Runtime.Serialization.Json;
 
 namespace ZMM.App.Controllers
 {
@@ -53,7 +54,7 @@ namespace ZMM.App.Controllers
         private List<DataResponse> responseData;
         private List<ModelResponse> modelResponseData;
         private List<CodeResponse> codeResponseData;
-        private static string[] extensions = new[] { "csv", "jpg", "jpeg", "png", "json", "webp", "zip", "mp4","txt" };
+        private static string[] extensions = new[] { "csv", "jpg", "jpeg", "png", "json", "webp", "zip", "mp4", "txt" };
         string zipOr7zPath = string.Empty;
         string extractPath = string.Empty;
         string fileName = string.Empty;
@@ -75,7 +76,7 @@ namespace ZMM.App.Controllers
 
             //Initialise ZMOD Dir scanning
             if (!IsScanned)
-            {                
+            {
                 ZMKDockerCmdHelper.InitZMKInstances();
                 InitZmodDirectory.ScanDirectoryToSeed();
                 IsScanned = true;
@@ -92,10 +93,10 @@ namespace ZMM.App.Controllers
 
         #region Get uploaded data - api/data
         [HttpGet]
-        public async Task<IActionResult> Get(string[] type,bool refresh)
+        public async Task<IActionResult> Get(string[] type, bool refresh)
         {
             //
-            if(refresh) 
+            if (refresh)
             {
                 DataPayload.Clear();
                 InitZmodDirectory.ScanDataDirectory();
@@ -371,7 +372,7 @@ namespace ZMM.App.Controllers
                 response = await _client.GetPreprocessingForm(filePath);
                 if (!string.IsNullOrEmpty(response))
                 {
-                   jsonObj = JObject.Parse(response);
+                    jsonObj = JObject.Parse(response);
                 }
                 return Json(jsonObj);
             }
@@ -387,21 +388,15 @@ namespace ZMM.App.Controllers
         {
             string response = string.Empty;
             string reqBody = string.Empty;
-            string userModelName="";
+            string userModelName = "";
 
-            using (var reader = new StreamReader(Request.Body))
-            {
-                var body = reader.ReadToEnd();
-                reqBody = body.ToString();
-            }
-            if (!string.IsNullOrEmpty(reqBody))
+            DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(AutoMLResponse));
+            AutoMLResponse autoMLResp = (AutoMLResponse)deserializer.ReadObject(Request.Body);
+            if (autoMLResp != null)
             {
                 try
                 {
-                    //find model name
-                    JObject rB = JObject.Parse(reqBody);
-                    userModelName = (string)rB["parameters"]["model_name"];
-                    //
+                    reqBody = JsonConvert.SerializeObject(autoMLResp);
                     response = await _client.PostProcessingForm(reqBody);
                 }
                 catch (Exception ex)
@@ -414,14 +409,12 @@ namespace ZMM.App.Controllers
             {
                 return NotFound();
             }
-            
 
             if (!string.IsNullOrEmpty(response))
             {
-                var jo = JsonConvert.DeserializeObject<AutoMLResponse>(response);
-                jo.executedAt = DateTime.Now;
+                autoMLResp.executedAt = DateTime.Now;
                 List<AutoMLResponse> tresp = new List<AutoMLResponse>();
-                tresp.Add(jo);
+                tresp.Add(autoMLResp);
                 //
                 //add to scheduler payload 
                 //add history
@@ -434,8 +427,8 @@ namespace ZMM.App.Controllers
                         {"executedAt",r.executedAt}
                     });
                 }
-                string idExisted = SchedulerPayload.GetById(id).Where(i=>i.Type == "AUTOML" && i.Id == id).Select(i=>i.Id).FirstOrDefault();
-                if(idExisted == id)
+                string idExisted = SchedulerPayload.GetById(id).Where(i => i.Type == "AUTOML" && i.Id == id).Select(i => i.Id).FirstOrDefault();
+                if (idExisted == id)
                 {
                     id = id + userModelName;
                 }
@@ -458,7 +451,7 @@ namespace ZMM.App.Controllers
                     ZMKResponse = tresp.ToList<object>(),
                     Status = "COMPLETED",
                     History = jHist.ToList<object>()
-                };                
+                };
                 SchedulerPayload.Create(schJob);
 
                 //
@@ -469,7 +462,6 @@ namespace ZMM.App.Controllers
             {
                 return NoContent();
             }
-
         }
         #endregion   
 
@@ -481,7 +473,7 @@ namespace ZMM.App.Controllers
             string response = string.Empty;
             string modelName = string.Empty;
             string filePath = string.Empty;
-            string data = string.Empty;            
+            string data = string.Empty;
             long fileSize;
             JObject joPredict = new JObject();
             JObject joData = new JObject();
@@ -626,7 +618,7 @@ namespace ZMM.App.Controllers
                     List<Property> _props = new List<Property>();
                     dirFullpath = DirectoryHelper.GetDataDirectoryPath();
                     string newFile = $"Predicted_{dataId}" + ".mp4";
-                    string newFilePath = Path.Combine(dirFullpath, newFile); 
+                    string newFilePath = Path.Combine(dirFullpath, newFile);
 
                     DataResponse newRecord = new DataResponse()
                     {
@@ -745,15 +737,15 @@ namespace ZMM.App.Controllers
                                     if (item.Id == modelId)
                                     {
                                         modelName = item.ModelName;
-                                        break; 
+                                        break;
                                     }
                                 }
-                                if(string.IsNullOrEmpty(modelName)) modelName = modelId;
+                                if (string.IsNullOrEmpty(modelName)) modelName = modelId;
                             }
 
                             #endregion
                             string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-                            zsResponse = await zsClient.ImageScoring(modelName, filePath,zmodId);
+                            zsResponse = await zsClient.ImageScoring(modelName, filePath, zmodId);
                             zsResponse = zsResponse.Replace("\n", "");
                             JObject jo = JObject.Parse(zsResponse.Replace("\"", "'"));
                             System.IO.File.WriteAllText(newFilePath, zsResponse);
@@ -849,7 +841,7 @@ namespace ZMM.App.Controllers
                             }
                             #endregion
                             //     
-                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);             
+                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
                             zsResponse = await zsClient.SingleScoring(modelName, record, zmodId);
 
                             zsResponse = zsResponse.Replace("\n", "");
@@ -928,7 +920,7 @@ namespace ZMM.App.Controllers
 
                             #endregion
                             string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-                            zsResponse = await zsClient.MultipleScoring(modelId, filePath,zmodId);
+                            zsResponse = await zsClient.MultipleScoring(modelId, filePath, zmodId);
                             zsResponse = zsResponse.Replace("\n", "");
                             JObject jo = JObject.Parse(zsResponse.Replace("\"", "'"));
                             string outputs = jo["outputs"].ToString();
@@ -1050,7 +1042,7 @@ namespace ZMM.App.Controllers
 
                 #endregion
                 string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-                zsResponse = await zsClient.MultipleScoring(modelName, filePath,zmodId);
+                zsResponse = await zsClient.MultipleScoring(modelName, filePath, zmodId);
                 zsResponse = zsResponse.Replace("\n", "");
                 JObject jo = JObject.Parse(zsResponse.Replace("\"", "'"));
                 System.IO.File.WriteAllText(newFilePath, zsResponse);
@@ -1143,13 +1135,14 @@ namespace ZMM.App.Controllers
             try
             {
                 //read request body
-                using (var reader = new StreamReader(Request.Body))
-                {
-                    var body = reader.ReadToEnd();
-                    reqBody = body.ToString();
-                }
-                //get new filename
-                if (!string.IsNullOrEmpty(reqBody))
+                  using (var reader = new StreamReader(Request.Body))
+                 {
+                     var body = reader.ReadToEnd();
+                     reqBody = body.ToString();
+                 }
+                 //get new filename
+                 if (!string.IsNullOrEmpty(reqBody)) 
+
                 {
                     var content = JObject.Parse(reqBody);
                     newFileName = (string)content["newName"];
@@ -1282,7 +1275,7 @@ namespace ZMM.App.Controllers
         #region [POST] /baseImage
         [HttpPost("baseImage")]
         public async Task<IActionResult> PostBaseImageAsync()
-        {       
+        {
             //variable
             string reqBody = "";
             string response = "";
@@ -1416,7 +1409,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #endregion
-    
+
         #region automl - anamoly
         [HttpPost]
         [Route("{id}/anamoly")]
@@ -1425,15 +1418,13 @@ namespace ZMM.App.Controllers
             string response = string.Empty;
             string reqBody = string.Empty;
 
-            using (var reader = new StreamReader(Request.Body))
-            {
-                var body = reader.ReadToEnd();
-                reqBody = body.ToString();
-            }
-            if (!string.IsNullOrEmpty(reqBody))
+            DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(AutoMLResponse));
+            AutoMLResponse autoMLResp = (AutoMLResponse)deserializer.ReadObject(Request.Body);
+            if (autoMLResp != null)
             {
                 try
                 {
+                    reqBody = JsonConvert.SerializeObject(autoMLResp);
                     response = await _client.AnamolyModel(reqBody);
                 }
                 catch (Exception ex)
@@ -1445,14 +1436,13 @@ namespace ZMM.App.Controllers
             else
             {
                 return NotFound();
-            }            
+            }
 
             if (!string.IsNullOrEmpty(response))
             {
-                var jo = JsonConvert.DeserializeObject<AutoMLResponse>(response);
-                jo.executedAt = DateTime.Now;
+                autoMLResp.executedAt = DateTime.Now;
                 List<AutoMLResponse> tresp = new List<AutoMLResponse>();
-                tresp.Add(jo);
+                tresp.Add(autoMLResp);
                 //
                 //add to scheduler payload 
                 //add history

@@ -23,6 +23,7 @@ using System.Text.RegularExpressions;
 using Quartz;
 using Quartz.Impl;
 
+
 namespace ZMM.App.Controllers
 {
     [Authorize]
@@ -609,9 +610,10 @@ namespace ZMM.App.Controllers
                                 Type = "PYTHON",
                                 Url = "",
                                 Recurrence = cronjson["recurrence"].ToString(),
-                                StartDate = cronjson["startDate"].ToString(),
-                                StartTimeH = (cronjson["startTimeH"].ToString() == null) ? "" : cronjson["startTimeH"].ToString(),
-                                StartTimeM = (cronjson["startTimeM"].ToString() == null) ? "" : cronjson["startTimeM"].ToString(),
+                                StartDate = (cronjson["startDate"] == null) ? "" : cronjson["startDate"].ToString(),
+                                //cronjson["startDate"].ToString(),
+                                StartTimeH = (cronjson["startTimeH"] == null) ? "" : cronjson["startTimeH"].ToString(),
+                                StartTimeM = (cronjson["startTimeM"] == null) ? "" : cronjson["startTimeM"].ToString(),
                                 ZMKResponse = tresp.ToList<object>(),
                                 History = tresp.ToList<object>()
                             };

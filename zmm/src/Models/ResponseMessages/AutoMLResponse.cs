@@ -3,28 +3,36 @@ using System.Collections.Generic;
 
 namespace ZMM.Models.ResponseMessages
 {
-
-    public class ListOfModelAccuracy
+    public class Datum
     {
-        public string modelDetail { get; set; }
-        public string modelName { get; set; }
-        public double score { get; set; }
-        public int bestmodel { get; set; }
+        public int position { get; set; }
+        public string variable { get; set; }
+        public string dtype { get; set; }
+        public int missing_val { get; set; }
+        public string changedataType { get; set; }
+        public string imputation_method { get; set; }
+        public string data_transformation_step { get; set; }
+        public bool use_for_model { get; set; }
+    }
+    public class Parameters
+    {
+        public int generation { get; set; }
+        public int population_size { get; set; }
+        public string model_name { get; set; }
+        public string scoring { get; set; }
+        public string algorithm { get; set; }
     }
 
     public class AutoMLResponse
     {
-        public string pID { get; set; }
-        public string status { get; set; }
-        public string newPMMLFileName { get; set; }
-        public string targetVar { get; set; }
+        public List<Datum> data { get; set; }
         public string problem_type { get; set; }
+        public string target_variable { get; set; }
         public string idforData { get; set; }
-        public List<int> shape { get; set; }
-        public string taskName { get; set; }
-        public List<ListOfModelAccuracy> listOfModelAccuracy { get; set; }
-        public string pmmlFilelocation { get; set; }
-        public List<object> generationInfo { get; set; }
+        public string newPMMLFileName { get; set; }
+        public string filePath { get; set; }
+        public Parameters parameters { get; set; }
         public DateTime executedAt { get; set; }
+        public string status { get; set; }
     }
 }
