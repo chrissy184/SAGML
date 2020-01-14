@@ -10,6 +10,8 @@
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
   <OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
   <NoWarn>$(NoWarn);1591</NoWarn>
+  <Version>10.5.0-beta</Version>
+  <AssemblyVersion>10.5.0</AssemblyVersion>
 </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>

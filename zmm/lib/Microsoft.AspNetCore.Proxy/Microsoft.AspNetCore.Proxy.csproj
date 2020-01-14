@@ -10,6 +10,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTags>Proxy , ASP .Net Core 3.0</PackageTags>
     <IsPackable>true</IsPackable>
+    <Version>10.5.0-beta</Version>
+    <AssemblyVersion>10.5.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
