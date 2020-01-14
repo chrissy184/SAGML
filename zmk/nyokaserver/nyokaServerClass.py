@@ -11,7 +11,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from rest_framework.decorators import api_view,schema
 from nyokaserver import nyokaUtilities,nyokaPMMLUtilities
-from nyokaBase import PMML43Ext as pml
+from nyoka import PMML43Ext as pml
 import typing
 from datetime import datetime
 import json,sys,subprocess
@@ -654,7 +654,7 @@ class NyokaServer:
 					colNames.append(indCol.__dict__['name'])
 			return (colNames,targetCol)
 			
-		from nyokaBase.skl.skl_to_pmml import model_to_pmml
+		from nyoka.skl.skl_to_pmml import model_to_pmml
 		processTheInput=payload
 		global MEMORY_DICT_ARCHITECTURE
 		try:
@@ -697,9 +697,9 @@ class NyokaServer:
 			
 		elif processTheInput['itemType']=='MODEL':
 			modelPath=processTheInput['filePath']
-			from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
+			from nyoka.reconstruct.pmml_to_pipeline_model import generate_skl_model
 			from sklearn.pipeline import Pipeline
-			from nyokaBase import PMML43Ext as pmmNY
+			from nyoka import PMML43Ext as pmmNY
 			pmObj=pmmNY.parse(modelPath,silence=True)
 			colInfo=getCOlumDet(pmObj)
 			print ('came to reconstruct')
@@ -711,7 +711,7 @@ class NyokaServer:
 					tf_session = Session()
 					with tf_session.as_default():
 						print ('step 5')
-						from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
+						from nyoka.reconstruct.pmml_to_pipeline_model import generate_skl_model
 						print ('step 5.1')
 						modelOb = generate_skl_model(pmObj).model
 						model_graph = tf.get_default_graph()
@@ -773,7 +773,7 @@ class NyokaServer:
 
 			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']=toExportDictExist
 
-			from nyokaBase.skl.skl_to_pmml import model_to_pmml
+			from nyoka.skl.skl_to_pmml import model_to_pmml
 			model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
 
 

@@ -101,10 +101,9 @@ namespace ZMM.Tools.TB
                 if (task.GetInput().MetaData.ContainsKey("ResourceLink")) return task.GetInput().MetaData["ResourceLink"];
                 else
                 {
-                    int taskPort = int.Parse(task.GetInput().MetaData["Port"]);
-                    string portString = (TensorBoard.HostURL.Contains("localhost")) ? ":" + taskPort : string.Empty;
-                    string linkPrefix = (TensorBoard.HostURL.Contains("localhost")) ? string.Empty : GetLinkPrefix(taskPort);
-                    LinkForResource = TensorBoard.HostURL + portString + linkPrefix;
+                    int taskPort = int.Parse(task.GetInput().MetaData["Port"]);                    
+                    string linkPrefix = GetLinkPrefix(taskPort);
+                    LinkForResource = TensorBoard.HostURL + linkPrefix;
                     UpdateTask(resourcePath, task, "ResourceLink", LinkForResource);
                 }
             }
@@ -140,12 +139,12 @@ namespace ZMM.Tools.TB
                 if (Status) break;
                 else
                 {
-                    if(IsPortAvailableInRange(TaskPort, ListOfAllowedPorts.First(), ListOfAllowedPorts.Last())) Console.WriteLine("Waiting for task port to start " + TaskPort);
-                    else 
+                    if(IsPortBusyInRange(TaskPort, ListOfAllowedPorts.First(), ListOfAllowedPorts.Last())) 
                     {
                         Console.WriteLine("Waiting for token id");                        
                         Status = WaitForStartupMessage(task);
                     }
+                    else Console.WriteLine("Waiting for task port to start " + TaskPort);
                     System.Threading.Thread.Sleep(1000);
                 }
             }

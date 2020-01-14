@@ -5,7 +5,7 @@ from string import ascii_uppercase
 import copy,json
 import ast,pathlib
 import traceback
-from nyokaBase import PMML43Ext as ny
+from nyoka import PMML43Ext as ny
 global MEMORY_DICT_ARCHITECTURE,MEMORY_OF_LAYERS
 
 settingFilePath='./settingFiles/'

@@ -59,6 +59,9 @@ export class DataComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   message = AlertMessages.DATA.deleteConfirmationData;
   public baseImageInfo: any = {};
+
+  @ViewChild('dataHubForm') dataHubForm;
+  public dataHubFormData: any = {};
   constructor(private apiService: HttpService, private utilService: UtilService, private router: Router) { }
 
   public changeSelectedIndex(index: number) {
@@ -351,6 +354,10 @@ export class DataComponent implements OnInit {
     this.changeSelectedIndex(3);
   }
 
+  public uploadNewDataFromDataHub() {
+    this.changeSelectedIndex(6);
+  }
+
   public goToInfoTab() {
     this.changeSelectedIndex(0);
   }
@@ -416,6 +423,27 @@ export class DataComponent implements OnInit {
       }, errorResponse => {
         console.log(errorResponse);
       });
+  }
+
+  dataHubFormSubmit() {
+    this.dataHubForm.submitted = true;
+    if (this.dataHubForm.valid) {
+      console.log(this.dataHubFormData);
+      let options = {
+        body: {
+          sql: this.dataHubFormData.sql
+        }
+      };
+      this.isContentLoading = true;
+      this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.datahub, options)
+        .pipe(finalize(() => { this.isContentLoading = false;this.dataHubFormData = {}; }))
+        .subscribe(response => {
+          console.log(response);
+          this.refresh();
+        }, errorResponse => {
+          console.log(errorResponse);
+        });
+    }
   }
 
   ngOnInit() {

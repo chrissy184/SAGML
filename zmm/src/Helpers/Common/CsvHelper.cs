@@ -14,8 +14,11 @@ namespace ZMM.Helpers.Common
             if (Path.GetExtension(csvFilePath).ToLower().Contains("csv"))
             {
                 var lines = File.ReadAllLines(csvFilePath);
-                rowColCount[0] = lines.Count();//includes header
-                rowColCount[1] = lines[0].Split(',').Count();
+                if (lines.Count() > 0)
+                {
+                    rowColCount[0] = lines.Count();//includes header
+                    rowColCount[1] = lines[0].Split(',').Count();
+                }
             }
 
             return rowColCount;
@@ -37,7 +40,7 @@ namespace ZMM.Helpers.Common
                     result.Append(i == table.Columns.Count - 1 ? "\n" : delimator);
                 }
             }
-            return result.ToString().TrimEnd(new char[] { '\r', '\n' });           
+            return result.ToString().TrimEnd(new char[] { '\r', '\n' });
         }
     }
 }

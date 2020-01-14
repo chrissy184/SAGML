@@ -14,7 +14,7 @@ from multiprocessing import Process
 from trainModel import kerasUtilities
 kerasUtilities = kerasUtilities.KerasUtilities()
 from multiprocessing import Lock, Process
-from nyokaBase import PMML43Ext as ny
+from nyoka import PMML43Ext as ny
 from tensorflow import Graph, Session
 import tensorflow as tf
 
@@ -73,7 +73,7 @@ class NewModelOperations:
         return listOFColumns,targetCol,modelPath
 
     def nyObjOfModel(self,pmmlObj,singMod):
-        import nyokaBase.PMML43Ext as ny
+        import nyoka.PMML43Ext as ny
         if singMod['pmmlModelObject'].__dict__['original_tagname_']=='MiningModel':
             nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,MiningModel=[singMod['pmmlModelObject']])
         elif singMod['pmmlModelObject'].__dict__['original_tagname_']=='DeepNetwork':
@@ -125,7 +125,7 @@ class NewModelOperations:
         global PMMLMODELSTORAGE
         pmmlFileObj=pathlib.Path(pmmlFile)
         pmmlFileForKey=pmmlFileObj.name.replace(pmmlFileObj.suffix,'')
-        from nyokaBase import PMML43Ext as ny
+        from nyoka import PMML43Ext as ny
         try:
             pmmlObj=ny.parse(pmmlFile,silence=True)
             # print (pmmlObj)
@@ -261,7 +261,7 @@ class NewModelOperations:
                             tf_session = Session()
                             with tf_session.as_default():
                                 print ('step 5')
-                                from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
+                                from nyoka.reconstruct.pmml_to_pipeline_model import generate_skl_model
                                 print ('step 5.1')
                                 model_net = generate_skl_model(modelProp)
                                 print ('step 5.2')
@@ -284,7 +284,7 @@ class NewModelOperations:
                     elif tempDict[taskT][mO]['modelObj']['modelArchType']=="SKLModel":
                         modelProp=tempDict[taskT][mO]['modelObj']['pmmlNyokaObj']
                         # print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp)
-                        from nyokaBase.reconstruct.pmml_to_pipeline_model import generate_skl_model
+                        from nyoka.reconstruct.pmml_to_pipeline_model import generate_skl_model
                         recoModelObj=generate_skl_model(modelProp)
                         if recoModelObj != None:
                             tempDict[taskT][mO]['modelObj']['recoModelObj']=recoModelObj
@@ -1228,7 +1228,7 @@ class TrainingViewModels:
             copyOrgFName=newNameFile
             kerasUtilities.updateStatusOfTraining(self.statusFile,'Complete')
         import shutil
-        from nyokaBase.skl.skl_to_pmml import model_to_pmml
+        from nyoka.skl.skl_to_pmml import model_to_pmml
         try:
             shutil.copy2(orgfName,copyOrgFName)
         except:

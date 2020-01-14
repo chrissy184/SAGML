@@ -18,17 +18,23 @@
         <button mat-icon-button matTooltip="Refresh" (click)="refresh()">
           <span class="mdi mdi-refresh text-secondary"></span>
         </button>
-        <!-- <button mat-icon-button matTooltip="New Data" [matMenuTriggerFor]="newDataMenu">
+        <button mat-icon-button matTooltip="Upload New Data" [matMenuTriggerFor]="newDataMenu">
           <span class="mdi mdi-file-plus text-secondary"></span>
         </button>
         <mat-menu #newDataMenu="matMenu">
-          <button mat-menu-item (click)="newWeldingData()">
+          <!-- <button mat-menu-item (click)="newWeldingData()">
             Generate Welding Images
+          </button> -->
+          <button mat-menu-item (click)="uploadNewCumulocityData()">
+            Cumulocity
           </button>
-        </mat-menu> -->
-        <button mat-icon-button matTooltip="Upload Data from Cumulocity" (click)="uploadNewCumulocityData()">
+          <button mat-menu-item (click)="uploadNewDataFromDataHub()">
+            DataHub
+          </button>
+        </mat-menu>
+        <!-- <button mat-icon-button matTooltip="Upload Data from Cumulocity" (click)="uploadNewCumulocityData()">
           <span class="mdi mdi-file-upload text-secondary"></span>
-        </button>
+        </button> -->
         <button mat-icon-button matTooltip="Upload Data" (click)="uploadNewFiles()">
           <span class="mdi mdi-cloud-upload text-secondary"></span>
         </button>
@@ -290,6 +296,41 @@
               <img [src]="baseImageInfo.url" class="img-fluid">
               <app-welding-config-form [baseImageInfo]="baseImageInfo" (close)="goToInfoTab()"
                 (selected)="onWeldingConfigFormSubmit($event)"></app-welding-config-form>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="DATAHUB">
+        <ng-template matTabContent>
+          <div *ngIf="tabSelectedIndex === 6">
+            <mat-toolbar>
+              <h2>Connect to Datahub</h2>
+              <div class="toolbar-mid"></div>
+              <div calss="content-toolbar">
+                <button *ngIf="(listOfData && listOfData.length) && !isLoading" mat-icon-button matTooltip="Cancel"
+                  (click)="uploadFilesDone()">
+                  <span class="mdi mdi-close text-secondary"></span>
+                </button>
+                <button mat-icon-button
+                  (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
+                  [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
+                  <span class="mdi text-secondary"
+                    [ngClass]="{'mdi-fullscreen': sidenav.opened, 'mdi-fullscreen-exit': !sidenav.opened}"></span>
+                </button>
+              </div>
+            </mat-toolbar>
+            <div class="details">
+              <div class="container-fluid">
+                <form class="p-4" #dataHubForm="ngForm">
+                  <mat-form-field class="w-100">
+                    <textarea matInput placeholder="Write SQL" required [(ngModel)]="dataHubFormData.sql" name="sql" id="sql"></textarea>
+                  </mat-form-field>
+                  <button class="float-right" mat-stroked-button color="primary" matTooltip="Submit" (click)="dataHubFormSubmit()">
+                    Submit
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         </ng-template>

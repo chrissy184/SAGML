@@ -13,7 +13,7 @@ from multiprocessing import Process
 from trainModel import kerasUtilities
 kerasUtilities = kerasUtilities.KerasUtilities()
 from multiprocessing import Lock, Process
-from nyokaBase import PMML43Ext as ny
+from nyoka import PMML43Ext as ny
 
 from trainModel.mergeTrainingV2 import TrainingViewModels
 
@@ -154,7 +154,7 @@ class NeuralNetworkModelTrainer:
 			return data_details
 
 		try:
-			from nyokaBase.keras.pmml_to_keras_model import GenerateKerasModel
+			from nyoka.keras.pmml_to_keras_model import GenerateKerasModel
 			modelObj=GenerateKerasModel(self.pmmlfileObj)
 		except Exception as e:
 			if not compileTestOnly:
@@ -388,7 +388,7 @@ class NeuralNetworkModelTrainer:
 							'targetName':'target','postProcessingScript':None,'taskType': 'trainAndscore',
 						'predictedClasses':predictedClass,'dataSet':None}
 							}
-				from nyokaBase.skl.skl_to_pmml import model_to_pmml
+				from nyoka.skl.skl_to_pmml import model_to_pmml
 				model_to_pmml(toExportDict, PMMLFileName=fileName)
 				kerasUtilities.updateStatusOfTraining(self.statusFile,'PMML file Successfully Saved')
 				return 'Success'
