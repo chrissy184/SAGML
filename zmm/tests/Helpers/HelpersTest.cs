@@ -7,20 +7,7 @@ using ZMM.Models.ResponseMessages;
 namespace ZMM.Helpers.Tests
 {
     public class HelpersTest
-    {
-        /*Need to Resolve
-        #region CSVHelper
-        [Fact]
-        public void Test_GetCsvRowColumnCount()
-        {
-            string path = @"C:\myCode\Project\new\src\App\wwwroot\uploads\data\mpg_data_example.csv";
-            int [] result = CsvHelper.GetCsvRowColumnCount(path);
-
-            Assert.NotNull(result);
-
-        }
-        #endregion
-        */
+    {        
 
         #region FilePathHelper
         [Fact]
@@ -83,40 +70,7 @@ namespace ZMM.Helpers.Tests
             Assert.Equal("/home/zmod/data/Hello.csv", result);
         }
 
-        /*Need to Resolve this
-        [Fact]
-        public void Test_Model_GetFilePathById()
-        {
-            //
-            List<Property> _prop = new List<Property>();
-            ModelResponse record = new ModelResponse()
-            {
-                Id = "HelloModel",
-                Name = "Hello.pmml",
-                User = "",
-                Created_on = DateTime.Now.ToString(),
-                Edited_on = DateTime.Now.ToString(),
-                Extension = "pmml",
-                MimeType = "application/pmml",
-                Size = 222,
-                Type = "PMML",
-                Url = "http://localhost/uploads/Model/HelloModel.pmml",
-                FilePath = "/home/zmod/model/HelloModel.pmml",
-                Loaded = false,
-                Deployed = false,
-                Properties = _prop
-            };
-
-            List<ModelResponse> records = new List<ModelResponse> {
-                record
-            };
-           
-            string result = FilePathHelper.GetFilePathById("HelloData", records);
-            //
-            Assert.Equal("/home/zmod/model/HelloModel.pmml", result);
-        }
-        //
-        */
+        
         #endregion
     }
 }
