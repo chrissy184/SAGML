@@ -61,15 +61,16 @@ namespace ZMM.App.Controllers
                 reqBody = reader.ReadToEnd().ToString();
             }
             JObject jsonBody = JObject.Parse(reqBody);
-            // reqSql = jsonBody["sql"].ToString().Replace("''","@"); 
-            // reqSql = jsonBody["sql"].ToString().Replace("'","\"");  
-            // reqSql = jsonBody["sql"].ToString().Replace("@","'");                
-            //
+            
             reqSql = jsonBody["sql"].ToString();
 
             #region ODBC
-
-            using (OdbcConnection connection = new OdbcConnection("Driver=Dremio Connector;ConnectionType=Direct;HOST=dremio-demo.westeurope.cloudapp.azure.com;PORT=31010;AuthenticationType=Plain;UID=demo;PWD=iug2019#riga"))
+            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            var settings = ZSSettingPayload.GetDataHubInfo(zmodId);            
+            string cnn = $"Driver={settings.Item5};ConnectionType=Direct;HOST={settings.Item1};PORT={settings.Item4};AuthenticationType=Plain;UID={settings.Item2};PWD={settings.Item3}";
+            Console.WriteLine($"DATAHUB >>>>>>>>>>>>>>>>>>>>> { cnn }");
+            //using (OdbcConnection connection = new OdbcConnection("Driver=Dremio Connector;ConnectionType=Direct;HOST=dremio-demo.westeurope.cloudapp.azure.com;PORT=31010;AuthenticationType=Plain;UID=demo;PWD=iug2019#riga"))
+            using (OdbcConnection connection = new OdbcConnection(cnn))
             {
                 try
                 {

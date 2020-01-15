@@ -90,6 +90,33 @@ namespace ZMM.Models.Payloads
         }
         #endregion
 
+        #region Get DataHub cnn details
+        public static Tuple<string, string, string, string, string> GetDataHubInfo(string zmodId)
+        {
+            string url = "", uname = "", pass = "", port="", driver="";
+            // var qry = GetSettingsByUser(zmodId)
+            // .Where(i => i.Settings.Any(s => s.selected == true))
+            // .SelectMany(col => col.Settings.Select(s => new { s.url, s.username, s.password }));
+
+            foreach (var _ in GetSettingsByUser(zmodId))
+            {
+                foreach (var record in _.Settings)
+                {
+                    if ((record.selected == true) && (record.type == "DH"))
+                    {
+                        url = record.url;
+                        uname = record.username;
+                        pass = record.password;
+                        port = record.port;
+                        driver = record.driver;
+                        break;
+                    }
+                }
+            }
+
+            return new Tuple<string, string, string, string, string>(url, uname, pass, port, driver);
+        }
+        #endregion      
 
     }
 }
