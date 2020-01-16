@@ -44,6 +44,10 @@ export class DataComponent implements OnInit {
     theme: 'vs-light',
     language: 'json'
   };
+  public editorOptionsSql: any = {
+    theme: 'vs-light',
+    language: 'sql'
+  };
 
   public displayedColumns: string[] = [];
   public dataSource: MatTableDataSource<any[]>;
@@ -59,8 +63,6 @@ export class DataComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   message = AlertMessages.DATA.deleteConfirmationData;
   public baseImageInfo: any = {};
-
-  @ViewChild('dataHubForm') dataHubForm;
   public dataHubFormData: any = {};
   constructor(private apiService: HttpService, private utilService: UtilService, private router: Router) { }
 
@@ -426,8 +428,7 @@ export class DataComponent implements OnInit {
   }
 
   dataHubFormSubmit() {
-    this.dataHubForm.submitted = true;
-    if (this.dataHubForm.valid) {
+    if (this.dataHubFormData.sql) {
       console.log(this.dataHubFormData);
       let options = {
         body: {
@@ -436,7 +437,7 @@ export class DataComponent implements OnInit {
       };
       this.isContentLoading = true;
       this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.datahub, options)
-        .pipe(finalize(() => { this.isContentLoading = false;this.dataHubFormData = {}; }))
+        .pipe(finalize(() => { this.isContentLoading = false; this.dataHubFormData = {}; }))
         .subscribe(response => {
           console.log(response);
           this.refresh();
