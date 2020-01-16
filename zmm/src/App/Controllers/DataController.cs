@@ -388,15 +388,21 @@ namespace ZMM.App.Controllers
         {
             string response = string.Empty;
             string reqBody = string.Empty;
-            string userModelName = "";
+            string userModelName="";
 
-            DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(AutoMLResponse));
-            AutoMLResponse autoMLResp = (AutoMLResponse)deserializer.ReadObject(Request.Body);
-            if (autoMLResp != null)
+            using (var reader = new StreamReader(Request.Body))
+            {
+                var body = reader.ReadToEnd();
+                reqBody = body.ToString();
+            }
+            if (!string.IsNullOrEmpty(reqBody))
             {
                 try
                 {
-                    reqBody = JsonConvert.SerializeObject(autoMLResp);
+                    //find model name
+                    JObject rB = JObject.Parse(reqBody);
+                    userModelName = (string)rB["parameters"]["model_name"];
+                    //
                     response = await _client.PostProcessingForm(reqBody);
                 }
                 catch (Exception ex)
@@ -409,12 +415,14 @@ namespace ZMM.App.Controllers
             {
                 return NotFound();
             }
+            
 
             if (!string.IsNullOrEmpty(response))
             {
-                autoMLResp.executedAt = DateTime.Now;
+                var jo = JsonConvert.DeserializeObject<AutoMLResponse>(response);
+                jo.executedAt = DateTime.Now;
                 List<AutoMLResponse> tresp = new List<AutoMLResponse>();
-                tresp.Add(autoMLResp);
+                tresp.Add(jo);
                 //
                 //add to scheduler payload 
                 //add history
@@ -427,8 +435,8 @@ namespace ZMM.App.Controllers
                         {"executedAt",r.executedAt}
                     });
                 }
-                string idExisted = SchedulerPayload.GetById(id).Where(i => i.Type == "AUTOML" && i.Id == id).Select(i => i.Id).FirstOrDefault();
-                if (idExisted == id)
+                string idExisted = SchedulerPayload.GetById(id).Where(i=>i.Type == "AUTOML" && i.Id == id).Select(i=>i.Id).FirstOrDefault();
+                if(idExisted == id)
                 {
                     id = id + userModelName;
                 }
@@ -451,7 +459,7 @@ namespace ZMM.App.Controllers
                     ZMKResponse = tresp.ToList<object>(),
                     Status = "COMPLETED",
                     History = jHist.ToList<object>()
-                };
+                };                
                 SchedulerPayload.Create(schJob);
 
                 //
