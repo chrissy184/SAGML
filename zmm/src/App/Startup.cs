@@ -37,6 +37,7 @@ using Quartz;
 using System.Collections.Specialized;
 using Quartz.Impl;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using ZMM.Middlewares;
 
 namespace ZMM.App
 {
@@ -226,6 +227,9 @@ namespace ZMM.App
 
             #endregion                   
 
+            #region Enforce Security Headers and Policy
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder().AddDefaultSecurePolicy());
+            #endregion
 
             app.UseStaticFiles();
 
