@@ -84,7 +84,7 @@ namespace ZMM.App.Controllers
             //
             // InitZmodDirectory.ScanDirectoryToSeed();
             //
-            responseData = DataPayload.Get();
+            responseData = DataPayload.Get().Where(d => d.Id.Contains("logs") == false && d.Type != "FOLDER").ToList<DataResponse>();
             modelResponseData = ModelPayload.Get();
             codeResponseData = CodePayload.Get();
         }
@@ -100,7 +100,7 @@ namespace ZMM.App.Controllers
             {
                 DataPayload.Clear();
                 InitZmodDirectory.ScanDataDirectory();
-                responseData = DataPayload.Get();
+                responseData = DataPayload.Get().Where(d => d.Id.Contains("logs") == false && d.Type != "FOLDER").ToList<DataResponse>();
             }
             //
             string jsonStr = JsonConvert.SerializeObject(responseData, Formatting.Indented);
@@ -171,6 +171,8 @@ namespace ZMM.App.Controllers
                     if (formFile.Length > 0)
                     {
                         fileName = formFile.FileName;
+                        if (!FilePathHelper.IsFileNameValid(fileName))
+                            return BadRequest("File name not valid.");
                         //check if the file with the same name exists
                         existingData = DataPayload.Get();
                         if (existingData.Count > 0)
@@ -264,7 +266,7 @@ namespace ZMM.App.Controllers
                             {
                                 type = "FOLDER";
                                 string zipFileName = fileName.Substring(0, fileName.Length - 4);
-
+                                filePath = DirectoryHelper.GetDataDirectoryPath() + zipFileName + ".zip";
                                 //extract
                                 await ZipHelper.ExtractAsync(fileStream.Name, $"{dirFullpath}{zipFileName}");
                                 //add properties
@@ -322,8 +324,13 @@ namespace ZMM.App.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message + "filepath :" + filePath);
-
+                #region Remove download file if exists on error
+                if(System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+                #endregion
+                return BadRequest(ex.Message);
             }
 
             if (_response.Count > 0)
@@ -388,7 +395,7 @@ namespace ZMM.App.Controllers
         {
             string response = string.Empty;
             string reqBody = string.Empty;
-            string userModelName="";
+            string userModelName = "";
 
             using (var reader = new StreamReader(Request.Body))
             {
@@ -415,7 +422,7 @@ namespace ZMM.App.Controllers
             {
                 return NotFound();
             }
-            
+
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -435,8 +442,8 @@ namespace ZMM.App.Controllers
                         {"executedAt",r.executedAt}
                     });
                 }
-                string idExisted = SchedulerPayload.GetById(id).Where(i=>i.Type == "AUTOML" && i.Id == id).Select(i=>i.Id).FirstOrDefault();
-                if(idExisted == id)
+                string idExisted = SchedulerPayload.GetById(id).Where(i => i.Type == "AUTOML" && i.Id == id).Select(i => i.Id).FirstOrDefault();
+                if (idExisted == id)
                 {
                     id = id + userModelName;
                 }
@@ -459,7 +466,7 @@ namespace ZMM.App.Controllers
                     ZMKResponse = tresp.ToList<object>(),
                     Status = "COMPLETED",
                     History = jHist.ToList<object>()
-                };                
+                };
                 SchedulerPayload.Create(schJob);
 
                 //
@@ -1143,17 +1150,19 @@ namespace ZMM.App.Controllers
             try
             {
                 //read request body
-                  using (var reader = new StreamReader(Request.Body))
-                 {
-                     var body = reader.ReadToEnd();
-                     reqBody = body.ToString();
-                 }
-                 //get new filename
-                 if (!string.IsNullOrEmpty(reqBody)) 
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var body = reader.ReadToEnd();
+                    reqBody = body.ToString();
+                }
+                //get new filename
+                if (!string.IsNullOrEmpty(reqBody))
 
                 {
                     var content = JObject.Parse(reqBody);
                     newFileName = (string)content["newName"];
+                    if (!FilePathHelper.IsFileNameValid(newFileName))
+                        return BadRequest("Renaming file failed.");
                     newFileName = Regex.Replace(newFileName, "[\n\r\t]", string.Empty);
                     newFileName = Regex.Replace(newFileName, @"\s", string.Empty);
                 }
@@ -1425,6 +1434,7 @@ namespace ZMM.App.Controllers
         {
             string response = string.Empty;
             string reqBody = string.Empty;
+            string modelName = "";
 
             DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(AutoMLResponse));
             AutoMLResponse autoMLResp = (AutoMLResponse)deserializer.ReadObject(Request.Body);
@@ -1433,6 +1443,7 @@ namespace ZMM.App.Controllers
                 try
                 {
                     reqBody = JsonConvert.SerializeObject(autoMLResp);
+                    modelName = JObject.Parse(reqBody)["newPMMLFileName"].ToString();
                     response = await _client.AnamolyModel(reqBody);
                 }
                 catch (Exception ex)
@@ -1470,8 +1481,8 @@ namespace ZMM.App.Controllers
                     DateCreated = DateTime.Now,
                     EditedOn = DateTime.Now.ToString(),
                     FilePath = "",
-                    Id = id,
-                    Name = id,
+                    Id = modelName,
+                    Name = modelName,
                     Type = "ANAMOLY",
                     Url = "",
                     Recurrence = "ONE_TIME",

@@ -158,6 +158,16 @@ namespace ZMM.App.Controllers
                     p["username"] = "******";
                     p["password"] = "******";
                 }
+
+                if(p["type"].ToString() == "DH")
+                {                    
+                    p["tenantID"].Parent.Remove();
+                }
+                else
+                {
+                    p["port"].Parent.Remove();
+                    p["driver"].Parent.Remove();
+                }
             }
             //
 

@@ -39,7 +39,7 @@ namespace ZMM.App.Controllers
         private List<CodeResponse> codeResponse;
 
         private readonly string BASEURLJUP;
-        private static string[] extensions = new[] { "py", "ipynb","r" };
+        private static string[] extensions = new[] { "py", "ipynb", "r" };
 
         private readonly IScheduler _scheduler;
 
@@ -58,7 +58,7 @@ namespace ZMM.App.Controllers
             this.BASEURLJUP = Configuration["JupyterServer:srvurl"];
             try
             {
-                codeResponse = CodePayload.Get();
+                codeResponse = CodePayload.Get().Where(c => c.Name.Contains("-checkpoint.ipynb") == false).ToList<CodeResponse>();
             }
             catch (Exception ex)
             {
@@ -100,6 +100,8 @@ namespace ZMM.App.Controllers
                     }
                     existingCodeData.Clear();
                     //
+                    if (!FilePathHelper.IsFileNameValid(formFile.FileName))
+                        return BadRequest("File name not valid.");
                     if (!IsFileExists)
                     {
                         var fileExt = System.IO.Path.GetExtension(formFile.FileName).Substring(1);
@@ -188,7 +190,7 @@ namespace ZMM.App.Controllers
             {
                 CodePayload.Clear();
                 InitZmodDirectory.ScanCodeDirectory();
-                codeResponse = CodePayload.Get();
+                codeResponse = CodePayload.Get().Where(c => c.Name.Contains("-checkpoint.ipynb") == false).ToList<CodeResponse>();
             }
 
             //
@@ -288,7 +290,7 @@ namespace ZMM.App.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
-            if(InstancePayload.IsInstanceExists(id) && CodePayload.GetById(id).Type == "JUPYTER_NOTEBOOK")
+            if (InstancePayload.IsInstanceExists(id) && CodePayload.GetById(id).Type == "JUPYTER_NOTEBOOK")
             {
                 return BadRequest(new { user = string.Empty, id = id, message = "Error deleting file. Instance of the file is running. Check Assests module" });
             }
@@ -431,6 +433,8 @@ namespace ZMM.App.Controllers
                 {
                     var content = JObject.Parse(reqBody);
                     newFileName = (string)content["newName"];
+                    if (!FilePathHelper.IsFileNameValid(newFileName))
+                        return BadRequest(new { message = "Renaming file failed." });
                     newFileName = Regex.Replace(newFileName, "[\n\r\t]", string.Empty);
                     newFileName = Regex.Replace(newFileName, @"\s", string.Empty);
                 }
@@ -625,7 +629,7 @@ namespace ZMM.App.Controllers
                     {
                         //add history
                         JArray jHist = new JArray();
-                        foreach(var r in tresp)
+                        foreach (var r in tresp)
                         {
                             jHist.Add(new JObject(){
                                     {"idforData", r.idforData},
@@ -653,8 +657,8 @@ namespace ZMM.App.Controllers
                             Status = "",
                             History = jHist.ToList<object>()
                         };
-                        
-                        
+
+
                         SchedulerPayload.Create(schJob);
                     }
 
