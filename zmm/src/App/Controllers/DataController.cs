@@ -266,7 +266,7 @@ namespace ZMM.App.Controllers
                             {
                                 type = "FOLDER";
                                 string zipFileName = fileName.Substring(0, fileName.Length - 4);
-
+                                filePath = DirectoryHelper.GetDataDirectoryPath() + zipFileName + ".zip";
                                 //extract
                                 await ZipHelper.ExtractAsync(fileStream.Name, $"{dirFullpath}{zipFileName}");
                                 //add properties
@@ -324,8 +324,13 @@ namespace ZMM.App.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message + "filepath :" + filePath);
-
+                #region Remove download file if exists on error
+                if(System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+                #endregion
+                return BadRequest(ex.Message);
             }
 
             if (_response.Count > 0)
