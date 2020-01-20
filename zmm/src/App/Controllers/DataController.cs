@@ -84,7 +84,7 @@ namespace ZMM.App.Controllers
             //
             // InitZmodDirectory.ScanDirectoryToSeed();
             //
-            responseData = DataPayload.Get();
+            responseData = DataPayload.Get().Where(d => d.Id.Contains("logs") == false && d.Type != "FOLDER").ToList<DataResponse>();
             modelResponseData = ModelPayload.Get();
             codeResponseData = CodePayload.Get();
         }
@@ -100,7 +100,7 @@ namespace ZMM.App.Controllers
             {
                 DataPayload.Clear();
                 InitZmodDirectory.ScanDataDirectory();
-                responseData = DataPayload.Get();
+                responseData = DataPayload.Get().Where(d => d.Id.Contains("logs") == false && d.Type != "FOLDER").ToList<DataResponse>();
             }
             //
             string jsonStr = JsonConvert.SerializeObject(responseData, Formatting.Indented);
