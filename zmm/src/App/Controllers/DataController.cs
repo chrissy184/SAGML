@@ -171,6 +171,8 @@ namespace ZMM.App.Controllers
                     if (formFile.Length > 0)
                     {
                         fileName = formFile.FileName;
+                        if (!FilePathHelper.IsFileNameValid(fileName))
+                            return BadRequest("File name not valid.");
                         //check if the file with the same name exists
                         existingData = DataPayload.Get();
                         if (existingData.Count > 0)
@@ -388,7 +390,7 @@ namespace ZMM.App.Controllers
         {
             string response = string.Empty;
             string reqBody = string.Empty;
-            string userModelName="";
+            string userModelName = "";
 
             using (var reader = new StreamReader(Request.Body))
             {
@@ -415,7 +417,7 @@ namespace ZMM.App.Controllers
             {
                 return NotFound();
             }
-            
+
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -435,8 +437,8 @@ namespace ZMM.App.Controllers
                         {"executedAt",r.executedAt}
                     });
                 }
-                string idExisted = SchedulerPayload.GetById(id).Where(i=>i.Type == "AUTOML" && i.Id == id).Select(i=>i.Id).FirstOrDefault();
-                if(idExisted == id)
+                string idExisted = SchedulerPayload.GetById(id).Where(i => i.Type == "AUTOML" && i.Id == id).Select(i => i.Id).FirstOrDefault();
+                if (idExisted == id)
                 {
                     id = id + userModelName;
                 }
@@ -459,7 +461,7 @@ namespace ZMM.App.Controllers
                     ZMKResponse = tresp.ToList<object>(),
                     Status = "COMPLETED",
                     History = jHist.ToList<object>()
-                };                
+                };
                 SchedulerPayload.Create(schJob);
 
                 //
@@ -1143,17 +1145,19 @@ namespace ZMM.App.Controllers
             try
             {
                 //read request body
-                  using (var reader = new StreamReader(Request.Body))
-                 {
-                     var body = reader.ReadToEnd();
-                     reqBody = body.ToString();
-                 }
-                 //get new filename
-                 if (!string.IsNullOrEmpty(reqBody)) 
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var body = reader.ReadToEnd();
+                    reqBody = body.ToString();
+                }
+                //get new filename
+                if (!string.IsNullOrEmpty(reqBody))
 
                 {
                     var content = JObject.Parse(reqBody);
                     newFileName = (string)content["newName"];
+                    if (!FilePathHelper.IsFileNameValid(formFile.FileName))
+                        return BadRequest("Renaming file failed.");
                     newFileName = Regex.Replace(newFileName, "[\n\r\t]", string.Empty);
                     newFileName = Regex.Replace(newFileName, @"\s", string.Empty);
                 }
@@ -1425,7 +1429,7 @@ namespace ZMM.App.Controllers
         {
             string response = string.Empty;
             string reqBody = string.Empty;
-            string modelName="";
+            string modelName = "";
 
             DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(AutoMLResponse));
             AutoMLResponse autoMLResp = (AutoMLResponse)deserializer.ReadObject(Request.Body);
