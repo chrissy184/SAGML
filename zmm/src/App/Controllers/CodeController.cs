@@ -58,7 +58,7 @@ namespace ZMM.App.Controllers
             this.BASEURLJUP = Configuration["JupyterServer:srvurl"];
             try
             {
-                codeResponse = CodePayload.Get();
+                codeResponse = CodePayload.Get().Where(c=>c.Name.Contains("-checkpoint.ipynb") == false).ToList<CodeResponse>();
             }
             catch (Exception ex)
             {
@@ -188,7 +188,7 @@ namespace ZMM.App.Controllers
             {
                 CodePayload.Clear();
                 InitZmodDirectory.ScanCodeDirectory();
-                codeResponse = CodePayload.Get();
+                codeResponse = CodePayload.Get().Where(c=>c.Name.Contains("-checkpoint.ipynb") == false).ToList<CodeResponse>();
             }
 
             //
