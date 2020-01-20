@@ -43,6 +43,11 @@ initiateLogging()
 create_lock()
 create_lockForModel()
 
+try:
+    os.mkdir('logs')
+except:
+    pass
+
 pref='api/v1/'
 
 urlpatterns=[
