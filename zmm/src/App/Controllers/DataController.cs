@@ -1425,6 +1425,7 @@ namespace ZMM.App.Controllers
         {
             string response = string.Empty;
             string reqBody = string.Empty;
+            string modelName="";
 
             DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(AutoMLResponse));
             AutoMLResponse autoMLResp = (AutoMLResponse)deserializer.ReadObject(Request.Body);
@@ -1433,6 +1434,7 @@ namespace ZMM.App.Controllers
                 try
                 {
                     reqBody = JsonConvert.SerializeObject(autoMLResp);
+                    modelName = JObject.Parse(reqBody)["newPMMLFileName"].ToString();
                     response = await _client.AnamolyModel(reqBody);
                 }
                 catch (Exception ex)
@@ -1470,8 +1472,8 @@ namespace ZMM.App.Controllers
                     DateCreated = DateTime.Now,
                     EditedOn = DateTime.Now.ToString(),
                     FilePath = "",
-                    Id = id,
-                    Name = id,
+                    Id = modelName,
+                    Name = modelName,
                     Type = "ANAMOLY",
                     Url = "",
                     Recurrence = "ONE_TIME",
