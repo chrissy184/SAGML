@@ -37,6 +37,11 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
 from testUseCase.initLog import initiateLogging
 
+try:
+    import os
+    os.mkdir('logs')
+except:
+    pass
 
 initiateLogging()
 
