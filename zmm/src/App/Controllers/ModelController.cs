@@ -44,7 +44,7 @@ namespace ZMM.App.Controllers
         private readonly IPyTensorServiceClient tbClient;
         private List<ModelResponse> responseData;
         private List<DataResponse> dataResponseData;
-        private static string[] extensions = new[] { "pmml", "onyx" };
+        private static string[] extensions = new[] { "pmml", "onnx" };
         private readonly IScheduler _scheduler;
         #endregion
 
