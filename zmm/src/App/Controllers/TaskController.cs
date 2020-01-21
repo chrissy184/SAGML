@@ -103,36 +103,60 @@ namespace ZMM.App.Controllers
                 JArray jArr = (JArray)joResp["runningTask"];
                 JArray jHist = new JArray();
                 //
-                foreach(var i in jArr.Children())
+                foreach (var i in jArr.Children())
                 {
                     foreach (var j in taskData.History)
                     {
                         string _type = j.GetType().ToString();
+
                         if (_type.Contains("ExecuteCodeResponse"))
                         {
                             ExecuteCodeResponse ecr = (ExecuteCodeResponse)j;
-                            if (i["idforData"].ToString() == ecr.idforData)
+                            if (!ecr.status.Contains("Complete"))
                             {
-                                jHist.Add(new JObject(){
+                                if (i["idforData"].ToString() == ecr.idforData)
+                                {
+                                    jHist.Add(new JObject(){
                                     {"idforData", ecr.idforData},
                                     {"status", i["status"].ToString()},
                                     {"executedAt",ecr.executedAt}
                                 });
-                                break;
+                                    break;
+                                }
                             }
                         }
-                        else if(_type.Contains("AutoMLResponse"))
+                        else if (_type.Contains("AutoMLResponse"))
                         {
                             AutoMLResponse amlr = (AutoMLResponse)j;
-                            if (i["idforData"].ToString() == amlr.idforData)
+                            if (!amlr.idforData.Contains("Complete"))
                             {
-                                jHist.Add(new JObject(){
+                                if (i["idforData"].ToString() == amlr.idforData)
+                                {
+                                    jHist.Add(new JObject(){
                                     {"idforData", amlr.idforData},
                                     {"status", i["status"].ToString()},
                                     {"executedAt",amlr.executedAt}
                                 });
-                                break;
+                                    break;
+                                }
                             }
+                        }
+                        else if (_type.Contains("Newtonsoft.Json.Linq.JObject"))
+                        {
+                            var jObj = JObject.Parse(j.ToString());
+                            if (!jObj["status"].ToString().Contains("Complete"))
+                            {
+                                if (i["idforData"].ToString() == jObj["idforData"].ToString())
+                                {
+                                    jHist.Add(new JObject(){
+                                    {"idforData", jObj["idforData"].ToString()},
+                                    {"status", i["status"].ToString()},
+                                    {"executedAt",jObj["executedAt"].ToString()}
+                                });
+                                    break;
+                                }
+                            }
+
                         }
                     }
                 }
