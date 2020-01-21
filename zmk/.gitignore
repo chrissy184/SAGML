@@ -17,6 +17,7 @@
 ./utility/migrations/*
 ./utility/__pycache__/*
 ./zmk/__pycache__/*
+logs/* 
 *.ipynb
 
 *.pyc
