@@ -34,11 +34,13 @@ Cumulocity IOT ML Workbench allows it's user to cover a wide variety of algorith
 ## Feature(s)
 1. AutoML.
 2. Support for Nueral Network and Workflow for ai projects.
-2. Integration with Cumulocity to import data.
-3. User Interface to drag and drop, edit, train or load model in memory.
-3. Integration with Data Scientist's Tools such as JupyterNotebook and Tensorboard.
-4. Repo (UMOYA CLI) as model management framework for versioning models and its resource (data and code) dependencies.
-5. User specific configurations to connect various tanents.
+3. Integration with Cumulocity to import data.
+4. User Interface to drag and drop, edit, train or load model in memory.
+5. Integration with Data Scientist's Tools such as JupyterNotebook and Tensorboard.
+6. Repo (UMOYA CLI) as model management framework for versioning models and its resource (data and code) dependencies.
+7. User specific configurations to connect various tanents.
+8. {{New features are coming for 10.5.0 beta release.}}
+
 
 ## Submitting patches
 1. Fork and create branch.
