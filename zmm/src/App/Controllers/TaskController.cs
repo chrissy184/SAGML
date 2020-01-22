@@ -98,7 +98,16 @@ namespace ZMM.App.Controllers
 
             if (!string.IsNullOrEmpty(taskData.Id))
             {
-                var resp = await nnclient.GetRunningTaskByTaskName(id);
+                string origid = "";
+                if (id.IndexOf('-') > 0)
+                {
+                    origid = id.Substring(0, id.IndexOf('-'));
+                }
+                else
+                {
+                    origid = id;
+                }
+                var resp = await nnclient.GetRunningTaskByTaskName(origid);
                 JObject joResp = JObject.Parse(resp);
                 JArray jArr = (JArray)joResp["runningTask"];
                 JArray jHist = new JArray();
