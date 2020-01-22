@@ -1162,7 +1162,7 @@ namespace ZMM.App.Controllers
                     var content = JObject.Parse(reqBody);
                     newFileName = (string)content["newName"];
                     if (!FilePathHelper.IsFileNameValid(newFileName))
-                        return BadRequest("Renaming file failed.");
+                      return BadRequest(new { message = "Renaming file failed. Invalid file name." });
                     newFileName = Regex.Replace(newFileName, "[\n\r\t]", string.Empty);
                     newFileName = Regex.Replace(newFileName, @"\s", string.Empty);
                 }
@@ -1474,6 +1474,11 @@ namespace ZMM.App.Controllers
                         {"executedAt",r.executedAt}
                     });
                 }
+                string idExisted = SchedulerPayload.GetById(id).Where(i => i.Type == "ANAMOLY" && i.Id == id).Select(i => i.Id).FirstOrDefault();
+                if (idExisted == id)
+                {
+                    id = $"{id}-{modelName}";
+                }
                 SchedulerResponse schJob = new SchedulerResponse()
                 {
                     CreatedOn = DateTime.Now.ToString(),
@@ -1490,7 +1495,7 @@ namespace ZMM.App.Controllers
                     StartTimeH = "",
                     StartTimeM = "",
                     ZMKResponse = tresp.ToList<object>(),
-                    Status = "COMPLETED",
+                    // Status = "COMPLETED",
                     History = jHist.ToList<object>()
                 };
                 SchedulerPayload.Create(schJob);

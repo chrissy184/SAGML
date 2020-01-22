@@ -434,7 +434,7 @@ namespace ZMM.App.Controllers
                     var content = JObject.Parse(reqBody);
                     newFileName = (string)content["newName"];
                     if (!FilePathHelper.IsFileNameValid(newFileName))
-                        return BadRequest(new { message = "Renaming file failed." });
+                        return BadRequest(new { message = "Renaming file failed. Invalid file name." });
                     newFileName = Regex.Replace(newFileName, "[\n\r\t]", string.Empty);
                     newFileName = Regex.Replace(newFileName, @"\s", string.Empty);
                 }
