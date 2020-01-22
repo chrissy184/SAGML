@@ -1481,7 +1481,7 @@ namespace ZMM.App.Controllers
                     DateCreated = DateTime.Now,
                     EditedOn = DateTime.Now.ToString(),
                     FilePath = "",
-                    Id = modelName,
+                    Id = id,
                     Name = modelName,
                     Type = "ANAMOLY",
                     Url = "",
