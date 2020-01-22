@@ -93,7 +93,7 @@ namespace ZMM.App.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSelectedTaskAysnc(string id)
         {
-            // var history = SchedulerPayload.Get();
+            
             var taskData = SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault();
 
             if (!string.IsNullOrEmpty(taskData.Id))
