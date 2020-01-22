@@ -53,7 +53,7 @@ class NewModelOperations:
     def getTargetAndColumnsName(self,modObjToDetect):
         targetCol=None
         listOFColumns=[]
-        if modObjToDetect.__dict__['original_tagname_'] in ['MiningModel','DeepNetwork','RegressionModel','AnomalyDetectionModel','NearestNeighborModel']:
+        if modObjToDetect.__dict__['original_tagname_'] in ['TreeModel','MiningModel','DeepNetwork','RegressionModel','AnomalyDetectionModel','NearestNeighborModel']:
             try:
                 for minF in modObjToDetect.get_MiningSchema().__dict__['MiningField']:
                     if minF.__dict__['usageType'] == 'target':
@@ -72,7 +72,7 @@ class NewModelOperations:
             listOFColumns=[]
         return listOFColumns,targetCol,modelPath
 
-    def nyObjOfModel(self,pmmlObj,singMod):
+    def nyObjOfModel(self,pmmlObj,singMod,tfForModel):
         import nyoka.PMML43Ext as ny
         if singMod['pmmlModelObject'].__dict__['original_tagname_']=='MiningModel':
             nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,MiningModel=[singMod['pmmlModelObject']])
@@ -98,6 +98,8 @@ class NewModelOperations:
             nyokaObj=ny.PMML(MiningBuildTask=pmmlObj.MiningBuildTask,DataDictionary=pmmlObj.DataDictionary,TreeModel=[singMod['pmmlModelObject']])
         else:
             nyokaObj=None
+        if nyokaObj and tfForModel:
+            nyokaObj.set_TransformationDictionary([tfForModel])
         return nyokaObj
 
     def getPredictionClassName(self,pmmlObj):
@@ -152,23 +154,29 @@ class NewModelOperations:
             tempDict['score']={}
             print ('print  step LM 1')
             for singMod in modelObj:
+                # print ('signModel',singMod)
+                tfForModel=None
+                for tD in pmmlObj.__dict__['TransformationDictionary']:
+                    if tD.__dict__['for_'] == singMod['pmmlModelObject'].modelName:
+                        tfForModel=tD
+
                 # print (singMod['pmmlModelObject'].taskType,singMod['pmmlModelObject'].modelName)
                 if singMod['pmmlModelObject'].taskType=='trainAndscore':
                     tempDict['train'][singMod['pmmlModelObject'].modelName]={}
                     tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
                     tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
-                    tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
+                    tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod,tfForModel)
                     tempDict['train'][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
                     tempDict['score'][singMod['pmmlModelObject'].modelName]={}
                     tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
                     tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
-                    tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
+                    tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod,tfForModel)
                     tempDict['score'][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
                 else:
                     tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]={}
                     tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']=singMod
                     tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlDdicObj']=pmmlObj.DataDictionary
-                    tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod)
+                    tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['pmmlNyokaObj']=self.nyObjOfModel(pmmlObj,singMod,tfForModel)
                     tempDict[singMod['pmmlModelObject'].taskType][singMod['pmmlModelObject'].modelName]['modelObj']['predictedClasses']=self.getPredictionClassName(pmmlObj)
             print ('print  step LM 2')
             tempDict2={}
