@@ -110,35 +110,39 @@ export class TasksComponent implements OnInit {
             });
     }
 
-    public selectTaskHistory(selectedHistory: any) {
-        console.log(selectedHistory);
-        this.selectedHistory = selectedHistory;
-        this.dataSourceTaskHistoryGenerationResults = [];
-        this.isContentLoading = true;
-        this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.taskGetHistory(this.selectedTask.id, selectedHistory.idforData))
-            .pipe(finalize(() => { this.isContentLoading = false; }))
-            .subscribe(response => {
-                console.log(response);
-                this.selectedTask.status = response.status;
-                if (response.errorMessage) {
-                    this.selectedTask.errorMessage = response.errorMessage;
-                    this.utilService.alert(AlertMessages.TASK.taskError);
-                } else {
-                    if (this.selectedTask.type === 'AUTOML') {
-                        this.dataSourceTaskHistoryGenerationResults = new MatTableDataSource(response.generationInfo);
-                        this.dataSourceTaskHistoryGenerationResults.paginator = this.paginatorGenerationResults;
-                        this.dataSourceTaskHistoryGenerationResults.sort = this.sortGenerationResults;
-                        this.selectedHistory.pmmlFilelocation = response.pmmlFilelocation;
-                        this.selectedHistory.newPMMLFileName = response.newPMMLFileName;
-                        this.selectedHistory.status = response.status;
-                    } else if (this.selectedTask.type === 'PYTHON') {
-                        this.selectedTask.information = response.information;
-                    } else if (this.selectedTask.type === 'NN' && response.tensorboardUrl) {
-                        this.selectedTask.tensorboardUrl = response.tensorboardUrl + '?t=' + Date.now();
-                        this.iframeLoaded();
+    public selectTaskHistory(selectedHistory: any, expandedElement: any) {
+        console.log(expandedElement);
+        if (expandedElement) {
+            this.selectedHistory = selectedHistory;
+            this.dataSourceTaskHistoryGenerationResults = [];
+            this.isContentLoading = true;
+            this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.taskGetHistory(this.selectedTask.id, selectedHistory.idforData))
+                .pipe(finalize(() => { this.isContentLoading = false; }))
+                .subscribe(response => {
+                    console.log(response);
+                    this.selectedTask.status = response.status;
+                    if (response.errorMessage) {
+                        this.selectedTask.errorMessage = response.errorMessage;
+                        this.utilService.alert(AlertMessages.TASK.taskError);
+                    } else {
+                        if (this.selectedTask.type === 'AUTOML') {
+                            this.dataSourceTaskHistoryGenerationResults = new MatTableDataSource(response.generationInfo);
+                            this.dataSourceTaskHistoryGenerationResults.paginator = this.paginatorGenerationResults;
+                            this.dataSourceTaskHistoryGenerationResults.sort = this.sortGenerationResults;
+                            this.selectedHistory.pmmlFilelocation = response.pmmlFilelocation;
+                            this.selectedHistory.newPMMLFileName = response.newPMMLFileName;
+                            this.selectedHistory.status = response.status;
+                        } else if (this.selectedTask.type === 'PYTHON') {
+                            this.selectedTask.information = response.information;
+                        } else if (this.selectedTask.type === 'NN' && response.tensorboardUrl) {
+                            this.selectedTask.tensorboardUrl = response.tensorboardUrl + '?t=' + Date.now();
+                            this.iframeLoaded();
+                        }
                     }
-                }
-            });
+                });
+        } else {
+            this.selectedHistory = {};
+        }
     }
 
     public refreshTask() {
