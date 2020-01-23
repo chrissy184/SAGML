@@ -290,19 +290,22 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> DeleteTaskAsync(string id)
         {
             string response = string.Empty;
+            //delete job from scheduler
+            // First we must get a reference to a scheduler
+            ISchedulerFactory schfack = new StdSchedulerFactory();
+            IScheduler scheduler = await schfack.GetScheduler();
+            string filePath = SchedulerPayload.GetById(id).Select(c=> c.FilePath).FirstOrDefault();
+            var jobKey = new JobKey(filePath);
+            bool isDeleted = await scheduler.DeleteJob(jobKey);
             //
-            SchedulerPayload.Delete(id);
-            //
-            response = await nnclient.DeleteRunningTask(id);
-            // if (!string.IsNullOrEmpty(response))
-            // {
-            //     JObject jsonObj = JObject.Parse(response);
-            //     return Json(jsonObj);
-            // }
-            // else
-            // {                
-            //     return BadRequest("error!");
-            // }
+            if(isDeleted)
+            {
+                SchedulerPayload.Delete(id);
+                //
+                response = await nnclient.DeleteRunningTask(id);
+            }
+            
+          
             return Json(new { message = "Task deleted.", id = id });
         }
 
