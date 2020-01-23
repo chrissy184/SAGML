@@ -147,7 +147,7 @@
                   <dd class="col-sm-9">{{ selectedModel.created_on  | date: 'dd MMM yy, hh:mm a'  }}</dd>
                   <ng-template ngFor let-item [ngForOf]="selectedModel?.information">
                     <dt class="col-sm-3 text-truncate text-capitalize">{{ item.property }}</dt>
-                    <dd class="col-sm-9">{{ item.value }}</dd>
+                    <dd class="col-sm-9">{{ isArray(item.value) ? item.value.join(", ") : item.value }}</dd>
                   </ng-template>
                 </dl>
               </div>
