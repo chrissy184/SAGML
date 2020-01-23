@@ -618,7 +618,7 @@ namespace ZMM.App.Controllers
                                 //cronjson["startDate"].ToString(),
                                 StartTimeH = (cronjson["startTimeH"] == null) ? "" : cronjson["startTimeH"].ToString(),
                                 StartTimeM = (cronjson["startTimeM"] == null) ? "" : cronjson["startTimeM"].ToString(),
-                                ZMKResponse = tresp.ToList<object>(),
+                                // ZMKResponse = tresp.ToList<object>(),
                                 History = tresp.ToList<object>()
                             };
                             SchedulerPayload.Create(schJob);
@@ -653,7 +653,7 @@ namespace ZMM.App.Controllers
                             StartDate = "",
                             StartTimeH = "",
                             StartTimeM = "",
-                            ZMKResponse = tresp.ToList<object>(),
+                            // ZMKResponse = tresp.ToList<object>(),
                             Status = "",
                             History = jHist.ToList<object>()
                         };

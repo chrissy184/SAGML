@@ -463,7 +463,7 @@ namespace ZMM.App.Controllers
                     StartDate = "",
                     StartTimeH = "",
                     StartTimeM = "",
-                    ZMKResponse = tresp.ToList<object>(),
+                    // ZMKResponse = tresp.ToList<object>(),
                     Status = "COMPLETED",
                     History = jHist.ToList<object>()
                 };
@@ -1494,7 +1494,7 @@ namespace ZMM.App.Controllers
                     StartDate = "",
                     StartTimeH = "",
                     StartTimeM = "",
-                    ZMKResponse = tresp.ToList<object>(),
+                    // ZMKResponse = tresp.ToList<object>(),
                     // Status = "COMPLETED",
                     History = jHist.ToList<object>()
                 };
