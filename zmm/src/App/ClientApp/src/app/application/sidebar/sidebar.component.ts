@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { UtilService } from '../../shared';
 
 @Component({
   selector: 'app-sidebar',
@@ -6,10 +7,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
-
-  constructor() { }
+  version: string;
+  versionFull: string;
+  constructor(private utilService: UtilService) { }
 
   ngOnInit() {
+    this.version = this.utilService.getAppVersion().split('.');
+    this.versionFull = this.utilService.getAppVersion();
   }
 
 }
