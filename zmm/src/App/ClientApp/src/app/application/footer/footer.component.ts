@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { UtilService } from '../../shared';
 
 @Component({
   selector: 'app-footer',
@@ -7,13 +6,8 @@ import { UtilService } from '../../shared';
   styleUrls: ['./footer.component.scss']
 })
 export class FooterComponent implements OnInit {
+  constructor() { }
 
-  version: string;
-
-  constructor(private utilService: UtilService) { }
-
-  ngOnInit() {
-    this.version = this.utilService.getAppVersion();
-  }
+  ngOnInit() { }
 
 }
