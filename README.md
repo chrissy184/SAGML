@@ -1,17 +1,17 @@
-# Cumulocity IOT ML Workbench
+# ML Workbench
 [<img src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/logo.png" alt="zmod_logo" height="50" style="float:right"/>](https://www.zmod.org/)
 
 Making and (re-)training machine learning and deep learning models.
 
-[![Build status](https://dev.azure.com/zementis-ai/Cumulocity%20IOT%20ML%20Workbench/_apis/build/status/CI-Pipeline%20(ZMOD))](https://dev.azure.com/zementis-ai/Cumulocity%20IOT%20ML%20Workbench/_build/latest?definitionId=6)
+[![Build status](https://dev.azure.com/zementis-ai/ML%20Workbench/_apis/build/status/CI-Pipeline%20(MLW))](https://dev.azure.com/zementis-ai/ML%20Workbench/_build/latest?definitionId=6)
 
 <p align="left">
   <img width="100%" src="https://github.com/SoftwareAG/ZMOD/blob/master/docs/quick-snaps.gif">
 </p>
 
-**Cumulocity IOT ML Workbench** is an open source machine learning and artificial intelligence platform for Data Scientist to solve business problems faster and quicker, build prototypes and convert them to actual project. The modeler helps from data preparation to model building and deployment, the tool supports a large variety of algorithms that can be run without a single line of code. The web based tool has various components which help Data Scientist of different skill levels to perfrom several model building tasks and provides deployment ready PMML files which can be hosted as a REST services.
+**ML Workbench** is an open source machine learning and artificial intelligence platform for Data Scientist to solve business problems faster and quicker, build prototypes and convert them to actual project. The modeler helps from data preparation to model building and deployment, the tool supports a large variety of algorithms that can be run without a single line of code. The web based tool has various components which help Data Scientist of different skill levels to perfrom several model building tasks and provides deployment ready PMML files which can be hosted as a REST services.
 
-Cumulocity IOT ML Workbench allows it's user to cover a wide variety of algorithms and Deep Neural Network architectures, with minimal or No code enviornment. It is also one of the few deep-learning platforms to support the Predictive Model Markup Languaue (PMML) format, PMML allows for different statistical and data mining tools to speak the same language.
+ML Workbench allows it's user to cover a wide variety of algorithms and Deep Neural Network architectures, with minimal or No code enviornment. It is also one of the few deep-learning platforms to support the Predictive Model Markup Languaue (PMML) format, PMML allows for different statistical and data mining tools to speak the same language.
 * **AutoML** : Automatically train Machine learning models on data supports huge space of algorithms and hyper parameters tuning.
 * **Model Editor** : Create Deep Neural Network models using drag and drop functionality, which supports wide variety of model layers, once model architecture is ready, train your model. Editor also comes with pre-trained architcture templates that helps in quick model building and training.
 * **Jupyter Notebook** : It has integrated Jupyter Notebook (For R and Python).
@@ -20,7 +20,7 @@ Cumulocity IOT ML Workbench allows it's user to cover a wide variety of algorith
 * **REST API Support** :  It has REST APIs to use as deployment tool.
 
 ## Getting Started
-1. Visit live instance of [Cumulocity IOT ML Workbench](https://www.zmod.org/)
+1. Visit live instance of [ML Workbench](https://www.zmod.org/)
 2. Use your github account or register with us and login.
 3. Explore Use case(s) and product features from [YouTube video guide](https://www.zmod.org/learn)<br/>
    <b>Couple of popular topics</b>
