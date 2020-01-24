@@ -7,7 +7,7 @@ using ZMM.Models.ResponseMessages;
 namespace ZMM.Helpers.Tests
 {
     public class HelpersTest
-    {        
+    {
 
         #region FilePathHelper
         [Fact]
@@ -34,7 +34,7 @@ namespace ZMM.Helpers.Tests
             List<CodeResponse> records = new List<CodeResponse> {
                 record
             };
-           
+
             string result = FilePathHelper.GetFilePathById("HelloCode", records);
             //
             Assert.Equal("some Path", result);
@@ -64,13 +64,22 @@ namespace ZMM.Helpers.Tests
             List<DataResponse> records = new List<DataResponse> {
                 record
             };
-           
+
             string result = FilePathHelper.GetFilePathById("HelloData", records);
             //
             Assert.Equal("/home/zmod/data/Hello.csv", result);
         }
 
-        
+        [Fact]
+        public void TestIsFileNameValid()
+        {
+            System.Console.WriteLine("Start Test : TestIsFileNameValid");
+            string fileName = @"Hello.csv";
+
+            Assert.True(FilePathHelper.IsFileNameValid(fileName));
+            System.Console.WriteLine("End Test : TestIsFileNameValid");
+        }
         #endregion
+
     }
 }
