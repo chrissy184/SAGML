@@ -57,8 +57,9 @@ namespace ZMM.Helpers.Common
         public static bool IsFileNameValid(string FileName)
         {
             bool blnStatus = false;
+            
             foreach (byte b in Encoding.UTF8.GetBytes(FileName.ToCharArray()))
-                if (b == 9)
+                if (b == 92)
                     return blnStatus = false;
             if (FileName.IndexOfAny(InvalidFilenameChars) >= 0)
                 return blnStatus = false;
