@@ -912,6 +912,59 @@
       "icon": "mdi mdi-layers",
       "layerGroup": "Recurrent Layer",
       "layers":[
+        
+        {
+          "connectionLayerId": "NA",
+          "itemType": "LAYER",
+          "layerId": "NA",
+          "layerIndex": "NA",
+          "layerType": "SimpleRNN",
+          "trainable": true,
+          "name": "SimpleRNN",
+          "properties": [
+            {
+              "dataType": "array",
+              "hint": "Input Shape of the Data",
+              "id": "inputDimension",
+              "label": "Input Dimension",
+              "options": [],
+              "value": []
+            },
+            {
+              "dataType": "array",
+              "hint": "Output Dimension",
+              "id": "outputDimension",
+              "label": "Output Dimension",
+              "value": []
+            }
+          ]
+        },
+        {
+          "connectionLayerId": "NA",
+          "itemType": "LAYER",
+          "layerId": "NA",
+          "layerIndex": "NA",
+          "layerType": "GRU",
+          "trainable": true,
+          "name": "GRU",
+          "properties": [
+            {
+              "dataType": "array",
+              "hint": "Input Shape of the Data",
+              "id": "inputDimension",
+              "label": "Input Dimension",
+              "options": [],
+              "value": []
+            },
+            {
+              "dataType": "array",
+              "hint": "Output Dimension",
+              "id": "outputDimension",
+              "label": "Output Dimension",
+              "value": []
+            }
+          ]
+        },
         {
           "connectionLayerId": "NA",
           "itemType": "LAYER",
