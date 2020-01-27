@@ -464,7 +464,7 @@ namespace ZMM.App.Controllers
                     StartTimeH = "",
                     StartTimeM = "",
                     // ZMKResponse = tresp.ToList<object>(),
-                    Status = "COMPLETED",
+                    // Status = "COMPLETED",
                     History = jHist.ToList<object>()
                 };
                 SchedulerPayload.Create(schJob);
