@@ -4,7 +4,7 @@
     "Path": "jupyter-notebook",
     "Param": "",
     "Command.0.Name": "Start",
-    "Command.0.Value": "   --config=\"{NotebookConfigFile}\" --browser=no-browser --notebook-dir=\"{NotebookDir}\"  --NotebookApp.base_url=\"{LinkPrefix}\"  --port={Port}  --allow-root",
+    "Command.0.Value": "   --config=\"{NotebookConfigFile}\" --browser=no-browser --notebook-dir=\"{NotebookDir}\"  --NotebookApp.base_url=\"{LinkPrefix}\"  --port={Port}",
     "Command.1.Name": "List",
     "Command.1.Value": "list --json",
     "Command.2.Name": "Stop",

@@ -33,6 +33,7 @@ namespace ZMM.App
                 logging.AddEventSourceLogger();
             })   
             .UseStartup(Assembly.GetEntryAssembly().FullName)
+            .UseKestrel(opt => opt.AddServerHeader = false)
             .UseUrls("http://+:7007;https://+:7008");
     }
 }

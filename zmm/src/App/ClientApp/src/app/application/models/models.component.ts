@@ -320,6 +320,9 @@ export class ModelsComponent implements OnInit {
   closeFilter() {
     this.publishModelData = false;
   }
+  isArray(obj : any ) {
+    return Array.isArray(obj)
+ }
 
   ngOnInit() {
     this.getAllPMML();

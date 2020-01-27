@@ -203,8 +203,8 @@ namespace ZMM.App.Controllers
                             StartDate = cronjson["startDate"].ToString(),
                             StartTimeH = (cronjson["startTimeH"].ToString() == null) ? "" : cronjson["startTimeH"].ToString(),
                             StartTimeM = (cronjson["startTimeM"].ToString() == null) ? "" : cronjson["startTimeM"].ToString(),
-                            ZMKResponse = tresp.ToList<object>(),
-                            Status = "Scheduled"
+                            // ZMKResponse = tresp.ToList<object>(),
+                            // Status = "Scheduled"
                         };
                         SchedulerPayload.Create(schJob);
                         #endregion
@@ -300,7 +300,7 @@ namespace ZMM.App.Controllers
                             StartDate = cronjson["startDate"].ToString(),
                             StartTimeH = (cronjson["startTimeH"].ToString() == null) ? "" : cronjson["startTimeH"].ToString(),
                             StartTimeM = (cronjson["startTimeM"].ToString() == null) ? "" : cronjson["startTimeM"].ToString(),
-                            ZMKResponse = tresp.ToList<object>()
+                            // ZMKResponse = tresp.ToList<object>()
                         };
                         SchedulerPayload.Create(schJob);
                         #endregion

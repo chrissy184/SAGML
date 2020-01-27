@@ -19,5 +19,7 @@ namespace ZMM.Models.ResponseMessages
         [JsonProperty("password")] public string password { get; set; }
         [JsonProperty("url")] public string url { get; set; }
         [JsonProperty("selected")] public bool selected { get; set; }
-    }    
+        [JsonProperty("port")] public string port { get; set; }
+        [JsonProperty("driver")] public string driver { get; set; }
+    }
 }

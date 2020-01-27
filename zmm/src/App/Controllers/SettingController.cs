@@ -22,7 +22,7 @@ namespace ZMM.App.Controllers
     {
         #region Variables... 
         private readonly IWebHostEnvironment _environment;
-        readonly ILogger<CodeController> Logger;
+        readonly ILogger<SettingController> Logger;
         public IConfiguration Configuration { get; }
         // private List<ZSSettingResponse> settingsResponse;
 
@@ -31,7 +31,7 @@ namespace ZMM.App.Controllers
         #endregion
 
         #region Constructor...
-        public SettingController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<CodeController> log)
+        public SettingController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<SettingController> log)
         {
             //update 
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
@@ -96,6 +96,7 @@ namespace ZMM.App.Controllers
         {
             //get the zmodId
             string UserEmailId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            // string UserEmailId = "generic@softwareag.com";
             JObject jObj = new JObject();
             await Task.FromResult(0);
             var settings = ZSSettingPayload.GetSettingsByUser(UserEmailId);
@@ -128,7 +129,8 @@ namespace ZMM.App.Controllers
                         new SettingProperty{ name="Zementis Server",type="ZS",tenantID="zserver", username="vran",password="Testing@123",url="https://ai.eu-latest.cumulocity.com/",selected=true },
                         new SettingProperty{ name="Zementis Server",type="ZS",tenantID="zserver", username="",password="",url="https://zserver.zmod.org/adapars/",selected=false },
                         new SettingProperty{ name="Nyoka Remote 1",type="NR",tenantID="dlexp", username="",password="",url="https://dlexp.zmod.org/",selected=false },
-                        new SettingProperty{ name="Nyoka Remote 2",type="NR",tenantID="dlexp", username="",password="",url="https://hub.zmod.org/",selected=true }
+                        new SettingProperty{ name="Nyoka Remote 2",type="NR",tenantID="dlexp", username="",password="",url="https://hub.zmod.org/",selected=true },
+                        new SettingProperty{ name="DataHub 1",type="DH",driver="Dremio Connector", username="demo",password="iug2019#riga",url="dremio-demo.westeurope.cloudapp.azure.com",port="31010",selected=true }
                     }
                 };
                 jObj = JObject.Parse(JsonConvert.SerializeObject(template)); 
@@ -155,6 +157,16 @@ namespace ZMM.App.Controllers
                 {
                     p["username"] = "******";
                     p["password"] = "******";
+                }
+
+                if(p["type"].ToString() == "DH")
+                {                    
+                    p["tenantID"].Parent.Remove();
+                }
+                else
+                {
+                    p["port"].Parent.Remove();
+                    p["driver"].Parent.Remove();
                 }
             }
             //

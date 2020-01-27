@@ -92,48 +92,96 @@ namespace ZMM.App.Controllers
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSelectedTaskAysnc(string id)
-        {
-            // var history = SchedulerPayload.Get();
+        {            
             var taskData = SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault();
 
             if (!string.IsNullOrEmpty(taskData.Id))
             {
-                var resp = await nnclient.GetRunningTaskByTaskName(id);
+                string origid = "";
+                if (id.IndexOf('-') > 0)
+                {
+                    origid = id.Substring(0, id.IndexOf('-'));
+                }
+                else
+                {
+                    origid = id;
+                }
+                var resp = await nnclient.GetRunningTaskByTaskName(origid);
                 JObject joResp = JObject.Parse(resp);
                 JArray jArr = (JArray)joResp["runningTask"];
                 JArray jHist = new JArray();
                 //
-                foreach(var i in jArr.Children())
+                foreach (var i in jArr.Children())
                 {
                     foreach (var j in taskData.History)
                     {
                         string _type = j.GetType().ToString();
+
                         if (_type.Contains("ExecuteCodeResponse"))
                         {
                             ExecuteCodeResponse ecr = (ExecuteCodeResponse)j;
-                            if (i["idforData"].ToString() == ecr.idforData)
+                            if (!ecr.status.Contains("Complete"))
                             {
-                                jHist.Add(new JObject(){
+                                if (i["idforData"].ToString() == ecr.idforData)
+                                {
+                                    jHist.Add(new JObject(){
                                     {"idforData", ecr.idforData},
                                     {"status", i["status"].ToString()},
                                     {"executedAt",ecr.executedAt}
                                 });
-                                break;
+                                    break;
+                                }
                             }
                         }
-                        else if(_type.Contains("AutoMLResponse"))
+                        else if (_type.Contains("AutoMLResponse"))
                         {
                             AutoMLResponse amlr = (AutoMLResponse)j;
-                            if (i["idforData"].ToString() == amlr.idforData)
+                            if (!amlr.status.Contains("Complete"))
                             {
-                                jHist.Add(new JObject(){
+                                if (i["idforData"].ToString() == amlr.idforData)
+                                {
+                                    jHist.Add(new JObject(){
                                     {"idforData", amlr.idforData},
                                     {"status", i["status"].ToString()},
                                     {"executedAt",amlr.executedAt}
                                 });
-                                break;
+                                    break;
+                                }
                             }
                         }
+                        else
+                        {
+                            var jObj = JObject.Parse(j.ToString());
+                            foreach(var item in taskData.History)
+                            {
+                                // if (i["idforData"].ToString() == item.)
+                                // {
+                                //     jHist.Add(new JObject(){
+                                //     {"idforData", ecr.idforData},
+                                //     {"status", i["status"].ToString()},
+                                //     {"executedAt",ecr.executedAt}
+                                // });
+                            }
+                        }
+                        // else if (_type.Contains("Newtonsoft.Json.Linq.JObject"))
+                        // {
+                        //     var jObj = JObject.Parse(j.ToString());
+                        //     if (!jObj["status"].ToString().Contains("Complete"))
+                        //     {
+                        //         if (i["idforData"].ToString() == jObj["idforData"].ToString())
+                        //         {
+                        //             jHist.Add(new JObject(){
+                        //             {"idforData", jObj["idforData"].ToString()},
+                        //             {"status", i["status"].ToString()},
+                        //             {"executedAt",jObj["executedAt"].ToString()}
+                        //         });
+                        //             break;
+                        //         }
+                        //     }
+
+                        // }
+
+                        
                     }
                 }
                 //
@@ -257,19 +305,22 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> DeleteTaskAsync(string id)
         {
             string response = string.Empty;
+            //delete job from scheduler
+            // First we must get a reference to a scheduler
+            ISchedulerFactory schfack = new StdSchedulerFactory();
+            IScheduler scheduler = await schfack.GetScheduler();
+            string filePath = SchedulerPayload.GetById(id).Select(c=> c.FilePath).FirstOrDefault();
+            var jobKey = new JobKey(filePath);
+            bool isDeleted = await scheduler.DeleteJob(jobKey);
             //
-            SchedulerPayload.Delete(id);
-            //
-            response = await nnclient.DeleteRunningTask(id);
-            // if (!string.IsNullOrEmpty(response))
-            // {
-            //     JObject jsonObj = JObject.Parse(response);
-            //     return Json(jsonObj);
-            // }
-            // else
-            // {                
-            //     return BadRequest("error!");
-            // }
+            if(isDeleted)
+            {
+                SchedulerPayload.Delete(id);
+                //
+                response = await nnclient.DeleteRunningTask(id);
+            }
+            
+          
             return Json(new { message = "Task deleted.", id = id });
         }
 

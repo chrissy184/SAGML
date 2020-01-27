@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Quartz;
 using ZMM.App.PyServicesClient;
-
+using ZMM.Models.ResponseMessages;
+using System.Runtime.Serialization.Json;
 public class TrainModelJob : IJob
 {
     public Task Execute(IJobExecutionContext context)
@@ -25,12 +26,12 @@ public class TrainModelJob : IJob
             reqObj.ContentType = "application/json";
             var response = (HttpWebResponse)reqObj.GetResponse();
 
-            using (StreamReader rdr = new StreamReader(response.GetResponseStream()))
+            using (var rdr = response.GetResponseStream())
             {
-                string resp = rdr.ReadToEnd();
-                var jresp = JObject.Parse(resp);
-                jresp.Add("executedAt", DateTime.Now);
-                JobSchedulerHelper.AddZMKResponses(dataMap.GetString("id"), jresp.ToString(), "Train");
+                DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(TrainingResponse));
+                TrainingResponse trainingResp = (TrainingResponse)deserializer.ReadObject(rdr);
+                trainingResp.executedAt = DateTime.Now;
+                JobSchedulerHelper.AddZMKResponses(dataMap.GetString("id"), trainingResp);
             }
         }
         catch (Exception ex)

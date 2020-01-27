@@ -44,7 +44,7 @@ namespace ZMM.App.Controllers
         private readonly IPyTensorServiceClient tbClient;
         private List<ModelResponse> responseData;
         private List<DataResponse> dataResponseData;
-        private static string[] extensions = new[] { "pmml", "onyx" };
+        private static string[] extensions = new[] { "pmml", "onnx" };
         private readonly IScheduler _scheduler;
         #endregion
 
@@ -116,6 +116,8 @@ namespace ZMM.App.Controllers
                     }
                     existingCodeData.Clear();
                     //
+                    if (!FilePathHelper.IsFileNameValid(formFile.FileName))
+                        return BadRequest(new { message = "Invalid file name." });
                     if (!IsFileExists)
                     {
                         string fileExt = System.IO.Path.GetExtension(formFile.FileName).Substring(1).ToString().ToLower();
@@ -1165,6 +1167,8 @@ namespace ZMM.App.Controllers
                 {
                     var content = JObject.Parse(reqBody);
                     newFileName = (string)content["newName"];
+                    if (!FilePathHelper.IsFileNameValid(newFileName))
+                        return BadRequest(new { message = "Renaming file failed. Invalid file name." });
                     newFileName = Regex.Replace(newFileName, "[\n\r\t]", string.Empty);
                     newFileName = Regex.Replace(newFileName, @"\s", string.Empty);
                 }

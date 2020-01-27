@@ -18,7 +18,7 @@
         <button mat-icon-button matTooltip="Refresh" (click)="refresh()">
           <span class="mdi mdi-refresh text-secondary"></span>
         </button>
-        <button mat-icon-button matTooltip="Upload New Data" [matMenuTriggerFor]="newDataMenu">
+        <button mat-icon-button matTooltip="Import Data" [matMenuTriggerFor]="newDataMenu">
           <span class="mdi mdi-file-plus text-secondary"></span>
         </button>
         <mat-menu #newDataMenu="matMenu">
@@ -76,8 +76,8 @@
               </h2>
               <div class="toolbar-mid"></div>
               <div class="content-toolbar">
-                <button *ngIf="selectedData.type == 'CSV' || selectedData.type == 'JSON'" mat-icon-button matTooltip="New AutoML"
-                  (click)="newAutoML()">
+                <button *ngIf="selectedData.type == 'CSV' || selectedData.type == 'JSON'" mat-icon-button
+                  matTooltip="New AutoML" (click)="newAutoML()">
                   <span class="mdi mdi-file-plus text-secondary"></span>
                 </button>
                 <button mat-icon-button matTooltip="Predict Data" [matMenuTriggerFor]="newPredictDataMenu">
@@ -308,6 +308,10 @@
               <h2>Connect to Datahub</h2>
               <div class="toolbar-mid"></div>
               <div calss="content-toolbar">
+                <button mat-icon-button matTooltip="Submit" (click)="dataHubFormSubmit()"
+                  [disabled]="!dataHubFormData.sql">
+                  <span class="mdi mdi-check text-secondary"></span>
+                </button>
                 <button *ngIf="(listOfData && listOfData.length) && !isLoading" mat-icon-button matTooltip="Cancel"
                   (click)="uploadFilesDone()">
                   <span class="mdi mdi-close text-secondary"></span>
@@ -322,14 +326,8 @@
             </mat-toolbar>
             <div class="details">
               <div class="container-fluid">
-                <form class="p-4" #dataHubForm="ngForm">
-                  <mat-form-field class="w-100">
-                    <textarea matInput placeholder="Write SQL" required [(ngModel)]="dataHubFormData.sql" name="sql" id="sql"></textarea>
-                  </mat-form-field>
-                  <button class="float-right" mat-stroked-button color="primary" matTooltip="Submit" (click)="dataHubFormSubmit()">
-                    Submit
-                  </button>
-                </form>
+                <ngx-monaco-editor name="sqlEditor" required class="app-code-editor" [options]="editorOptionsSql"
+                  [(ngModel)]="dataHubFormData.sql"></ngx-monaco-editor>
               </div>
             </div>
           </div>
