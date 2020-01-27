@@ -92,8 +92,7 @@ namespace ZMM.App.Controllers
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSelectedTaskAysnc(string id)
-        {
-            
+        {            
             var taskData = SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault();
 
             if (!string.IsNullOrEmpty(taskData.Id))
@@ -137,7 +136,7 @@ namespace ZMM.App.Controllers
                         else if (_type.Contains("AutoMLResponse"))
                         {
                             AutoMLResponse amlr = (AutoMLResponse)j;
-                            if (!amlr.idforData.Contains("Complete"))
+                            if (!amlr.status.Contains("Complete"))
                             {
                                 if (i["idforData"].ToString() == amlr.idforData)
                                 {
@@ -150,23 +149,39 @@ namespace ZMM.App.Controllers
                                 }
                             }
                         }
-                        else if (_type.Contains("Newtonsoft.Json.Linq.JObject"))
+                        else
                         {
                             var jObj = JObject.Parse(j.ToString());
-                            if (!jObj["status"].ToString().Contains("Complete"))
+                            foreach(var item in taskData.History)
                             {
-                                if (i["idforData"].ToString() == jObj["idforData"].ToString())
-                                {
-                                    jHist.Add(new JObject(){
-                                    {"idforData", jObj["idforData"].ToString()},
-                                    {"status", i["status"].ToString()},
-                                    {"executedAt",jObj["executedAt"].ToString()}
-                                });
-                                    break;
-                                }
+                                // if (i["idforData"].ToString() == item.)
+                                // {
+                                //     jHist.Add(new JObject(){
+                                //     {"idforData", ecr.idforData},
+                                //     {"status", i["status"].ToString()},
+                                //     {"executedAt",ecr.executedAt}
+                                // });
                             }
-
                         }
+                        // else if (_type.Contains("Newtonsoft.Json.Linq.JObject"))
+                        // {
+                        //     var jObj = JObject.Parse(j.ToString());
+                        //     if (!jObj["status"].ToString().Contains("Complete"))
+                        //     {
+                        //         if (i["idforData"].ToString() == jObj["idforData"].ToString())
+                        //         {
+                        //             jHist.Add(new JObject(){
+                        //             {"idforData", jObj["idforData"].ToString()},
+                        //             {"status", i["status"].ToString()},
+                        //             {"executedAt",jObj["executedAt"].ToString()}
+                        //         });
+                        //             break;
+                        //         }
+                        //     }
+
+                        // }
+
+                        
                     }
                 }
                 //
