@@ -276,16 +276,16 @@ namespace ZMM.App.Controllers
             IScheduler scheduler = await schfack.GetScheduler();
             string filePath = SchedulerPayload.GetById(id).Select(c => c.FilePath).FirstOrDefault();
             var jobKey = new JobKey(filePath);
-            bool isDeleted = await scheduler.DeleteJob(jobKey);
-            //
-            if (isDeleted)
+            try
             {
+                bool isDeleted = await scheduler.DeleteJob(jobKey);
                 SchedulerPayload.Delete(id);
-                //
                 response = await nnclient.DeleteRunningTask(id);
             }
-
-
+            catch (Exception ex)
+            {
+                return Json(new { message = $"Task not deleted. {ex.Message}", id = id });
+            }
             return Json(new { message = "Task deleted.", id = id });
         }
 
