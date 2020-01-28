@@ -908,38 +908,7 @@
         }
       ]
     },
-    {
-      "icon": "mdi mdi-layers",
-      "layerGroup": "Recurrent Layer",
-      "layers":[
-        {
-          "connectionLayerId": "NA",
-          "itemType": "LAYER",
-          "layerId": "NA",
-          "layerIndex": "NA",
-          "layerType": "LSTM",
-          "trainable": true,
-          "name": "LSTM",
-          "properties": [
-            {
-              "dataType": "array",
-              "hint": "Input Shape of the Data",
-              "id": "inputDimension",
-              "label": "Input Dimension",
-              "options": [],
-              "value": []
-            },
-            {
-              "dataType": "array",
-              "hint": "Output Dimension",
-              "id": "outputDimension",
-              "label": "Output Dimension",
-              "value": []
-            }
-          ]
-        }
-      ]
-    },
+    
     {
       "icon": "mdi mdi-layers",
       "layerGroup": "Templates",
