@@ -96,12 +96,12 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> Get(string[] type, bool refresh)
         {
             //
-            //if (refresh)
-           // {
+            if (refresh)
+            {
                 DataPayload.Clear();
                 InitZmodDirectory.ScanDataDirectory();
                 responseData = DataPayload.Get().Where(d => d.Id.Contains("logs") == false).ToList<DataResponse>();
-           // }
+            }
             //
             string jsonStr = JsonConvert.SerializeObject(responseData, Formatting.Indented);
             // jsonStr = jsonStr.ToPrettyJsonString();
@@ -318,9 +318,6 @@ namespace ZMM.App.Controllers
                             };
                             //
                             _response.Add(DataPayload.Create(newRecord));
-                            string[] strRefresh = {""};
-
-                            await Get(strRefresh, true);
                         }
                     }
                 }
