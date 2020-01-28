@@ -1039,7 +1039,7 @@ namespace ZMM.App.Controllers
                     {
                         try
                         {
-                            string zmkResponse = await zmeClient.PostConvertPmmlAsync(record.FilePath, record.FilePath.Replace(id, $"Converted_{id}"));
+                            string zmkResponse = await zmeClient.PostConvertPmmlAsync(record.FilePath, record.FilePath.Replace(id, $"{id}_model"));
                             Logger.LogInformation("PostZSUploadPmmlAsync ZMK Response after post " + zmkResponse);
                             if (!string.IsNullOrEmpty(zmkResponse) && !zmkResponse.Contains("Failed"))
                             {
