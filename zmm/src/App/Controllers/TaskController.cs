@@ -92,8 +92,10 @@ namespace ZMM.App.Controllers
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSelectedTaskAysnc(string id)
-        {            
+        {
             var taskData = SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault();
+            var _type = SchedulerPayload.Get().Where(s => s.Id == id).Select(t => t.Type).FirstOrDefault();
+            List<object> taskHistNew = new List<object>();
 
             if (!string.IsNullOrEmpty(taskData.Id))
             {
@@ -109,87 +111,50 @@ namespace ZMM.App.Controllers
                 var resp = await nnclient.GetRunningTaskByTaskName(origid);
                 JObject joResp = JObject.Parse(resp);
                 JArray jArr = (JArray)joResp["runningTask"];
-                JArray jHist = new JArray();
                 //
-                foreach (var i in jArr.Children())
+                if(taskData.Recurrence == "REPEAT")
                 {
+                    taskHistNew.Clear();
                     foreach (var j in taskData.History)
                     {
-                        string _type = j.GetType().ToString();
-
-                        if (_type.Contains("ExecuteCodeResponse"))
+                        if (_type.Contains("PYTHON"))
                         {
                             ExecuteCodeResponse ecr = (ExecuteCodeResponse)j;
-                            if (!ecr.status.Contains("Complete"))
-                            {
-                                if (i["idforData"].ToString() == ecr.idforData)
-                                {
-                                    jHist.Add(new JObject(){
-                                    {"idforData", ecr.idforData},
-                                    {"status", i["status"].ToString()},
-                                    {"executedAt",ecr.executedAt}
-                                });
-                                    break;
-                                }
-                            }
+                            string _status = jArr.Where(s => s["idforData"].ToString() == ecr.idforData).Select(s => s["status"].Value<string>()).FirstOrDefault();
+                            ecr.status = _status;
+                            taskHistNew.Add(ecr);
                         }
-                        else if (_type.Contains("AutoMLResponse"))
+                        if (_type.Contains("AUTOML"))
                         {
-                            AutoMLResponse amlr = (AutoMLResponse)j;
-                            if (!amlr.status.Contains("Complete"))
-                            {
-                                if (i["idforData"].ToString() == amlr.idforData)
-                                {
-                                    jHist.Add(new JObject(){
-                                    {"idforData", amlr.idforData},
-                                    {"status", i["status"].ToString()},
-                                    {"executedAt",amlr.executedAt}
-                                });
-                                    break;
-                                }
-                            }
+                            AutoMLResponse obj = (AutoMLResponse)j;
+                            string _status = jArr.Where(s => s["idforData"].ToString() == obj.idforData).Select(s => s["status"].Value<string>()).FirstOrDefault();
+                            obj.status = _status;
+                            taskHistNew.Add(obj);
                         }
-                        else
+                    }                    
+                }
+                else if(taskData.Recurrence == "ONE_TIME")
+                {
+                    taskHistNew.Clear();
+                    foreach (var j in taskData.History)
+                    {
+                        var jo = JObject.Parse(j.ToString());
+                        string _idfordata = jArr.Where(s => s["idforData"].ToString() == jo["idforData"].ToString()).Select(s => s["idforData"].Value<string>()).FirstOrDefault();
+                        if (!string.IsNullOrEmpty(_idfordata))
                         {
-                            var jObj = JObject.Parse(j.ToString());
-                            foreach(var item in taskData.History)
+                            JObject obj = JObject.FromObject(new
                             {
-                                // if (i["idforData"].ToString() == item.)
-                                // {
-                                //     jHist.Add(new JObject(){
-                                //     {"idforData", ecr.idforData},
-                                //     {"status", i["status"].ToString()},
-                                //     {"executedAt",ecr.executedAt}
-                                // });
-                            }
+                                idforData = _idfordata,
+                                status = jArr.Where(s => s["idforData"].ToString() == jo["idforData"].ToString()).Select(s => s["status"].Value<string>()).FirstOrDefault(),
+                                executedAt = jo["executedAt"].ToString()
+                            });
+                            taskHistNew.Add(obj);
                         }
-                        // else if (_type.Contains("Newtonsoft.Json.Linq.JObject"))
-                        // {
-                        //     var jObj = JObject.Parse(j.ToString());
-                        //     if (!jObj["status"].ToString().Contains("Complete"))
-                        //     {
-                        //         if (i["idforData"].ToString() == jObj["idforData"].ToString())
-                        //         {
-                        //             jHist.Add(new JObject(){
-                        //             {"idforData", jObj["idforData"].ToString()},
-                        //             {"status", i["status"].ToString()},
-                        //             {"executedAt",jObj["executedAt"].ToString()}
-                        //         });
-                        //             break;
-                        //         }
-                        //     }
-
-                        // }
-
-                        
                     }
                 }
-                //
-                if ((jHist != null) && (jHist.Count > 0))
-                {
-                    taskData.History = jHist.ToList<object>();
-                    SchedulerPayload.Update(taskData);
-                }
+                taskData.History.Clear();
+                taskData.History = taskHistNew;
+                SchedulerPayload.Update(taskData);
 
                 return Json(SchedulerPayload.Get().Where(s => s.Id == id).FirstOrDefault());
             }
@@ -309,18 +274,18 @@ namespace ZMM.App.Controllers
             // First we must get a reference to a scheduler
             ISchedulerFactory schfack = new StdSchedulerFactory();
             IScheduler scheduler = await schfack.GetScheduler();
-            string filePath = SchedulerPayload.GetById(id).Select(c=> c.FilePath).FirstOrDefault();
+            string filePath = SchedulerPayload.GetById(id).Select(c => c.FilePath).FirstOrDefault();
             var jobKey = new JobKey(filePath);
-            bool isDeleted = await scheduler.DeleteJob(jobKey);
-            //
-            if(isDeleted)
+            try
             {
+                bool isDeleted = await scheduler.DeleteJob(jobKey);
                 SchedulerPayload.Delete(id);
-                //
                 response = await nnclient.DeleteRunningTask(id);
             }
-            
-          
+            catch (Exception ex)
+            {
+                return Json(new { message = $"Task not deleted. {ex.Message}", id = id });
+            }
             return Json(new { message = "Task deleted.", id = id });
         }
 

@@ -100,7 +100,7 @@ namespace ZMM.App.Controllers
             {
                 DataPayload.Clear();
                 InitZmodDirectory.ScanDataDirectory();
-                responseData = DataPayload.Get().Where(d => d.Id.Contains("logs") == false && d.Type != "FOLDER").ToList<DataResponse>();
+                responseData = DataPayload.Get().Where(d => d.Id.Contains("logs") == false).ToList<DataResponse>();
             }
             //
             string jsonStr = JsonConvert.SerializeObject(responseData, Formatting.Indented);
@@ -464,7 +464,7 @@ namespace ZMM.App.Controllers
                     StartTimeH = "",
                     StartTimeM = "",
                     // ZMKResponse = tresp.ToList<object>(),
-                    Status = "COMPLETED",
+                    // Status = "COMPLETED",
                     History = jHist.ToList<object>()
                 };
                 SchedulerPayload.Create(schJob);
