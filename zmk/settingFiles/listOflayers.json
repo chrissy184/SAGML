@@ -912,7 +912,6 @@
       "icon": "mdi mdi-layers",
       "layerGroup": "Recurrent Layer",
       "layers":[
-        
         {
           "connectionLayerId": "NA",
           "itemType": "LAYER",
@@ -929,6 +928,48 @@
               "label": "Input Dimension",
               "options": [],
               "value": []
+            },
+            {
+              "dataType": "string",
+              "hint": "Activation function for the dense layer",
+              "id": "activationFunction",
+              "label": "Activation Function",
+              "options": [
+                "linear",
+                "tanh",
+                "relu",
+                "sigmoid",
+                "softmax"
+              ],
+              "value": "tanh"
+            },
+            {
+              "dataType":"string",
+              "hint": "Return sequence option",
+              "id": "return_sequences",
+              "label": "Return Sequences",
+              "options": [
+               "True","False"
+              ],
+              "value": "False"
+            },
+            {
+              "dataType":"string",
+              "hint": "Return state option",
+              "id": "return_state",
+              "label": "Return state",
+              "options": [
+               "True","False"
+              ],
+              "value": "False"
+            },
+            {
+              "dataType": "integer",
+              "hint": "Neurons for Simple RNN layer",
+              "id": "units",
+              "label": "Units",
+              "options": [],
+              "value": ""
             },
             {
               "dataType": "array",
@@ -957,6 +998,48 @@
               "value": []
             },
             {
+              "dataType": "string",
+              "hint": "Activation function for the dense layer",
+              "id": "activationFunction",
+              "label": "Activation Function",
+              "options": [
+                "linear",
+                "tanh",
+                "relu",
+                "sigmoid",
+                "softmax"
+              ],
+              "value": "tanh"
+            },
+            {
+              "dataType":"string",
+              "hint": "Return sequence option",
+              "id": "return_sequences",
+              "label": "Return Sequences",
+              "options": [
+               "True","False"
+              ],
+              "value": "False"
+            },
+            {
+              "dataType":"string",
+              "hint": "Return state option",
+              "id": "return_state",
+              "label": "Return state",
+              "options": [
+               "True","False"
+              ],
+              "value": "False"
+            },
+            {
+              "dataType": "integer",
+              "hint": "Neurons for Simple RNN layer",
+              "id": "units",
+              "label": "Units",
+              "options": [],
+              "value": ""
+            },
+            {
               "dataType": "array",
               "hint": "Output Dimension",
               "id": "outputDimension",
@@ -981,6 +1064,48 @@
               "label": "Input Dimension",
               "options": [],
               "value": []
+            },
+            {
+              "dataType": "string",
+              "hint": "Activation function for the dense layer",
+              "id": "activationFunction",
+              "label": "Activation Function",
+              "options": [
+                "linear",
+                "tanh",
+                "relu",
+                "sigmoid",
+                "softmax"
+              ],
+              "value": "tanh"
+            },
+            {
+              "dataType":"string",
+              "hint": "Return sequence option",
+              "id": "return_sequences",
+              "label": "Return Sequences",
+              "options": [
+               "True","False"
+              ],
+              "value": "False"
+            },
+            {
+              "dataType":"string",
+              "hint": "Return state option",
+              "id": "return_state",
+              "label": "Return state",
+              "options": [
+               "True","False"
+              ],
+              "value": "False"
+            },
+            {
+              "dataType": "integer",
+              "hint": "Neurons for Simple RNN layer",
+              "id": "units",
+              "label": "Units",
+              "options": [],
+              "value": ""
             },
             {
               "dataType": "array",
