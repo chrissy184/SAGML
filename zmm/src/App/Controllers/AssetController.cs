@@ -295,19 +295,10 @@ namespace ZMM.App.Controllers
             bool result = false;       
             string ResourceName = $"{id}.pmml";
             string ResourceNameWithoutExtension = id;
-            string notebookDir = DirectoryHelper.GetCodeDirectoryPath() + ResourceNameWithoutExtension;
-            string ResourcePath = notebookDir + System.IO.Path.DirectorySeparatorChar + ResourceName; 
+            string ResourcePath = DirectoryHelper.GetModelDirectoryPath() + ResourceName; 
             string Message = "Error";
             System.Console.WriteLine("Resource Path " + ResourcePath);
             Dictionary<string,string> Result = new Dictionary<string, string>(); 
-            //
-            var obj = new
-            {         
-                base_url = "/",             
-                NotebookDir = $"{notebookDir}",
-                ResourcePath = $"{ResourcePath}"
-            };
-            //
             try
             {  
                 TensorBoard  TBTool = this.tbClient.GetTensorBoardTool();                 

@@ -791,24 +791,12 @@ namespace ZMM.App.Controllers
                         }
                         TensorBoardLink = TBTool.GetResourceLink(ResourcePath, out TensorboardLogFolder);
                         Console.WriteLine($"TensorBoardLink >>>>>>{TensorBoardLink}");
-                        //                    
-                        //TB redirection
-                        string tbLink = "";
-                        if (TensorBoardLink.Contains("6006")) tbLink = TensorBoardLink.Replace(":6006", "/tb1");
-                        else if (TensorBoardLink.Contains("6007")) tbLink = TensorBoardLink.Replace(":6007", "/tb2");
-                        else if (TensorBoardLink.Contains("6008")) tbLink = TensorBoardLink.Replace(":6008", "/tb3");
-                        else tbLink = TensorBoardLink;
-                        //
+                        
                         jObjOrig.Add("filePath", ResourcePath);
                         jObjOrig.Add("tensorboardLogFolder", TensorboardLogFolder);
-                        jObjOrig.Add("tensorboardUrl", tbLink);
+                        jObjOrig.Add("tensorboardUrl", TensorBoardLink);
                         Logger.LogInformation("PostModelTrainAsync", jObjOrig.ToString());
-                        //for asset
-                        // int sIdx =  TensorBoardLink.IndexOf(":6");
-                        // var tbInst = new List<InstanceProperty>();
-                        // tbInst.Add(new InstanceProperty(){ key = "port", value = TensorBoardLink.Substring(sIdx,6)});
-
-                        //
+                     
                         var objJNBInst = new InstanceResponse()
                         {
                             Id = id,
@@ -821,7 +809,7 @@ namespace ZMM.App.Controllers
                     catch (Exception ex)
                     {
                         Logger.LogCritical("PostModelTrainAsync", ex.Message);
-                        //return BadRequest(new { user = CURRENT_USER, id = id, message = ex.Message});
+                        return BadRequest(new { message = ex.Message});
                     }
 
                 }
