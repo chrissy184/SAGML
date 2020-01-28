@@ -887,7 +887,7 @@ namespace ZMM.App.Controllers
                             StartTimeH = (cronjson["startTimeH"].ToString() == null) ? "" : cronjson["startTimeH"].ToString(),
                             StartTimeM = (cronjson["startTimeM"].ToString() == null) ? "" : cronjson["startTimeM"].ToString(),
                             History = tresp.ToList<object>(),
-                            Status = "Scheduled"
+                            // Status = "Scheduled"
                         };
                         SchedulerPayload.Create(schJob);
                         #endregion

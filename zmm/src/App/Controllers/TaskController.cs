@@ -109,6 +109,7 @@ namespace ZMM.App.Controllers
                     origid = id;
                 }
                 var resp = await nnclient.GetRunningTaskByTaskName(origid);
+                resp = resp.Replace("\\","\\\\");
                 JObject joResp = JObject.Parse(resp);
                 JArray jArr = (JArray)joResp["runningTask"];
                 //
