@@ -27,7 +27,7 @@ namespace ZMM.TB.Tests
         static internal string TBSecondResourceFile = TestDir + DirectoryPathSeperator + "HelloWorld2.pmml";
         static internal string TBThirdResourceFile = TestDir + DirectoryPathSeperator + "HelloWorld3.pmml"; 
 
-        const string ExceptionAfterAllInstanceRunning = "It reaches maximum number of allowed tensorboard instance. Please, stop previously running notebook from \"Assets\" or contact Administrator.";
+        const string ExceptionAfterAllInstanceRunning = "It reaches maximum number of allowed tensorboard instance. Please, stop previously running Tensorboard from \"Assets\" or contact Administrator.";
         static internal string TBFourthResourceFile = TestDir + DirectoryPathSeperator + "HelloWorld4.pmml";
         public static TensorBoard TensorBoardTool; 
 
