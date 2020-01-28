@@ -887,7 +887,7 @@ namespace ZMM.App.Controllers
                             StartTimeH = (cronjson["startTimeH"].ToString() == null) ? "" : cronjson["startTimeH"].ToString(),
                             StartTimeM = (cronjson["startTimeM"].ToString() == null) ? "" : cronjson["startTimeM"].ToString(),
                             History = tresp.ToList<object>(),
-                            Status = "Scheduled"
+                            // Status = "Scheduled"
                         };
                         SchedulerPayload.Create(schJob);
                         #endregion
@@ -1039,7 +1039,7 @@ namespace ZMM.App.Controllers
                     {
                         try
                         {
-                            string zmkResponse = await zmeClient.PostConvertPmmlAsync(record.FilePath, record.FilePath.Replace(id, $"Converted_{id}"));
+                            string zmkResponse = await zmeClient.PostConvertPmmlAsync(record.FilePath, record.FilePath.Replace(id, $"{id}_model"));
                             Logger.LogInformation("PostZSUploadPmmlAsync ZMK Response after post " + zmkResponse);
                             if (!string.IsNullOrEmpty(zmkResponse) && !zmkResponse.Contains("Failed"))
                             {

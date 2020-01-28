@@ -109,6 +109,7 @@ namespace ZMM.App.Controllers
                     origid = id;
                 }
                 var resp = await nnclient.GetRunningTaskByTaskName(origid);
+                resp = resp.Replace("\\","\\\\");
                 JObject joResp = JObject.Parse(resp);
                 JArray jArr = (JArray)joResp["runningTask"];
                 //
@@ -138,18 +139,38 @@ namespace ZMM.App.Controllers
                     taskHistNew.Clear();
                     foreach (var j in taskData.History)
                     {
-                        var jo = JObject.Parse(j.ToString());
-                        string _idfordata = jArr.Where(s => s["idforData"].ToString() == jo["idforData"].ToString()).Select(s => s["idforData"].Value<string>()).FirstOrDefault();
-                        if (!string.IsNullOrEmpty(_idfordata))
+                        if(j.ToString() == "ZMM.Models.ResponseMessages.TrainingResponse")
                         {
-                            JObject obj = JObject.FromObject(new
+                            TrainingResponse jlist = (TrainingResponse)j;
+                            string _idfordata = jArr.Where(s => s["idforData"].ToString() == jlist.idforData).Select(s => s["idforData"].Value<string>()).FirstOrDefault();
+                            if (!string.IsNullOrEmpty(_idfordata))
                             {
-                                idforData = _idfordata,
-                                status = jArr.Where(s => s["idforData"].ToString() == jo["idforData"].ToString()).Select(s => s["status"].Value<string>()).FirstOrDefault(),
-                                executedAt = jo["executedAt"].ToString()
-                            });
-                            taskHistNew.Add(obj);
+                                JObject obj = JObject.FromObject(new
+                                {
+                                    idforData = _idfordata,
+                                    status = jArr.Where(s => s["idforData"].ToString() == jlist.idforData).Select(s => s["status"].Value<string>()).FirstOrDefault(),
+                                    executedAt = jlist.executedAt
+                                });
+                                taskHistNew.Add(obj);
+                            }
+
                         }
+                        else
+                        {
+                            var jo = JObject.Parse(j.ToString());
+                            string _idfordata = jArr.Where(s => s["idforData"].ToString() == jo["idforData"].ToString()).Select(s => s["idforData"].Value<string>()).FirstOrDefault();
+                            if (!string.IsNullOrEmpty(_idfordata))
+                            {
+                                JObject obj = JObject.FromObject(new
+                                {
+                                    idforData = _idfordata,
+                                    status = jArr.Where(s => s["idforData"].ToString() == jo["idforData"].ToString()).Select(s => s["status"].Value<string>()).FirstOrDefault(),
+                                    executedAt = jo["executedAt"].ToString()
+                                });
+                                taskHistNew.Add(obj);
+                            }
+                        }
+                        
                     }
                 }
                 taskData.History.Clear();
