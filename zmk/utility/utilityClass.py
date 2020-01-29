@@ -32,6 +32,9 @@ class Utility:
 	def convertZMKtoZS(inputFile,outputFile=None):
 
 		# print (inputFile,outputFile)
+
+		import pathlib
+		fO=pathlib.Path(inputFile)
 		with open(inputFile,'r') as ff:
 			zmkFile = ff.read()
 		zmkFile = zmkFile.replace('architectureName="TrainedModel"','architectureName="mobilenet"')
@@ -43,22 +46,27 @@ class Utility:
 			if "max_value" in line:
 				line = line.replace("max_value=\"6.0\"","")
 				line = line.replace("rectifier","reLU6")
-			if "<Extension" in line and "sectionId" in line:
+			if( "<Extension" in line) and ("sectionId" in line):
 				continue
-			if "<script" in line or "</script" in line or "<Data filePath=" in line:
+			if ("<script" in line) or ("</script" in line) or ("<Data filePath=" in line):
 				continue
-			if 'units' in line:
+			if ('units' in line):
 				r = re.findall('units=\"[0-9]+"',line)
 				if len(r) != 0:
 					line = line.replace(r[0],'')
-			if 'for' in line:
+			if ('for' in line):
 				r = re.findall('for=\"[a-z A-Z 0-9]+"',line)
 				if len(r) != 0:
 					line = line.replace(r[0],'')
-			if "AnomalyDetectionModel" not in line and "SupportVectorMachineModel" not in line and 'modelName' in line:
+			if ("AnomalyDetectionModel" not in line) and ("SupportVectorMachineModel" not in line) and ('modelName' in line):
 				r = re.findall('modelName=\"[a-z A-Z 0-9]+"',line)
 				if len(r) != 0:
 					line = line.replace(r[0],'')
+			if ("AnomalyDetectionModel"  in line) and ('modelName' in line):
+				# print ('Came here')
+				r = re.findall('modelName=\"[a-z A-Z 0-9]+"',line)
+				if len(r) != 0:
+					line = line.replace(r[0],'modelName='+'"'+fO.name.replace(fO.suffix,'')+'"')
 			if 'taskType' in line:
 				r = re.findall('taskType=\"[a-z A-Z]+"',line)
 				if len(r) != 0:
