@@ -1,12 +1,10 @@
 version: '3.5'
 
 services:
-
-
    zmm:
-    image: store/softwareag/zementis-modeler-zmm:10.5.0
+    image: store/softwareag/zementis-modeler-zmm:10.5.0 
     container_name: zmm
-    command: /bin/bash -c "dotnet App.dll"
+    command: /bin/bash -c "dotnet App.dll --environment=ProductionBanLambdaQuad"
     working_dir: /publish
     volumes:
       - shared-content:/ZMOD
@@ -14,12 +12,13 @@ services:
       - ./Data:/ZMOD/Data
       - ./Models:/ZMOD/Models 
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./zmm/src/App:/publish/zmm/src/App
-
     ports:
-      - "7007:7007"
+
+      - "7008:7008"
+      - "7007:7007"  
     expose:
-       - "7007"
+       - "7008"
+       - "7007"  
        - "8888"
        - "8889"
        - "8890"
