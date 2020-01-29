@@ -195,6 +195,11 @@ class Utility:
 		# print ('taskName >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ',taskName)
 		allTaskList=RUNNING_TASK_MEMORY
 		filtListofTask=[i for i in allTaskList if i['taskName']==taskName]
+		for tak in filtListofTask:
+			try:
+				del tak['errorTraceback']
+			except:
+				pass
 		runningTask={'runningTask':filtListofTask}
 		return JsonResponse(runningTask,status=200)
 
@@ -206,6 +211,10 @@ class Utility:
 		filtListofTask=[i for i in allTaskList if i['taskName']==taskName]
 		filtListofTaskId=[i for i in allTaskList if i['idforData']==idForData]
 		runningTask=filtListofTaskId[0]
+		try:
+			del runningTask['errorTraceback']
+		except:
+			pass
 		return JsonResponse(runningTask,status=200, safe=False)
 
 
