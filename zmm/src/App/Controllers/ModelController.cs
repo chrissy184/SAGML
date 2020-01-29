@@ -791,24 +791,12 @@ namespace ZMM.App.Controllers
                         }
                         TensorBoardLink = TBTool.GetResourceLink(ResourcePath, out TensorboardLogFolder);
                         Console.WriteLine($"TensorBoardLink >>>>>>{TensorBoardLink}");
-                        //                    
-                        //TB redirection
-                        string tbLink = "";
-                        if (TensorBoardLink.Contains("6006")) tbLink = TensorBoardLink.Replace(":6006", "/tb1");
-                        else if (TensorBoardLink.Contains("6007")) tbLink = TensorBoardLink.Replace(":6007", "/tb2");
-                        else if (TensorBoardLink.Contains("6008")) tbLink = TensorBoardLink.Replace(":6008", "/tb3");
-                        else tbLink = TensorBoardLink;
-                        //
+                        
                         jObjOrig.Add("filePath", ResourcePath);
                         jObjOrig.Add("tensorboardLogFolder", TensorboardLogFolder);
-                        jObjOrig.Add("tensorboardUrl", tbLink);
+                        jObjOrig.Add("tensorboardUrl", TensorBoardLink);
                         Logger.LogInformation("PostModelTrainAsync", jObjOrig.ToString());
-                        //for asset
-                        // int sIdx =  TensorBoardLink.IndexOf(":6");
-                        // var tbInst = new List<InstanceProperty>();
-                        // tbInst.Add(new InstanceProperty(){ key = "port", value = TensorBoardLink.Substring(sIdx,6)});
-
-                        //
+                     
                         var objJNBInst = new InstanceResponse()
                         {
                             Id = id,
@@ -821,7 +809,7 @@ namespace ZMM.App.Controllers
                     catch (Exception ex)
                     {
                         Logger.LogCritical("PostModelTrainAsync", ex.Message);
-                        //return BadRequest(new { user = CURRENT_USER, id = id, message = ex.Message});
+                        return BadRequest(new { message = ex.Message});
                     }
 
                 }
@@ -887,7 +875,7 @@ namespace ZMM.App.Controllers
                             StartTimeH = (cronjson["startTimeH"].ToString() == null) ? "" : cronjson["startTimeH"].ToString(),
                             StartTimeM = (cronjson["startTimeM"].ToString() == null) ? "" : cronjson["startTimeM"].ToString(),
                             History = tresp.ToList<object>(),
-                            Status = "Scheduled"
+                            // Status = "Scheduled"
                         };
                         SchedulerPayload.Create(schJob);
                         #endregion
@@ -1039,7 +1027,7 @@ namespace ZMM.App.Controllers
                     {
                         try
                         {
-                            string zmkResponse = await zmeClient.PostConvertPmmlAsync(record.FilePath, record.FilePath.Replace(id, $"Converted_{id}"));
+                            string zmkResponse = await zmeClient.PostConvertPmmlAsync(record.FilePath, record.FilePath.Replace(id, $"{id}_model"));
                             Logger.LogInformation("PostZSUploadPmmlAsync ZMK Response after post " + zmkResponse);
                             if (!string.IsNullOrEmpty(zmkResponse) && !zmkResponse.Contains("Failed"))
                             {

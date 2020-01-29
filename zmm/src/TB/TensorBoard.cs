@@ -50,7 +50,7 @@ namespace ZMM.Tools.TB
                             if (WaitForTaskToStart(tempTask, FreePort)) AddTask(tempTask.GetName(), tempTask);
                             else throw new Exception("Unable to start tensorboard. Please, contact Administrator.");
                         }
-                        else throw new Exception("It reaches maximum number of allowed tensorboard instance. Please, stop previously running notebook from \"Assets\" or contact Administrator.");
+                        else throw new Exception("It reaches maximum number of allowed tensorboard instance. Please, stop previously running Tensorboard from \"Assets\" or contact Administrator.");
                     }
                     break;
                 default:
