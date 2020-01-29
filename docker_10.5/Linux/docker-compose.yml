@@ -4,7 +4,7 @@ services:
    zmm:
     image: store/softwareag/zementis-modeler-zmm:10.5.0 
     container_name: zmm
-    command: /bin/bash -c "dotnet App.dll --environment=ProductionBanLambdaQuad"
+    command: /bin/bash -c "dotnet App.dll"
     working_dir: /publish
     volumes:
       - shared-content:/ZMOD
