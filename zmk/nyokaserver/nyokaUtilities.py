@@ -241,23 +241,6 @@ class NyokaUtilities:
             templateArch=self.pmmlToJson(settingFilePath+'vGG19Arch.pmml')
         return templateArch,pmmlObj
 
-    def outputForSimpleRNN(self,tempdata7):
-        try:
-            tempdata7=self.convertToStandardJson(tempdata7)
-            # print (tempdata7)
-
-            tomul=tempdata7['properties']['units']
-            if tomul.__class__.__name__ != 'int':
-                raise Exception("Expected integer value for units, got string/empty value",tomul)
-            # if tempdata7['properties']['units']
-            return ((1,tomul),'success','success')
-        except Exception as e :
-            errorMessage='Error while calculating output >> '+ str(e)
-            errorTraceback=str(traceback.format_exc())
-            # print('No input came>>', errorMessage)
-            tomul=0
-            return ((1,tomul),errorMessage,errorTraceback)
-
 
     def addLayertoJson(self,tempData):
         if tempData['layerType'] in ['Input']:
@@ -300,9 +283,6 @@ class NyokaUtilities:
             [j for j in tempData['properties'] if j['id']=='outputDimension' ][0]['value']=valRet
         elif tempData['layerType'] in ['MaxPooling1D','AveragePooling1D']:
             valRet,messageInfo,traceBack=self.outputForMaxPooling1D(tempData)
-            [j for j in tempData['properties'] if j['id']=='outputDimension' ][0]['value']=valRet
-        elif tempData['layerType'] in ['SimpleRNN','GRU','LSTM']:
-            valRet,messageInfo,traceBack=self.outputForSimpleRNN(tempData)
             [j for j in tempData['properties'] if j['id']=='outputDimension' ][0]['value']=valRet
         # print ('NyokaUtilities $$$$$$$$$$$$$tempData',tempData)
         if messageInfo != 'success':
@@ -593,10 +573,8 @@ class NyokaUtilities:
                             tempDict['sectionId']=None
                 overAll.append(tempDict)
 
-            allLayers=MEMORY_OF_LAYERS['layerinfo'][0]['layers']+MEMORY_OF_LAYERS['layerinfo'][1]['layers']
-            # print (allLayers)
-            listOFLayersName=[j['name'] for j in allLayers]
-            # print (listOFLayersName)
+            allLayers=MEMORY_OF_LAYERS['layerinfo'][0]['layers']
+            listOFLayersName=[j['name'] for j in MEMORY_OF_LAYERS['layerinfo'][0]['layers']]
             architecture=[]
             for tempLay in overAll:
                 import copy
