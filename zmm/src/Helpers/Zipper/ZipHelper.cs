@@ -17,7 +17,7 @@ namespace ZMM.Helpers.Zipper
 
         private static readonly long MAXLIMITOFEXTRATEDFILESIZE = 2147483648;
 
-        private const int MAXIMUMNUMBEROFFILES = 1024;
+        private const int MAXIMUMNUMBEROFFILES = 100000;
 
         private static FileSystemWatcher DirectoryWatcher;
 
