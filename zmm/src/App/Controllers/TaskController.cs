@@ -303,14 +303,8 @@ namespace ZMM.App.Controllers
             var jobKey = new JobKey(filePath);
             bool isDeleted = await scheduler.DeleteJob(jobKey);
             //
-            if (isDeleted)
-            {
-                SchedulerPayload.Delete(id);
-                //
-                response = await nnclient.DeleteRunningTask(id);
-            }
-
-
+            SchedulerPayload.Delete(id);
+            response = await nnclient.DeleteRunningTask(id);
             return Json(new { message = "Task deleted.", id = id });
         }
 
