@@ -6,7 +6,7 @@ A startup **ASP.NET Core 3.0.100 / Angular 7** (Ubuntu 18.04) **project** with a
 ## INTRODUCING ZMM App
 *   Overview [iWiki](https://iwiki.eur.ad.sag/pages/viewpage.action?pageId=551011559)
 *   Features logs or raise defect [iTrac] (https://itrac.eur.ad.sag/projects/ZENA/issues/ZENA-466?filter=allopenissues)
-*   External identity server as [KeyCloak] (https://accounts.zmod.org)
+*   External identity server as [KeyCloak] (https://accounts.mlw.ai)
 
 [Live Demo - ZMM App on Test](https://lambda-quad)
 
