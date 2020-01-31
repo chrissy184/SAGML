@@ -38,6 +38,7 @@ using System.Collections.Specialized;
 using Quartz.Impl;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using ZMM.Middlewares;
+using Microsoft.IdentityModel.Logging;
 
 namespace ZMM.App
 {
@@ -69,7 +70,7 @@ namespace ZMM.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            IdentityModelEventSource.ShowPII = true;
             #region Allow Synchronous IO to read stream in model and code
             services.Configure<KestrelServerOptions>(options =>
             {
