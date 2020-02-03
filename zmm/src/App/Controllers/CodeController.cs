@@ -677,5 +677,90 @@ namespace ZMM.App.Controllers
         }
         #endregion
         #endregion
+    
+        #region Create new empty file
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateFileAsync(string type)
+        {
+            if(string.IsNullOrEmpty(type)) return BadRequest(new{message = "Type is needed."});
+            await System.Threading.Tasks.Task.FromResult(0);
+            #region Variables
+            string _type = type.ToLower();
+            long fileSize = 0L;
+            string dirFullpath = DirectoryHelper.GetCodeDirectoryPath();
+            string _id = $"New_{DateTime.Now.Ticks.ToString()}";
+            string newFile = $"{_id}.{_type}";
+            string _url = "";
+            string _filePath = Path.Combine(dirFullpath, newFile);
+            CodeResponse _code = new CodeResponse();
+            List<Property> _props = new List<Property>();
+            StringBuilder fileContent = new StringBuilder();
+            #endregion
+            //
+            switch (_type)
+            {
+                case "py":
+                    fileContent.Append("print ('Your code goes here')");
+                    _url = DirectoryHelper.GetCodeUrl(newFile);
+                    break;
+                case "ipynb":
+                    fileContent.Append("{");
+                    fileContent.Append("\"cells\": [");
+                    fileContent.Append("{");
+                    fileContent.Append("\"cell_type\": \"code\",");
+                    fileContent.Append("\"execution_count\": null,");
+                    fileContent.Append("\"metadata\": {},");
+                    fileContent.Append("\"outputs\": [],");
+                    fileContent.Append("\"source\": []");
+                    fileContent.Append("}");
+                    fileContent.Append(" ],");
+                    fileContent.Append("\"metadata\": {");
+                    fileContent.Append("\"kernelspec\": {");
+                    fileContent.Append("\"display_name\": \"Python 3\",");
+                    fileContent.Append("\"language\": \"python\",");
+                    fileContent.Append("\"name\": \"python3\"");
+                    fileContent.Append("}");
+                    fileContent.Append("},");
+                    fileContent.Append("\"nbformat\": 4,");
+                    fileContent.Append("\"nbformat_minor\": 2");
+                    fileContent.Append("}");
+                    dirFullpath = $"{dirFullpath}/{_id}";
+                    _url = DirectoryHelper.GetCodeUrl(_id + "/" + newFile);
+                    if (!Directory.Exists(dirFullpath))
+                    {
+                        Directory.CreateDirectory(dirFullpath);
+                        _filePath = Path.Combine(dirFullpath, newFile);
+                    }                                         
+                    break;
+            }
+
+            using (StreamWriter writer = new StreamWriter(_filePath))
+            {
+                foreach (string line in fileContent.ToString().Split(",@,"))
+                    writer.WriteLine(line);
+
+                writer.Flush();
+                fileSize = writer.BaseStream.Length;
+            }
+            //
+            CodeResponse newRecord = new CodeResponse()
+            {
+                Id = _id,
+                Name = newFile,                
+                Created_on = DateTime.Now.ToString(),
+                Edited_on = DateTime.Now.ToString(),
+                Extension = _type,
+                MimeType = "application/octet-stream",
+                Size = fileSize,
+                Type = _type == "ipynb"? "JUPYTER_NOTEBOOK" : "PYTHON",
+                Url = _url,
+                FilePath = dirFullpath,
+                DateCreated = DateTime.Now
+            };
+            CodePayload.Create(newRecord);
+            
+            return Json(CodePayload.GetById(_id));
+        }
+        #endregion
     }
 }
