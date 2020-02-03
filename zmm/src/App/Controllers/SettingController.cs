@@ -130,7 +130,7 @@ namespace ZMM.App.Controllers
                         new SettingProperty{ name="Zementis Server",type="ZS",tenantID="zserver", username="",password="",url="https://zserver.zmod.org/adapars/",selected=false },
                         new SettingProperty{ name="Nyoka Remote 1",type="NR",tenantID="dlexp", username="",password="",url="https://dlexp.zmod.org/",selected=false },
                         new SettingProperty{ name="Nyoka Remote 2",type="NR",tenantID="dlexp", username="",password="",url="https://hub.zmod.org/",selected=true },
-                        new SettingProperty{ name="DataHub 1",type="DH",driver="Dremio Connector", username="demo",password="iug2019#riga",url="dremio-demo.westeurope.cloudapp.azure.com",port="31010",selected=true }
+                        new SettingProperty{ name="DataHub 1",type="DH",driver="Dremio", username="demo",password="iug2019#riga",url="dremio-demo.westeurope.cloudapp.azure.com",port="31010",selected=true }
                     }
                 };
                 jObj = JObject.Parse(JsonConvert.SerializeObject(template)); 
