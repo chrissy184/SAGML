@@ -56,11 +56,10 @@ You can ask questions at
 *	[https://stackoverflow.com](https://stackoverflow.com) by tagging your questions with #pmml, #zmod
 *	You can also post bug reports in [GitHub issues](https://github.com/SoftwareAG/ZMOD/issues) 
 
-## Credits to open source projects used as reference
+## License
+This project is under Apache License 2.0. It has list of 3rd party components and libraries. Get more details from [here](https://github.com/SoftwareAG/MLW/blob/master/LICENSE) 
 
-
-______________________
-These tools are provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.	
+This tool is provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.	
 
 Contact us at [TECHcommunity](mailto:technologycommunity@softwareag.com?subject=Github/SoftwareAG) if you have any questions.
 
