@@ -14,16 +14,16 @@ Making and (re-)training machine learning and deep learning models.
 ML Workbench allows it's user to cover a wide variety of algorithms and Deep Neural Network architectures, with minimal or No code enviornment. It is also one of the few deep-learning platforms to support the Predictive Model Markup Languaue (PMML) format, PMML allows for different statistical and data mining tools to speak the same language.
 
 ## Getting Started
-1. Visit live instance of [ML Workbench](https://www.zmod.org/)
+1. Visit live instance of [ML Workbench](https://demo.mlw.ai/)
 2. Use your github account or register with us and login.
-3. Explore Use case(s) and product features from [YouTube video guide](https://www.zmod.org/learn)<br/>
+3. Explore Use case(s) and product features from [YouTube video guide](https://www.mlw.ai/learn)<br/>
    <b>Couple of popular topics</b>
-   1. [AutoML](https://www.zmod.org/learn/6RUJ0Nk52u8)<br/>
-   2. [Distracted Driver Use Case](https://www.zmod.org/learn/0SZHvRSJwyc)<br/>
-   3. [Import data from Cumulocity](https://www.zmod.org/learn/_YCGPhMETF4)<br/>
-   4. [Jupyter Notebook](https://www.zmod.org/learn/dm98Rjb8l6w)<br/>
-   5. [Python Execution](https://www.zmod.org/learn/Hnu7lvcc0kc)<br/>
-4. For any query, Get help from our [Open Source Community](https://www.zmod.org/community) 
+   1. [AutoML](https://www.mlw.ai/learn/)<br/>
+   2. [Distracted Driver Use Case](https://www.mlw.ai/learn/)<br/>
+   3. [Import data from Cumulocity](https://www.zmod.org/learn/)<br/>
+   4. [Jupyter Notebook](https://www.zmod.org/learn/)<br/>
+   5. [Python Execution](https://www.zmod.org/learn/)<br/>
+4. For any query, Get help from our [Open Source Community](https://www.mlw.ai/community) 
 
 ## Feature(s)
 1. AutoML for automated training of Machine Learning models.
@@ -35,10 +35,10 @@ ML Workbench allows it's user to cover a wide variety of algorithms and Deep Neu
 7. Integration with Data Scientist's Tools such as Jupyter Notebook and Tensorboard.
 8. Integration with Repo \ UMOYA (Ref : https://hub.umoya.ai/) as a model management framework for versioning models and its resource (data and code) dependencies.
 9. User-specific configurations to connect various Cumulocity IOT tenants.
-10. Swagger Rest Interface.
-11. Docker support.
+10. Swagger Rest API(s) [Interface](https://demo.mlw.ai/swagger/index.html)
+11. Docker [support](https://hub.docker.com/search?q=SoftwareAG&type=image)
 12. Built in UMOYA CLI (https://hub.umoya.ai/packages/umoya) in ML Workbench's Docker Container Shell.
-13. Enable DevOps.
+13. Enable [DevOps](https://dev.azure.com/zementis-ai/ML%20Workbench/_build/latest?definitionId=6).
 
 
 ## Submitting patches
