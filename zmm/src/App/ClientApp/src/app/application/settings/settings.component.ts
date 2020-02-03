@@ -35,7 +35,7 @@ export class SettingsComponent implements OnInit {
       "selected": false
     },
     {
-      "name": "Zementis Server",
+      "name": "Predictive Analytics",
       "type": "ZS",
       "tenantID": "ai",
       "username": "*******",
@@ -44,13 +44,13 @@ export class SettingsComponent implements OnInit {
       "selected": true
     },
     {
-      "name": "Zementis Server",
-      "type": "ZS",
-      "tenantID": "zserver",
+      "name": "Repo Server",
+      "type": "NR",
+      "tenantID": "repo",
       "username": "*******",
       "password": "*******",
-      "url": "https://zserver.zmod.org/adapars/",
-      "selected": false
+      "url": "https://repo.umoya.ai/",
+      "selected": true
     },
     {
       "name": "Repo Server",
