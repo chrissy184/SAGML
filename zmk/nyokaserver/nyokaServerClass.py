@@ -60,6 +60,11 @@ def removeExtraNewLinesFromWeights(pmmlObj):
 			lay.LayerBias.content_[0].value=lay.LayerBias.content_[0].value.replace('\n','')
 		except:
 			pass
+		try:
+			lay.LayerRecurrentWeights.valueOf_=lay.LayerRecurrentWeights.valueOf_.replace('\n','')
+			lay.LayerRecurrentWeights.content_[0].value=lay.LayerRecurrentWeights.content_[0].value.replace('\n','')
+		except:
+			pass
 	return pmmlObj
 
 
