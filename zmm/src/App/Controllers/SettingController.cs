@@ -124,13 +124,13 @@ namespace ZMM.App.Controllers
                 {    
                     ZmodId = UserEmailId,                
                     Settings = new List<SettingProperty> {
-                        new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="vran",password="Testing@123",url="https://ai.eu-latest.cumulocity.com",selected=true },
-                        new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="vran",password="Testing@123",url="https://ai.cumulocity.com",selected=false },
-                        new SettingProperty{ name="Zementis Server",type="ZS",tenantID="zserver", username="vran",password="Testing@123",url="https://ai.eu-latest.cumulocity.com/",selected=true },
-                        new SettingProperty{ name="Zementis Server",type="ZS",tenantID="zserver", username="",password="",url="https://zserver.zmod.org/adapars/",selected=false },
-                        new SettingProperty{ name="Nyoka Remote 1",type="NR",tenantID="dlexp", username="",password="",url="https://dlexp.zmod.org/",selected=false },
-                        new SettingProperty{ name="Nyoka Remote 2",type="NR",tenantID="dlexp", username="",password="",url="https://hub.zmod.org/",selected=true },
-                        new SettingProperty{ name="DataHub 1",type="DH",driver="Dremio Connector", username="demo",password="iug2019#riga",url="dremio-demo.westeurope.cloudapp.azure.com",port="31010",selected=true }
+                        new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="*******",password="*******",url="https://ai.eu-latest.cumulocity.com",selected=true },
+                        new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="*******",password="*******",url="https://ai.cumulocity.com",selected=false },
+                        new SettingProperty{ name="Zementis Server",type="ZS",tenantID="zserver", username="*******",password="*******",url="https://ai.eu-latest.cumulocity.com/",selected=true },
+                        new SettingProperty{ name="Zementis Server",type="ZS",tenantID="zserver", username="*******",password="*******",url="https://zserver.zmod.org/adapars/",selected=false },
+                        new SettingProperty{ name="Repo Server 1",type="NR",tenantID="repo", username="*******",password="*******",url="https://repo.umoya.ai/",selected=false },
+                        new SettingProperty{ name="Repo Server 2",type="NR",tenantID="hub", username="*******",password="*******",url="https://hub.umoya.ai/",selected=true },
+                        new SettingProperty{ name="DataHub 1",type="DH",driver="Dremio Connector", username="*******",password="*******",url="https://url",port="0000",selected=true }
                     }
                 };
                 jObj = JObject.Parse(JsonConvert.SerializeObject(template)); 

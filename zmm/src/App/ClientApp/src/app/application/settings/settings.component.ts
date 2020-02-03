@@ -14,13 +14,14 @@ export class SettingsComponent implements OnInit {
     theme: 'vs-light',
     language: 'json'
   };
+
   public defaultSettingsJSON: any = `{
     "settings": [{
       "name": "Cumulocity",
       "type": "C8Y",
       "tenantID": "ai",
-      "username": "vran",
-      "password": "Testing@123",
+      "username": "*******",
+      "password": "*******",
       "url": "https://ai.eu-latest.cumulocity.com",
       "selected": true
     },
@@ -28,8 +29,8 @@ export class SettingsComponent implements OnInit {
       "name": "Cumulocity",
       "type": "C8Y",
       "tenantID": "ai",
-      "username": "vran",
-      "password": "Testing@123",
+      "username": "*******",
+      "password": "*******",
       "url": "https://ai.cumulocity.com",
       "selected": false
     },
@@ -37,8 +38,8 @@ export class SettingsComponent implements OnInit {
       "name": "Zementis Server",
       "type": "ZS",
       "tenantID": "ai",
-      "username": "vran",
-      "password": "Testing@123",
+      "username": "*******",
+      "password": "*******",
       "url": "https://ai.eu-latest.cumulocity.com",
       "selected": true
     },
@@ -46,18 +47,18 @@ export class SettingsComponent implements OnInit {
       "name": "Zementis Server",
       "type": "ZS",
       "tenantID": "zserver",
-      "username": "",
-      "password": "",
+      "username": "*******",
+      "password": "*******",
       "url": "https://zserver.zmod.org/adapars/",
       "selected": false
     },
     {
-      "name": "Nyoka Remote",
+      "name": "Repo Server",
       "type": "NR",
-      "tenantID": "dlexp",
-      "username": "",
-      "password": "",
-      "url": "https://dlexp.zmod.org/",
+      "tenantID": "hub",
+      "username": "*******",
+      "password": "*******",
+      "url": "https://hub.umoya.ai/",
       "selected": true
     }
   ]
