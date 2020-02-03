@@ -53,7 +53,7 @@ If you have an idea or found a bug, open an issue to discuss it.
 
 ## Support
 You can ask questions at
-*	[https://stackoverflow.com](https://stackoverflow.com) by tagging your questions with #pmml, #zmod
+*	[https://stackoverflow.com](https://stackoverflow.com) by tagging your questions with #pmml, #zmod, #mlw
 *	You can also post bug reports in [GitHub issues](https://github.com/SoftwareAG/ZMOD/issues) 
 
 ## License
