@@ -318,17 +318,31 @@ class NewModelOperations:
                                 weight_file = modelFolder+'/dumpedWeights.h5'
                                 modelRecon.model.keras_model.save_weights(weight_file)
                                 MODEL_DIR=modelFolder
-                                model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=modelRecon.config)
-                                model.load_weights(weight_file,by_name=True)
+                                modelMrcnn = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=modelRecon.config)
+                                modelMrcnn.load_weights(weight_file,by_name=True)
                                 model_graph = tf.get_default_graph()
+
+                        inputShapevals=[inpuShape.value for inpuShape in list(modelMrcnn.input.shape)]
+                        if str(modelMrcnn) != 'None':
+                            tempDict[taskT][mO]['modelObj']['recoModelObj']=modelMrcnn
+                            tempDict[taskT][mO]['modelObj']['model_graph']=model_graph
+                            tempDict[taskT][mO]['modelObj']['tf_session']=tf_session
+                            tempDict[taskT][mO]['modelObj']['inputShape']=inputShapevals
+                            modelLoadStatus.append(1)
+                        else:
+                            modelLoadStatus.append(0)
+                        try:
+                            tempDict[taskT][mO]['modelObj']['hyperparameters']=hyperParDict[mO]
+                        except:
+                            tempDict[taskT][mO]['modelObj']['hyperparameters']=None
                         # pmmlName = pmmlName
-                        PMMLMODELSTORAGE[pmmlName]={}
-                        PMMLMODELSTORAGE[pmmlName]['model']=model
-                        PMMLMODELSTORAGE[pmmlName]['modelType']='MRCNN'
-                        PMMLMODELSTORAGE[pmmlName]['model_graph']=model_graph
-                        PMMLMODELSTORAGE[pmmlName]['predClasses']=list(predClasses)
-                        PMMLMODELSTORAGE[pmmlName]['tf_session']=tf_session
-                        modelType='MRCNN'
+                        # PMMLMODELSTORAGE[pmmlName]={}
+                        # PMMLMODELSTORAGE[pmmlName]['model']=model
+                        # PMMLMODELSTORAGE[pmmlName]['modelType']='MRCNN'
+                        # PMMLMODELSTORAGE[pmmlName]['model_graph']=model_graph
+                        # PMMLMODELSTORAGE[pmmlName]['predClasses']=list(predClasses)
+                        # PMMLMODELSTORAGE[pmmlName]['tf_session']=tf_session
+                        # modelType='MRCNN'
 
             
             
