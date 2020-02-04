@@ -691,7 +691,7 @@ namespace ZMM.App.Controllers
             string dirFullpath = DirectoryHelper.GetCodeDirectoryPath();
             string _id = $"New_{DateTime.Now.Ticks.ToString()}";
             string newFile = $"{_id}.{_type}";
-            string _url = "";
+            string _url = DirectoryHelper.GetCodeUrl(newFile);
             string _filePath = Path.Combine(dirFullpath, newFile);
             CodeResponse _code = new CodeResponse();
             List<Property> _props = new List<Property>();
@@ -701,8 +701,7 @@ namespace ZMM.App.Controllers
             switch (_type)
             {
                 case "py":
-                    fileContent.Append("print ('Your code goes here')");
-                    _url = DirectoryHelper.GetCodeUrl(newFile);
+                    fileContent.Append("print ('Your code goes here')");                    
                     break;
                 case "ipynb":
                     fileContent.Append("{");
@@ -725,8 +724,7 @@ namespace ZMM.App.Controllers
                     fileContent.Append("\"nbformat\": 4,");
                     fileContent.Append("\"nbformat_minor\": 2");
                     fileContent.Append("}");
-                    dirFullpath = $"{dirFullpath}/{_id}";
-                    _url = DirectoryHelper.GetCodeUrl(_id + "/" + newFile);
+                    dirFullpath = $"{dirFullpath}/{_id}";                    
                     if (!Directory.Exists(dirFullpath))
                     {
                         Directory.CreateDirectory(dirFullpath);
@@ -755,7 +753,7 @@ namespace ZMM.App.Controllers
                 Size = fileSize,
                 Type = _type == "ipynb"? "JUPYTER_NOTEBOOK" : "PYTHON",
                 Url = _url,
-                FilePath = dirFullpath,
+                FilePath = _filePath,
                 DateCreated = DateTime.Now
             };
             CodePayload.Create(newRecord);
