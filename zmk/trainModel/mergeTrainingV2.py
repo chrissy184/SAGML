@@ -136,7 +136,12 @@ class NewModelOperations:
             for inMod in modelObjectToCheck:
                 if len(pmmlObj.__dict__[inMod]) >0:
                     modPMMLObj=pmmlObj.__dict__[inMod]
-                    if inMod == 'DeepNetwork':
+                    if (inMod == 'DeepNetwork') and (pmmlObj.DeepNetwork[0].Extension[0].name == 'config'):
+                        print ('load model step 1.1.0')
+                        for ininMod in modPMMLObj:
+                            colInfo=self.getTargetAndColumnsName(ininMod)
+                            modelObj.append({'modelArchType':'MRCNN','pmmlModelObject':ininMod,'recoModelObj':None,'listOFColumns':None,'targetCol':colInfo[1],'modelPath':colInfo[2]})
+                    elif (inMod == 'DeepNetwork') and (pmmlObj.DeepNetwork[0].Extension[0].name != 'config'):
                         print ('load model step 1.0.0')
                         for ininMod in modPMMLObj:
                             colInfo=self.getTargetAndColumnsName(ininMod)
@@ -305,16 +310,18 @@ class NewModelOperations:
                             tempDict[taskT][mO]['modelObj']['hyperparameters']=None
 
                     elif tempDict[taskT][mO]['modelObj']['modelArchType']=="MRCNN":#(nyoka_pmml_obj.DeepNetwork)  and (checkMRCNN==True):
-                        from nyoka.mrcnn import pmml_to_maskrcnn
-                        from nyoka.mrcnn import model as modellib
-                        predClasses=self.getPredClasses(nyoka_pmml_obj)
+                        from nyoka.reconstruct import pmml_to_mrcnn
+                        from nyoka.reconstruct import model as modellib
+                        from string import ascii_uppercase
+                        from random import choice
+                        predClasses=kerasUtilities.getPredClasses(pmmlObj)
                         modelFolder='./logs/MaskRCNNWei_'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
-                        self.checkCreatePath(modelFolder)
+                        kerasUtilities.checkCreatePath(modelFolder)
                         model_graph = Graph()
                         with model_graph.as_default():
                             tf_session = Session()
                             with tf_session.as_default():
-                                modelRecon=pmml_to_maskrcnn.GenerateMaskRcnnModel(nyoka_pmml_obj)
+                                modelRecon=pmml_to_mrcnn.GenerateMaskRcnnModel(pmmlObj)
                                 weight_file = modelFolder+'/dumpedWeights.h5'
                                 modelRecon.model.keras_model.save_weights(weight_file)
                                 MODEL_DIR=modelFolder
@@ -322,12 +329,14 @@ class NewModelOperations:
                                 modelMrcnn.load_weights(weight_file,by_name=True)
                                 model_graph = tf.get_default_graph()
 
-                        inputShapevals=[inpuShape.value for inpuShape in list(modelMrcnn.input.shape)]
+                        # inputShapevals=[inpuShape.value for inpuShape in list(modelMrcnn.model.keras_model.input.shape)]
                         if str(modelMrcnn) != 'None':
                             tempDict[taskT][mO]['modelObj']['recoModelObj']=modelMrcnn
                             tempDict[taskT][mO]['modelObj']['model_graph']=model_graph
                             tempDict[taskT][mO]['modelObj']['tf_session']=tf_session
-                            tempDict[taskT][mO]['modelObj']['inputShape']=inputShapevals
+                            tempDict[taskT][mO]['modelObj']['inputShape']=None
+                            tempDict[taskT][mO]['modelObj']['predClasses']=list(predClasses)
+                            tempDict[taskT][mO]['modelObj']['modelFolder']=modelFolder
                             modelLoadStatus.append(1)
                         else:
                             modelLoadStatus.append(0)
