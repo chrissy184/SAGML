@@ -63,7 +63,9 @@ export class DataComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   message = AlertMessages.DATA.deleteConfirmationData;
   public baseImageInfo: any = {};
-  public dataHubFormData: any = {};
+  public dataHubFormData: any = {
+    sql: `/* Write your SQL query for Data pulling */`
+  };
   constructor(private apiService: HttpService, private utilService: UtilService, private router: Router) { }
 
   public changeSelectedIndex(index: number) {
