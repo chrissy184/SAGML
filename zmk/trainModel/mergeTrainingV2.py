@@ -123,10 +123,17 @@ class NewModelOperations:
 
     def loadExecutionModel(self,pmmlFile):
         # print ('loadmodel started')
-        # print (pmmlFile)
+        print (pmmlFile)
         global PMMLMODELSTORAGE
         pmmlFileObj=pathlib.Path(pmmlFile)
         pmmlFileForKey=pmmlFileObj.name.replace(pmmlFileObj.suffix,'')
+        mrcnnCond=False
+        try:
+            pmmlObj.DeepNetwork[0].Extension[0].name == 'config'
+            mrcnnCond=False
+        except:
+            pass
+
         from nyoka import PMML43Ext as ny
         try:
             pmmlObj=ny.parse(pmmlFile,silence=True)
@@ -136,12 +143,12 @@ class NewModelOperations:
             for inMod in modelObjectToCheck:
                 if len(pmmlObj.__dict__[inMod]) >0:
                     modPMMLObj=pmmlObj.__dict__[inMod]
-                    if (inMod == 'DeepNetwork') and (pmmlObj.DeepNetwork[0].Extension[0].name == 'config'):
+                    if (inMod == 'DeepNetwork') and (mrcnnCond):
                         print ('load model step 1.1.0')
                         for ininMod in modPMMLObj:
                             colInfo=self.getTargetAndColumnsName(ininMod)
                             modelObj.append({'modelArchType':'MRCNN','pmmlModelObject':ininMod,'recoModelObj':None,'listOFColumns':None,'targetCol':colInfo[1],'modelPath':colInfo[2]})
-                    elif (inMod == 'DeepNetwork') and (pmmlObj.DeepNetwork[0].Extension[0].name != 'config'):
+                    elif (inMod == 'DeepNetwork') and (mrcnnCond==False):
                         print ('load model step 1.0.0')
                         for ininMod in modPMMLObj:
                             colInfo=self.getTargetAndColumnsName(ininMod)
@@ -344,14 +351,6 @@ class NewModelOperations:
                             tempDict[taskT][mO]['modelObj']['hyperparameters']=hyperParDict[mO]
                         except:
                             tempDict[taskT][mO]['modelObj']['hyperparameters']=None
-                        # pmmlName = pmmlName
-                        # PMMLMODELSTORAGE[pmmlName]={}
-                        # PMMLMODELSTORAGE[pmmlName]['model']=model
-                        # PMMLMODELSTORAGE[pmmlName]['modelType']='MRCNN'
-                        # PMMLMODELSTORAGE[pmmlName]['model_graph']=model_graph
-                        # PMMLMODELSTORAGE[pmmlName]['predClasses']=list(predClasses)
-                        # PMMLMODELSTORAGE[pmmlName]['tf_session']=tf_session
-                        # modelType='MRCNN'
 
             
             

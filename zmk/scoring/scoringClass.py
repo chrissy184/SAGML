@@ -373,6 +373,7 @@ class NewScoringView:
 
 	def wrapperForNewLogic(self,modelName,jsonData,filePath):
 		global PMMLMODELSTORAGE
+		print (PMMLMODELSTORAGE.keys())
 		if jsonData != None:
 			return JsonResponse({'Result':'Please add support'})
 			# if modelName in PMMLMODELSTORAGE:
