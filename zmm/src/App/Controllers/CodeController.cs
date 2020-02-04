@@ -724,11 +724,11 @@ namespace ZMM.App.Controllers
                     fileContent.Append("\"nbformat\": 4,");
                     fileContent.Append("\"nbformat_minor\": 2");
                     fileContent.Append("}");
-                    dirFullpath = $"{dirFullpath}/{_id}";                    
+                    dirFullpath = $"{dirFullpath}{_id}/";                    
                     if (!Directory.Exists(dirFullpath))
                     {
                         Directory.CreateDirectory(dirFullpath);
-                        _filePath = Path.Combine(dirFullpath, newFile);
+                        _filePath = $"{dirFullpath}{newFile}";
                     }                                         
                     break;
             }
