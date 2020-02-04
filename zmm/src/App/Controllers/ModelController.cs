@@ -1072,7 +1072,7 @@ namespace ZMM.App.Controllers
                             }
                             else
                             {
-                                return BadRequest(new { message = "Model loading failed.", errorCode = 500, exception = "No response from server." });
+                                return BadRequest(new { message = "Model deploying failed.", errorCode = 500, exception = "No response from server." });
                             }
                         }
                         catch (Exception ex)
