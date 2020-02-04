@@ -38,6 +38,7 @@ export const ApiRoutes = {
     modelRename: (id: string) => `model/${id}/rename`,
 
     code: 'code',
+    codeCreate: `code/create`,
     codeGet: (id: string) => `code/${id}`,
     codeJupyter: (id: string) => `code/${id}/jupyter`,
     codeDownload: (id: string) => `code/${id}/download`,

@@ -192,6 +192,20 @@ export class CodeComponent implements OnInit {
     this.utilService.toggleSidebar(action);
   }
 
+  newCode(type: string) {
+    this.isLoading = true;
+    const options = {
+      params: {
+        type: type
+      }
+    };
+    this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.codeCreate, options)
+      .pipe(finalize(() => { this.isLoading = false; }))
+      .subscribe(response => {
+        this.getAllCode();
+      });
+  }
+
   ngOnInit() {
     this.getAllCode();
   }

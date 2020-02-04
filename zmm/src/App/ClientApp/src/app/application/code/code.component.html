@@ -18,6 +18,17 @@
         <button mat-icon-button matTooltip="Refresh" (click)="refresh()">
           <span class="mdi mdi-refresh text-secondary"></span>
         </button>
+        <button mat-icon-button matTooltip="Create New" [matMenuTriggerFor]="newCodeMenu">
+          <span class="mdi mdi-file-plus text-secondary"></span>
+        </button>
+        <mat-menu #newCodeMenu="matMenu">
+          <button mat-menu-item (click)="newCode('PY')">
+            PY
+          </button>
+          <button mat-menu-item (click)="newCode('IPYNB')">
+            IPYNB
+          </button>
+        </mat-menu>
         <button mat-icon-button matTooltip="Upload Code" (click)="uploadNewFiles()">
           <span class="mdi mdi-cloud-upload  text-secondary"></span>
         </button>
