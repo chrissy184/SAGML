@@ -654,6 +654,37 @@ namespace ZMM.App.Controllers
                     DataPayload.Create(newRecord);
                     return Json(newRecord);
                 }
+                else if ((resultPath.ToLower().Contains("jpeg") || resultPath.ToLower().Contains("jpg") || resultPath.ToLower().Contains("png")) && !string.IsNullOrEmpty(data))
+                {
+                    //download jpg,jpeg,png file from resultPath
+                    string _mimeType = resultPath.ToLower();
+                    Byte[] dataMP4 = null;
+                    dataMP4 = await _client.DownloadFile(joPredict["result"].ToString(), $"Predicted_{dataId}.{_mimeType}");
+                    
+                    List<Property> _props = new List<Property>();
+                    dirFullpath = DirectoryHelper.GetDataDirectoryPath();
+                    string newFile = $"Predicted_{dataId}.{_mimeType}";
+                    string newFilePath = Path.Combine(dirFullpath, newFile);
+
+                    DataResponse newRecord = new DataResponse()
+                    {
+                        Created_on = DateTime.Now.ToString(),
+                        Edited_on = DateTime.Now.ToString(),
+                        Extension = _mimeType,
+                        FilePath = dirFullpath + newFile,
+                        Id = newFile.Replace($".{_mimeType}", ""),
+                        MimeType = $"image/{_mimeType}",
+                        Name = newFile,
+                        Properties = _props,
+                        Size = dataMP4.Length,
+                        Type = "IMAGE",
+                        Url = DirectoryHelper.GetDataUrl(newFile),
+                        User = CURRENT_USER,
+                        DateCreated = DateTime.Now
+                    };
+                    DataPayload.Create(newRecord);
+                    return Json(newRecord);
+                }
                 else
                 {
                     return BadRequest(new { message = "", errorCode = "404", exception = "" });
