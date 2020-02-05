@@ -456,6 +456,7 @@ class NewScoringView:
 						predClasses=['class_'+str(i) for i in range(len(np.ravel(predi)))]
 					targetResult= {j:str(float(k)) for j,k in zip(predClasses,list(predi[0]))}
 				else:
+					print ('Came for NNModel Scoring')
 					rowsIn=testData.shape[0]
 					colsIn=testData.shape[1]
 					model_graph = modeScope['modelObj']['model_graph']
@@ -481,45 +482,6 @@ class NewScoringView:
 				# print (testData,str(type(testData)))
 				if pathlib.Path(filePath).suffix in ['.jpg','.JPG','.png','.PNG']:
 					resafile=kerasUtilities.detectObject(filePath, modelName,modeScope,target_path)
-				# 	inputShapevals=modeScope['modelObj']['inputShape']
-				# 	testimage=filePath
-				# 	img_height, img_width=inputShapevals[1:3]
-				# 	img = image.load_img(testimage, target_size=(img_height, img_width))
-				# 	x = image.img_to_array(img)
-				# 	x=x/255
-				# 	x=x.reshape(1,img_height, img_width,3)
-				# 	model_graph = modeScope['modelObj']['model_graph']
-				# 	tf_session = modeScope['modelObj']['tf_session']
-				# 	with model_graph.as_default():
-				# 		with tf_session.as_default():
-				# 			modelToUse=modeScope['modelObj']['recoModelObj'].model
-				# 			predi=modelToUse.predict(x)
-				# 	predClasses=modeScope['modelObj']['predictedClasses']
-				# 	if len(predClasses)==0:
-				# 		import numpy as np
-				# 		predClasses=['class_'+str(i) for i in range(len(np.ravel(predi)))]
-				# 	targetResult= {j:str(float(k)) for j,k in zip(predClasses,list(predi[0]))}
-				# else:
-				# 	rowsIn=testData.shape[0]
-				# 	colsIn=testData.shape[1]
-				# 	model_graph = modeScope['modelObj']['model_graph']
-				# 	tf_session = modeScope['modelObj']['tf_session']
-				# 	with model_graph.as_default():
-				# 		with tf_session.as_default():
-				# 			modelToUse=modeScope['modelObj']['recoModelObj'].model
-				# 			try:
-				# 				resultData=modelToUse.predict(testData.values)
-				# 			except:
-				# 				testData=testData.values.reshape(rowsIn,1,colsIn)
-				# 				resultData=modelToUse.predict(testData)
-
-				# 	if modeScope['modelObj']['hyperparameters']['problemType']=='classification':
-				# 		import numpy as np
-				# 		resultData=[np.argmax(j) for j in resultData]
-				# 		if modeScope['modelObj']['predictedClasses'] != None:
-				# 			resultData=[modeScope['modelObj']['predictedClasses'][i] for i in resultData]
-				# 		else:
-				# 			pass
 
 			else:
 				XVarForModel=modeScope['modelObj']['listOFColumns']
@@ -529,9 +491,15 @@ class NewScoringView:
 			# print (resultData)
 			if pathlib.Path(filePath).suffix =='.csv':
 				if modeScope['modelObj']['targetCol']==None:
-					testData['predicted']=resultData
+					try:
+						testData['predicted']=resultData
+					except:
+						testData=pd.DataFrame(resultData)
 				else:
-					testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
+					try:
+						testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
+					except:
+						testData=pd.DataFrame(resultData)
 				print (testData.shape)
 				resafile=target_path+'result.csv'
 				testData.to_csv(resafile, index=False)

@@ -729,36 +729,48 @@ class TrainingViewModels:
         #     return
         # model = modelObj.model
         tensor_board = self.startTensorBoard(tensorboardLogFolder)
-        # try:
-            # print ('Came here 1'*5 )
-        model_graph = modelObj['modelObj']['model_graph']
-        tf_session = modelObj['modelObj']['tf_session']
-        with model_graph.as_default():
-            with tf_session.as_default():
-                
-                if 'f1' in listOfMetrics:
-                    listOfMetrics.remove('f1')
-                    optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
-                    modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'],metrics=listOfMetrics+[self.f1])
-                    import tensorflow as tf
-                    kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
-                    with tf.device(gpuCPUSelect(selDev)):
-                        modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
-                                    validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
-                else:
-                    optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
-                    modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics)
-                    import tensorflow as tf
-                    kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
-                    with tf.device(gpuCPUSelect(selDev)):
-                        modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
-                                    validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
-
-                        print ('9'*500)
-        # except Exception as e:
-        #     print ('Came here 2'*5 )
-        #     data_details=self.upDateStatus()
-        #     self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+        try:
+                # print ('Came here 1'*5 )
+            model_graph = modelObj['modelObj']['model_graph']
+            tf_session = modelObj['modelObj']['tf_session']
+            with model_graph.as_default():
+                with tf_session.as_default():
+                    
+                    if 'f1' in listOfMetrics:
+                        listOfMetrics.remove('f1')
+                        optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'],metrics=listOfMetrics+[self.f1])
+                        import tensorflow as tf
+                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                        with tf.device(gpuCPUSelect(selDev)):
+                            modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                        validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+                    else:
+                        try:
+                            optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                            modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics)
+                            import tensorflow as tf
+                            kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                            with tf.device(gpuCPUSelect(selDev)):
+                                modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                            validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+                        except:
+                            trShape=trainDataX.shape
+                            teShape=testDataX.shape
+                            trainDataX=trainDataX.values.reshape(trShape[0],1,trShape[1])
+                            testDataX=testDataX.values.reshape(teShape[0],1,teShape[1])
+                            optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                            modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics)
+                            import tensorflow as tf
+                            kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                            with tf.device(gpuCPUSelect(selDev)):
+                                modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                            validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+                            print ('9'*500)
+        except Exception as e:
+            print ('Came here 2'*5 )
+            data_details=self.upDateStatus()
+            self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
 
         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
         modelObj['modelObj']['recoModelObj'].model=modelV1
@@ -806,36 +818,36 @@ class TrainingViewModels:
         #     return
         # model = modelObj.model
         tensor_board = self.startTensorBoard(tensorboardLogFolder)
-        # try:
-            # print ('Came here 1'*5 )
-        model_graph = modelObj['modelObj']['model_graph']
-        tf_session = modelObj['modelObj']['tf_session']
-        with model_graph.as_default():
-            with tf_session.as_default():
-                
-                if 'f1' in listOfMetrics:
-                    listOfMetrics.remove('f1')
-                    optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
-                    modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'],metrics=listOfMetrics+[self.f1])
-                    import tensorflow as tf
-                    kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
-                    with tf.device(gpuCPUSelect(selDev)):
-                        modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
-                                    validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
-                else:
-                    optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
-                    modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics)
-                    import tensorflow as tf
-                    kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
-                    with tf.device(gpuCPUSelect(selDev)):
-                        modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
-                                    validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+        try:
+                # print ('Came here 1'*5 )
+            model_graph = modelObj['modelObj']['model_graph']
+            tf_session = modelObj['modelObj']['tf_session']
+            with model_graph.as_default():
+                with tf_session.as_default():
+                    
+                    if 'f1' in listOfMetrics:
+                        listOfMetrics.remove('f1')
+                        optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'],metrics=listOfMetrics+[self.f1])
+                        import tensorflow as tf
+                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                        with tf.device(gpuCPUSelect(selDev)):
+                            modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                        validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
+                    else:
+                        optiMi=self.setOptimizer(datHyperPara['optimizer'],datHyperPara['learningRate'])
+                        modelV1.compile(optimizer=optiMi, loss=datHyperPara['loss'], metrics=listOfMetrics)
+                        import tensorflow as tf
+                        kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Started')
+                        with tf.device(gpuCPUSelect(selDev)):
+                            modelV1.fit(x=trainDataX, y=trainDataY, epochs=datHyperPara['epoch'], callbacks=[tensor_board],\
+                                        validation_data=(testDataX, testDataY), steps_per_epoch=stepsPerEpochT, validation_steps=stepsPerEpochV)
 
-                        print ('9'*500)
-        # except Exception as e:
-        #     print ('Came here 2'*5 )
-        #     data_details=self.upDateStatus()
-        #     self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
+                            print ('9'*500)
+        except Exception as e:
+            print ('Came here 2'*5 )
+            data_details=self.upDateStatus()
+            self.updateStatusWithError(data_details,'Training Failed','Error while fitting data to Keras Model >> '+ str(e),traceback.format_exc(),self.statusFile)
 
         kerasUtilities.updateStatusOfTraining(self.statusFile,'Training Completed')
         modelObj['modelObj']['recoModelObj'].model=modelV1
