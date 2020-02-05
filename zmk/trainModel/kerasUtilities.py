@@ -279,9 +279,12 @@ class KerasUtilities:
     def detectObject(self,filePath, modelName,modeScope,target_path):
         global PMMLMODELSTORAGE
         import pathlib
+        import matplotlib
         import matplotlib.pyplot as plt
+        from trainModel.mrcnn import visualize
         fO=pathlib.Path(filePath)
         resa=target_path+'pred_'+fO.name
+        # resa2=target_path+'pred2_'+fO.name
         class_names=modeScope['modelObj']['predClasses']
         model_graph = modeScope['modelObj']['model_graph']
         tf_session = modeScope['modelObj']['tf_session']
@@ -290,11 +293,17 @@ class KerasUtilities:
                 model=modeScope['modelObj']['recoModelObj']
                 image = skimage.io.imread(filePath)
                 r = model.detect([image],verbose=1)[0]
-                print (type(r))
-                print(r.keys())
-                from trainModel.mrcnn import visualize
-                visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], class_names, r['scores'])
-                plt.savefig(resa)
+                # newRois=r['rois']
+                # newIm=image.copy()
+                # for bb in newRois:
+                #     newIm=visualize.draw_box(newIm, bb, [255])
+
+                # matplotlib.image.imsave(resa, newIm)
+                # print (type(r))
+                # print(r.keys())
+                # from trainModel.mrcnn import visualize
+                newIm=visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], class_names, r['scores'],show_bbox=True)#,show_bbox=False)
+                matplotlib.image.imsave(resa, newIm)
         
         return resa
 

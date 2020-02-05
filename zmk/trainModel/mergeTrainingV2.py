@@ -123,21 +123,21 @@ class NewModelOperations:
 
     def loadExecutionModel(self,pmmlFile):
         # print ('loadmodel started')
-        print (pmmlFile)
+        # print (pmmlFile)
+        from nyoka import PMML43Ext as ny
         global PMMLMODELSTORAGE
         pmmlFileObj=pathlib.Path(pmmlFile)
         pmmlFileForKey=pmmlFileObj.name.replace(pmmlFileObj.suffix,'')
         mrcnnCond=False
         try:
-            pmmlObj.DeepNetwork[0].Extension[0].name == 'config'
-            mrcnnCond=False
-        except:
-            pass
-
-        from nyoka import PMML43Ext as ny
-        try:
             pmmlObj=ny.parse(pmmlFile,silence=True)
-            # print (pmmlObj)
+            # print(pmmlObj.DeepNetwork[0].Extension[0].name)
+            try:
+                pmmlObj.DeepNetwork[0].Extension[0].name == 'config'
+                mrcnnCond=True
+            except:
+                pass
+            # print (mrcnnCond)
             print ('load model step 1.0')
             modelObj=[]
             for inMod in modelObjectToCheck:
