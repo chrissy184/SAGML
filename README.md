@@ -57,7 +57,7 @@ You can ask questions at
 *	You can also post bug reports in [GitHub issues](https://github.com/SoftwareAG/ZMOD/issues) 
 
 ## License
-This project is under [Apache License 2.0](https://github.com/SoftwareAG/MLW/blob/master/LICENSE). It has list of 3rd party components and libraries. Get more details from [here](https://github.com/SoftwareAG/MLW/blob/3rdPartyNotice/Third-Party%20License(s)%20of%20Cumulocity%20IoT%20ML%20Workbench%20(ZMD)%20Version%2010.5%20Docker.pdf) 
+This project is under [Apache License 2.0](https://github.com/SoftwareAG/MLW/blob/master/LICENSE). It has list of 3rd party components and libraries. Get more details from [here](https://github.com/SoftwareAG/MLW/blob/master/Third-Party%20License(s)%20Terms.pdf) 
 
 This tool is provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.	
 
