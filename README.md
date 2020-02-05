@@ -33,11 +33,11 @@ ML Workbench allows it's user to cover a wide variety of algorithms and Deep Neu
 5. One-Click deployment to Cumulocity IoT Predictive Analytics (ZAD).
 6. Integration with Cumulocity and DataHub.
 7. Integration with Data Scientist's Tools such as Jupyter Notebook and Tensorboard.
-8. Integration with Repo \ UMOYA (Ref : https://hub.umoya.ai/) as a model management framework for versioning models and its resource (data and code) dependencies.
+8. Integration with [Repo \ UMOYA](https://hub.umoya.ai/) as a model management framework for versioning models and its resource (data and code) dependencies.
 9. User-specific configurations to connect various Cumulocity IOT tenants.
 10. Swagger Rest API(s) [Interface](https://demo.mlw.ai/swagger/index.html)
 11. Docker [support](https://hub.docker.com/search?q=SoftwareAG&type=image)
-12. Built in UMOYA CLI (https://hub.umoya.ai/packages/umoya) in ML Workbench's Docker Container Shell.
+12. Built in [UMOYA CLI](https://hub.umoya.ai/packages/umoya) in ML Workbench's Docker Container Shell.
 13. Enable [DevOps](https://dev.azure.com/zementis-ai/ML%20Workbench/_build/latest?definitionId=6).
 
 
