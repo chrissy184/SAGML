@@ -33,11 +33,11 @@ ML Workbench allows it's user to cover a wide variety of algorithms and Deep Neu
 5. One-Click deployment to Cumulocity IoT Predictive Analytics (ZAD).
 6. Integration with Cumulocity and DataHub.
 7. Integration with Data Scientist's Tools such as Jupyter Notebook and Tensorboard.
-8. Integration with Repo \ UMOYA (Ref : https://hub.umoya.ai/) as a model management framework for versioning models and its resource (data and code) dependencies.
+8. Integration with [Repo \ UMOYA](https://hub.umoya.ai/) as a model management framework for versioning models and its resource (data and code) dependencies.
 9. User-specific configurations to connect various Cumulocity IOT tenants.
 10. Swagger Rest API(s) [Interface](https://demo.mlw.ai/swagger/index.html)
 11. Docker [support](https://hub.docker.com/search?q=SoftwareAG&type=image)
-12. Built in UMOYA CLI (https://hub.umoya.ai/packages/umoya) in ML Workbench's Docker Container Shell.
+12. Built in [UMOYA CLI](https://hub.umoya.ai/packages/umoya) in ML Workbench's Docker Container Shell.
 13. Enable [DevOps](https://dev.azure.com/zementis-ai/ML%20Workbench/_build/latest?definitionId=6).
 
 
@@ -57,10 +57,8 @@ You can ask questions at
 *	You can also post bug reports in [GitHub issues](https://github.com/SoftwareAG/ZMOD/issues) 
 
 ## License
-This project is under Apache License 2.0. It has list of 3rd party components and libraries. Get more details from [here](https://github.com/SoftwareAG/MLW/blob/master/LICENSE) 
+This project is under [Apache License 2.0](https://github.com/SoftwareAG/MLW/blob/master/LICENSE). It has list of 3rd party components and libraries. Get more details from [here](https://github.com/SoftwareAG/MLW/blob/master/Third-Party%20License(s)%20Terms.pdf) 
 
 This tool is provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.	
 
 Contact us at [TECHcommunity](mailto:technologycommunity@softwareag.com?subject=Github/SoftwareAG) if you have any questions.
-
-
