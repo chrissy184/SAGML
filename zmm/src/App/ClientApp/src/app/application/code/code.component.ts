@@ -202,7 +202,7 @@ export class CodeComponent implements OnInit {
     this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.codeCreate, options)
       .pipe(finalize(() => { this.isLoading = false; }))
       .subscribe(response => {
-        this.getAllCode();
+        this.refresh();
       });
   }
 
