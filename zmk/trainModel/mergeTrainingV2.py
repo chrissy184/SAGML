@@ -304,46 +304,6 @@ class NewModelOperations:
                         except:
                             tempDict[taskT][mO]['modelObj']['hyperparameters']=None
 
-                    elif tempDict[taskT][mO]['modelObj']['modelArchType']=="MRCNN":#(nyoka_pmml_obj.DeepNetwork)  and (checkMRCNN==True):
-                        from nyoka.mrcnn import pmml_to_maskrcnn
-                        from nyoka.mrcnn import model as modellib
-                        predClasses=self.getPredClasses(nyoka_pmml_obj)
-                        modelFolder='./logs/MaskRCNNWei_'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
-                        self.checkCreatePath(modelFolder)
-                        model_graph = Graph()
-                        with model_graph.as_default():
-                            tf_session = Session()
-                            with tf_session.as_default():
-                                modelRecon=pmml_to_maskrcnn.GenerateMaskRcnnModel(nyoka_pmml_obj)
-                                weight_file = modelFolder+'/dumpedWeights.h5'
-                                modelRecon.model.keras_model.save_weights(weight_file)
-                                MODEL_DIR=modelFolder
-                                modelMrcnn = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=modelRecon.config)
-                                modelMrcnn.load_weights(weight_file,by_name=True)
-                                model_graph = tf.get_default_graph()
-
-                        inputShapevals=[inpuShape.value for inpuShape in list(modelMrcnn.input.shape)]
-                        if str(modelMrcnn) != 'None':
-                            tempDict[taskT][mO]['modelObj']['recoModelObj']=modelMrcnn
-                            tempDict[taskT][mO]['modelObj']['model_graph']=model_graph
-                            tempDict[taskT][mO]['modelObj']['tf_session']=tf_session
-                            tempDict[taskT][mO]['modelObj']['inputShape']=inputShapevals
-                            modelLoadStatus.append(1)
-                        else:
-                            modelLoadStatus.append(0)
-                        try:
-                            tempDict[taskT][mO]['modelObj']['hyperparameters']=hyperParDict[mO]
-                        except:
-                            tempDict[taskT][mO]['modelObj']['hyperparameters']=None
-                        # pmmlName = pmmlName
-                        # PMMLMODELSTORAGE[pmmlName]={}
-                        # PMMLMODELSTORAGE[pmmlName]['model']=model
-                        # PMMLMODELSTORAGE[pmmlName]['modelType']='MRCNN'
-                        # PMMLMODELSTORAGE[pmmlName]['model_graph']=model_graph
-                        # PMMLMODELSTORAGE[pmmlName]['predClasses']=list(predClasses)
-                        # PMMLMODELSTORAGE[pmmlName]['tf_session']=tf_session
-                        # modelType='MRCNN'
-
             
             
             PMMLMODELSTORAGE[pmmlFileForKey]=tempDict
