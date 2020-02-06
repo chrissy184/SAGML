@@ -629,7 +629,7 @@ namespace ZMM.App.Controllers
                     //download mp4 file from resultPath
                     Byte[] dataMP4 = null;
                     dataMP4 = await _client.DownloadFile(joPredict["result"].ToString(), $"Predicted_{dataId}" + ".mp4");
-
+                    
                     List<Property> _props = new List<Property>();
                     dirFullpath = DirectoryHelper.GetDataDirectoryPath();
                     string newFile = $"Predicted_{dataId}" + ".mp4";
@@ -657,7 +657,7 @@ namespace ZMM.App.Controllers
                 else if ((resultPath.ToLower().Contains("jpeg") || resultPath.ToLower().Contains("jpg") || resultPath.ToLower().Contains("png")) && !string.IsNullOrEmpty(data))
                 {
                     //download jpg,jpeg,png file from resultPath
-                    string _mimeType = resultPath.ToLower();
+                    string _mimeType = Path.GetExtension(resultPath).Remove(0,1).ToLower();
                     Byte[] dataMP4 = null;
                     dataMP4 = await _client.DownloadFile(joPredict["result"].ToString(), $"Predicted_{dataId}.{_mimeType}");
                     
