@@ -280,7 +280,7 @@ class KerasUtilities:
         global PMMLMODELSTORAGE
         import pathlib
         import matplotlib
-        matplotlib.use('TkAgg')
+        # matplotlib.use('TkAgg')
         from trainModel.mrcnn import visualize
         fO=pathlib.Path(filePath)
         resa=target_path+'pred_'+fO.name
