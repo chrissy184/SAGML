@@ -14,7 +14,7 @@ export class SettingsComponent implements OnInit {
     theme: 'vs-light',
     language: 'json'
   };
-
+  public editor;
   public defaultSettingsJSON: any = `{
     "settings": [{
       "name": "Cumulocity",
@@ -73,6 +73,7 @@ export class SettingsComponent implements OnInit {
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(response => {
         this.settingsJSON = JSON.stringify(response);
+        console.log(response, 'response came');
         localStorage.setItem('settingsJSON', this.settingsJSON);
       });
   }
@@ -93,6 +94,17 @@ export class SettingsComponent implements OnInit {
         this.settingsJSON = JSON.stringify(response);
         localStorage.setItem('settingsJSON', this.settingsJSON);
         this.utilService.alert('Settings Saved.');
+        if (this.editor) {
+          setTimeout(() => {
+            this.editor.getAction('editor.action.formatDocument').run();
+          }, 300);
+        }
       });
+  }
+  onEditorInit(editor: any) {
+    this.editor = editor;
+    setTimeout(() => {
+      this.editor.getAction('editor.action.formatDocument').run();
+    }, 300);
   }
 }
