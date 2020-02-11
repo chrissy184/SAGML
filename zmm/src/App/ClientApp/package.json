@@ -31,7 +31,6 @@
     "@swimlane/ngx-dnd": "^8.1.0",
     "@types/dragula": "^3.7.0",
     "bootstrap": "^4.4.1",
-    "core-js": "^3.6.4",
     "cron-editor": "^2.1.8",
     "cronstrue": "^1.88.0",
     "file-saver": "^1.3.8",
