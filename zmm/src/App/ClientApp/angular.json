@@ -148,5 +148,8 @@
       }
     }
   },
-  "defaultProject": "ZMM"
+  "defaultProject": "ZMM",
+  "cli": {
+    "analytics": "08fc5fbf-452d-4310-9b1d-954cabc103f7"
+  }
 }
