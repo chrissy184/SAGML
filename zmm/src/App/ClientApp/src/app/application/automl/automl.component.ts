@@ -46,8 +46,8 @@ export class AutomlComponent implements OnInit {
   };
   public fromDefaultData: any = {};
   supervised = true;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
   pageSize = 10;
   pageSizeOptions = [10, 25, 100];
   isLoading = false;

@@ -17,7 +17,7 @@ export class WeldingConfigFormComponent implements OnInit {
   public isLoading = false;
   public isContentLoading = false;
 
-  @ViewChild('thisForm') thisForm;
+  @ViewChild('thisForm', { static: true }) thisForm;
 
   gapOptions = [1, 2, 3, 4, 5];
   x_varOptions = [1, 2, 3, 4];

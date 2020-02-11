@@ -15,7 +15,7 @@ export class ApplicationComponent implements OnInit {
     top: 0
   };
   public onlineAlert: any;
-  @ViewChild('sidenav') public sidenav: MatSidenav;
+  @ViewChild('sidenav', { static: true }) public sidenav: MatSidenav;
 
   constructor(private utilService: UtilService) { }
 

@@ -9,8 +9,8 @@ import { environment } from '../../../environments/environment';
 })
 export class AppDropzoneComponent implements OnInit, OnChanges {
 
-  @ViewChild(DropzoneComponent) componentRef?: DropzoneComponent;
-  @ViewChild(DropzoneDirective) directiveRef?: DropzoneDirective;
+  @ViewChild(DropzoneComponent, { static: true }) componentRef?: DropzoneComponent;
+  @ViewChild(DropzoneDirective, { static: false }) directiveRef?: DropzoneDirective;
   @Input() dropzoneConfig: any = {};
   @Output() dropzoneSuccess = new EventEmitter<any>();
   @Input() openFileBrowserWindow: boolean;
