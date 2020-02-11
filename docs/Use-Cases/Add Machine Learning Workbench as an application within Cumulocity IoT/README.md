@@ -1,24 +1,17 @@
-# **Steps to install Cumulocity IOT ML Workbench in Windows 10 / Linux / MacOS through docker**
-
-<br>
+# **Steps to install Cumulocity IOT ML Workbench in Windows 10 / Linux / MacOS with docker**
 
 # Feature tags
-<br>
-10.5 (Latest)
-
+## 10.5 (Latest)
 - docker pull store/softwareag/mlw-zmm:10.5
 - docker pull store/softwareag/mlw-zmk:10.5
 
-1.38.2
+## 1.38.2
 - docker pull store/softwareag/zementis-modeler-zmm:1.38.2
 - docker pull store/softwareag/zementis-modeler-zmk:1.38.2
 - docker pull store/softwareag/zementis-modeler-nginx:1.38.2
 
-<br>
-
 # Pre-requisites
-Please pick your installation instructions in the following according to the OS you are using.
-
+Please, follow installation instructions as given below.
 - Keep 30 GB memory space for Cumulocity IOT ML Workbench application.
 - Docker 18.09 CE onwards
 - Docker-compose version 1.23.2
@@ -27,26 +20,18 @@ Please pick your installation instructions in the following according to the OS 
 Installation time may take up to 20 mins depending on the machine type and/or internet connectivity.
 you can extract or pull images in parallel by opening multiple commands prompts tab.
 
-<br>
-
-# [Windows 10](#Windows-10) | [Linux](#Linux) | [MacOS](#MacOS)
-
-<br>
-
 # Windows 10
 
-## Steps to install Cumulocity IOT ML Workbench in Windows 10 machine through docker :
+## Steps to install Cumulocity IOT ML Workbench in Windows 10 Machine with docker :
 
 **Step 1**: The first step is to download the docker installer from https://hub.docker.com/editions/community/docker-ce-desktop-windows
 
 **Step 2**: Before installation, we need to turn on Hyper-V in “Turn Windows features on or off”
-
 - Search for “Turn Windows features on or off” in global search and turn on Hyper-V. Restart your computer
 
 **Step 3**: Once this is done, we need to start Docker Desktop with administrator privilege
 
 **Step 4**: Docker icon will be visible on the system tray now
-
 - Next step is to go to docker settings by right clicking on docker icon
 - In those settings, tick the C drive in Shared Drives tab
 
@@ -60,10 +45,8 @@ you can extract or pull images in parallel by opening multiple commands prompts 
 | 10.5 | docker pull store/softwareag/mlw-zmm:10.5  | docker pull store/softwareag/mlw-zmk:10.5 |
 | 1.38.2 | docker pull store/softwareag/zementis-modeler-zmm:1.38.2 | docker pull store/softwareag/zementis-modeler-zmk:1.38.2 |
 
-- For 1.38.2 in addition to the above commands, the below command also needs to be run
-
-  - docker pull store/softwareag/zementis-modeler-nginx:1.38.2
-
+For 1.38.2, Please run below command as well
+docker pull store/softwareag/zementis-modeler-nginx:1.38.2
 
 **Step 7**: Create a folder in your preferred location
 ``` 
@@ -94,17 +77,13 @@ mlw_up.ps1
 mlw_down.ps1 
 ```
 
-<br>
-
 # Linux
 
-## Steps to install Cumulocity IOT ML Workbench in Linux machine through docker :
+## Steps to install Cumulocity IOT ML Workbench in Linux Machine with docker :
 
 ### if you have standalone Linux system, please proceed to step 4
 
 ### If you do not have a standalone Linux system, than it can be installed using your preferred virtualization software [VMWare](https://my.vmware.com/en/web/vmware/info/slug/desktop_end_user_computing/vmware_workstation_pro/15_0) or [Virtual Box](https://www.virtualbox.org/). Start from Step 1
-
-<br>
 
 **Step 1**: The first step is to download the VM player. You could do that in the below link
 
@@ -136,11 +115,8 @@ Supply your docker username and password to log in. After the login is successfu
 | 10.5 | docker pull store/softwareag/mlw-zmm:10.5  | docker pull store/softwareag/mlw-zmk:10.5 |
 | 1.38.2 | docker pull store/softwareag/zementis-modeler-zmm:1.38.2 | docker pull store/softwareag/zementis-modeler-zmk:1.38.2 |
 
-- For 1.38.2 in addition to the above commands, the below command also needs to be run
-
-  - docker pull store/softwareag/zementis-modeler-nginx:1.38.2
-
-
+For 1.38.2, Please run below command as well
+docker pull store/softwareag/zementis-modeler-nginx:1.38.2
 
 **Step 7**: Create a folder in your preferred location
 ``` 
@@ -178,16 +154,13 @@ mlw up
 mlw down
 ```
 
-<br>
-
 # MacOS
 
-## Steps to install Cumulocity IOT ML Workbench in MacOS machine through docker :
+## Steps to install Cumulocity IOT ML Workbench in MacOS Machine with docker :
 
 **Step 1**: The first step is to install the Docker and Docker Compose. Below are the links to do so
-
-- https://docs.docker.com/docker-for-mac/
-- https://docs.docker.com/compose/install/
+* https://docs.docker.com/docker-for-mac/
+* https://docs.docker.com/compose/install/
 
 **Step 2**: Now Docker is successfully installed in your system
 
@@ -202,9 +175,8 @@ Supply your docker username and password to log in. After the login is successfu
 | 10.5 | docker pull store/softwareag/mlw-zmm:10.5  | docker pull store/softwareag/mlw-zmk:10.5 |
 | 1.38.2 | docker pull store/softwareag/zementis-modeler-zmm:1.38.2 | docker pull store/softwareag/zementis-modeler-zmk:1.38.2 |
 
-- For 1.38.2 in addition to the above commands, the below command also needs to be run
-
-  - docker pull store/softwareag/zementis-modeler-nginx:1.38.2
+For 1.38.2, Please run below command as well
+docker pull store/softwareag/zementis-modeler-nginx:1.38.2
 
 **Step 4**: Create a folder in your preferred location
 ``` 
@@ -242,8 +214,6 @@ mlw up
 mlw down
 ```
 
-<br>
-
 # Adding Machine Learning Workbench as an application within Cumulocity IoT
 
 **Step 1**: Make sure the MLW is up and running in the Docker environment
@@ -264,36 +234,25 @@ mlw down
 
 **Step 7**: We could now navigate to our Cumulocity IoT instance using the App Switcher within MLW 
 
-<br>
+<img width="100%" src="https://github.com/SoftwareAG/MLW/blob/master/docs/Use-Cases/Add%20Machine%20Learning%20Workbench%20as%20an%20application%20within%20Cumulocity%20IoT/snap-shots/quick-snaps.gif">
 
 # Troubleshooting #
 
-  * **ERROR: Pool overlaps with another one on this address space**. 
-    * If you see the above error, make sure you stop the Cumulocity IOT ML Workbench application from the directory where it was started or remove the docker network by typing:
-       * docker network rm ***network name***
-
-  * If envsubst command does not exist in mac. Please follow instructions below to get the package:
-https://github.com/tardate/LittleCodingKata/tree/master/tools/envsubst
-
-
-  * ERROR: for zmm  Cannot start service zmm: driver failed programming external connectivity on endpoint: Error starting userland proxy: mkdir /port/tcp:0.0.0.0:port:tcp: ip :port: input/output error
-
-    * Stop all the running containers docker stop $(docker ps -a -q) then
-    * Stop the Docker on your machine & restart it.
-
-<br>
+**ERROR: Pool overlaps with another one on this address space**. 
+  * If you see the above error, make sure you stop the Cumulocity IOT ML Workbench application from the directory where it was started or remove the docker network by typing:
+  * docker network rm ***network name***
+  * If envsubst command does not exist in mac. Please follow instructions below to get the package:               https://github.com/tardate/LittleCodingKata/tree/master/tools/envsubst
+**ERROR: for zmm  Cannot start service zmm: driver failed programming external connectivity on endpoint: Error starting userland proxy: mkdir /port/tcp:0.0.0.0:port:tcp: ip :port: input/output error
+  * Stop all the running containers docker stop $(docker ps -a -q) then
+  * Stop the Docker on your machine & restart it.
 
 # Documentation #
 
 The full documentation is available from the website: https://www.mlw.ai
 
-<br>
-
 # License #
 
 License terms for this product can be found here: http://www.softwareag.com/license -> Limited Use License Agreement for Software AG Docker Images
-
-<br>
 
 # Base Image #
 
