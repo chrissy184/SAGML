@@ -29,13 +29,13 @@ export class TasksComponent implements OnInit {
 
     public displayedColumnsTaskHistory: string[] = ['expand', 'executedAt', 'status'];
     public dataSourceTaskHistory: any = [];
-    @ViewChild('taskHistoryMatPaginator', { static: false }) paginator: MatPaginator;
-    @ViewChild('taskHistoryMatSort', { static: false }) sort: MatSort;
+    @ViewChild('taskHistoryMatPaginator') paginator: MatPaginator;
+    @ViewChild('taskHistoryMatSort') sort: MatSort;
 
     public displayedColumnsGenerationResults: string[] = ['expand', 'modelName', 'score', 'bestmodel'];
     public dataSourceTaskHistoryGenerationResults: any = [];
-    @ViewChild('generationResultsMatPaginator', { static: false }) paginatorGenerationResults: MatPaginator;
-    @ViewChild('generationResultsMatSort', { static: false }) sortGenerationResults: MatSort;
+    @ViewChild('generationResultsMatPaginator') paginatorGenerationResults: MatPaginator;
+    @ViewChild('generationResultsMatSort') sortGenerationResults: MatSort;
 
     message = AlertMessages.TASK.deleteConfirmationTask;
     constructor(private apiService: HttpService, private utilService: UtilService) { }

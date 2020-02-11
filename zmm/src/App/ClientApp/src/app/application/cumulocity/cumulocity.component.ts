@@ -48,7 +48,7 @@ export class CumulocityComponent implements OnInit {
     aggregationType: 'MINUTELY',
     series: ['c8y_Acceleration.accelerationY', 'c8y_Acceleration.accelerationX', 'c8y_Acceleration.accelerationZ']
   };
-  @ViewChild('seriesForm', { static: false }) seriesForm;
+  @ViewChild('seriesForm') seriesForm;
   public isLoading = false;
   public isContentLoading = false;
   public headers: any = {};
