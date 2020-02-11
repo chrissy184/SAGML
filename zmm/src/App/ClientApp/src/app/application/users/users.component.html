@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="content-toolbar">
-        <button mat-icon-button matTooltip="Create new user">
+        <button mat-icon-button aria-label="icon"  matTooltip="Create new user">
           <span class="mdi mdi-account-plus-outline  text-secondary"></span>
         </button>
       </div>
@@ -53,7 +53,7 @@
       <div></div>
       <div class="toolbar-mid"></div>
       <div calss="content-toolbar">
-        <button mat-icon-button (click)="sidenav.toggle() ; toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')" [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
+        <button mat-icon-button aria-label="icon"  (click)="sidenav.toggle() ; toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')" [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
           <span class="mdi text-secondary" [ngClass]="{'mdi-fullscreen': sidenav.opened, 'mdi-fullscreen-exit': !sidenav.opened}"></span>
         </button>
       </div>

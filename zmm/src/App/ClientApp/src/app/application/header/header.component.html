@@ -1,6 +1,6 @@
 <mat-toolbar class="application-header bg-white">
   <div class="application-brand d-flex align-items-center">
-    <button mat-icon-button (click)="navOpen()" class="mr-1">
+    <button mat-icon-button aria-label="icon"  (click)="navOpen()" class="mr-1">
       <span class="mdi "
         [ngClass]="{'mdi-chevron-double-left': isNavOpen, 'mdi-chevron-double-right': !isNavOpen }"></span>
     </button>
@@ -18,7 +18,7 @@
         <h3>SAG Cloud</h3>
       </span>
     </div>
-    <button mat-icon-button matTooltip="Apps" [matMenuTriggerFor]="appsMenu" (click)="updateUrl()">
+    <button mat-icon-button aria-label="icon"  matTooltip="Apps" [matMenuTriggerFor]="appsMenu" (click)="updateUrl()">
       <span class="mdi mdi-apps"></span>
     </button>
     <mat-menu #appsMenu="matMenu" xPosition="before">
@@ -29,13 +29,13 @@
         <img alt="" src="/assets/devices.png" width="34" height="34" class="mr-2" /> Device Management
       </button>
     </mat-menu>
-    <button mat-icon-button disabled>
+    <button mat-icon-button aria-label="icon"  disabled>
       <span class="mdi mdi-account-circle"></span>
       <span class="avatar">
         <img alt="" *ngIf="userInfo.gravtarUrl" [src]="userInfo.gravtarUrl">
       </span>
     </button>
-    <button mat-icon-button (click)="logout()" matTooltip="Logout">
+    <button mat-icon-button aria-label="icon"  (click)="logout()" matTooltip="Logout">
       <span class="mdi mdi-power mr-2"></span>
     </button>
   </div>

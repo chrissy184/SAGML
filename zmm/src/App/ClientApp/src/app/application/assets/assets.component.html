@@ -9,12 +9,12 @@
                 <span class="mdi mdi-magnify"></span>
               </span>
             </div>
-            <input type="text" class="form-control" [(ngModel)]="filter" placeholder="Filter">
+            <label hidden for="filter"></label><input type="text" class="form-control" [(ngModel)]="filter" placeholder="Filter" id="filter">
           </div>
         </div>
       </div>
       <div class="content-toolbar">
-        <button mat-icon-button matTooltip="Start ZMK Instance" (click)="displayInstanceForm()">
+        <button mat-icon-button aria-label="icon"  matTooltip="Start ZMK Instance" (click)="displayInstanceForm()">
           <span class="mdi mdi-file-plus text-secondary"></span>
         </button>
       </div>
@@ -43,7 +43,7 @@
           (click)="killInstance();">
           <span class="mdi mdi-power text-secondary"></span>
         </button>
-        <button mat-icon-button (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')" [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
+        <button mat-icon-button aria-label="icon"  (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')" [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
           <span class="mdi text-secondary" [ngClass]="{'mdi-fullscreen': sidenav.opened, 'mdi-fullscreen-exit': !sidenav.opened}"></span>
         </button>
       </div>

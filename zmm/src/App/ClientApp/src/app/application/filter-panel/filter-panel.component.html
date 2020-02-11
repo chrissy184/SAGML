@@ -4,10 +4,10 @@
       Select Item
     </div>
     <div class="content-toolbar">
-      <button mat-icon-button matTooltip="Cancel" (click)="closeFilter()">
+      <button mat-icon-button aria-label="icon"  matTooltip="Cancel" (click)="closeFilter()">
         <span class="mdi mdi-close text-secondary"></span>
       </button>
-      <button mat-icon-button matTooltip="Submit" (click)="submit()" [disabled]="!selectedData.id">
+      <button mat-icon-button aria-label="icon"  matTooltip="Submit" (click)="submit()" [disabled]="!selectedData.id">
         <span class="mdi mdi-check text-secondary"></span>
       </button>
     </div>
@@ -21,7 +21,7 @@
               <span class="mdi mdi-magnify"></span>
             </span>
           </div>
-          <input type="text" class="form-control" [(ngModel)]="filter" placeholder="Filter">
+          <label hidden for="filter"></label><input type="text" class="form-control" [(ngModel)]="filter" placeholder="Filter" id="filter">
         </div>
       </div>
     </div>
