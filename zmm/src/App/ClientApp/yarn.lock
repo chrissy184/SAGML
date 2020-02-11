@@ -386,10 +386,10 @@
   resolved "https://registry.yarnpkg.com/@mdi/font/-/font-4.5.95.tgz#43c0d2e7b08d4221a778f58d899455d0c45916ed"
   integrity sha512-AjR2Zgu1feBXWlTfEjD6JQqLAMCqYn2Gzia5PWqFnysvz5F6JmPHtQFldIHXqyv2s/FwME7ZDBc5N86NEHbyvQ==
 
-"@ng-bootstrap/ng-bootstrap@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@ng-bootstrap/ng-bootstrap/-/ng-bootstrap-4.0.0.tgz#e56aafc8e3ae900b88d528303a5962cc363088ed"
-  integrity sha512-jWVHRDUYppOSvzclP9d3lVWGUO+y0X9W6jdfyYehDkJCY0MFgtwefLYMtQ/NJ4niPzm2d/zZn+Bte48iIn0nKw==
+"@ng-bootstrap/ng-bootstrap@^5.2.2":
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/@ng-bootstrap/ng-bootstrap/-/ng-bootstrap-5.2.2.tgz#65d7d0ddfd686b534c65f7fc79bd75b17856b59a"
+  integrity sha512-8tPmS0e48uDCy1KEWS73LrDSPuAuAuAgkilIks13NcdIHcYY4Pd0aZC8spnnA/kxQ8/8du4aWFUw6XhNYIjMvQ==
   dependencies:
     tslib "^1.9.0"
 
@@ -443,11 +443,21 @@
     contra "1.9.4"
     crossvent "1.5.4"
 
-"@swimlane/ngx-dnd@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@swimlane/ngx-dnd/-/ngx-dnd-6.0.0.tgz#9889ef6a510fd4e243a3b2a837a22d2d5a9ec333"
-  integrity sha512-5ABQi7qFi7VrbmMHNAg45Z24wtwIr5UwRBHMzWyClwJfC+055QBNNmyvnRIEAVhLi/M2Dc8LB+NQKyg5XbWcZw==
+"@swimlane/dragula@^3.8.0":
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/@swimlane/dragula/-/dragula-3.8.0.tgz#1fb96e898339c062acf0d0405173eca218d0b15d"
+  integrity sha512-1F3sWPs9GRbQysuOa92llH21YYgc0YezTAtt72AmMxgv8erX8h/S6hYWzqEj5SIB/+u/YRx298dKU0tGoYGgNg==
   dependencies:
+    contra "1.9.4"
+    crossvent "1.5.4"
+
+"@swimlane/ngx-dnd@^8.1.0":
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/@swimlane/ngx-dnd/-/ngx-dnd-8.1.0.tgz#b090b8439f7f0c4d912ae5271cfc7899f49c2edb"
+  integrity sha512-R1WvfkQSSwgOvWzQHGXUTVKmAo/lAIG3c4kLYETC+Mf5bEAueeBD7it7Vjd5A7xGaJPwHffVajPMRoqhC9IcGQ==
+  dependencies:
+    "@swimlane/dragula" "^3.8.0"
+    "@types/dragula" "^2.1.34"
     tslib "^1.9.0"
 
 "@types/dragula@^2.1.34":
@@ -1328,10 +1338,10 @@ bonjour@^3.5.0:
     multicast-dns "^6.0.1"
     multicast-dns-service-types "^1.1.0"
 
-bootstrap@^4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.3.1.tgz#280ca8f610504d99d7b6b4bfc4b68cec601704ac"
-  integrity sha512-rXqOmH1VilAt2DyPzluTi2blhk17bO7ef+zLLPlWvG494pDxcM234pJ8wTc/6R40UWizAIIMgxjvxZg5kmsbag==
+bootstrap@^4.4.1:
+  version "4.4.1"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.4.1.tgz#8582960eea0c5cd2bede84d8b0baf3789c3e8b01"
+  integrity sha512-tbx5cHubwE6e2ZG7nqM3g/FZ5PQEDMWmMGNrCUBVRPHXTJaH7CBDdsLeu3eCh3B1tzAxTnAbtmrzvWEvT2NNEA==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -2151,10 +2161,10 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-cron-editor@^2.1.7:
-  version "2.1.7"
-  resolved "https://registry.yarnpkg.com/cron-editor/-/cron-editor-2.1.7.tgz#8e252431b4769ad6f5e1128e24702a510e227d5b"
-  integrity sha512-SsmPX0DDAouKpsfVCavEKwF5RKcRH7AZyujRH3GW5h91oN6oR0jTNOE6R9KQ322khjCazFSldw1zgcX74+ahzw==
+cron-editor@^2.1.8:
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/cron-editor/-/cron-editor-2.1.8.tgz#a2348bf07fa296964c2ebd0fc2334aa578ffc42e"
+  integrity sha512-IqupHx2KYNRWpPsb3L+KJ7JTXCIRvtJzjWZdzxMbzbdPh/mPdGJfaGMBVcxY8+2QwOXQhq/5ueHQDEUhHwsqSQ==
   dependencies:
     tslib "^1.9.0"
 
