@@ -39,7 +39,13 @@ class PMMLView(APIView):
 				raise Exception("Invalid Request Parameter")
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return NyokaServer.getDetailsOfPMML(filePath)
+		
+		import pathlib
+		fO=pathlib.Path(filePath)
+		if fO.suffix == '.pmml':
+			return NyokaServer.getDetailsOfPMML(filePath)
+		elif fO.suffix == '.h5':
+			return None
 
 
 class PMMLGlobalView(APIView):
