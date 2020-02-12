@@ -13,7 +13,7 @@ export class CompileParameterFormComponent implements OnInit {
   data: any = {};
   formData: any = {};
   public isLoading = false;
-  @ViewChild('compileForm') compileForm;
+  @ViewChild('compileForm', { static: true }) compileForm;
   constructor() { }
   closeForm() {
     this.close.emit(true);

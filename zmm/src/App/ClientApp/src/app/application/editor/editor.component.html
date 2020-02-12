@@ -36,7 +36,7 @@
       </h2>
       <div class="toolbar-mid"></div>
       <div class="content-toolbar" hidden>
-        <button mat-icon-button [matTooltip]="'Close'">
+        <button mat-icon-button aria-label="icon"  [matTooltip]="'Close'">
           <span class="mdi mdi-close text-secondary"></span>
         </button>
       </div>
@@ -120,7 +120,7 @@
           <div *ngSwitchCase="'FOLDING'">
             <div class="ngx-section">
               <header class="ngx-section-header ngx-section-collapsible">
-                <button mat-icon-button class="ngx-section-toggle"
+                <button mat-icon-button aria-label="icon"  class="ngx-section-toggle"
                   [matTooltip]="!model.sectionCollapse ? 'Collapse' : 'Expand'" type="button"
                   (click)="toggleLayerSection(model)">
                   <span class="icon-arrow-down"
@@ -165,7 +165,7 @@
         <div *ngIf="item.itemType === 'FOLDING'">
           <div class="ngx-section">
             <header class="ngx-section-header ngx-section-collapsible">
-              <button mat-icon-button class="ngx-section-toggle"
+              <button mat-icon-button aria-label="icon"  class="ngx-section-toggle"
                 [matTooltip]="!item.sectionCollapse ? 'Collapse' : 'Expand'" type="button"
                 (click)="toggleLayerSection(item)">
                 <span class="icon-arrow-down"

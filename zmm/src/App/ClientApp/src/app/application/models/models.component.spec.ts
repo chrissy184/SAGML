@@ -13,15 +13,13 @@ import { BrowserModule, By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router, RouterModule } from '@angular/router';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import {
-  MatSnackBarModule,
-  MatSidenavModule,
-  MatProgressBarModule,
-  MatListModule,
-  MatCheckboxModule,
-  MatTooltipModule,
-  MatMenuModule
-} from '@angular/material';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ApiPrefixInterceptor } from 'src/app/shared/http/api-prefix.interceptor';
 import { ErrorHandlerInterceptor } from 'src/app/shared/http/error-handler.interceptor';
 import { of } from 'rxjs';

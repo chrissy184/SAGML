@@ -21,19 +21,17 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { SnackbarComponent } from '../../shared/snackbar/snackbar.component';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { environment } from '../../../environments/environment';
-import {
-  MatButtonModule,
-  MatTabsModule,
-  MatToolbarModule,
-  MatSidenavModule,
-  MatMenuModule,
-  MatTooltipModule,
-  MatTableModule,
-  MatSnackBarModule,
-  MatSlideToggleModule,
-  MatPaginatorModule,
-  MatSortModule
-} from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 class TestModule { }
 describe('DataComponent', () => {

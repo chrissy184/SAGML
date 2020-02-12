@@ -20,13 +20,11 @@ import { SnackbarComponent } from '../../shared/snackbar/snackbar.component';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { AssetComponent } from './asset.component';
 import { By } from '@angular/platform-browser';
-import {
-  MatToolbarModule,
-  MatSidenavModule,
-  MatMenuModule,
-  MatTooltipModule,
-  MatSnackBarModule,
-} from '@angular/material';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 describe('AssetComponent', () => {
   let component: AssetComponent;
