@@ -32,7 +32,7 @@
     <button mat-icon-button aria-label="icon"  disabled>
       <span class="mdi mdi-account-circle"></span>
       <span class="avatar">
-        <img alt="" *ngIf="userInfo.gravtarUrl" [src]="userInfo.gravtarUrl">
+        <img alt="" *ngIf="userInfo.gravtarUrl" [src]="userInfo.gravtarUrl" rel="preconnect">
       </span>
     </button>
     <button mat-icon-button aria-label="icon"  (click)="logout()" matTooltip="Logout">
