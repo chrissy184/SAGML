@@ -20,7 +20,7 @@ import requests, json,sys,subprocess, typing
 from nyokaserver import nyokaUtilities,nyokaPMMLUtilities
 from nyoka import PMML43Ext as pml
 from nyokaserver.nyokaServerClass import NyokaServer
-
+from KerasModelSupport.views import KerasExecution
 
 class PMMLView(APIView):
 	http_method_names=['get']
@@ -45,7 +45,7 @@ class PMMLView(APIView):
 		if fO.suffix == '.pmml':
 			return NyokaServer.getDetailsOfPMML(filePath)
 		elif fO.suffix == '.h5':
-			return None
+			return KerasExecution().getDetailsfromKerasModel(filePath)
 
 
 class PMMLGlobalView(APIView):
