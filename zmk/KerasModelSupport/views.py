@@ -4,20 +4,48 @@ from django.http import JsonResponse
 import pathlib,datetime
 from tensorflow import Graph, Session
 import tensorflow as tf
+
+from trainModel.kerasUtilities import PMMLMODELSTORAGE
+global PMMLMODELSTORAGE
 # Create your views here.
+
+
 class KerasExecution:
 
     def loadKerasModel(self,filePath):
-        model_graph = Graph()
-        with model_graph.as_default():
-            tf_session = Session()
-            with tf_session.as_default():
-                seqModel=load_model(filePath)
-        return seqModel
+        global PMMLMODELSTORAGE
+        fO=pathlib.Path(filePath)
+        keyToModel=fO.name.replace(fO.suffix,'')
+        # print (PMMLMODELSTORAGE)
+        try:
+            model_graph = Graph()
+            with model_graph.as_default():
+                tf_session = Session()
+                with tf_session.as_default():
+                    seqModel=load_model(filePath)
+
+            tempDictModel={'modelObj':seqModel,
+                            'model_graph':model_graph,
+                            'tf_session':tf_session,
+                            'inputShape':seqModel.input_shape,
+                            }
+            PMMLMODELSTORAGE[keyToModel]=tempDictModel
+            messageToWorld= "Model Loaded Successfully"
+            reStat=200
+        except:
+            messageToWorld="Model load failed, please connect with admin"
+            keyToModel=None
+            reStat=500
+        resultResp={'message':messageToWorld,'keytoModel':keyToModel}
+        return JsonResponse(resultResp,status=reStat)
 
     def getDetailsfromKerasModel(self,filePath):
         fO=pathlib.Path(filePath)
-        seqModel=self.loadKerasModel(filePath)
+        keyToModel=fO.name.replace(fO.suffix,'')
+        self.loadKerasModel(filePath)
+        global PMMLMODELSTORAGE
+        print (PMMLMODELSTORAGE)
+        seqModel=PMMLMODELSTORAGE[keyToModel]['modelObj']
 
         modelLastLayer=seqModel.layers[-1]
         if modelLastLayer.get_config()['activation'] in ['softmax']:

@@ -43,6 +43,7 @@ class PMMLView(APIView):
 		import pathlib
 		fO=pathlib.Path(filePath)
 		if fO.suffix == '.pmml':
+			print ('Came to PMML')
 			return NyokaServer.getDetailsOfPMML(filePath)
 		elif fO.suffix == '.h5':
 			return KerasExecution().getDetailsfromKerasModel(filePath)
