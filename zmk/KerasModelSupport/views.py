@@ -26,6 +26,7 @@ class KerasExecution:
 
             tempDictModel={'modelObj':seqModel,
                             'model_graph':model_graph,
+                            'modelGeneratedFrom':'Keras',
                             'tf_session':tf_session,
                             'inputShape':seqModel.input_shape,
                             }
@@ -44,11 +45,11 @@ class KerasExecution:
         keyToModel=fO.name.replace(fO.suffix,'')
         self.loadKerasModel(filePath)
         global PMMLMODELSTORAGE
-        print (PMMLMODELSTORAGE)
+        # print (PMMLMODELSTORAGE)
         seqModel=PMMLMODELSTORAGE[keyToModel]['modelObj']
 
         modelLastLayer=seqModel.layers[-1]
-        if modelLastLayer.get_config()['activation'] in ['softmax']:
+        if modelLastLayer.get_config()['activation'] in ['softmax','sigmoid']:
             funcType= 'Classification'
         else:
             funcType='Regression'

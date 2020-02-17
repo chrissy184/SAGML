@@ -99,7 +99,9 @@ class ScoreView(APIView):
 
 
 	def post(self,requests,modelName):
-		modelName=modelName[:-5]
+		# modelName=modelName[:-5]
+		modelName=modelName.replace('.pmml','')
+		modelName=modelName.replace('.h5','')
 		print (modelName)
 		try:
 			filePath=requests.POST.get('filePath')
