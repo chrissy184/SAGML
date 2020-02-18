@@ -21,5 +21,6 @@ namespace ZMM.Models.ResponseMessages
         [JsonProperty("selected")] public bool selected { get; set; }
         [JsonProperty("port")] public string port { get; set; }
         [JsonProperty("driver")] public string driver { get; set; }
+        [JsonProperty("ssl")] public string ssl { get; set; }
     }
 }

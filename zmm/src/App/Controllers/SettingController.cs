@@ -129,7 +129,7 @@ namespace ZMM.App.Controllers
                         new SettingProperty{ name="Predictive Analytics",type="ZS",tenantID="zserver", username="*******",password="*******",url="https://ai.eu-latest.cumulocity.com/",selected=true },
                         new SettingProperty{ name="Repo Server 1",type="NR",tenantID="repo", username="*******",password="*******",url="https://repo.umoya.ai/",selected=false },
                         new SettingProperty{ name="Repo Server 2",type="NR",tenantID="hub", username="*******",password="*******",url="https://hub.umoya.ai/",selected=true },
-                        new SettingProperty{ name="DataHub 1",type="DH",driver="Dremio", username="*******",password="*******",url="https://url",port="0000",selected=true }
+                        new SettingProperty{ name="DataHub 1",type="DH",driver="Dremio", username="*******",password="*******",url="https://url",port="0000",selected=true, ssl ="1" }
                     }
                 };
                 jObj = JObject.Parse(JsonConvert.SerializeObject(template)); 
@@ -166,6 +166,10 @@ namespace ZMM.App.Controllers
                 {
                     p["port"].Parent.Remove();
                     p["driver"].Parent.Remove();
+                }
+                if(p["ssl"].ToString() == "")
+                {
+                    p["ssl"].Parent.Remove();
                 }
             }
             //
