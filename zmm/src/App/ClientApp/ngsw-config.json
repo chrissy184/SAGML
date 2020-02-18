@@ -4,11 +4,7 @@
   "dataGroups": [
     {
       "name": "tb",
-      "urls": [
-        "/tb1",
-        "/tb2",
-        "/tb3"
-      ],
+      "urls": ["/tb1", "/tb2", "/tb3"],
       "cacheConfig": {
         "maxSize": 0,
         "maxAge": "0u",
@@ -24,7 +20,7 @@
         "files": [
           "/favicon.ico",
           "/index.html",
-          "/manifest.webmanifest",
+          "/manifest.json",
           "/*.css",
           "/*.js",
           "/*.ttf",
