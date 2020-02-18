@@ -91,9 +91,9 @@ namespace ZMM.Models.Payloads
         #endregion
 
         #region Get DataHub cnn details
-        public static Tuple<string, string, string, string, string> GetDataHubInfo(string zmodId)
+        public static Tuple<string, string, string, string, string, string> GetDataHubInfo(string zmodId)
         {
-            string url = "", uname = "", pass = "", port="", driver="";
+            string url = "", uname = "", pass = "", port="", driver="", ssl = "";
             // var qry = GetSettingsByUser(zmodId)
             // .Where(i => i.Settings.Any(s => s.selected == true))
             // .SelectMany(col => col.Settings.Select(s => new { s.url, s.username, s.password }));
@@ -109,12 +109,13 @@ namespace ZMM.Models.Payloads
                         pass = record.password;
                         port = record.port;
                         driver = record.driver;
+                        ssl = record.ssl;
                         break;
                     }
                 }
             }
 
-            return new Tuple<string, string, string, string, string>(url, uname, pass, port, driver);
+            return new Tuple<string, string, string, string, string, string>(url, uname, pass, port, driver, ssl);
         }
         #endregion      
 
