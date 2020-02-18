@@ -1,6 +1,6 @@
 {
-  "name": "MLW",
-  "short_name": "MLW",
+  "name": "Machine Learning Workbench",
+  "short_name": "mlw",
   "theme_color": "#1776BF",
   "background_color": "#1776BF",
   "color": "#FFFFFF",

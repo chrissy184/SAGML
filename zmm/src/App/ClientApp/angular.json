@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ZMM": {
+    "mlw": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -67,18 +67,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ZMM:build"
+            "browserTarget": "mlw:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "ZMM:build:production"
+              "browserTarget": "mlw:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ZMM:build"
+            "browserTarget": "mlw:build"
           }
         },
         "test": {
@@ -102,7 +102,7 @@
         }
       }
     },
-    "ZMM-e2e": {
+    "mlw-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "architect": {
@@ -110,11 +110,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "ZMM:serve"
+            "devServerTarget": "mlw:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "ZMM:serve:production"
+              "devServerTarget": "mlw:serve:production"
             }
           }
         },
@@ -128,7 +128,7 @@
       }
     }
   },
-  "defaultProject": "ZMM",
+  "defaultProject": "mlw",
   "cli": {
     "analytics": "08fc5fbf-452d-4310-9b1d-954cabc103f7"
   }
