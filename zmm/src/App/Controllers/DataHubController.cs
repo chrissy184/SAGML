@@ -26,7 +26,7 @@ namespace ZMM.App.Controllers
         private readonly IWebHostEnvironment _environment;
         private IConfiguration Configuration { get; }
         readonly ILogger<DataHubController> Logger;
-        private List<DataResponse> responseData;
+        // private List<DataResponse> responseData;
 
         #endregion
 
