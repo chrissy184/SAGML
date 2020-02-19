@@ -44,7 +44,7 @@ namespace ZMM.App.Controllers
         private readonly IPyTensorServiceClient tbClient;
         private List<ModelResponse> responseData;
         private List<DataResponse> dataResponseData;
-        private static string[] extensions = new[] { "pmml", "onnx" };
+        private static string[] extensions = new[] { "pmml", "onnx","h5" };
         private readonly IScheduler _scheduler;
         #endregion
 
@@ -108,7 +108,7 @@ namespace ZMM.App.Controllers
                         //
                         foreach (var record in existingCodeData)
                         {
-                            if ((record.Name == formFile.FileName) && (record.User == CURRENT_USER))
+                            if (record.Name == formFile.FileName)
                             {
                                 IsFileExists = true;
                             }
@@ -135,14 +135,14 @@ namespace ZMM.App.Controllers
                                 await formFile.CopyToAsync(fileStream);
                             }
                         }
-
-                        if (fileExt.Contains("pmml"))
+                        //
+                        if (fileExt.ToLower().Contains("pmml"))
                         {
                             type = "PMML";
                         }
-                        else
+                        else if(fileExt.ToLower().Contains("h5"))
                         {
-                            type = fileExt.ToUpper();
+                            type = "H5";
                         }
                         List<Property> _props = new List<Property>();
                         string _url = DirectoryHelper.GetModelUrl(formFile.FileName);
@@ -161,8 +161,7 @@ namespace ZMM.App.Controllers
                             Name = formFile.FileName,
                             Size = formFile.Length,
                             Type = type,
-                            Url = _url,
-                            User = CURRENT_USER,
+                            Url = _url,                            
                             Properties = _props
                         };
                         //
