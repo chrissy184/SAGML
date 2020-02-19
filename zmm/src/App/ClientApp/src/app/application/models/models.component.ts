@@ -35,9 +35,10 @@ export class ModelsComponent implements OnInit {
     url: ApiRoutes.models,
     acceptedFiles: `
     .pmml,
-    .onnx
+    .onnx,
+    .h5
     `,
-    acceptedFilesMsg: 'Allowed file type are PMML, ONNX'
+    acceptedFilesMsg: 'Allowed file type are PMML, ONNX, H5'
   };
   public tabSelectedIndex = 0;
 
@@ -64,8 +65,6 @@ export class ModelsComponent implements OnInit {
     this.getAllPMML();
     this.uploadFiles = false;
   }
-
-
 
   public downloadModel() {
     this.isContentLoading = true;
@@ -320,9 +319,9 @@ export class ModelsComponent implements OnInit {
   closeFilter() {
     this.publishModelData = false;
   }
-  isArray(obj : any ) {
+  isArray(obj: any) {
     return Array.isArray(obj)
- }
+  }
 
   ngOnInit() {
     this.getAllPMML();

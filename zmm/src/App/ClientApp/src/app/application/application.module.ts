@@ -35,6 +35,7 @@ import { ExcuteFormComponent } from './code/excute-form/excute-form.component';
 import { CronEditorModule } from 'cron-editor';
 import { RepoComponent } from './repo/repo.component';
 import { SettingsComponent } from './settings/settings.component';
+import { AutomlResultComponent } from './tasks/automl-result/automl-result.component';
 
 @NgModule({
   imports: [
@@ -72,7 +73,8 @@ import { SettingsComponent } from './settings/settings.component';
     LicenseComponent,
     ExcuteFormComponent,
     RepoComponent,
-    SettingsComponent
+    SettingsComponent,
+    AutomlResultComponent
   ]
 })
 export class ApplicationModule { }
