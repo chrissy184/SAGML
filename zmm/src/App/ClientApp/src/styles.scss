@@ -2,6 +2,7 @@
 @import '../node_modules/@mdi/font/css/materialdesignicons.min.css';
 @import '../node_modules/bootstrap/scss/bootstrap';
 @import '~dropzone/dist/min/dropzone.min.css';
+
 @font-face {
     font-family: 'Avenir-Black';
     src: url('/assets/webfont/Avenir-Black.eot?#iefix') format('embedded-opentype'), url('/assets/webfont/Avenir-Black.woff') format('woff'), url('/assets/webfont/Avenir-Black.ttf') format('truetype'), url('/assets/webfont/Avenir-Black.svg#Avenir-Black') format('svg');
@@ -21,12 +22,14 @@
 .logo {
     display: inline-block;
     padding: 17px 0;
+
     h1 {
         font-size: 16px;
         font-weight: 700;
         font-family: 'Avenir-Black';
         line-height: 1;
     }
+
     h3 {
         font-size: 14px;
         font-weight: 400;
@@ -62,6 +65,7 @@ dt {
         width: 40px;
         line-height: 40px;
     }
+
     &:hover {
         background-color: rgba(0, 0, 0, .1);
     }
@@ -69,6 +73,7 @@ dt {
 
 .zms-page {
     min-height: 100%;
+
     .main-container {
         .mat-toolbar {
             height: auto;
@@ -76,12 +81,14 @@ dt {
             padding: 8px 16px;
             border-bottom: 1px solid $border-color;
             min-height: 58px;
+
             h2 {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
         }
+
         .dropzone {
             border: 2px dashed $primary;
             border-radius: 5px;
@@ -89,6 +96,7 @@ dt {
             padding: 20px;
             background-color: $white;
             min-height: 300px;
+
             .dz-message {
                 background-color: $white;
                 border: 0;
@@ -96,6 +104,7 @@ dt {
                 padding: 60px 0;
                 min-height: 233px;
             }
+
             &.dz-started .dz-message {
                 display: none !important;
             }
@@ -107,6 +116,7 @@ dt {
     .list-group-item-action {
         cursor: pointer;
     }
+
     .list-group-item-action.active {
         border-color: $border-color;
         background-color: $light;
@@ -127,9 +137,11 @@ dt {
     left: 0;
     right: 0;
     background: $white;
+
     .content-sidenav {
         width: 350px;
         border-right: 1px solid $border-color;
+
         .details-list {
             overflow: auto;
             position: absolute;
@@ -140,6 +152,7 @@ dt {
             z-index: 0;
         }
     }
+
     .content-main {
         .mat-tab-group {
             position: absolute;
@@ -147,11 +160,13 @@ dt {
             left: 0;
             right: 0;
             bottom: 0;
+
             .mat-tab-body-wrapper {
                 height: 100%;
                 ;
             }
         }
+
         .details {
             overflow: auto;
             position: absolute;
@@ -162,6 +177,7 @@ dt {
             z-index: 0;
         }
     }
+
     .filter {
         .form-control {
             outline: none !important;
@@ -170,6 +186,7 @@ dt {
             border-radius: 0;
             padding: 0;
         }
+
         .input-group-text {
             border: 0;
             background: transparent;
@@ -244,6 +261,7 @@ dt {
     bottom: 0;
     border-left: 1px solid #ddd;
     z-index: 999;
+
     .details-list {
         overflow: auto;
         position: absolute;
@@ -279,8 +297,8 @@ dt {
 }
 
 .mat-button-toggle-checked {
-  background-color: $primary;
-  color: $white;
+    background-color: $primary;
+    color: $white;
 }
 
 .cron-editor {
@@ -337,6 +355,7 @@ dt {
         display: inline-block;
     }
 }
+
 .filter {
     label {
         opacity: 0;
