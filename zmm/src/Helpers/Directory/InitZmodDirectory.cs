@@ -734,7 +734,7 @@ namespace ZMM.Helpers.ZMMDirectory
             var zmodDir = new ZmodDirectory(DirectoryHelper.fileUploadDirectoryPath);
 
             //loop of model
-            #region  CODE - PMML
+            #region  MODEL - PMML
             foreach (var item in zmodDir.PmmlFiles)
             {
                 List<Property> _props = new List<Property>();
@@ -755,6 +755,36 @@ namespace ZMM.Helpers.ZMMDirectory
                     Name = fileName,
                     Size = item.Value.info.Length,
                     Type = "PMML",
+                    Url = _url,
+                    User = "",
+                    Properties = _props,
+                    DateCreated = item.Value.info.CreationTime
+                };
+                ModelPayload.Create(newRecord);
+            }
+            #endregion
+            
+            #region  MODEL - H5
+            foreach (var item in zmodDir.H5Files)
+            {
+                List<Property> _props = new List<Property>();
+                fileName = item.Value.info.Name;
+                fileExt = "h5";
+                _url = DirectoryHelper.GetModelUrl(item.Value.info.Name);
+                //
+                ModelResponse newRecord = new ModelResponse()
+                {
+                    Created_on = item.Value.info.CreationTime.ToString(),
+                    Deployed = false,
+                    Edited_on = item.Value.info.LastWriteTime.ToString(),
+                    Extension = fileExt,
+                    FilePath = item.Value.info.FullName,
+                    Id = fileName.Replace($".{fileExt}", ""),
+                    Loaded = false,
+                    MimeType = "application/octet-stream",
+                    Name = fileName,
+                    Size = item.Value.info.Length,
+                    Type = "H5",
                     Url = _url,
                     User = "",
                     Properties = _props,
