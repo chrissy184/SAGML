@@ -16,6 +16,8 @@ namespace ZMM.App.Clients.Repo
         public int TotalDownloads { get; set; }
 
         public string Registration { get; set; }
+
+        public IEnumerable<PackageVersion> Versions { get; set; }
      
     }
 }
