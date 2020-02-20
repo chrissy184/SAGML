@@ -116,10 +116,9 @@
                         <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
                         <ng-container matColumnDef="expandedDetail">
                             <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumnsTaskHistory.length">
-                                <div class="element-detail" [@detailExpand]="
-                    row == expandedElement ? 'expanded' : 'collapsed'
-                  ">
-                                    <div class="p-4 mb-3 border">
+                                <div class="element-detail"
+                                    [@detailExpand]="row == expandedElement ? 'expanded' : 'collapsed'">
+                                    <div class="mb-3 border">
                                         <!-- This section to expand the task history row and display diffrent kind of infromation based on task type -->
                                         <div *ngIf="selectedTask?.errorMessage">
                                             <h6 class="p-4 text-muted">
@@ -134,10 +133,8 @@
                                                 [selectedHistory]='selectedHistory'></app-automl-result>
                                         </ng-template>
 
-                                        <ng-template [ngIf]="
-                        selectedTask?.type === 'ANAMOLY' &&
-                        selectedHistory?.status === 'Complete'
-                      ">
+                                        <ng-template
+                                            [ngIf]="selectedTask?.type === 'ANAMOLY' && selectedHistory?.status === 'Complete'">
                                             <h6 class=" p-4 text-muted">
                                                 Model is successfully trained and saved in Models section.
                                             </h6>
