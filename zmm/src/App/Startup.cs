@@ -265,6 +265,7 @@ namespace ZMM.App
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = ClientUIDirectory;
+                spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
                 if (IsDevelopment)
                 {
                     spa.UseAngularCliServer(npmScript: "start");
