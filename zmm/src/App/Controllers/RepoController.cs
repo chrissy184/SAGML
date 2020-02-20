@@ -48,7 +48,7 @@ namespace ZMM.App.Controllers
         /// <response code="201">Returns list of resource(s)</response>
         /// <response code="204">If no resource(s) found</response>
         /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>   
-        [HttpGet]    
+        [HttpGet("/api/repo")]  
         [Produces("application/json")]    
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -68,7 +68,8 @@ namespace ZMM.App.Controllers
         }
         #endregion
 
-        [HttpGet("{id}")]
+        #region Get Resource Info
+        [HttpGet("/api/repo/{id}")]
         /// <summary>
         /// Get Resource meta data (info) from UMOYA (Repo) Server.
         /// </summary>
@@ -82,8 +83,123 @@ namespace ZMM.App.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get(string id)
         {
-            return Ok(new { message = "Get Resource Controller with " + id });
+            return Ok(new { message = "Not yet implemented " + id });
         }
+        #endregion
+
+        #region GetModels
+        /// <summary>
+        /// Get all model resource(s) from UMOYA (Repo) Server.
+        /// </summary>
+        /// <returns> List of Model Resource(s)</returns>
+        /// <response code="201">Returns list of resource(s) which are models</response>
+        /// <response code="204">If no resource(s) found</response>
+        /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>   
+        [HttpGet("/api/repo/models")]    
+        [Produces("application/json")]    
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<Package>>> GetModels()
+        {   
+            try
+            {
+                IEnumerable<Package> ListOfResources = await Client.GetModels();
+                if(ListOfResources.Count() > 0) return Ok(ListOfResources.ToList());
+                else return NoContent();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        #region GetCode
+        /// <summary>
+        /// Get all code resource(s) from UMOYA (Repo) Server.
+        /// </summary>
+        /// <returns> List of Code Resource(s)</returns>
+        /// <response code="201">Returns list of code resource(s)</response>
+        /// <response code="204">If no resource(s) found</response>
+        /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>   
+        [HttpGet("/api/repo/codes")]    
+        [Produces("application/json")]    
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<Package>>> GetCodes()
+        {   
+            try
+            {
+                IEnumerable<Package> ListOfResources = await Client.GetCode();
+                if(ListOfResources.Count() > 0) return Ok(ListOfResources.ToList());
+                else return NoContent();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        #region GetData
+        /// <summary>
+        /// Get all data resource(s) from UMOYA (Repo) Server.
+        /// </summary>
+        /// <returns> List of Data Resource(s)</returns>
+        /// <response code="201">Returns list of data resource(s)</response>
+        /// <response code="204">If no resource(s) found</response>
+        /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>   
+        [HttpGet("/api/repo/data")]    
+        [Produces("application/json")]    
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<Package>>> GetData()
+        {   
+            try
+            {
+                IEnumerable<Package> ListOfResources = await Client.GetData();
+                if(ListOfResources.Count() > 0) return Ok(ListOfResources.ToList());
+                else return NoContent();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        #region GetData
+        /// <summary>
+        /// Get all resource(s) from UMOYA (Repo) Server by Query.
+        /// </summary>
+        /// <returns> List of Resource(s) by query</returns>
+        /// <response code="201">Returns list of resource(s) by query</response>
+        /// <response code="204">If no resource(s) found</response>
+        /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>   
+        [HttpGet("/api/repo/query")]    
+        [Produces("application/json")]    
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<Package>>> Query(string QueryString)
+        {   
+            try
+            {
+                IEnumerable<Package> ListOfResources = await Client.Query(QueryString);
+                if(ListOfResources.Count() > 0) return Ok(ListOfResources.ToList());
+                else return NoContent();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        
         
     }
 }
