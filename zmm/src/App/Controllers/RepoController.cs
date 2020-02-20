@@ -54,11 +54,11 @@ namespace ZMM.App.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<Package>>> Get(string ResourceType, string QueryString)
+        public async Task<ActionResult<IEnumerable<Resource>>> Get(string ResourceType, string QueryString)
         {   
             try
             {
-                IEnumerable<Package> ListOfResources = await Client.Get(ResourceType, QueryString);
+                IEnumerable<Resource> ListOfResources = await Client.Get(ResourceType, QueryString);
                 if(ListOfResources.Count() > 0) return Ok(ListOfResources.ToList());
                 else return NoContent();
             }
@@ -69,22 +69,27 @@ namespace ZMM.App.Controllers
         }
         #endregion
         
-        #region Get Resource Info
+        #region Get Resource Info with dependencies and meta data
         [HttpGet("/api/repo/{id}")]
         /// <summary>
         /// Get Resource meta data (info) from UMOYA (Repo) Server.
         /// </summary>
         /// <returns>Resource meta data (info)</returns>
         /// <response code="200">Return resource meta data(info) along with list of version(s)</response>
-        /// <response code="204">If resource is not found</response>
         /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>      
         [Produces("application/json")]    
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Get(string id)
+        public async Task<ActionResult<ResourceInfo>> Get(string id)
         {
-            return Ok(new { message = "Not yet implemented " + id });
+            try
+            {
+                return await Client.Get(id);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         #endregion
 

@@ -26,7 +26,7 @@ namespace ZMM.App.Clients.Repo
             this.Config = Conf;
         }
 
-        public async Task<IEnumerable<Package>> Get()
+        public async Task<IEnumerable<Resource>> Get()
         {      
             HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURL);
             if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
@@ -36,12 +36,15 @@ namespace ZMM.App.Clients.Repo
 
 
         //https://???/v3/registration/helloworld.pmml/index.json
-        public Task<Package> Get(string ResourceId)
+        public async Task<ResourceInfo> Get(string ResourceId)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLByResourceId.Replace("ResourceId", ResourceId));
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            ResourceInfo SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<ResourceInfo>();
+            return SearchResultSetInListOfResources;
         }
 
-        public Task<IEnumerable<Package>> Get(string ResourceType, string QueryString)
+        public Task<IEnumerable<Resource>> Get(string ResourceType, string QueryString)
         {
             if(!string.IsNullOrEmpty(ResourceType))
             {
@@ -65,7 +68,7 @@ namespace ZMM.App.Clients.Repo
             }
         }
 
-        private async Task<IEnumerable<Package>> GetResourcesByType(string ResourceType)
+        private async Task<IEnumerable<Resource>> GetResourcesByType(string ResourceType)
         {            
             HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceType + ResourceType);
             if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
@@ -73,7 +76,7 @@ namespace ZMM.App.Clients.Repo
             return SearchResultSetInListOfResources.Data;
         }
 
-        private async Task<IEnumerable<Package>> GetResourcesByTypeAndQueryString(string ResourceType, string QueryString)
+        private async Task<IEnumerable<Resource>> GetResourcesByTypeAndQueryString(string ResourceType, string QueryString)
         {            
             HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceTypeAndQueryString.Replace("ResourceType", ResourceType).Replace("QueryString", QueryString));
             if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
@@ -81,7 +84,7 @@ namespace ZMM.App.Clients.Repo
             return SearchResultSetInListOfResources.Data;
         }        
 
-        private async Task<IEnumerable<Package>> GetResourcesByQuery(string QueryString)
+        private async Task<IEnumerable<Resource>> GetResourcesByQuery(string QueryString)
         {
             HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQuery + QueryString);
             if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
@@ -90,17 +93,17 @@ namespace ZMM.App.Clients.Repo
         }
 
 
-        public Task<IRepoResponse> Add(Package ResourceInfo)
+        public Task<IRepoResponse> Add(Resource ResourceInfo)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IRepoResponse> Delete(Package ResourceInfo)
+        public Task<IRepoResponse> Delete(Resource ResourceInfo)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IRepoResponse> Publish(Package ResourceInfo)
+        public Task<IRepoResponse> Publish(Resource ResourceInfo)
         {
             throw new NotImplementedException();
         }
