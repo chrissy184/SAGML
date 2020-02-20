@@ -49,10 +49,13 @@ class KerasExecution:
         seqModel=PMMLMODELSTORAGE[keyToModel]['modelObj']
 
         modelLastLayer=seqModel.layers[-1]
-        if modelLastLayer.get_config()['activation'] in ['softmax','sigmoid']:
-            funcType= 'Classification'
-        else:
-            funcType='Regression'
+        try:
+            if modelLastLayer.get_config()['activation'] in ['softmax','sigmoid']:
+                funcType= 'Classification'
+            else:
+                funcType='Regression'
+        except:
+            funcType='None'
         allInfo={}
         allInfo['modelGeneratedFrom']='Keras'
         allInfo['deployableToZAD']=False

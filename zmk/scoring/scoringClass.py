@@ -424,18 +424,34 @@ class NewScoringView:
 		print (modelObjs)
 		if pathlib.Path(filePath).suffix =='.csv':
 			testData=pd.read_csv(filePath)
-			model_graph = modelInformation['model_graph']
-			tf_session = modelInformation['tf_session']
-			with model_graph.as_default():
-				with tf_session.as_default():
-					modelToUse=modelInformation['modelObj']
-					predi=modelToUse.predict(testData)
+		elif pathlib.Path(filePath).suffix in ['.jpg','.JPG','.png','.PNG']:
+			inputShapevals=modelInformation['inputShape']
+			testimage=filePath
+			img_height, img_width=inputShapevals[1:3]
+			img = image.load_img(testimage, target_size=(img_height, img_width))
+			x = image.img_to_array(img)
+			x=x/255
+			testData=x.reshape(1,img_height, img_width,3)
+
+		model_graph = modelInformation['model_graph']
+		tf_session = modelInformation['tf_session']
+		with model_graph.as_default():
+			with tf_session.as_default():
+				modelToUse=modelInformation['modelObj']
+				predi=modelToUse.predict(testData)
 
 		if pathlib.Path(filePath).suffix =='.csv':
-				testData['predicted_Score']=predi
-				print (testData.shape)
-				resafile=target_path+'result.csv'
-				testData.to_csv(resafile, index=False)
+			testData['predicted_Score']=predi
+			print (testData.shape)
+			resafile=target_path+'result.csv'
+			testData.to_csv(resafile, index=False)
+		elif pathlib.Path(filePath).suffix in ['.jpg','.JPG','.png','.PNG']:
+			import numpy as np
+			predClasses=['class_'+str(i) for i in range(len(np.ravel(predi)))]
+			targetResult= {j:str(float(k)) for j,k in zip(predClasses,list(predi[0]))}
+			resafile=target_path+'result.txt'
+			with open(resafile,'w') as f:
+				f.write(json.dumps(targetResult))
 
 		resultResp={'result':resafile}
 		return JsonResponse(resultResp,status=200)
