@@ -25,7 +25,7 @@ namespace ZMM.App.Clients.Repo
         }
 
         public async Task<IEnumerable<Package>> Get()
-        {            
+        {      
             HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURL);
             if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
             Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
@@ -33,29 +33,42 @@ namespace ZMM.App.Clients.Repo
         }
 
 
-        public Task<Resources> Get(string ResourceId)
+        //https://???/v3/registration/helloworld.pmml/index.json
+        public Task<Package> Get(string ResourceId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IRepoResponse> GetModels()
-        {
-            throw new NotImplementedException();
+        public async Task<IEnumerable<Package>> GetModels()
+        {            
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceType + "model");
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
+            return SearchResultSetInListOfResources.Data;
         }
 
-        public Task<IRepoResponse> GetData()
+        public async Task<IEnumerable<Package>> GetData()
         {
-            throw new NotImplementedException();
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceType + "data");
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
+            return SearchResultSetInListOfResources.Data;
         }
 
-        public Task<IRepoResponse> GetCode()
+        public async Task<IEnumerable<Package>> GetCode()
         {
-            throw new NotImplementedException();
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceType + "code");
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
+            return SearchResultSetInListOfResources.Data;
         }
 
-        public Task<IRepoResponse> Query(string QueryString)
+        public async Task<IEnumerable<Package>> Query(string QueryString)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQuery + QueryString);
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
+            return SearchResultSetInListOfResources.Data;
         }
 
         public Task<IRepoResponse> Add(Package ResourceInfo)
@@ -82,10 +95,6 @@ namespace ZMM.App.Clients.Repo
         {
             throw new NotImplementedException();
         }
-
-        Task<IRepoResponse> IRepoClient.Get(string ResourceId)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

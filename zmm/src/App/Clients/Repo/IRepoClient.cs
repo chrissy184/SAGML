@@ -8,11 +8,11 @@ namespace ZMM.App.Clients.Repo
     public interface IRepoClient
     {
         Task<IEnumerable<Package>> Get();
-        Task<IRepoResponse> Get(string ResourceId);
-        Task<IRepoResponse> GetModels();
-        Task<IRepoResponse> GetData();
-        Task<IRepoResponse> GetCode();
-        Task<IRepoResponse> Query(string QueryString);
+        Task<Package> Get(string ResourceId);
+        Task<IEnumerable<Package>> GetModels();
+        Task<IEnumerable<Package>> GetData();
+        Task<IEnumerable<Package>> GetCode();
+        Task<IEnumerable<Package>> Query(string QueryString);
         Task<IRepoResponse> Add(Package ResourceInfo);
         Task<IRepoResponse> Delete(Package ResourceInfo);
         Task<IRepoResponse> Publish(Package ResourceInfo);
