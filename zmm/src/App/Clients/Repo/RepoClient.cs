@@ -16,6 +16,8 @@ namespace ZMM.App.Clients.Repo
 {
     public class RepoClient : IRepoClient
     {
+
+        private List<string> ResourceTypes = new List<string>(){"model", "code", "data"};
         public IConfiguration Config { get; }  
         readonly ILogger<RepoClient> Logger;
 
@@ -39,37 +41,54 @@ namespace ZMM.App.Clients.Repo
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Package>> GetModels()
+        public Task<IEnumerable<Package>> Get(string ResourceType, string QueryString)
+        {
+            if(!string.IsNullOrEmpty(ResourceType))
+            {
+                if(ResourceTypes.Contains(ResourceType.ToLower()))
+                {
+                    if(!string.IsNullOrEmpty(QueryString))
+                    {
+                        return GetResourcesByTypeAndQueryString(ResourceType, QueryString);
+                    }
+                    else
+                    {                    
+                        return GetResourcesByType(ResourceType);              
+                    } 
+                }
+                else throw new Exception("Given resource type is not valid. Valid resource types are model, code, data");
+            }
+            else 
+            {
+                if(!string.IsNullOrEmpty(QueryString)) return GetResourcesByQuery(QueryString);
+                else return Get();
+            }
+        }
+
+        private async Task<IEnumerable<Package>> GetResourcesByType(string ResourceType)
         {            
-            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceType + "model");
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceType + ResourceType);
             if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
             Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
             return SearchResultSetInListOfResources.Data;
         }
 
-        public async Task<IEnumerable<Package>> GetData()
-        {
-            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceType + "data");
+        private async Task<IEnumerable<Package>> GetResourcesByTypeAndQueryString(string ResourceType, string QueryString)
+        {            
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceTypeAndQueryString.Replace("ResourceType", ResourceType).Replace("QueryString", QueryString));
             if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
             Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
             return SearchResultSetInListOfResources.Data;
-        }
+        }        
 
-        public async Task<IEnumerable<Package>> GetCode()
-        {
-            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceType + "code");
-            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
-            Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
-            return SearchResultSetInListOfResources.Data;
-        }
-
-        public async Task<IEnumerable<Package>> Query(string QueryString)
+        private async Task<IEnumerable<Package>> GetResourcesByQuery(string QueryString)
         {
             HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQuery + QueryString);
             if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
             Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
             return SearchResultSetInListOfResources.Data;
         }
+
 
         public Task<IRepoResponse> Add(Package ResourceInfo)
         {

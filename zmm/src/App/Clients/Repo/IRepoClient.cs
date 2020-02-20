@@ -9,10 +9,7 @@ namespace ZMM.App.Clients.Repo
     {
         Task<IEnumerable<Package>> Get();
         Task<Package> Get(string ResourceId);
-        Task<IEnumerable<Package>> GetModels();
-        Task<IEnumerable<Package>> GetData();
-        Task<IEnumerable<Package>> GetCode();
-        Task<IEnumerable<Package>> Query(string QueryString);
+        Task<IEnumerable<Package>> Get(string ResourceType, string QueryString);
         Task<IRepoResponse> Add(Package ResourceInfo);
         Task<IRepoResponse> Delete(Package ResourceInfo);
         Task<IRepoResponse> Publish(Package ResourceInfo);
