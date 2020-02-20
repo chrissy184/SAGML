@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using ZMM.Helpers.Common;
 using ZMM.Models.Payloads;
@@ -15,18 +16,24 @@ namespace ZMM.App.Clients.Repo
 {
     public class RepoClient : IRepoClient
     {
-        public IConfiguration Config { get; }
+        public IConfiguration Config { get; }  
+        readonly ILogger<RepoClient> Logger;
+
         public RepoClient(IConfiguration Conf)
         {
             this.Config = Conf;
         }
 
-        public Task<IRepoResponse> Get()
-        {
-            throw new NotImplementedException();
+        public async Task<IEnumerable<Package>> Get()
+        {            
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURL);
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
+            return SearchResultSetInListOfResources.Data;
         }
 
-        public Task<IRepoResponse> Get(string ResourceId)
+
+        public Task<Resources> Get(string ResourceId)
         {
             throw new NotImplementedException();
         }
@@ -51,17 +58,17 @@ namespace ZMM.App.Clients.Repo
             throw new NotImplementedException();
         }
 
-        public Task<IRepoResponse> Add(Resource ResourceInfo)
+        public Task<IRepoResponse> Add(Package ResourceInfo)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IRepoResponse> Delete(Resource ResourceInfo)
+        public Task<IRepoResponse> Delete(Package ResourceInfo)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IRepoResponse> Publish(Resource ResourceInfo)
+        public Task<IRepoResponse> Publish(Package ResourceInfo)
         {
             throw new NotImplementedException();
         }
@@ -72,6 +79,11 @@ namespace ZMM.App.Clients.Repo
         }
 
         public Task<IRepoResponse> Deploy()
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IRepoResponse> IRepoClient.Get(string ResourceId)
         {
             throw new NotImplementedException();
         }
