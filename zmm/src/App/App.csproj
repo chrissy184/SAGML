@@ -24,71 +24,72 @@
     <ProjectUISubcaption>ZMM (ASP.NET Core 3.0)</ProjectUISubcaption>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.0.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.Proxy" Version="0.2.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.0.0"/>
-    <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0"/>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc3"/>
-    <PackageReference Include="Quartz" Version="3.0.7"/>
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.0.0-rc3"/>
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="5.0.0-rc3"/>
-    <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0"/>
-    <PackageReference Include="System.Data.Odbc" Version="4.7.0"/>
-    <PackageReference Include="CoreCompat.System.Drawing" Version="1.0.0-beta006"/>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0"/>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Proxy" Version="0.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc3" />
+    <PackageReference Include="Quartz" Version="3.0.7" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.0.0-rc3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="5.0.0-rc3" />
+    <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0" />
+    <PackageReference Include="System.Data.Odbc" Version="4.7.0" />
+    <PackageReference Include="CoreCompat.System.Drawing" Version="1.0.0-beta006" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <Content Remove="$(SpaRoot)**"/>
-    <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**"/>
+    <Content Remove="$(SpaRoot)**" />
+    <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Data\Data.csproj"/>
-    <ProjectReference Include="..\Helpers\Helpers.csproj"/>
-    <ProjectReference Include="..\DirScan\DirScan.csproj"/>
-    <ProjectReference Include="..\JNB\JNB.csproj"/>
-    <ProjectReference Include="..\TB\TB.csproj"/>
-    <ProjectReference Include="..\..\lib\Microsoft.AspNetCore.Proxy\Microsoft.AspNetCore.Proxy.csproj"/>
+    <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\Helpers\Helpers.csproj" />
+    <ProjectReference Include="..\DirScan\DirScan.csproj" />
+    <ProjectReference Include="..\JNB\JNB.csproj" />
+    <ProjectReference Include="..\TB\TB.csproj" />
+    <ProjectReference Include="..\..\lib\Microsoft.AspNetCore.Proxy\Microsoft.AspNetCore.Proxy.csproj" />
   </ItemGroup>
   <Target Name="ResolveToolDependenciesForUbuntu" BeforeTargets="Build" Condition=" '$(IsLinux)' == 'true'">
-    <Message Text="Resolving Tool dependecies (ubuntu)" Importance="high"/>
-    <Exec Command="cp -r ../JNB/config $(OutputPath)"/>
-    <Exec Command="cp -r ../JNB/config ."/>
-    <Exec Command="cp -r ../Tasks/tools $(OutputPath)"/>
-    <Exec Command="cp -r ../Tasks/tools ."/>
+    <Message Text="Resolving Tool dependecies (ubuntu)" Importance="high" />
+    <Exec Command="cp -r ../JNB/config $(OutputPath)" />
+    <Exec Command="cp -r ../JNB/config ." />
+    <Exec Command="cp -r ../Tasks/tools $(OutputPath)" />
+    <Exec Command="cp -r ../Tasks/tools ." />
   </Target>
   <Target Name="ResolveToolDependenciesForWindow" BeforeTargets="Build" Condition=" '$(IsWindows)' == 'true'">
-    <Message Text="Resolving Tool dependecies (windows)" Importance="high"/>
-    <Exec Command="xcopy ..\JNB\config $(OutputPath)\config\ /K /D /H /Y"/>
-    <Exec Command="xcopy ..\JNB\config config\ /K /D /H /Y"/>
-    <Exec Command="xcopy ..\Tasks\tools $(OutputPath)\tools\ /K /D /H /Y"/>
-    <Exec Command="xcopy ..\Tasks\tools tools\ /K /D /H /Y"/>
+    <Message Text="Resolving Tool dependecies (windows)" Importance="high" />
+    <Exec Command="xcopy ..\JNB\config $(OutputPath)\config\ /K /D /H /Y" />
+    <Exec Command="xcopy ..\JNB\config config\ /K /D /H /Y" />
+    <Exec Command="xcopy ..\Tasks\tools $(OutputPath)\tools\ /K /D /H /Y" />
+    <Exec Command="xcopy ..\Tasks\tools tools\ /K /D /H /Y" />
   </Target>
   <Target Name="ResolveToolDependenciesPublishForUbuntu" BeforeTargets="Publish" Condition=" '$(IsLinux)' == 'true'">
-    <Message Text="Resolving Tool dependecies (ubuntu) for Publish" Importance="high"/>
-    <Exec Command="cp -r ../JNB/config $(PublishDir)"/>
-    <Exec Command="cp -r ../JNB/config ."/>
+    <Message Text="Resolving Tool dependecies (ubuntu) for Publish" Importance="high" />
+    <Exec Command="cp -r ../JNB/config $(PublishDir)" />
+    <Exec Command="cp -r ../JNB/config ." />
   </Target>
   <Target Name="ResolveToolDependenciesPublishForWindow" BeforeTargets="Publish" Condition=" '$(IsWindows)' == 'true'">
-    <Message Text="Resolving Tool dependecies (windows) for Publish" Importance="high"/>
-    <Exec Command="xcopy ..\JNB\config $(PublishDir)\config\ /K /D /H /Y"/>
-    <Exec Command="xcopy ..\JNB\config config\ /K /D /H /Y"/>
+    <Message Text="Resolving Tool dependecies (windows) for Publish" Importance="high" />
+    <Exec Command="xcopy ..\JNB\config $(PublishDir)\config\ /K /D /H /Y" />
+    <Exec Command="xcopy ..\JNB\config config\ /K /D /H /Y" />
   </Target>
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
     <Exec Command="node --version" ContinueOnError="true">
-      <Output TaskParameter="ExitCode" PropertyName="ErrorCode"/>
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
     </Exec>
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn"/>
-    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE."/>
-    <Message Importance="high" Text="Restoring dependencies using 'yarn'. This may take several minutes..."/>
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn" />
+    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
+    <Message Importance="high" Text="Restoring dependencies using 'yarn'. This may take several minutes..." />
   </Target>
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn"/>
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn build:prod"/>
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build:ssr -- --prod" Condition=" '$(BuildServerSideRenderer)' == 'true' "/>
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn build:prod" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build:ssr -- --prod" Condition=" '$(BuildServerSideRenderer)' == 'true' " />
     <ItemGroup>
-      <DistFiles Include="wwwroot\**; $(SpaRoot)dist-server\**"/>
-      <DistFiles Include="$(SpaRoot)node_modules\**" Condition="'$(BuildServerSideRenderer)' == 'true'"/>
+      <DistFiles Include="wwwroot\**; $(SpaRoot)dist-server\**" />
+      <DistFiles Include="$(SpaRoot)node_modules\**" Condition="'$(BuildServerSideRenderer)' == 'true'" />
       <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
         <RelativePath>%(DistFiles.Identity)</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -96,8 +97,8 @@
     </ItemGroup>
   </Target>
   <Target Name="ResolvePublishFolder" AfterTargets="Publish">
-    <Message Text="Resolving folder for publish"/>
-    <MakeDir Directories="$(PublishDir)Logs" Condition="!Exists('$(PublishDir)Logs')"/>
-    <WriteLinesToFile File="$(PublishDir)Logs\.log" Lines="Generated file" Overwrite="True" Condition="!Exists('$(PublishDir)Logs\.log')"/>
+    <Message Text="Resolving folder for publish" />
+    <MakeDir Directories="$(PublishDir)Logs" Condition="!Exists('$(PublishDir)Logs')" />
+    <WriteLinesToFile File="$(PublishDir)Logs\.log" Lines="Generated file" Overwrite="True" Condition="!Exists('$(PublishDir)Logs\.log')" />
   </Target>
 </Project>
