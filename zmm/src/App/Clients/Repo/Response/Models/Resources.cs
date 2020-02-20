@@ -5,6 +5,6 @@ namespace ZMM.App.Clients.Repo
     public class Resources
     {
         public int TotalHits { get; set; }
-        public IEnumerable<Package> Data { get; set; }
+        public IEnumerable<Resource> Data { get; set; }
     }
 }

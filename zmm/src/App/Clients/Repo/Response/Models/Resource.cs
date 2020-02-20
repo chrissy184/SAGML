@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 namespace ZMM.App.Clients.Repo
 {    
  
-    public class Package
+    public class Resource
     {       
         public string Id { get; set; }
         public string Version { get; set; }
