@@ -45,7 +45,7 @@ namespace ZMM.App.Controllers
         /// Get all resource(s) from UMOYA (Repo) Server.
         /// </summary>
         /// <returns> List of Resource(s)</returns>
-        /// <response code="201">Returns list of resource(s)</response>
+        /// <response code="200">Returns list of resource(s)</response>
         /// <response code="204">If no resource(s) found</response>
         /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>   
         [HttpGet("/api/repo")]  
@@ -74,7 +74,7 @@ namespace ZMM.App.Controllers
         /// Get Resource meta data (info) from UMOYA (Repo) Server.
         /// </summary>
         /// <returns>Resource meta data (info)</returns>
-        /// <response code="201">Return resource meta data(info) along with list of version(s)</response>
+        /// <response code="200">Return resource meta data(info) along with list of version(s)</response>
         /// <response code="204">If resource is not found</response>
         /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>      
         [Produces("application/json")]    
@@ -92,7 +92,7 @@ namespace ZMM.App.Controllers
         /// Get all model resource(s) from UMOYA (Repo) Server.
         /// </summary>
         /// <returns> List of Model Resource(s)</returns>
-        /// <response code="201">Returns list of resource(s) which are models</response>
+        /// <response code="200">Returns list of resource(s) which are models</response>
         /// <response code="204">If no resource(s) found</response>
         /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>   
         [HttpGet("/api/repo/models")]    
@@ -120,7 +120,7 @@ namespace ZMM.App.Controllers
         /// Get all code resource(s) from UMOYA (Repo) Server.
         /// </summary>
         /// <returns> List of Code Resource(s)</returns>
-        /// <response code="201">Returns list of code resource(s)</response>
+        /// <response code="200">Returns list of code resource(s)</response>
         /// <response code="204">If no resource(s) found</response>
         /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>   
         [HttpGet("/api/repo/codes")]    
@@ -148,7 +148,7 @@ namespace ZMM.App.Controllers
         /// Get all data resource(s) from UMOYA (Repo) Server.
         /// </summary>
         /// <returns> List of Data Resource(s)</returns>
-        /// <response code="201">Returns list of data resource(s)</response>
+        /// <response code="200">Returns list of data resource(s)</response>
         /// <response code="204">If no resource(s) found</response>
         /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>   
         [HttpGet("/api/repo/data")]    
@@ -176,7 +176,7 @@ namespace ZMM.App.Controllers
         /// Get all resource(s) from UMOYA (Repo) Server by Query.
         /// </summary>
         /// <returns> List of Resource(s) by query</returns>
-        /// <response code="201">Returns list of resource(s) by query</response>
+        /// <response code="200">Returns list of resource(s) by query</response>
         /// <response code="204">If no resource(s) found</response>
         /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>   
         [HttpGet("/api/repo/query")]    
