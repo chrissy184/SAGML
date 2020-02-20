@@ -36,6 +36,7 @@
     <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0"/>
     <PackageReference Include="System.Data.Odbc" Version="4.7.0"/>
     <PackageReference Include="CoreCompat.System.Drawing" Version="1.0.0-beta006"/>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0"/>
   </ItemGroup>
   <ItemGroup>
     <Content Remove="$(SpaRoot)**"/>
