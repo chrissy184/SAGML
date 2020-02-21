@@ -38,6 +38,8 @@ using System.Collections.Specialized;
 using Quartz.Impl;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using ZMM.Middlewares;
+using Microsoft.IdentityModel.Logging;
+using ZMM.App.Clients.Repo;
 
 namespace ZMM.App
 {
@@ -69,7 +71,7 @@ namespace ZMM.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            IdentityModelEventSource.ShowPII = true;
             #region Allow Synchronous IO to read stream in model and code
             services.Configure<KestrelServerOptions>(options =>
             {
@@ -118,7 +120,7 @@ namespace ZMM.App
             #region Register the Swagger generator
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZMOD", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MLW", Version = "v1" });
             });
             #endregion            
             
@@ -136,6 +138,8 @@ namespace ZMM.App
             services.AddSingleton<IPyTensorServiceClient>(new PyTensorServiceClient(ToolHostURL,ContentDir));
             services.AddSingleton<IPyCompile>(new PyCompile(Configuration));  
             services.AddSingleton(provider => GetScheduler());
+            services.AddSingleton<IRepoClient>(new RepoClient(Configuration));
+
             #endregion
 
             #region Add Proxy to services
@@ -217,12 +221,11 @@ namespace ZMM.App
 
             #region swagger middleware
             app.UseSwagger();
+           
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-            // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZMOD v1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "MLW v1");                
             });      
 
             #endregion                   
