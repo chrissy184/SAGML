@@ -116,13 +116,22 @@ namespace ZMM.App.Controllers
                     }
                     existingCodeData.Clear();
                     //
+                    string fileExt = System.IO.Path.GetExtension(formFile.FileName).Substring(1).ToString().ToLower();
+                    if (fileExt.ToLower().Contains("pmml"))
+                    {
+                        type = "PMML";
+                    }
+                    else if (fileExt.ToLower().Contains("h5"))
+                    {
+                        type = "H5";
+                    }
+                    //
                     if (!FilePathHelper.IsFileNameValid(formFile.FileName))
                         return BadRequest(new { message = "Invalid file name." });
                     if (!IsFileExists)
-                    {
-                        string fileExt = System.IO.Path.GetExtension(formFile.FileName).Substring(1).ToString().ToLower();
-                        #region upload large file
-                        if (size > 40000)
+                    {                        
+                        #region upload large file > 400MB
+                        if (size > 40000000)
                         {
                             //check if same job is scheduled
                             ISchedulerFactory schfack = new StdSchedulerFactory();
@@ -140,7 +149,7 @@ namespace ZMM.App.Controllers
                                 .WithPriority(1)
                                 .Build();
 
-                                IJobDetail job = JobBuilder.Create<UploadDataJob>()
+                                IJobDetail job = JobBuilder.Create<UploadJob>()
                                 .WithIdentity(filePath)
                                 .Build();
 
@@ -165,15 +174,7 @@ namespace ZMM.App.Controllers
                                 await formFile.CopyToAsync(fileStream);
                             }
                         }
-                        //
-                        if (fileExt.ToLower().Contains("pmml"))
-                        {
-                            type = "PMML";
-                        }
-                        else if (fileExt.ToLower().Contains("h5"))
-                        {
-                            type = "H5";
-                        }
+                        
                         List<Property> _props = new List<Property>();
                         string _url = DirectoryHelper.GetModelUrl(formFile.FileName);
                         string _filePath = Path.Combine(dirFullpath, formFile.FileName);
