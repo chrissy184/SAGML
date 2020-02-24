@@ -10,27 +10,79 @@ import { finalize } from 'rxjs/operators';
 export class RepoComponent implements OnInit {
   public nyokaRemote: any = {};
   public isContentLoading = false;
+  public isLoading = false;
+  public listOfRepo: any = [];
+  public selectedRepo: any = {};
+  public selectedRepoReponse: any = {};
+  public filter: any = '';
+  public selectedFilter = '';
   constructor(private apiService: HttpService, private utilService: UtilService) { }
-  public getSettings() {
-    this.isContentLoading = true;
-    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.settings)
-      .pipe(finalize(() => { this.isContentLoading = false; }))
+
+  ngOnInit() {
+    this.getAllRepo();
+  }
+
+  public toggleSidebar(action: string) {
+    this.utilService.toggleSidebar(action);
+  }
+
+  public getAllRepo(resourceType?: any) {
+    this.isLoading = true;
+    const options: any = {
+      params: {}
+    };
+    if (resourceType) {
+      options.params.ResourceType = resourceType;
+    }
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.repo, options)
+      .pipe(finalize(() => { this.isLoading = false; }))
       .subscribe(response => {
-        console.log(response);
-        this.nyokaRemote = this.utilService.getSettingsObject('NR', response);
-        console.log(this.nyokaRemote);
-        if (this.nyokaRemote && this.nyokaRemote.url) {
-          console.log(this.nyokaRemote.url);
-        } else {
-          this.utilService.alert('Remote url is not defined.');
+        this.listOfRepo = response;
+        // select first record by default
+        if (response && response.length) {
+          this.getRepoDetails(response[0]);
         }
       });
   }
-  ngOnInit() {
-    this.getSettings();
+
+  public filterRepo() {
+    this.getAllRepo(this.selectedFilter)
   }
-  public toggleSidebar(action: string) {
-    this.utilService.toggleSidebar(action);
+
+  public refresh() {
+    this.getAllRepo(this.selectedFilter);
+  }
+
+  public getRepoDetails(selectedRepo: any) {
+    this.selectedRepo = selectedRepo;
+    this.selectedRepo.latestVersion = selectedRepo.version;
+    this.isContentLoading = true;
+    const options = {
+      params: {}
+    };
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.repoGet(selectedRepo.id), options)
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(response => {
+        this.selectedRepoReponse = response;
+
+        this.filterResponse(selectedRepo.version);
+      });
+  }
+
+  public filterResponse(version: string) {
+    let data = this.selectedRepoReponse;
+    if (data && data.items) {
+      let items = data.items[0];
+      for (let item of items.items) {
+        if (item.catalogEntry.version === version) {
+          this.selectedRepo = Object.assign(this.selectedRepo, item.catalogEntry);
+        }
+      }
+    }
+  }
+
+  public downloadRepo() {
+    this.utilService.alert('Work in progress...');
   }
 
 }
