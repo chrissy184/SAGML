@@ -11,6 +11,7 @@ namespace ZMM.App.Clients.Repo
         public int Downloads { get; set; }
         public string Language { get; set; }
         public string LicenseUrl { get; set; }
+        public string Published {get; set;}
         public bool HasReadme {get; set;}
         public IEnumerable<string> PackageTypes { get; set; }
         public IEnumerable<string> Tags { get; set; }
