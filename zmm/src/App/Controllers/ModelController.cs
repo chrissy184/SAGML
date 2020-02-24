@@ -90,7 +90,7 @@ namespace ZMM.App.Controllers
             var filePath = Path.GetTempFileName();
             string dirFullpath = DirectoryHelper.GetModelDirectoryPath();
             #endregion
-
+            
             //check if folder path exists...if not then create folder
             if (!Directory.Exists(dirFullpath))
             {
@@ -121,6 +121,36 @@ namespace ZMM.App.Controllers
                     if (!IsFileExists)
                     {
                         string fileExt = System.IO.Path.GetExtension(formFile.FileName).Substring(1).ToString().ToLower();
+                        #region upload large file
+                        if (size > 40000)
+                        {
+                            //check if same job is scheduled
+                            ISchedulerFactory schfack = new StdSchedulerFactory();
+                            IScheduler scheduler = await schfack.GetScheduler();
+                            var jobKey = new JobKey(filePath);
+                            if (await scheduler.CheckExists(jobKey))
+                            {
+                                await scheduler.ResumeJob(jobKey);
+                            }
+                            else
+                            {
+                                #region create quartz job for training model
+                                ITrigger trigger = TriggerBuilder.Create()
+                                .WithIdentity($"Uploading Model Job-{DateTime.Now}")
+                                .WithPriority(1)
+                                .Build();
+
+                                IJobDetail job = JobBuilder.Create<UploadDataJob>()
+                                .WithIdentity(filePath)
+                                .Build();
+
+                                job.JobDataMap["id"] = formFile.FileName.Replace($".{fileExt}", "");
+                                job.JobDataMap["filePath"] = filePath; 
+                                await _scheduler.ScheduleJob(job, trigger);
+                                #endregion
+                            }
+                        }
+                        #endregion
                         // upload file start
                         using (var fileStream = new FileStream(Path.Combine(dirFullpath, formFile.FileName), FileMode.Create))
                         {
@@ -140,7 +170,7 @@ namespace ZMM.App.Controllers
                         {
                             type = "PMML";
                         }
-                        else if(fileExt.ToLower().Contains("h5"))
+                        else if (fileExt.ToLower().Contains("h5"))
                         {
                             type = "H5";
                         }
@@ -161,7 +191,7 @@ namespace ZMM.App.Controllers
                             Name = formFile.FileName,
                             Size = formFile.Length,
                             Type = type,
-                            Url = _url,                            
+                            Url = _url,
                             Properties = _props
                         };
                         //
