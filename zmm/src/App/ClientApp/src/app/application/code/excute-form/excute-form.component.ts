@@ -14,7 +14,7 @@ export class ExcuteFormComponent implements OnInit {
   data: any = [];
   formData: any = {};
   public isLoading = false;
-  @ViewChild('displayConfigForm') displayConfigForm;
+  @ViewChild('displayConfigForm', { static: true }) displayConfigForm;
 
   public cronExpression = '0 15 0/1 1/1 * ? *';
   public isCronDisabled = false;

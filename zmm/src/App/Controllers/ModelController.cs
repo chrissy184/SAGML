@@ -44,7 +44,7 @@ namespace ZMM.App.Controllers
         private readonly IPyTensorServiceClient tbClient;
         private List<ModelResponse> responseData;
         private List<DataResponse> dataResponseData;
-        private static string[] extensions = new[] { "pmml", "onnx" };
+        private static string[] extensions = new[] { "pmml", "onnx","h5" };
         private readonly IScheduler _scheduler;
         #endregion
 
@@ -90,7 +90,7 @@ namespace ZMM.App.Controllers
             var filePath = Path.GetTempFileName();
             string dirFullpath = DirectoryHelper.GetModelDirectoryPath();
             #endregion
-
+            
             //check if folder path exists...if not then create folder
             if (!Directory.Exists(dirFullpath))
             {
@@ -108,7 +108,7 @@ namespace ZMM.App.Controllers
                         //
                         foreach (var record in existingCodeData)
                         {
-                            if ((record.Name == formFile.FileName) && (record.User == CURRENT_USER))
+                            if (record.Name == formFile.FileName)
                             {
                                 IsFileExists = true;
                             }
@@ -116,11 +116,50 @@ namespace ZMM.App.Controllers
                     }
                     existingCodeData.Clear();
                     //
+                    string fileExt = System.IO.Path.GetExtension(formFile.FileName).Substring(1).ToString().ToLower();
+                    if (fileExt.ToLower().Contains("pmml"))
+                    {
+                        type = "PMML";
+                    }
+                    else if (fileExt.ToLower().Contains("h5"))
+                    {
+                        type = "H5";
+                    }
+                    //
                     if (!FilePathHelper.IsFileNameValid(formFile.FileName))
                         return BadRequest(new { message = "Invalid file name." });
                     if (!IsFileExists)
-                    {
-                        string fileExt = System.IO.Path.GetExtension(formFile.FileName).Substring(1).ToString().ToLower();
+                    {                        
+                        #region upload large file > 400MB
+                        if (size > 40000000)
+                        {
+                            //check if same job is scheduled
+                            ISchedulerFactory schfack = new StdSchedulerFactory();
+                            IScheduler scheduler = await schfack.GetScheduler();
+                            var jobKey = new JobKey(filePath);
+                            if (await scheduler.CheckExists(jobKey))
+                            {
+                                await scheduler.ResumeJob(jobKey);
+                            }
+                            else
+                            {
+                                #region create quartz job for training model
+                                ITrigger trigger = TriggerBuilder.Create()
+                                .WithIdentity($"Uploading Model Job-{DateTime.Now}")
+                                .WithPriority(1)
+                                .Build();
+
+                                IJobDetail job = JobBuilder.Create<UploadJob>()
+                                .WithIdentity(filePath)
+                                .Build();
+
+                                job.JobDataMap["id"] = formFile.FileName.Replace($".{fileExt}", "");
+                                job.JobDataMap["filePath"] = filePath; 
+                                await _scheduler.ScheduleJob(job, trigger);
+                                #endregion
+                            }
+                        }
+                        #endregion
                         // upload file start
                         using (var fileStream = new FileStream(Path.Combine(dirFullpath, formFile.FileName), FileMode.Create))
                         {
@@ -135,15 +174,7 @@ namespace ZMM.App.Controllers
                                 await formFile.CopyToAsync(fileStream);
                             }
                         }
-
-                        if (fileExt.Contains("pmml"))
-                        {
-                            type = "PMML";
-                        }
-                        else
-                        {
-                            type = fileExt.ToUpper();
-                        }
+                        
                         List<Property> _props = new List<Property>();
                         string _url = DirectoryHelper.GetModelUrl(formFile.FileName);
                         string _filePath = Path.Combine(dirFullpath, formFile.FileName);
@@ -162,7 +193,6 @@ namespace ZMM.App.Controllers
                             Size = formFile.Length,
                             Type = type,
                             Url = _url,
-                            User = CURRENT_USER,
                             Properties = _props
                         };
                         //

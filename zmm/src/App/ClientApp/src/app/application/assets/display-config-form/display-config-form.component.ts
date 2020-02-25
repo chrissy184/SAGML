@@ -13,7 +13,7 @@ export class DisplayConfigFormComponent implements OnInit {
   formData: any = {};
   public isLoading = false;
   public gpuOptions = [{ id: 'NO_GPU', name: 'NO GPU' }];
-  @ViewChild('displayConfigForm') displayConfigForm;
+  @ViewChild('displayConfigForm', { static: true }) displayConfigForm;
   constructor() { }
 
   ngOnInit() {

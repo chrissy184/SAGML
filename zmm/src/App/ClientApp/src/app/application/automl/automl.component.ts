@@ -1,7 +1,9 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { ApiRoutes, HttpService, UtilService, AlertMessages } from '../../shared';
 import { Router } from '@angular/router';
-import { MatPaginator, MatTableDataSource, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 @Component({
   selector: 'app-automl',
   templateUrl: './automl.component.html',
@@ -46,8 +48,8 @@ export class AutomlComponent implements OnInit {
   };
   public fromDefaultData: any = {};
   supervised = true;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
   pageSize = 10;
   pageSizeOptions = [10, 25, 100];
   isLoading = false;

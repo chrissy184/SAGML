@@ -26,7 +26,7 @@ namespace ZMM.App.Controllers
         private readonly IWebHostEnvironment _environment;
         private IConfiguration Configuration { get; }
         readonly ILogger<DataHubController> Logger;
-        private List<DataResponse> responseData;
+        // private List<DataResponse> responseData;
 
         #endregion
 
@@ -67,7 +67,7 @@ namespace ZMM.App.Controllers
             #region ODBC
             string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
             var settings = ZSSettingPayload.GetDataHubInfo(zmodId);            
-            string cnn = $"Driver={settings.Item5};ConnectionType=Direct;HOST={settings.Item1};PORT={settings.Item4};AuthenticationType=Plain;UID={settings.Item2};PWD={settings.Item3}";
+            string cnn = $"Driver={settings.Item5};ConnectionType=Direct;HOST={settings.Item1};PORT={settings.Item4};AuthenticationType=Plain;UID={settings.Item2};PWD={settings.Item3};SSL={settings.Item6}";
             Console.WriteLine($"DATAHUB >>>>>>>>>>>>>>>>>>>>> { cnn }");
             //using (OdbcConnection connection = new OdbcConnection("Driver=Dremio Connector;ConnectionType=Direct;HOST=dremio-demo.westeurope.cloudapp.azure.com;PORT=31010;AuthenticationType=Plain;UID=demo;PWD=iug2019#riga"))
             using (OdbcConnection connection = new OdbcConnection(cnn))

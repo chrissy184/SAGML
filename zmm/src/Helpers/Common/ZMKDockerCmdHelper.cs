@@ -13,13 +13,13 @@ namespace ZMM.Helpers.Common
     {       
         public static Dictionary<string,string> StartCommands = new Dictionary<string, string>()
             {
-                {"zmk1", "docker run -d --net=global-zmod-net --ip=\"172.20.0.4\" -p 8000:8000 --name=zmk1 --volumes-from zmm store/softwareag/zementis-modeler-zmk:1.38.1"},
-                {"zmk2", "docker run -d --net=global-zmod-net --ip=\"172.20.0.5\" -p 8001:8000 --name=zmk2 --volumes-from zmm store/softwareag/zementis-modeler-zmk:1.38.1"},
-                {"zmk3", "docker run -d --net=global-zmod-net --ip=\"172.20.0.6\" -p 8002:8000 --name=zmk3 --volumes-from zmm store/softwareag/zementis-modeler-zmk:1.38.1"}
+                {"zmk1", "docker run -d --net=global-zmod-net --ip=\"172.20.0.4\" -p 8000:8000 --name=zmk1 --volumes-from zmm store/softwareag/mlw-zmk:10.5"},
+                {"zmk2", "docker run -d --net=global-zmod-net --ip=\"172.20.0.5\" -p 8001:8000 --name=zmk2 --volumes-from zmm store/softwareag/mlw-zmk:10.5"},
+                {"zmk3", "docker run -d --net=global-zmod-net --ip=\"172.20.0.6\" -p 8002:8000 --name=zmk3 --volumes-from zmm store/softwareag/mlw-zmk:10.5"}
             }; 
         public static IList<InstanceResponse> GetAllRunningZMK()
         {
-            string cmd = "docker ps | awk '{if (NR!=1) {print}}' | awk '{print $1, $2, $NF}' | grep 'store/softwareag/zementis-modeler-zmk'";
+            string cmd = "docker ps | awk '{if (NR!=1) {print}}' | awk '{print $1, $2, $NF}' | grep 'store/softwareag/mlw-zmk'";
             string output ="";
             IList<InstanceResponse> runningZMK = new List<InstanceResponse>();
             //

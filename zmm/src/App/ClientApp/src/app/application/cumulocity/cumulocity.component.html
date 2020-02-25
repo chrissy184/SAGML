@@ -58,7 +58,7 @@
   <ng-container matColumnDef="action">
     <th mat-header-cell *matHeaderCellDef> Save </th>
     <td mat-cell *matCellDef="let element">
-      <button mat-icon-button (click)="selectDevice(element)" [matTooltip]="'Save Data'">
+      <button mat-icon-button aria-label="icon"  (click)="selectDevice(element)" [matTooltip]="'Save Data'">
         <span class="mdi text-secondary mdi-content-save"></span>
       </button>
     </td>
@@ -100,7 +100,7 @@
   <ng-container matColumnDef="action">
     <th mat-header-cell *matHeaderCellDef>Save </th>
     <td mat-cell *matCellDef="let element">
-      <button mat-icon-button (click)="saveCumulocityImage(element)" [matTooltip]="'Save Image'">
+      <button mat-icon-button aria-label="icon"  (click)="saveCumulocityImage(element)" [matTooltip]="'Save Image'">
         <span class="mdi text-secondary mdi-content-save"></span>
       </button>
     </td>
@@ -116,10 +116,10 @@
       Series Parameters
     </div>
     <div class="content-toolbar">
-      <button mat-icon-button matTooltip="Cancel" (click)="selectedDevice = {}">
+      <button mat-icon-button aria-label="icon"  matTooltip="Cancel" (click)="selectedDevice = {}">
         <span class="mdi mdi-close text-secondary"></span>
       </button>
-      <button mat-icon-button matTooltip="Submit" (click)="submitSeriesParameters()">
+      <button mat-icon-button aria-label="icon"  matTooltip="Submit" (click)="submitSeriesParameters()">
         <span class="mdi mdi-check text-secondary"></span>
       </button>
     </div>

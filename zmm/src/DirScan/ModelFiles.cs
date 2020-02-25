@@ -76,4 +76,13 @@ namespace ZMM.DS
             #endregion
         }
     }
+    public class H5FileInfo : ZmodFileInfo
+    {
+        public H5FileInfo(string path) : base(path)
+        {
+        }
+        public H5FileInfo()
+        {
+        }
+    }
 }

@@ -14,13 +14,13 @@
       <h2>Manage Credentials</h2>
       <div class="toolbar-mid"></div>
       <div class="content-toolbar">
-        <button mat-icon-button matTooltip="Save" (click)="saveSettings()">
+        <button mat-icon-button aria-label="icon"  matTooltip="Save" (click)="saveSettings()">
           <span class="mdi mdi-content-save text-secondary"></span>
         </button>
       </div>
     </mat-toolbar>
     <div class="details">
-      <ngx-monaco-editor class="app-code-editor" [options]="editorOptions" [(ngModel)]="settingsJSON">
+      <ngx-monaco-editor class="app-code-editor" [options]="editorOptions" [(ngModel)]="settingsJSON" (onInit)="onEditorInit($event)">
       </ngx-monaco-editor>
     </div>
   </mat-sidenav-content>

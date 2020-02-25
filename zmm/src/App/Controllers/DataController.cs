@@ -34,6 +34,8 @@ using xml = System.Xml;
 using System.Data;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization.Json;
+using Quartz;
+using Quartz.Impl;
 
 namespace ZMM.App.Controllers
 {
@@ -60,11 +62,12 @@ namespace ZMM.App.Controllers
         string fileName = string.Empty;
         private readonly string CURRENT_USER = "";
         private static bool IsScanned = false;
+         private readonly IScheduler _scheduler;
         #endregion
 
         #region Constructor...
         public DataController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<DataController> log, IPyAutoMLServiceClient srv, IPyNNServiceClient nnsrv, IZSModelPredictionClient _zsClient,
-            IBaseImageForWielding _baseImageClient)
+            IBaseImageForWielding _baseImageClient, IScheduler factory)
         {
             this._client = srv;
             this._nnclient = nnsrv;
@@ -72,6 +75,7 @@ namespace ZMM.App.Controllers
             this.baseImageClient = _baseImageClient;
             this.Configuration = configuration;
             this.Logger = log;
+            _scheduler = factory;
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
 
             //Initialise ZMOD Dir scanning
@@ -187,13 +191,45 @@ namespace ZMM.App.Controllers
                             }
                         }
                         existingData.Clear();
+                        string _url = DirectoryHelper.GetDataUrl(formFile.FileName);
+                        string _filePath = Path.Combine(dirFullpath, fileName);
                         //
                         if (!IsFileExists)
                         {
                             string fileUrl = Path.Combine(dirFullpath, fileName);
                             string fileExt = System.IO.Path.GetExtension(fileUrl).Substring(1).ToLower();
-                            FileStream fileStream;
+                            
+                            #region upload large file > 400MB
+                            if (size > 40000000)
+                            {
+                                //check if same job is scheduled
+                                ISchedulerFactory schfack = new StdSchedulerFactory();
+                                IScheduler scheduler = await schfack.GetScheduler();
+                                var jobKey = new JobKey(_filePath);
+                                if (await scheduler.CheckExists(jobKey))
+                                {
+                                    await scheduler.ResumeJob(jobKey);
+                                }
+                                else
+                                {
+                                    #region create quartz job for training model
+                                    ITrigger trigger = TriggerBuilder.Create()
+                                    .WithIdentity($"Uploading Model Job-{DateTime.Now}")
+                                    .WithPriority(1)
+                                    .Build();
 
+                                    IJobDetail job = JobBuilder.Create<UploadJob>()
+                                    .WithIdentity(_filePath)
+                                    .Build();
+
+                                    job.JobDataMap["id"] = formFile.FileName.Replace($".{fileExt}", "");
+                                    job.JobDataMap["filePath"] = _filePath;
+                                    await _scheduler.ScheduleJob(job, trigger);
+                                    #endregion
+                                }
+                            }
+                            #endregion
+                            FileStream fileStream;
                             using (fileStream = new FileStream(fileUrl, FileMode.Create))
                             {
                                 //check file allowed extensions
@@ -214,91 +250,8 @@ namespace ZMM.App.Controllers
                                         return BadRequest("File upload failed");
                                     }
                                 }
-                            }
-
-                            if (formFile.ContentType.Contains("image"))
-                            {
-                                type = "IMAGE";
-                                using (var image = new Bitmap(fileUrl))
-                                {
-                                    _props.Add(new Property { key = "Width", value = image.Width.ToString() + " px" });
-                                    _props.Add(new Property { key = "Height", value = image.Height.ToString() + " px" });
-                                    image.Dispose();
-                                }
-                            }
-                            else if (formFile.ContentType.Contains("json") || fileExt == "json")
-                            {
-                                type = "JSON";
-                                //read json file from filestream
-                                if (!string.IsNullOrEmpty(fileName))
-                                {
-                                    using (StreamReader reader = new StreamReader(fileUrl))
-                                    {
-                                        fileContent = await reader.ReadToEndAsync();
-                                    }
-                                }
-                                //parse
-                                if (!string.IsNullOrEmpty(fileContent))
-                                {
-                                    JsonTextReader reader = new JsonTextReader(new StringReader(fileContent));
-                                    int objCtr = 0;
-                                    while (reader.Read())
-                                    {
-                                        if (reader.TokenType == JsonToken.EndObject)
-                                        {
-                                            objCtr++;
-                                        }
-                                    }
-                                    _props.Add(new Property { key = "Number of Objects", value = objCtr.ToString() });
-
-                                }
-                            }
-                            else if (formFile.ContentType.Contains("csv") || fileExt == "csv" || formFile.ContentType.Contains("excel")
-                                || formFile.ContentType.Contains("comma-separated-value"))
-                            {
-                                type = "CSV";
-                                //get properties row and column count
-                                int[] csvProps = CsvHelper.GetCsvRowColumnCount(dirFullpath + @"/" + fileName);
-                                _props.Add(new Property { key = "Number of rows", value = csvProps[0].ToString() });
-                                _props.Add(new Property { key = "Number of columns", value = csvProps[1].ToString() });
-                            }
-                            else if (formFile.ContentType.Contains("zip") || fileExt == "zip")
-                            {
-                                type = "FOLDER";
-                                string zipFileName = fileName.Substring(0, fileName.Length - 4);
-                                filePath = DirectoryHelper.GetDataDirectoryPath() + zipFileName + ".zip";
-                                //extract
-                                await ZipHelper.ExtractAsync(fileStream.Name, $"{dirFullpath}{zipFileName}");
-                                //add properties
-                                _props.Add(new Property
-                                {
-                                    key = "Subdirectories",
-                                    value = DirectoryHelper.CountDirectories(fileStream.Name.Replace(".zip", "")).ToString()
-                                });
-                                _props.Add(new Property
-                                {
-                                    key = "Files",
-                                    value = DirectoryHelper.CountFiles(fileStream.Name.Replace(".zip", "")).ToString()
-                                });
-
-                                //extract end
-                                fileName = formFile.FileName.Replace(".zip", "");
-                            }
-                            else if (formFile.ContentType.Contains("mp4") || fileExt == "mp4")
-                            {
-                                type = "VIDEO";
-                            }
-                            else if (formFile.ContentType.Contains("text") || fileExt == "txt")
-                            {
-                                type = "TEXT";
-                            }
-                            else
-                            {
-                                type = "UNRECOGNIZED";
-                            }
-                            //
-                            string _url = DirectoryHelper.GetDataUrl(formFile.FileName);
-                            string _filePath = Path.Combine(dirFullpath, fileName);
+                            }                   
+                            
                             //
                             DataResponse newRecord = new DataResponse()
                             {
@@ -629,7 +582,7 @@ namespace ZMM.App.Controllers
                     //download mp4 file from resultPath
                     Byte[] dataMP4 = null;
                     dataMP4 = await _client.DownloadFile(joPredict["result"].ToString(), $"Predicted_{dataId}" + ".mp4");
-
+                    
                     List<Property> _props = new List<Property>();
                     dirFullpath = DirectoryHelper.GetDataDirectoryPath();
                     string newFile = $"Predicted_{dataId}" + ".mp4";
@@ -647,6 +600,37 @@ namespace ZMM.App.Controllers
                         Properties = _props,
                         Size = dataMP4.Length,
                         Type = "VIDEO",
+                        Url = DirectoryHelper.GetDataUrl(newFile),
+                        User = CURRENT_USER,
+                        DateCreated = DateTime.Now
+                    };
+                    DataPayload.Create(newRecord);
+                    return Json(newRecord);
+                }
+                else if ((resultPath.ToLower().Contains("jpeg") || resultPath.ToLower().Contains("jpg") || resultPath.ToLower().Contains("png")) && !string.IsNullOrEmpty(data))
+                {
+                    //download jpg,jpeg,png file from resultPath
+                    string _mimeType = Path.GetExtension(resultPath).Remove(0,1).ToLower();
+                    Byte[] dataMP4 = null;
+                    dataMP4 = await _client.DownloadFile(joPredict["result"].ToString(), $"Predicted_{dataId}.{_mimeType}");
+                    
+                    List<Property> _props = new List<Property>();
+                    dirFullpath = DirectoryHelper.GetDataDirectoryPath();
+                    string newFile = $"Predicted_{dataId}.{_mimeType}";
+                    string newFilePath = Path.Combine(dirFullpath, newFile);
+
+                    DataResponse newRecord = new DataResponse()
+                    {
+                        Created_on = DateTime.Now.ToString(),
+                        Edited_on = DateTime.Now.ToString(),
+                        Extension = _mimeType,
+                        FilePath = dirFullpath + newFile,
+                        Id = newFile.Replace($".{_mimeType}", ""),
+                        MimeType = $"image/{_mimeType}",
+                        Name = newFile,
+                        Properties = _props,
+                        Size = dataMP4.Length,
+                        Type = "IMAGE",
                         Url = DirectoryHelper.GetDataUrl(newFile),
                         User = CURRENT_USER,
                         DateCreated = DateTime.Now

@@ -276,26 +276,36 @@ class KerasUtilities:
         return ('Success')
 
 
-    def detectObject(self,filePath, modelName):
+    def detectObject(self,filePath, modelName,modeScope,target_path):
         global PMMLMODELSTORAGE
-        pmmlstoragepointer=modelName.replace('.pmml','')
-        pointerObj=PMMLMODELSTORAGE[pmmlstoragepointer]
-        model_graph = pointerObj['model_graph']
-        tf_session = pointerObj['tf_session']
+        import pathlib
+        import matplotlib
+        # matplotlib.use('TkAgg')
+        from trainModel.mrcnn import visualize
+        fO=pathlib.Path(filePath)
+        resa=target_path+'pred_'+fO.name
+        # resa2=target_path+'pred2_'+fO.name
+        class_names=modeScope['modelObj']['predClasses']
+        model_graph = modeScope['modelObj']['model_graph']
+        tf_session = modeScope['modelObj']['tf_session']
         with model_graph.as_default():
             with tf_session.as_default():
-                model=pointerObj['model']
+                model=modeScope['modelObj']['recoModelObj']
                 image = skimage.io.imread(filePath)
-                result = model.detect([image],verbose=1)
-        for key,val in result[0].items():
-            result[0][key] = val.tolist()
-        # target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
-        # kerasUtilities.checkCreatePath(target_path)
-        # resafile=target_path+'result.txt'
-        # with open(resafile,'w') as ff:
-        #   json.dump(result, ff)
-        data_details = result[0]
-        return data_details
+                r = model.detect([image],verbose=1)[0]
+                # newRois=r['rois']
+                # newIm=image.copy()
+                # for bb in newRois:
+                #     newIm=visualize.draw_box(newIm, bb, [255])
+
+                # matplotlib.image.imsave(resa, newIm)
+                # print (type(r))
+                # print(r.keys())
+                # from trainModel.mrcnn import visualize
+                newIm=visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], class_names, r['scores'],show_bbox=True)#,show_bbox=False)
+                matplotlib.image.imsave(resa, newIm)
+        
+        return resa
 
     def predictImagedata(self,pmmlstoragepointer,testimage):
         # print ('Came to image prediction')

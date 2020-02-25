@@ -41,7 +41,7 @@ public scoringOptions = [
 ];
 public algorithmOptions = [];
 public algorithmOptionsAnomaly = [];
-@ViewChild('automlTrainingParamsForm') automlTrainingParamsForm;
+@ViewChild('automlTrainingParamsForm', { static: true }) automlTrainingParamsForm;
 
 constructor() { }
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, fromEvent, merge, of } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { DomSanitizer } from '@angular/platform-browser';
 import { saveAs } from 'file-saver';
 import { SnackbarComponent } from '../snackbar/snackbar.component';

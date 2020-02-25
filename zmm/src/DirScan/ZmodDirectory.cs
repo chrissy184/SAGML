@@ -58,7 +58,9 @@ namespace ZMM.DS
         public Dictionary<string, ImageDirInfo> ImageFiles { get; set; } =
             new Dictionary<string, ImageDirInfo>();
         public Dictionary<string, PmmlFileInfo> PmmlFiles { get; set; } =
-            new Dictionary<string, PmmlFileInfo>();
+            new Dictionary<string, PmmlFileInfo>();        
+        public Dictionary<string, H5FileInfo> H5Files { get; set; } =
+            new Dictionary<string, H5FileInfo>();
         public Dictionary<string, TextFileInfo> TextFiles { get; set; } =
             new Dictionary<string, TextFileInfo>();
         public Dictionary<string, RFileInfo> RFiles { get; set; } =
@@ -82,6 +84,8 @@ namespace ZMM.DS
                     .ToDictionary(x => new RaiFile(x).NameWithExtension, x => new ImageDirInfo(x));
             PmmlFiles = (from _ in Directory.GetFiles(ModelDir, "*.pmml", SearchOption.AllDirectories)
                     select _).ToDictionary(x => new RaiFile(x).NameWithExtension, x => new PmmlFileInfo(x));
+            H5Files = (from _ in Directory.GetFiles(ModelDir, "*.h5", SearchOption.AllDirectories)
+                    select _).ToDictionary(x => new RaiFile(x).NameWithExtension, x => new H5FileInfo(x));
             TextFiles = (from _ in Directory.GetFiles(DataDir, "*.txt", SearchOption.TopDirectoryOnly)
                     select _).ToDictionary(x => new RaiFile(x).NameWithExtension, x => new TextFileInfo(x));
             RFiles = (from _ in Directory.GetFiles(CodeDir, "*.r", SearchOption.TopDirectoryOnly)

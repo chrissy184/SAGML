@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ApiRoutes, HttpService, UtilService, AlertMessages } from '../../shared';
 import { finalize } from 'rxjs/operators';
-import { MatPaginator, MatTableDataSource, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 
 
@@ -63,7 +65,9 @@ export class DataComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   message = AlertMessages.DATA.deleteConfirmationData;
   public baseImageInfo: any = {};
-  public dataHubFormData: any = {};
+  public dataHubFormData: any = {
+    sql: `/* Write your SQL query for Data pulling */`
+  };
   constructor(private apiService: HttpService, private utilService: UtilService, private router: Router) { }
 
   public changeSelectedIndex(index: number) {

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'scoring',
     'utility',
     'executionEngine',
+    'KerasModelSupport',
 ]
 
 MIDDLEWARE = [

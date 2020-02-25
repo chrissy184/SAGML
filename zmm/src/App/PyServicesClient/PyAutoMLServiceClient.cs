@@ -7,6 +7,8 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using ZMM.Helpers.ZMMDirectory;
+using ZMM.Helpers.Common;
+using System.Drawing.Imaging;
 
 namespace ZMM.App.PyServicesClient
 {
@@ -189,10 +191,16 @@ namespace ZMM.App.PyServicesClient
                     {   
                         Byte[] byteArray = await response.Content.ReadAsByteArrayAsync(); 
                         string dirFullpath = DirectoryHelper.GetDataDirectoryPath();
-                        if(fileName.Contains("png")) 
+                        if(fileName.ToLower().Contains("png") ||(fileName.ToLower().Contains("jpg"))||(fileName.ToLower().Contains("jpeg"))) 
                         {
-                            Image img = ByteArrayToImage(byteArray);                            
-                            string newFilePath = $"{dirFullpath}BaseImage";
+                            Image img = ByteArrayToImage(byteArray); 
+                            // Bitmap bm = new Bitmap(img);
+                            var imgFormat = img.RawFormat;
+                            
+                            // var myImageCodecInfo = ImageHelper.GetEncoderInfo("image/jpeg"); 
+                            // var myEncoder = Encoder.Quality;
+                                                     
+                            string newFilePath = $"{dirFullpath}";
                             if (!Directory.Exists(newFilePath))
                             {
                                 Directory.CreateDirectory(newFilePath);
@@ -201,8 +209,22 @@ namespace ZMM.App.PyServicesClient
                             {
                                 System.IO.File.Delete($"{newFilePath}/{fileName}");
                             }
-
-                            img.Save($"{newFilePath}/{fileName}");
+                            try
+                            {
+                                // EncoderParameter myEncoderParameter;
+                                // EncoderParameters myEncoderParameters = new EncoderParameters(1);
+                                // myEncoderParameter = new EncoderParameter(myEncoder, 75L);
+                                // myEncoderParameters.Param[0] = myEncoderParameter;
+                                // bm.Save($"{newFilePath}/{fileName}", myImageCodecInfo, myEncoderParameters);
+                                File.WriteAllBytes($"{dirFullpath}{fileName}",byteArray);
+                                // img.Save($"{newFilePath}/{fileName}", imgFormat);
+                                result = byteArray;
+                            }
+                            catch(Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                            }
+                            
                         }     
                         else if(fileName.Contains("mp4"))
                         {

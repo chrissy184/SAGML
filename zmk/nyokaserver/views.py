@@ -20,7 +20,7 @@ import requests, json,sys,subprocess, typing
 from nyokaserver import nyokaUtilities,nyokaPMMLUtilities
 from nyoka import PMML43Ext as pml
 from nyokaserver.nyokaServerClass import NyokaServer
-
+from KerasModelSupport.views import KerasExecution
 
 class PMMLView(APIView):
 	http_method_names=['get']
@@ -39,7 +39,14 @@ class PMMLView(APIView):
 				raise Exception("Invalid Request Parameter")
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
-		return NyokaServer.getDetailsOfPMML(filePath)
+		
+		import pathlib
+		fO=pathlib.Path(filePath)
+		if fO.suffix == '.pmml':
+			print ('Came to PMML')
+			return NyokaServer.getDetailsOfPMML(filePath)
+		elif fO.suffix == '.h5':
+			return KerasExecution().getDetailsfromKerasModel(filePath)
 
 
 class PMMLGlobalView(APIView):

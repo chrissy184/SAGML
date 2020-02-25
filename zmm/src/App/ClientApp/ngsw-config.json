@@ -1,13 +1,10 @@
 {
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
   "dataGroups": [
     {
       "name": "tb",
-      "urls": [
-        "/tb1",
-        "/tb2",
-        "/tb3"
-      ],
+      "urls": ["/tb1", "/tb2", "/tb3"],
       "cacheConfig": {
         "maxSize": 0,
         "maxAge": "0u",
@@ -23,6 +20,7 @@
         "files": [
           "/favicon.ico",
           "/index.html",
+          "/manifest.json",
           "/*.css",
           "/*.js",
           "/*.ttf",
@@ -39,7 +37,8 @@
       "updateMode": "prefetch",
       "resources": {
         "files": [
-          "/assets/**"
+          "/assets/**",
+          "/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"
         ]
       }
     }

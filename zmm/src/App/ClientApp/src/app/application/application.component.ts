@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { UtilService } from '../shared';
-import { MatSidenav } from '@angular/material';
+import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-application',
@@ -15,7 +15,7 @@ export class ApplicationComponent implements OnInit {
     top: 0
   };
   public onlineAlert: any;
-  @ViewChild('sidenav') public sidenav: MatSidenav;
+  @ViewChild('sidenav', { static: true }) public sidenav: MatSidenav;
 
   constructor(private utilService: UtilService) { }
 

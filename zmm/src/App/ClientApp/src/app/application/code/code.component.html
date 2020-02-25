@@ -10,15 +10,26 @@
                 <span class="mdi mdi-magnify"></span>
               </span>
             </div>
-            <input type="text" class="form-control" [(ngModel)]="filter" placeholder="Filter">
+            <label for="filter">Filter</label><input type="text" class="form-control" [(ngModel)]="filter" placeholder="Filter" id="filter">
           </div>
         </div>
       </div>
       <div class="content-toolbar">
-        <button mat-icon-button matTooltip="Refresh" (click)="refresh()">
+        <button mat-icon-button aria-label="icon"  matTooltip="Refresh" (click)="refresh()">
           <span class="mdi mdi-refresh text-secondary"></span>
         </button>
-        <button mat-icon-button matTooltip="Upload Code" (click)="uploadNewFiles()">
+        <button mat-icon-button aria-label="icon"  matTooltip="Create New" [matMenuTriggerFor]="newCodeMenu">
+          <span class="mdi mdi-file-plus text-secondary"></span>
+        </button>
+        <mat-menu #newCodeMenu="matMenu">
+          <button mat-menu-item (click)="newCode('PY')">
+            Python
+          </button>
+          <button mat-menu-item (click)="newCode('IPYNB')">
+            Notebook
+          </button>
+        </mat-menu>
+        <button mat-icon-button aria-label="icon"  matTooltip="Upload Code" (click)="uploadNewFiles()">
           <span class="mdi mdi-cloud-upload  text-secondary"></span>
         </button>
       </div>
@@ -59,14 +70,14 @@
                 <button *ngIf="selectedCode.extension == 'py'" mat-icon-button matTooltip="Execute" (click)="execute()">
                   <span class="mdi mdi-play"></span>
                 </button>
-                <button mat-icon-button matTooltip="Edit" (click)="editCode()">
+                <button mat-icon-button aria-label="icon"  matTooltip="Edit" (click)="editCode()">
                   <span class="mdi mdi-square-edit-outline text-secondary"></span>
                 </button>
-                <button mat-icon-button matTooltip="Download" (click)="downloadCode()">
+                <button mat-icon-button aria-label="icon"  matTooltip="Download" (click)="downloadCode()">
                   <span class="mdi mdi-download text-secondary"></span>
                 </button>
                 <app-confirmationbar [message]="message" (confirmDelete)="deleteCode()"></app-confirmationbar>
-                <button mat-icon-button
+                <button mat-icon-button aria-label="icon" 
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -101,20 +112,20 @@
                   (blur)="updateName(name)">{{ selectedCode?.id }}</span>.{{ selectedCode?.extension }}</h2>
               <div class="toolbar-mid"></div>
               <div calss="content-toolbar">
-                <button mat-icon-button matTooltip="Save Code" (click)="saveCode()">
+                <button mat-icon-button aria-label="icon"  matTooltip="Save Code" (click)="saveCode()">
                   <span class="mdi mdi-content-save text-secondary"></span>
                 </button>
-                <button mat-icon-button matTooltip="Execute" (click)="execute()">
+                <button mat-icon-button aria-label="icon"  matTooltip="Execute" (click)="execute()">
                   <span class="mdi mdi-play"></span>
                 </button>
-                <button mat-icon-button matTooltip="Download" (click)="downloadCode()">
+                <button mat-icon-button aria-label="icon"  matTooltip="Download" (click)="downloadCode()">
                   <span class="mdi mdi-download text-secondary"></span>
                 </button>
                 <app-confirmationbar [message]="message" (confirmDelete)="deleteCode()"></app-confirmationbar>
-                <button mat-icon-button matTooltip="Close" (click)="close()">
+                <button mat-icon-button aria-label="icon"  matTooltip="Close" (click)="close()">
                   <span class="mdi mdi-close text-secondary"></span>
                 </button>
-                <button mat-icon-button
+                <button mat-icon-button aria-label="icon" 
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -138,14 +149,14 @@
                   (blur)="updateName(name)">{{ selectedCode?.id }}</span>.{{ selectedCode?.extension }}</h2>
               <div class="toolbar-mid"></div>
               <div class="content-toolbar">
-                <button mat-icon-button matTooltip="Download" (click)="downloadCode()">
+                <button mat-icon-button aria-label="icon"  matTooltip="Download" (click)="downloadCode()">
                   <span class="mdi mdi-download text-secondary"></span>
                 </button>
                 <app-confirmationbar [message]="message" (confirmDelete)="deleteCode()"></app-confirmationbar>
-                <button mat-icon-button matTooltip="Close" (click)="close()">
+                <button mat-icon-button aria-label="icon"  matTooltip="Close" (click)="close()">
                   <span class="mdi mdi-close text-secondary"></span>
                 </button>
-                <button mat-icon-button
+                <button mat-icon-button aria-label="icon" 
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -171,7 +182,7 @@
                   (click)="uploadFilesDone()">
                   <span class="mdi mdi-close text-secondary"></span>
                 </button>
-                <button mat-icon-button
+                <button mat-icon-button aria-label="icon" 
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"

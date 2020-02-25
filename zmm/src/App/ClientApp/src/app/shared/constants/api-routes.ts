@@ -7,7 +7,7 @@ export const ApiRoutes = {
     },
     accountUserInfo: 'account/userInfo',
     accountLogout: 'account/logout',
-    loginRedirect:'https://accounts.mlw.ai/auth/realms/master/protocol/openid-connect/logout?post_logout_redirect_uri=' + location.origin + '&x-client-SKU=ID_NETSTANDARD2_0&x-client-ver=5.5.0.0', 
+    loginRedirect: 'https://accounts.mlw.ai/auth/realms/master/protocol/openid-connect/logout?post_logout_redirect_uri=' + location.origin + '&x-client-SKU=ID_NETSTANDARD2_0&x-client-ver=5.5.0.0',
 
     data: 'data',
     dataGet: (id: string) => `data/${id}`,
@@ -38,6 +38,7 @@ export const ApiRoutes = {
     modelRename: (id: string) => `model/${id}/rename`,
 
     code: 'code',
+    codeCreate: `code/create`,
     codeGet: (id: string) => `code/${id}`,
     codeJupyter: (id: string) => `code/${id}/jupyter`,
     codeDownload: (id: string) => `code/${id}/download`,
@@ -54,5 +55,8 @@ export const ApiRoutes = {
     instanceKill: (id: string) => `instances/${id}`,
 
     settings: 'setting',
-    datahub: 'datahub'
+    datahub: 'datahub',
+
+    repo: 'repo',
+    repoGet: (id: string) => `repo/${id}`
 };

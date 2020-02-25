@@ -373,6 +373,7 @@ class NewScoringView:
 
 	def wrapperForNewLogic(self,modelName,jsonData,filePath):
 		global PMMLMODELSTORAGE
+		print (modelName,PMMLMODELSTORAGE.keys())
 		if jsonData != None:
 			return JsonResponse({'Result':'Please add support'})
 			# if modelName in PMMLMODELSTORAGE:
@@ -384,7 +385,12 @@ class NewScoringView:
 			# 	scoredOutput=self.scoreFileData(modelName,jsonData)
 		elif filePath != None:
 			if modelName in PMMLMODELSTORAGE:
-				scoredOutput=self.scoreFileData(modelName,filePath)
+				if 'modelGeneratedFrom' in PMMLMODELSTORAGE[modelName]:
+					print ('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Came here')
+					scoredOutput=self.kerasScoring(modelName,filePath)
+				else:
+					print ('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Came here 2')
+					scoredOutput=self.scoreFileData(modelName,filePath)
 			else:
 				pmmlFile='../ZMOD/Models/'+modelName+'.pmml'
 				NewModelOperations().loadExecutionModel(pmmlFile)
@@ -407,6 +413,49 @@ class NewScoringView:
 		except:
 			os.makedirs(folderPath)
 			return ('path created')
+
+	def kerasScoring(self,modelName,filePath):
+		target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+		self.checkCreatePath(target_path)
+		global PMMLMODELSTORAGE
+		# print (PMMLMODELSTORAGE[modelName])
+		modelInformation =PMMLMODELSTORAGE[modelName]
+		modelObjs=list(modelInformation.keys())
+		print (modelObjs)
+		if pathlib.Path(filePath).suffix =='.csv':
+			testData=pd.read_csv(filePath)
+		elif pathlib.Path(filePath).suffix in ['.jpg','.JPG','.png','.PNG']:
+			inputShapevals=modelInformation['inputShape']
+			testimage=filePath
+			img_height, img_width=inputShapevals[1:3]
+			img = image.load_img(testimage, target_size=(img_height, img_width))
+			x = image.img_to_array(img)
+			x=x/255
+			testData=x.reshape(1,img_height, img_width,3)
+
+		model_graph = modelInformation['model_graph']
+		tf_session = modelInformation['tf_session']
+		with model_graph.as_default():
+			with tf_session.as_default():
+				modelToUse=modelInformation['modelObj']
+				predi=modelToUse.predict(testData)
+
+		if pathlib.Path(filePath).suffix =='.csv':
+			testData['predicted_Score']=predi
+			print (testData.shape)
+			resafile=target_path+'result.csv'
+			testData.to_csv(resafile, index=False)
+		elif pathlib.Path(filePath).suffix in ['.jpg','.JPG','.png','.PNG']:
+			import numpy as np
+			predClasses=['class_'+str(i) for i in range(len(np.ravel(predi)))]
+			targetResult= {j:str(float(k)) for j,k in zip(predClasses,list(predi[0]))}
+			resafile=target_path+'result.txt'
+			with open(resafile,'w') as f:
+				f.write(json.dumps(targetResult))
+
+		resultResp={'result':resafile}
+		return JsonResponse(resultResp,status=200)
+
 
 	def scoreFileData(self,modelName,filePath):
 		target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
@@ -455,6 +504,7 @@ class NewScoringView:
 						predClasses=['class_'+str(i) for i in range(len(np.ravel(predi)))]
 					targetResult= {j:str(float(k)) for j,k in zip(predClasses,list(predi[0]))}
 				else:
+					print ('Came for NNModel Scoring')
 					rowsIn=testData.shape[0]
 					colsIn=testData.shape[1]
 					model_graph = modeScope['modelObj']['model_graph']
@@ -476,6 +526,11 @@ class NewScoringView:
 						else:
 							pass
 
+			elif modeScope['modelObj']['modelArchType']=='MRCNN':
+				# print (testData,str(type(testData)))
+				if pathlib.Path(filePath).suffix in ['.jpg','.JPG','.png','.PNG']:
+					resafile=kerasUtilities.detectObject(filePath, modelName,modeScope,target_path)
+
 			else:
 				XVarForModel=modeScope['modelObj']['listOFColumns']
 				testData=testData[XVarForModel]
@@ -484,13 +539,19 @@ class NewScoringView:
 			# print (resultData)
 			if pathlib.Path(filePath).suffix =='.csv':
 				if modeScope['modelObj']['targetCol']==None:
-					testData['predicted']=resultData
+					try:
+						testData['predicted']=resultData
+					except:
+						testData=pd.DataFrame(resultData)
 				else:
-					testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
+					try:
+						testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
+					except:
+						testData=pd.DataFrame(resultData)
 				print (testData.shape)
 				resafile=target_path+'result.csv'
 				testData.to_csv(resafile, index=False)
-			elif pathlib.Path(filePath).suffix in ['.jpg','.JPG','.png','.PNG']:
+			elif (pathlib.Path(filePath).suffix in ['.jpg','.JPG','.png','.PNG'] )  and (modeScope['modelObj']['modelArchType']!='MRCNN') :
 				resafile=target_path+'result.txt'
 				with open(resafile,'w') as f:
 					f.write(json.dumps(targetResult))

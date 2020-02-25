@@ -24,7 +24,7 @@ from nyokaserver import nyokaUtilities,nyokaPMMLUtilities
 # from nyokaBase import PMML43Ext as pml
 from scoring.scoringClass import Scoring,NewScoringView
 from trainModel.mergeTrainingV2 import NewModelOperations
-
+from KerasModelSupport.views import KerasExecution
 
 
 class ModelsView(APIView):
@@ -51,7 +51,12 @@ class ModelsView(APIView):
 		except:
 			return JsonResponse({'error':'Invalid Request Parameter'},status=400)
 		print('filpath >>>>>>>>>>>>>>>> ',filePath)
-		return NewModelOperations().loadExecutionModel(filePath)
+		import pathlib
+		fO=pathlib.Path(filePath)
+		if fO.suffix == '.pmml':
+			return NewModelOperations().loadExecutionModel(filePath)
+		elif fO.suffix == '.h5':
+			return KerasExecution().loadKerasModel(filePath)
 		# return Scoring().loadModelfile(filePath,idfordata)
 
 
@@ -94,7 +99,9 @@ class ScoreView(APIView):
 
 
 	def post(self,requests,modelName):
-		modelName=modelName[:-5]
+		# modelName=modelName[:-5]
+		modelName=modelName.replace('.pmml','')
+		modelName=modelName.replace('.h5','')
 		print (modelName)
 		try:
 			filePath=requests.POST.get('filePath')

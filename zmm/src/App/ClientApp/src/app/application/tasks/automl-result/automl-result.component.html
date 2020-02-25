@@ -1,0 +1,49 @@
+<table mat-table #generationResultsMatSort matSort [dataSource]="dataSourceTaskHistoryGenerationResults"
+  multiTemplateDataRows class="w-100">
+  <ng-container matColumnDef="expand">
+    <th mat-header-cell *matHeaderCellDef class="w75"></th>
+    <td mat-cell *matCellDef="let row" class="w75">
+      <button mat-icon-button aria-label="icon" [matTooltip]="row == expandedElement ? 'Collapse' : 'Expand'"
+        (click)="expandedElement = expandedElement === row ? null : row">
+        <span class="mdi mdi-chevron-right text-secondary"
+          [ngClass]="{'mdi-chevron-down':row == expandedElement, 'mdi-chevron-right': !(row == expandedElement)}"></span>
+      </button>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="modelName">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Model Name</th>
+    <td mat-cell *matCellDef="let row">{{ row?.modelName }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="score">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Score</th>
+    <td mat-cell *matCellDef="let row">{{ row?.score }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="bestmodel">
+    <th mat-header-cell *matHeaderCellDef class="text-center">Best Model</th>
+    <td mat-cell *matCellDef="let row" class="text-center">
+      <span *ngIf="!row.bestmodel">NA</span>
+      <button *ngIf="row.bestmodel" mat-icon-button (click)="saveModel()" [matTooltip]="'Save Model'">
+        <span class="mdi text-secondary mdi-content-save"></span>
+      </button>
+    </td>
+  </ng-container>
+
+  <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+  <ng-container matColumnDef="expandedDetail">
+    <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumnsGenerationResults.length">
+      <div class="element-detail" [@detailExpand]="row == expandedElement ? 'expanded' : 'collapsed'">
+        <div class="p-4 mb-3 border">{{ row?.modelDetail }}</div>
+      </div>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumnsGenerationResults; sticky: true"></tr>
+  <tr mat-row class="element-row" *matRowDef="let row; columns: displayedColumnsGenerationResults"></tr>
+  <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+</table>
+
+<mat-paginator #generationResultsMatPaginator [hidden]="isContentLoading" [pageSize]="10"
+  [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>

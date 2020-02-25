@@ -1,5 +1,121 @@
 <mat-sidenav-container class="page-container">
-  <div class="details" *ngIf="nyokaRemote && nyokaRemote.url" >
-    <iframe [src]="nyokaRemote.url | safe:'resourceUrl'" class="iframe"></iframe>
-  </div>
+  <mat-sidenav #sidenav mode="side" opened class="content-sidenav" [fixedInViewport]="false" [fixedTopGap]="0"
+    [fixedBottomGap]="0">
+    <mat-toolbar>
+      <div class="toolbar-mid">
+        <div class="filter">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <span class="mdi mdi-magnify"></span>
+              </span>
+            </div>
+            <label for="filter">Filter</label><input type="text" class="form-control" [(ngModel)]="filter"
+              placeholder="Filter" id="filter">
+          </div>
+        </div>
+      </div>
+      <div class="content-toolbar">
+        <button mat-icon-button aria-label="icon" matTooltip="Refresh" (click)="refresh()">
+          <span class="mdi mdi-refresh text-secondary"></span>
+        </button>
+        <button mat-icon-button aria-label="icon" matTooltip="Filter" [matMenuTriggerFor]="filterRepoMenu">
+          <span class="mdi mdi-filter-menu text-secondary"></span>
+        </button>
+        <mat-menu #filterRepoMenu="matMenu">
+          <mat-radio-group aria-labelledby="radio-group-label" class="radio-group" [(ngModel)]="selectedFilter"
+            (change)="filterRepo()">
+            <mat-radio-button class="radio-button pt-1 px-3 d-block" value="">Any</mat-radio-button>
+            <mat-radio-button class="radio-button pt-1 px-3 d-block" value="Model">Model</mat-radio-button>
+            <mat-radio-button class="radio-button pt-1 px-3 d-block" value="Code">Code</mat-radio-button>
+            <mat-radio-button class="radio-button pt-1 px-3 d-block" value="Data">Data</mat-radio-button>
+          </mat-radio-group>
+        </mat-menu>
+      </div>
+    </mat-toolbar>
+    <app-loader [isLoading]="isLoading"></app-loader>
+    <cdk-virtual-scroll-viewport itemSize="75" class="details-list">
+      <ul class="list-group list-group-flush">
+        <li *cdkVirtualFor="let item of listOfRepo | searchfilter: 'id':filter"
+          [ngClass]="{ active: item.id === selectedRepo.id }"
+          class="list-group-item list-group-item-action text-truncate" (click)="sidenav.open(); getRepoDetails(item)">
+          <div class="text-truncate">
+            <span class="mdi mr-2" [ngClass]="utilService.fileTypeIcon(item.type)"></span>
+            <span innerHtml="{{ item.id | highlight: filter }}"></span>
+          </div>
+          <div class="text-muted">
+            <small>Total Downloads: {{ item.totalDownloads }}</small>
+          </div>
+        </li>
+        <li *ngIf="!(listOfRepo && listOfRepo.length) && !isLoading"
+          class="list-group-item text-truncate text-center text-muted">
+          No resources available
+        </li>
+      </ul>
+    </cdk-virtual-scroll-viewport>
+  </mat-sidenav>
+  <mat-sidenav-content class="content-main">
+    <mat-toolbar>
+      <h2 *ngIf="selectedRepo?.id">{{ selectedRepo?.id }} <span>({{ selectedRepo?.version }})</span></h2>
+      <div class="toolbar-mid"></div>
+      <div calss="content-toolbar" *ngIf="selectedRepo?.id">
+        <button mat-icon-button aria-label="icon" [matTooltip]="'Download'" (click)="downloadRepo()">
+          <span class="mdi mdi-download text-secondary"></span>
+        </button>
+        <button mat-icon-button aria-label="icon"
+          (click)="sidenav.toggle();toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
+          [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
+          <span class="mdi text-secondary"
+            [ngClass]="{'mdi-fullscreen': sidenav.opened, 'mdi-fullscreen-exit': !sidenav.opened}"></span>
+        </button>
+      </div>
+    </mat-toolbar>
+    <app-loader [isLoading]="isContentLoading"></app-loader>
+
+    <div class="details">
+      <ng-template [ngIf]="selectedRepo?.id">
+        <div class="container-fluid py-3">
+          <dl class="row">
+
+            <dt class="col-sm-3 text-truncate">Description</dt>
+            <dd class="col-sm-9">{{ selectedRepo.description }}</dd>
+
+            <dt class="col-sm-3 text-truncate">Tags</dt>
+            <dd class="col-sm-9">{{ selectedRepo.tags.join(', ') }}</dd>
+
+            <dt class="col-sm-3 text-truncate">Authors</dt>
+            <dd class="col-sm-9">{{ selectedRepo.authors.join(', ') }}</dd>
+
+            <dt class="col-sm-3 text-truncate">Total Downloads</dt>
+            <dd class="col-sm-9">{{ selectedRepo.totalDownloads }}</dd>
+
+            <dt class="col-sm-3 text-truncate" *ngIf="selectedRepo?.packageTypes">Package Types</dt>
+            <dd class="col-sm-9" *ngIf="selectedRepo?.packageTypes">{{ selectedRepo?.packageTypes.join(', ') }}</dd>
+
+            <ng-template [ngIf]="selectedRepo?.versions.length > 1">
+              <dt class="col-sm-3 text-truncate">Versions</dt>
+              <dd class="col-sm-9">
+                <ng-template ngFor let-prop [ngForOf]="selectedRepo?.versions" let-i="index">
+                  <div><a [routerLink]="" (click)="filterResponse(prop.version)">Version:
+                      {{ prop.version }} <span *ngIf="prop.version == selectedRepo.latestVersion">(Latest)</span> </a>,
+                    <span>Downloads:
+                      {{ prop.downloads}}</span></div>
+                </ng-template>
+              </dd>
+            </ng-template>
+
+            <ng-template [ngIf]="selectedRepo?.dependencyGroups?.length">
+              <dt class="col-sm-3 text-truncate">Dependencies</dt>
+              <dd class="col-sm-9">
+                <ng-template ngFor let-prop [ngForOf]="selectedRepo?.dependencyGroups[0]?.dependencies" let-i="index">
+                  <div>{{prop.id}} {{prop.range}}</div>
+                </ng-template>
+              </dd>
+            </ng-template>
+
+          </dl>
+        </div>
+      </ng-template>
+    </div>
+  </mat-sidenav-content>
 </mat-sidenav-container>
