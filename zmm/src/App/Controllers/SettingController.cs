@@ -13,6 +13,7 @@ using ZMM.Models.ResponseMessages;
 using ZMM.Models.Payloads;
 using Newtonsoft.Json;
 using System.Text;
+using ZMM.Helpers.Common;
 
 namespace ZMM.App.Controllers
 {
@@ -52,8 +53,11 @@ namespace ZMM.App.Controllers
                 jsonBody = body.ToString();
             }
 
+
             if (!string.IsNullOrEmpty(jsonBody))
             {
+                if (XSSBlackListed.CheckString(jsonBody))
+                    return BadRequest(new { message = "Invalid settings. Please enter correct settings.", errorCode = 400 });
                 zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
                 //parse
                 JObject jObj = JObject.Parse(jsonBody);
@@ -62,15 +66,15 @@ namespace ZMM.App.Controllers
 
                 //fetch the original record
                 List<SettingProperty> setListOrig = ZSSettingPayload.GetSettingsByUser(zmodId).SelectMany(b => b.Settings).ToList<SettingProperty>();
-                foreach(var p in setList)
+                foreach (var p in setList)
                 {
-                    if(p.username.Contains("******"))
+                    if (p.username.Contains("******"))
                     {
-                        p.username = setListOrig.Where(c => c.url == p.url).Select(c=> c.username).FirstOrDefault().ToString();
+                        p.username = setListOrig.Where(c => c.url == p.url).Select(c => c.username).FirstOrDefault().ToString();
                     }
-                    if(p.password.Contains("******"))
+                    if (p.password.Contains("******"))
                     {
-                        p.password = setListOrig.Where(c => c.url == p.url).Select(c=> c.password).FirstOrDefault().ToString();
+                        p.password = setListOrig.Where(c => c.url == p.url).Select(c => c.password).FirstOrDefault().ToString();
                     }
                 }
 
@@ -92,7 +96,7 @@ namespace ZMM.App.Controllers
 
         #region GET Settings
         [HttpGet("~/api/setting")]
-        public async Task<IActionResult> GetSettingsAsync(string type,bool selected, bool unmask, bool showall)
+        public async Task<IActionResult> GetSettingsAsync(string type, bool selected, bool unmask, bool showall)
         {
             //get the zmodId
             string UserEmailId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
@@ -102,27 +106,27 @@ namespace ZMM.App.Controllers
             var settings = ZSSettingPayload.GetSettingsByUser(UserEmailId);
             List<SettingProperty> settingProperties;
 
-            if(string.IsNullOrEmpty(type))
+            if (string.IsNullOrEmpty(type))
             {
                 settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();
             }
             else
-            {                
-                settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>(); 
+            {
+                settingProperties = settings.SelectMany(b => b.Settings).ToList<SettingProperty>();
 
-                if(!string.IsNullOrEmpty(type) && (showall == true)) 
-                    settingProperties = settingProperties.Where(c=>c.type == $"{type}").ToList<SettingProperty>();
+                if (!string.IsNullOrEmpty(type) && (showall == true))
+                    settingProperties = settingProperties.Where(c => c.type == $"{type}").ToList<SettingProperty>();
                 else
-                    settingProperties = settingProperties.Where(c=>c.type == $"{type}" && c.selected == selected).ToList<SettingProperty>();
+                    settingProperties = settingProperties.Where(c => c.type == $"{type}" && c.selected == selected).ToList<SettingProperty>();
             }
             // var selectedType = settingProperties.Where(c=>c.type == $"{type}").ToList<SettingProperty>();
             //
             #region seed settings
-            if(settings.Count == 0)
-            {     
+            if (settings.Count == 0)
+            {
                 var template = new ZSSettingResponse
-                {    
-                    ZmodId = UserEmailId,                
+                {
+                    ZmodId = UserEmailId,
                     Settings = new List<SettingProperty> {
                         new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="*******",password="*******",url="https://ai.eu-latest.cumulocity.com",selected=true },
                         new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="*******",password="*******",url="https://ai.cumulocity.com",selected=false },
@@ -132,22 +136,22 @@ namespace ZMM.App.Controllers
                         new SettingProperty{ name="DataHub 1",type="DH",driver="Dremio", username="*******",password="*******",url="https://url",port="0000",selected=true, ssl ="1" }
                     }
                 };
-                jObj = JObject.Parse(JsonConvert.SerializeObject(template)); 
-                ZSSettingPayload.CreateOrUpdate(template);            
+                jObj = JObject.Parse(JsonConvert.SerializeObject(template));
+                ZSSettingPayload.CreateOrUpdate(template);
             }
             else
             {
                 var template = new ZSSettingResponse
-                {    
-                    ZmodId = UserEmailId,                
+                {
+                    ZmodId = UserEmailId,
                     Settings = settingProperties
                 };
 
-                jObj = JObject.Parse(JsonConvert.SerializeObject(template));  
-            } 
+                jObj = JObject.Parse(JsonConvert.SerializeObject(template));
+            }
 
             #endregion
-                       
+
             jObj.Remove("zmodId");
             //
             foreach (var p in jObj["settings"])
@@ -158,8 +162,8 @@ namespace ZMM.App.Controllers
                     p["password"] = "******";
                 }
 
-                if(p["type"].ToString() == "DH")
-                {                    
+                if (p["type"].ToString() == "DH")
+                {
                     p["tenantID"].Parent.Remove();
                 }
                 else
@@ -167,7 +171,7 @@ namespace ZMM.App.Controllers
                     p["port"].Parent.Remove();
                     p["driver"].Parent.Remove();
                 }
-                if(p["ssl"].ToString() == "")
+                if (p["ssl"].ToString() == "")
                 {
                     p["ssl"].Parent.Remove();
                 }
