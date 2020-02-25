@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using ZMM.Helpers.Common;
 using ZMM.Models.Payloads;
@@ -15,41 +16,82 @@ namespace ZMM.App.Clients.Repo
 {
     public class RepoClient : IRepoClient
     {
-        public IConfiguration Config { get; }
+
+        private List<string> ResourceTypes = new List<string>(){"model", "code", "data"};
+        public IConfiguration Config { get; }  
+        readonly ILogger<RepoClient> Logger;
+
         public RepoClient(IConfiguration Conf)
         {
             this.Config = Conf;
         }
 
-        public Task<IRepoResponse> Get()
-        {
-            throw new NotImplementedException();
+        public async Task<IEnumerable<Resource>> Get()
+        {      
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURL);
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
+            return SearchResultSetInListOfResources.Data;
         }
 
-        public Task<IRepoResponse> Get(string ResourceId)
+
+        //https://???/v3/registration/helloworld.pmml/index.json
+        public async Task<ResourceInfo> Get(string ResourceId)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLByResourceId.Replace("ResourceId", ResourceId));
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            ResourceInfo SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<ResourceInfo>();
+            return SearchResultSetInListOfResources;
         }
 
-        public Task<IRepoResponse> GetModels()
+        public Task<IEnumerable<Resource>> Get(string ResourceType, string QueryString)
         {
-            throw new NotImplementedException();
+            if(!string.IsNullOrEmpty(ResourceType))
+            {
+                if(ResourceTypes.Contains(ResourceType.ToLower()))
+                {
+                    if(!string.IsNullOrEmpty(QueryString))
+                    {
+                        return GetResourcesByTypeAndQueryString(ResourceType, QueryString);
+                    }
+                    else
+                    {                    
+                        return GetResourcesByType(ResourceType);              
+                    } 
+                }
+                else throw new Exception("Given resource type is not valid. Valid resource types are model, code, data");
+            }
+            else 
+            {
+                if(!string.IsNullOrEmpty(QueryString)) return GetResourcesByQuery(QueryString);
+                else return Get();
+            }
         }
 
-        public Task<IRepoResponse> GetData()
-        {
-            throw new NotImplementedException();
+        private async Task<IEnumerable<Resource>> GetResourcesByType(string ResourceType)
+        {            
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceType + ResourceType);
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
+            return SearchResultSetInListOfResources.Data;
         }
 
-        public Task<IRepoResponse> GetCode()
+        private async Task<IEnumerable<Resource>> GetResourcesByTypeAndQueryString(string ResourceType, string QueryString)
+        {            
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQueryByResourceTypeAndQueryString.Replace("ResourceType", ResourceType).Replace("QueryString", QueryString));
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
+            return SearchResultSetInListOfResources.Data;
+        }        
+
+        private async Task<IEnumerable<Resource>> GetResourcesByQuery(string QueryString)
         {
-            throw new NotImplementedException();
+            HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(Constants.RepoURLQuery + QueryString);
+            if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exception("Exception while request to repo. Status Code : " + ResponseFromRepo.StatusCode);            
+            Resources SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<Resources>();
+            return SearchResultSetInListOfResources.Data;
         }
 
-        public Task<IRepoResponse> Query(string QueryString)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task<IRepoResponse> Add(Resource ResourceInfo)
         {
@@ -75,5 +117,6 @@ namespace ZMM.App.Clients.Repo
         {
             throw new NotImplementedException();
         }
+        
     }
 }

@@ -48,7 +48,7 @@ export class AutomlResultComponent implements OnInit, OnChanges {
   @Input() selectedHistory: any;
   public dataSourceTaskHistoryGenerationResults: any = [];
   @ViewChild("generationResultsMatPaginator") paginatorGenerationResults: MatPaginator;
-  @ViewChild("generationResultsMatSort", { static: true }) sortGenerationResults: MatSort;
+  @ViewChild(MatSort, { static: true }) sortGenerationResults: MatSort;
   constructor(private apiService: HttpService, private utilService: UtilService) { }
 
   ngOnChanges() {
@@ -64,12 +64,6 @@ export class AutomlResultComponent implements OnInit, OnChanges {
 
   }
 
-  public selectTaskHistory(selectedAutoMLHistory: any, expandedElement: any) {
-    console.log(selectedAutoMLHistory, expandedElement);
-    if (expandedElement) {
-      this.selectedAutoMLHistory = selectedAutoMLHistory;
-    }
-  }
   public saveModel() {
     console.log(this.selectedHistory);
     const options = {

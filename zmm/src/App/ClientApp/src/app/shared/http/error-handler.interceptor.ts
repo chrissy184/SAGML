@@ -34,13 +34,8 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
     } else {
       console.error('Server Side Error => ', response);
       if (response.status === 504 || response.status === 0) {
-        if(response.statusText.indexOf('Unknown')==0)
-        {
-          this.utilService.alert(`Redirecting to login page.`);
-          this.goToUrl(ApiRoutes.loginRedirect);
-        }
-        else
-          this.utilService.alert(`Unable to connect to server: ${response.statusText}`);
+        this.utilService.alert(`Redirecting to login page.`);
+        this.goToUrl(ApiRoutes.loginRedirect);
       } else if (response.status === 400) {
         this.utilService.alert(`Oops! Something went wrong and we could't process your request.`);
       }
