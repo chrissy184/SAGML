@@ -8,12 +8,12 @@ using ZMM.Models.Payloads;
 
 namespace ZMM.Helpers.Common
 {
-    public static class XSSBlackListed
+    public static class XSSBlackList
     {
-       static string[]  xssBlackListed = { "javascript","script","<",">" ,"alert"};
+       static string[]  xssBlackList = { "javascript","script","<",">" ,"alert"};
         public static bool CheckString(string strData)
         {
-            if (xssBlackListed.ToList().Any(strData.Contains))
+            if (xssBlackList.ToList().Any(strData.ToLower().Contains))
                 return true;
             else
                 return false;

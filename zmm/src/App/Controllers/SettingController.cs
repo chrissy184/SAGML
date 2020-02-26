@@ -52,12 +52,10 @@ namespace ZMM.App.Controllers
                 var body = await reader.ReadToEndAsync();
                 jsonBody = body.ToString();
             }
-
-
             if (!string.IsNullOrEmpty(jsonBody))
             {
-                if (XSSBlackListed.CheckString(jsonBody))
-                    return BadRequest(new { message = "Invalid settings. Please enter correct settings.", errorCode = 400 });
+                if (XSSBlackList.CheckString(jsonBody))
+                    return BadRequest(new { message = "Error: Unable to save settings. Invalid input. Please enter correct settings.", errorCode = 400 });
                 zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
                 //parse
                 JObject jObj = JObject.Parse(jsonBody);
