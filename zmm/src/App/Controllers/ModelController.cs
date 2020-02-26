@@ -44,10 +44,10 @@ namespace ZMM.App.Controllers
         private readonly IPyTensorServiceClient tbClient;
         private List<ModelResponse> responseData;
         private List<DataResponse> dataResponseData;
-        private static string[] extensions = new[] { "pmml", "onnx","h5" };
+        private static string[] extensions = new[] { "pmml", "onnx", "h5" };
         private readonly IScheduler _scheduler;
         #endregion
-
+private static string deployedModelFileName = "DeployedModel.json"; 
         #region Constructor
         public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log, IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, IPyTensorServiceClient tbClientInstance, IScheduler factory)
         {
@@ -62,7 +62,8 @@ namespace ZMM.App.Controllers
             try
             {
                 responseData = ModelPayload.Get();
-                dataResponseData = DataPayload.Get();                
+                dataResponseData = DataPayload.Get();
+               
             }
             catch (Exception ex)
             {
@@ -90,7 +91,7 @@ namespace ZMM.App.Controllers
             var filePath = Path.GetTempFileName();
             string dirFullpath = DirectoryHelper.GetModelDirectoryPath();
             #endregion
-            
+
             //check if folder path exists...if not then create folder
             if (!Directory.Exists(dirFullpath))
             {
@@ -129,7 +130,7 @@ namespace ZMM.App.Controllers
                     if (!FilePathHelper.IsFileNameValid(formFile.FileName))
                         return BadRequest(new { message = "Invalid file name." });
                     if (!IsFileExists)
-                    {                        
+                    {
                         #region upload large file > 400MB
                         if (size > 40000000)
                         {
@@ -154,7 +155,7 @@ namespace ZMM.App.Controllers
                                 .Build();
 
                                 job.JobDataMap["id"] = formFile.FileName.Replace($".{fileExt}", "");
-                                job.JobDataMap["filePath"] = filePath; 
+                                job.JobDataMap["filePath"] = filePath;
                                 await _scheduler.ScheduleJob(job, trigger);
                                 #endregion
                             }
@@ -174,7 +175,7 @@ namespace ZMM.App.Controllers
                                 await formFile.CopyToAsync(fileStream);
                             }
                         }
-                        
+
                         List<Property> _props = new List<Property>();
                         string _url = DirectoryHelper.GetModelUrl(formFile.FileName);
                         string _filePath = Path.Combine(dirFullpath, formFile.FileName);
@@ -215,9 +216,10 @@ namespace ZMM.App.Controllers
             {
                 ModelPayload.Clear();
                 InitZmodDirectory.ScanModelsDirectory();
-                responseData = ModelPayload.Get();
+                responseData = ModelPayload.Get();                
             }
-            //
+            // //get details of model deployed from DeployedModel.json
+                DeployedModelFunctions.GetDeployedModel(deployedModelFileName, responseData);
             DefaultContractResolver contractResolver = new DefaultContractResolver
             {
                 NamingStrategy = new CamelCaseNamingStrategy()
@@ -291,6 +293,7 @@ namespace ZMM.App.Controllers
         public IActionResult Delete(string id)
         {
             bool result = ModelPayload.Delete(id);
+
 
             if (result == true)
             {
@@ -446,7 +449,7 @@ namespace ZMM.App.Controllers
             ModelResponse _data = new ModelResponse();
             List<Property> _props = new List<Property>();
             StringBuilder fileContent = new StringBuilder();
-            string _type ="";
+            string _type = "";
 
             try
             {
@@ -490,7 +493,7 @@ namespace ZMM.App.Controllers
                     fileContent.Append("</PMML>");
                     //
                 }
-                
+
                 using (StreamWriter writer = new StreamWriter(_filePath))
                 {
                     foreach (string line in fileContent.ToString().Split(",@,"))
@@ -647,7 +650,7 @@ namespace ZMM.App.Controllers
             string reqBody = string.Empty;
             JObject jsonObj = new JObject();
 
-            if(string.IsNullOrEmpty(id)) return BadRequest();
+            if (string.IsNullOrEmpty(id)) return BadRequest();
 
             using (var reader = new StreamReader(Request.Body))
             {
@@ -684,7 +687,7 @@ namespace ZMM.App.Controllers
             string response = string.Empty;
             string reqBody = string.Empty;
             JObject jsonObj = new JObject();
-            if(string.IsNullOrEmpty(id)) return BadRequest();
+            if (string.IsNullOrEmpty(id)) return BadRequest();
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = reader.ReadToEnd();
@@ -711,7 +714,7 @@ namespace ZMM.App.Controllers
             {
                 return NotFound();
             }
-            
+
         }
         #endregion
 
@@ -775,7 +778,7 @@ namespace ZMM.App.Controllers
                 var body = reader.ReadToEnd();
                 reqBody = body.ToString();
             }
-            if(string.IsNullOrEmpty(reqBody)) return NotFound();
+            if (string.IsNullOrEmpty(reqBody)) return NotFound();
             try
             {
                 //get file name
@@ -821,12 +824,12 @@ namespace ZMM.App.Controllers
                         }
                         TensorBoardLink = TBTool.GetResourceLink(ResourcePath, out TensorboardLogFolder);
                         Console.WriteLine($"TensorBoardLink >>>>>>{TensorBoardLink}");
-                        
+
                         jObjOrig.Add("filePath", ResourcePath);
                         jObjOrig.Add("tensorboardLogFolder", TensorboardLogFolder);
                         jObjOrig.Add("tensorboardUrl", TensorBoardLink);
                         Logger.LogInformation("PostModelTrainAsync", jObjOrig.ToString());
-                     
+
                         var objJNBInst = new InstanceResponse()
                         {
                             Id = id,
@@ -839,16 +842,16 @@ namespace ZMM.App.Controllers
                     catch (Exception ex)
                     {
                         Logger.LogCritical("PostModelTrainAsync", ex.Message);
-                        return BadRequest(new { message = ex.Message});
+                        return BadRequest(new { message = ex.Message });
                     }
 
                 }
                 if (!string.IsNullOrEmpty(dataFolder) && (jObjOrig["dataFolder"] == null)) jObjOrig.Add("dataFolder", dataFolder);
-                
+
                 /* remove what is not needed to send to zmk api */
                 jObjOrig.Remove("recurrence");
                 jObjOrig.Remove("cronExpression");
-                /* end */                
+                /* end */
                 /* call NN train api */
                 response = await nnclient.TrainModel(jObjOrig.ToString());
                 //
@@ -954,7 +957,7 @@ namespace ZMM.App.Controllers
         {
             string zsResponse = string.Empty;
             try
-            {                
+            {
                 zsResponse = await zsClient.GetModels(ZSSettingPayload.GetUserNameOrEmail(HttpContext));
                 await Task.FromResult(0);
             }
@@ -1016,6 +1019,9 @@ namespace ZMM.App.Controllers
                                 ModelPayload.Update(updateRecord);
                                 responseData = ModelPayload.Get();
                                 response = "{ id: '" + record.Id + "', deployed: false}";
+                               // string fileName = "DeployedModel.json";
+                                if (!DeployedModelFunctions.DeleteDeployedModel(deployedModelFileName, record.Id))
+                                    return BadRequest(new { message = "Error in updating Deployed model status file." });
                                 if (!string.IsNullOrEmpty(response)) jsonResponse = JObject.Parse(response);
                                 isExists = true;
                             }
@@ -1097,6 +1103,9 @@ namespace ZMM.App.Controllers
                                 ModelPayload.Update(updateRecord);
                                 responseData = ModelPayload.Get();
                                 response = @"{ id: '" + record.Id + "', deployed: true}";
+                               // string fileName = "DeployedModel.json";
+                                if (!DeployedModelFunctions.CreateUpdateJSONFile(deployedModelFileName, record.Id))
+                                    return BadRequest(new { message = "Error while creating or updating Deployed Model file." });
                                 if (!string.IsNullOrEmpty(response)) jsonResponse = JObject.Parse(response);
                                 isExists = true;
                             }
@@ -1122,7 +1131,7 @@ namespace ZMM.App.Controllers
 
 
         #endregion
-        
+
 
         #region Get deployed models
         [HttpGet("~/api/model/deployed")]

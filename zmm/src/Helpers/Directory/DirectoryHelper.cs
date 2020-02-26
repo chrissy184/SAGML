@@ -61,6 +61,10 @@ namespace ZMM.Helpers.ZMMDirectory
         {
             return fileUploadDirectoryPath + "/Code/";
         }
+        public static string GetZSDeployedModelDirectoryPath()
+        {             
+            return fileUploadDirectoryPath + "/ZSDeployedModel/";
+        }
         public static string GetDataUrl(string filename)
         {
             string _path = string.Empty;
