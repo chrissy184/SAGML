@@ -103,6 +103,7 @@ class Scoring:
 		global PMMLMODELSTORAGE
 		# modelname=param
 		modelName=modelName.replace('.pmml','')
+		modelName=modelName.replace('.h5','')
 		print('modelname ',modelName)
 		try:
 			messNotice=NewModelOperations().deleteLoadedModelfromMemory(modelName)
