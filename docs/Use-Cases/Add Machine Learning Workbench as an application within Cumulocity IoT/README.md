@@ -57,24 +57,25 @@ mkdir MLWORKBENCH
 cd MLWORKBENCH 
 ```
 
-**Step 8**: Now copy all the files from the below link to MLWORKBENCH directory
+**Step 8**: Now copy file(s) from the below link to MLWORKBENCH directory
 
 | Version | github file location| 
 | --- | --- |
-| 10.5 | https://github.com/SoftwareAG/MLW/tree/10.5/docker/10.5/Windows  | 
+| 10.5 | https://github.com/SoftwareAG/MLW/blob/master/docker/10.5/Windows/install.ps1  | 
 | 1.38.2 | https://github.com/SoftwareAG/MLW/tree/1.38.2/Docker/Windows | 
 
 
-**Step 9**: Now run the script mlw_up.ps1 from Powershell
+**Step 9**: Now run the script install.ps1 from Powershell for 10.5
 ``` 
-mlw_up.ps1 
+install.ps1 
+mlw up
 ``` 
 
-**Step 10**: Open your browser type "localhost:7007". This will launch the Cumulocity IOT ML Workbench. If you are running version 1.38.2, type "localhost" in your browser.
+**Step 10**: This will launch the Cumulocity IOT ML Workbench. If you are running version 1.38.2, type "localhost" in your browser.
 
 **Step 11**: To stop Cumulocity IOT ML Workbench application, type the below command from the directory where mlw up was typed
 ```
-mlw_down.ps1 
+mlw down
 ```
 
 # Linux
