@@ -106,6 +106,36 @@ namespace ZMM.App.Controllers
                     if (!IsFileExists)
                     {
                         var fileExt = System.IO.Path.GetExtension(formFile.FileName).Substring(1);
+                        #region upload large file > 400MB
+                        if (size > 40000000)
+                        {
+                            //check if same job is scheduled
+                            ISchedulerFactory schfack = new StdSchedulerFactory();
+                            IScheduler scheduler = await schfack.GetScheduler();
+                            var jobKey = new JobKey(filePath);
+                            if (await scheduler.CheckExists(jobKey))
+                            {
+                                await scheduler.ResumeJob(jobKey);
+                            }
+                            else
+                            {
+                                #region create quartz job for training model
+                                ITrigger trigger = TriggerBuilder.Create()
+                                .WithIdentity($"Uploading Model Job-{DateTime.Now}")
+                                .WithPriority(1)
+                                .Build();
+
+                                IJobDetail job = JobBuilder.Create<UploadJob>()
+                                .WithIdentity(filePath)
+                                .Build();
+
+                                job.JobDataMap["id"] = formFile.FileName.Replace($".{fileExt}", "");
+                                job.JobDataMap["filePath"] = filePath; 
+                                await _scheduler.ScheduleJob(job, trigger);
+                                #endregion
+                            }
+                        }
+                        #endregion                        
                         if (fileExt.ToLower() == "ipynb")
                         {
                             dirFullpath = dirFullpath + formFile.FileName.Replace(".ipynb", "/");

@@ -13,6 +13,7 @@ namespace ZMM.Helpers.ZMMDirectory
             string dataPath = $"{path}/Data/";
             string modelPath = $"{path}/Models/";
             string schedulerPath = $"{path}/Scheduler/";
+            string ZSModelDeployedPath = $"{path}/ZSDeployedModel/";
             //
             if(!string.IsNullOrEmpty(path))
             {
@@ -37,6 +38,11 @@ namespace ZMM.Helpers.ZMMDirectory
                 if (!Directory.Exists(schedulerPath))
                 {
                     Directory.CreateDirectory(schedulerPath);
+                }
+                //check if ModelDeployed folder path exists...if not then create folder
+                if (!Directory.Exists(ZSModelDeployedPath))
+                {
+                    Directory.CreateDirectory(ZSModelDeployedPath);
                 }
             }
             return result;
