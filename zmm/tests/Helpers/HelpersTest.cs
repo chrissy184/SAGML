@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Xunit;
 using ZMM.Helpers.Common;
 using ZMM.Models.ResponseMessages;
@@ -78,6 +79,89 @@ namespace ZMM.Helpers.Tests
 
             Assert.True(FilePathHelper.IsFileNameValid(fileName));
             System.Console.WriteLine("End Test : TestIsFileNameValid");
+        }
+        #endregion
+        #region ZipFileSanitize for positive test scenarios
+        [Fact]
+        public void TestZipSanitizeWithPositiveInput()
+        {
+            System.Console.WriteLine("Start Test : TestZipSanitizeWithPositiveInput");
+            System.Console.WriteLine("Check if directory exists to get zip files from github");
+            //create folder
+            if (!Directory.Exists(TestAPIs.TestDir))
+            {
+                System.Console.WriteLine("Creating directory to get zip files from github");
+                Directory.CreateDirectory(TestAPIs.TestDir);
+            }
+            else
+            {
+                string[] filePaths = Directory.GetFiles(TestAPIs.TestDir);
+                foreach (string filePath in filePaths)
+                    File.Delete(filePath);
+            }
+            System.Console.WriteLine("Getting zip file for positive scenario");
+            TestAPIs.ProcessStart("https://github.com/nimeshgit/mlw-testdata/raw/master/DisDriver.zip");
+            System.Console.WriteLine("Getting zip file name");
+            string fileName = Path.GetFileName(Directory.GetFiles(TestAPIs.TestDir)[0]);
+            System.Console.WriteLine("Checking zip file is sanitized");
+            Assert.True(FilePathHelper.IsFileNameValid(fileName), "Zip file is sanitized.");
+            System.Console.WriteLine("End Test : TestZipSanitizeWithPositiveInput");
+        }
+        #endregion
+
+        #region ZipFileSanitize for positive test scenarios for Zip bomb file
+        [Fact]
+        public void TestZipSanitizeForZipBombPositiveInput()
+        {
+            System.Console.WriteLine("Start Test : TestZipSanitizeForZipBombPositiveInput");
+            System.Console.WriteLine("Check if directory exists to get zip files from github");
+            //create folder
+            if (!Directory.Exists(TestAPIs.TestDir))
+            {
+                System.Console.WriteLine("Creating directory to get zip files from github");
+                Directory.CreateDirectory(TestAPIs.TestDir);
+            }
+            else
+            {
+                string[] filePaths = Directory.GetFiles(TestAPIs.TestDir);
+                foreach (string filePath in filePaths)
+                    File.Delete(filePath);
+            }
+            System.Console.WriteLine("Getting zip file for positive scenario");
+            TestAPIs.ProcessStart("https://github.com/nimeshgit/mlw-testdata/raw/master/5GB%20ZIP%20Bomb%20fIle.zip");
+            System.Console.WriteLine("Getting zip file name");
+            string fileName = Path.GetFileName(Directory.GetFiles(TestAPIs.TestDir)[0]);
+            System.Console.WriteLine("Checking zip file is sanitized");
+            Assert.True(FilePathHelper.IsFileNameValid(fileName), "Zip file is sanitized.");
+            System.Console.WriteLine("End Test : TestZipSanitizeForZipBombPositiveInput");
+        }
+        #endregion
+
+        #region ZipFileSanitize for negative test scenarios for Zip bomb file
+        [Fact]
+        public void TestZipSanitizeForZipBombNegativeInput()
+        {
+            System.Console.WriteLine("Start Test : TestZipSanitizeForZipBombNegativeInput");
+            System.Console.WriteLine("Check if directory exists to get zip files from github");
+            //create folder
+            if (!Directory.Exists(TestAPIs.TestDir))
+            {
+                System.Console.WriteLine("Creating directory to get zip files from github");
+                Directory.CreateDirectory(TestAPIs.TestDir);
+            }
+            else
+            {
+                string[] filePaths = Directory.GetFiles(TestAPIs.TestDir);
+                foreach (string filePath in filePaths)
+                    File.Delete(filePath);
+            }
+            System.Console.WriteLine("Getting zip file for positive scenario");
+            TestAPIs.ProcessStart("https://github.com/nimeshgit/mlw-testdata/raw/master/13GB%20ZIP%20Bomb%20fIle.zip");
+            System.Console.WriteLine("Getting zip file name");
+            string fileName = Path.GetFileName(Directory.GetFiles(TestAPIs.TestDir)[0]);
+            System.Console.WriteLine("Checking zip file is sanitized");
+            Assert.True(FilePathHelper.IsFileNameValid(fileName), "Zip file is sanitized.");
+            System.Console.WriteLine("End Test : TestZipSanitizeForZipBombNegativeInput");
         }
         #endregion
 
