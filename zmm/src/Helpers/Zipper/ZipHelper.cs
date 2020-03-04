@@ -46,7 +46,7 @@ namespace ZMM.Helpers.Zipper
         #endregion
 
         #region Zip Bomb resolutions - To restrict zip file contents size before extraction
-        private static bool SanitizeZipFile(string FilePath)
+        public static bool SanitizeZipFile(string FilePath)
         {
             bool IsFileSanitized = true;
             long TempSumOfVolume = 0;

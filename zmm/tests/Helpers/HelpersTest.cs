@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Xunit;
 using ZMM.Helpers.Common;
+using ZMM.Helpers.Zipper;
 using ZMM.Models.ResponseMessages;
 
 namespace ZMM.Helpers.Tests
@@ -80,6 +82,113 @@ namespace ZMM.Helpers.Tests
             System.Console.WriteLine("End Test : TestIsFileNameValid");
         }
         #endregion
+        #region ZipFileSanitize for positive test scenarios
+        [Fact]
+        public void TestZipSanitizeWithPositiveInput()
+        {
+            System.Console.WriteLine("Start Test : TestZipSanitizeWithPositiveInput");
+            System.Console.WriteLine("Check if directory exists to get zip files from github");
+             if (!Directory.Exists(TestAPIs.TestDir))
+            {
+                System.Console.WriteLine("Creating test directory");
+                Directory.CreateDirectory(TestAPIs.TestDir);
+            }
+            else
+            {
+                System.Console.WriteLine("Deleting test directory which already exists");
+                string[] filePaths = Directory.GetFiles(TestAPIs.TestDir);
+                foreach (string filePath in filePaths)
+                    File.Delete(filePath);
+            }
+            System.Console.WriteLine("Getting zip file for negative scenario");
+            string fileToGetFromGitHub = "https://github.com/nimeshgit/mlw-testdata/raw/master/DisDriver.zip";
+            TestAPIs.ProcessStart(fileToGetFromGitHub);
+            System.Console.WriteLine("URL for test data to get from github: " + fileToGetFromGitHub);
 
+            System.Console.WriteLine("Checking if file is sanitized");
+            Assert.True(ZipHelper.SanitizeZipFile(Directory.GetFiles(TestAPIs.TestDir)[0]),"Zip file is sanitized");
+           
+            System.Console.WriteLine("End Test : TestZipSanitizeWithPositiveInput");
+            #region  Do cleanup
+            Directory.Delete(TestAPIs.TestDir, true);
+            #endregion
+        }
+        #endregion
+
+        #region ZipFileSanitize for negative test scenarios for Zip bomb file
+        [Fact]
+        public void TestZipSanitizeForZipBombNegativeInput()
+        {
+            System.Console.WriteLine("Start Test : TestZipSanitizeForZipBombNegativeInput");
+            System.Console.WriteLine("Check if directory exists to get zip files from github");
+            string fileToGetFromGitHub = "https://github.com/nimeshgit/mlw-testdata/raw/master/5GB%20ZIP%20Bomb%20fIle.zip";
+            if (!Directory.Exists(TestAPIs.TestDir))
+            {
+                System.Console.WriteLine("Creating test directory");
+                Directory.CreateDirectory(TestAPIs.TestDir);
+            }
+            else
+            {
+                System.Console.WriteLine("Deleting test directory which already exists");
+                string[] filePaths = Directory.GetFiles(TestAPIs.TestDir);
+                foreach (string filePath in filePaths)
+                    File.Delete(filePath);
+            }
+            System.Console.WriteLine("Getting zip file for negative scenario");
+            TestAPIs.ProcessStart(fileToGetFromGitHub);
+            System.Console.WriteLine("URL for test data to get from github: " + fileToGetFromGitHub);
+
+            System.Console.WriteLine("Checking if file is sanitized");
+            string fileName = Path.GetFileName(Directory.GetFiles(TestAPIs.TestDir)[0]);
+            string errorMessage = "Zip file exceeds maximum size limit 2 GB or maximum number of contents items limit 1024. Please, upload zip file which has contents size less then 2 GB.";
+            var ex = Assert.Throws<Exception>(() => ZipHelper.SanitizeZipFile(Directory.GetFiles(TestAPIs.TestDir)[0]));
+            Assert.Equal(errorMessage, ex.Message);
+
+            System.Console.WriteLine("End Test : TestZipSanitizeForZipBombNegativeInput");
+
+            #region  Do cleanup
+            Directory.Delete(TestAPIs.TestDir, true);
+            #endregion
+        }
+        #endregion
+
+        #region ZipFileSanitize for negative test scenarios for Zip bomb file
+        [Fact]
+        public void TestZipSanitizeForZipBombRecursiveNegativeInput()
+        {
+            System.Console.WriteLine("Start Test : TestZipSanitizeForZipBombNegativeInput");
+            System.Console.WriteLine("Check if directory exists to get zip files from github");
+            //create folder
+            string fileToGetFromGitHub = "https://github.com/nimeshgit/mlw-testdata/raw/master/13GB%20ZIP%20Bomb%20fIle.zip";
+            if (!Directory.Exists(TestAPIs.TestDir))
+            {
+                System.Console.WriteLine("Creating test directory");
+                Directory.CreateDirectory(TestAPIs.TestDir);
+            }
+            else
+            {
+                System.Console.WriteLine("Deleting test directory which already exists");
+                string[] filePaths = Directory.GetFiles(TestAPIs.TestDir);
+                foreach (string filePath in filePaths)
+                    File.Delete(filePath);
+            }
+            System.Console.WriteLine("URL for test data to get from github: " + fileToGetFromGitHub);
+            TestAPIs.ProcessStart(fileToGetFromGitHub);
+
+            System.Console.WriteLine("File name to test: " + fileToGetFromGitHub);
+            System.Console.WriteLine("Check if file is sanitized");
+
+            string fileName = Path.GetFileName(Directory.GetFiles(TestAPIs.TestDir)[0]);
+            string errorMessage = "Zip file exceeds maximum size limit 2 GB or maximum number of contents items limit 1024. Please, upload zip file which has contents size less then 2 GB.";
+            var ex = Assert.Throws<Exception>(() => ZipHelper.SanitizeZipFile(Directory.GetFiles(TestAPIs.TestDir)[0]));
+            Assert.Equal(errorMessage, ex.Message);
+            System.Console.WriteLine("End Test : TestZipSanitizeForZipBombNegativeInput");
+
+            #region  Do cleanup
+            Directory.Delete(TestAPIs.TestDir, true);
+            #endregion
+
+        }
+        #endregion
     }
 }
