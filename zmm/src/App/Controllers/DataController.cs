@@ -212,9 +212,9 @@ namespace ZMM.App.Controllers
                                 }
                                 else
                                 {
-                                    #region create quartz job for training model
+                                    #region large uploading data
                                     ITrigger trigger = TriggerBuilder.Create()
-                                    .WithIdentity($"Uploading Model Job-{DateTime.Now}")
+                                    .WithIdentity($"Uploading Data Job-{DateTime.Now}")
                                     .WithPriority(1)
                                     .Build();
 
