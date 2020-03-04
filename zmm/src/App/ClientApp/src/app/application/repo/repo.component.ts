@@ -82,7 +82,18 @@ export class RepoComponent implements OnInit {
   }
 
   public downloadRepo() {
-    this.utilService.alert('Work in progress...');
+    this.isContentLoading = true;
+    const options = {
+      body: {
+        id: this.selectedRepo.id,
+        version: this.selectedRepo.version
+      }
+    };
+    this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.repoDownload(this.selectedRepo.id), options)
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(() => {
+        this.utilService.alert('Download complete.');
+      });
   }
 
 }
