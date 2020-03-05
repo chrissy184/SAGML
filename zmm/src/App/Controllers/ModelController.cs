@@ -493,6 +493,19 @@ private static string deployedModelFileName = "DeployedModel.json";
                     fileContent.Append("</PMML>");
                     //
                 }
+                else if (_type == "WFBETA")
+                {
+                    //create blank model data for WORKFLOW BETA                                    
+                    fileContent.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>,@,");
+                    fileContent.Append("<PMML xmlns=\"http://www.dmg.org/PMML-4_3\" version=\"4.3Ext\" type=\"multiBeta\">,@,");
+                    fileContent.Append("<Header copyright=\"Copyright (c) 2018 Software AG\" description=\"Work Flow Beta\">,@,");
+                    fileContent.Append("<Timestamp>" + DateTime.Now.ToString("yyyy-MM-dd H:mm:ss.") + TimeSpan.TicksPerMillisecond + "</Timestamp>,@,");
+                    fileContent.Append("</Header>,@,");
+                    fileContent.Append("<DeepNetwork>,@,");
+                    fileContent.Append("</DeepNetwork>,@,");
+                    fileContent.Append("</PMML>");
+                    //
+                }
 
                 using (StreamWriter writer = new StreamWriter(_filePath))
                 {
