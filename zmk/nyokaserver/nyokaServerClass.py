@@ -903,12 +903,12 @@ class NyokaServer:
 			for kk in tempObj['DeepNetwork'][0].NetworkLayer:
 				layerList.append(kk.get_layerType())
 
-			if (len(tempObj['script']) >=1) or ('LSTM' in layerList) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
+			if (len(tempObj['script']) >=1) or ('LSTM' in layerList) or (tempObj['Header'].__dict__['description'] in ['Work Flow','Work Flow Beta']):
 				deployInfo=False
 			else:
 				deployInfo=True
 		else:
-			if (len(tempObj['script']) >=1) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
+			if (len(tempObj['script']) >=1) or (tempObj['Header'].__dict__['description'] in ['Work Flow','Work Flow Beta']):
 				deployInfo=False
 			else:
 				deployInfo=True

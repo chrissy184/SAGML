@@ -433,6 +433,8 @@ class NyokaUtilities:
         if 'type' in mm:
             if mm['type']=='multi':
                 allInfo['modelGeneratedFrom']='Workflow'
+            if mm['type']=='multiBeta':
+                allInfo['modelGeneratedFrom']='WorkflowBeta'
 
 
         return allInfo
