@@ -46,8 +46,9 @@ namespace ZMM.App.Controllers
         private List<DataResponse> dataResponseData;
         private static string[] extensions = new[] { "pmml", "onnx", "h5" };
         private readonly IScheduler _scheduler;
+        private static string deployedModelFileName = "DeployedModel.json"; 
         #endregion
-private static string deployedModelFileName = "DeployedModel.json"; 
+        
         #region Constructor
         public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log, IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, IPyTensorServiceClient tbClientInstance, IScheduler factory)
         {
