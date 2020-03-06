@@ -104,12 +104,12 @@
                 </button>
 
                 <button mat-icon-button aria-label="icon"
-                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'"
+                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow' || selectedModel?.modelGeneratedFrom === 'WorkflowBeta'"
                   (click)="trainPmml()" matTooltip="Train Model">
                   <span class="mdi mdi-settings text-secondary"></span>
                 </button>
                 <button
-                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'"
+                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow' || selectedModel?.modelGeneratedFrom === 'WorkflowBeta'"
                   mat-icon-button (click)="editpmml()" matTooltip="Edit Model">
                   <span class="mdi mdi-square-edit-outline  text-secondary"></span>
                 </button>
