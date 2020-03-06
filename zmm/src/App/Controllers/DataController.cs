@@ -241,7 +241,39 @@ namespace ZMM.App.Controllers
                                     }
                                 }
                             }                   
-                            
+                             switch (fileExt.ToLower())
+                            {
+                                case "csv":
+                                    type = "CSV";
+                                    break;
+                                case "json":
+                                    type = "JSON";
+                                    break;
+                                case "png":
+                                    type = "IMAGE";
+                                    break;
+                                    case "jpeg":
+                                    type = "IMAGE";
+                                    break;
+                                    case "jpg":
+                                    type = "IMAGE";
+                                    break;
+                                    case "webp":
+                                    type = "IMAGE";
+                                    break;
+                                    case "mp4":
+                                    type = "VIDEO";
+                                    break;
+                                     case "zip":
+                                    type = "FOLDER";
+                                    break;
+                                     case "txt":
+                                    type = "TEXT";
+                                    break;
+                                default:
+                                    type = "UNRECOGNIZED";
+                                    break;
+                            }
                             //
                             DataResponse newRecord = new DataResponse()
                             {
@@ -254,7 +286,7 @@ namespace ZMM.App.Controllers
                                 Name = fileName,
                                 Properties = _props,
                                 Size = formFile.Length,
-                                Type = fileExt.ToUpper(),
+                                Type = type,
                                 Url = _url,
                                 User = CURRENT_USER,
                                 DateCreated = DateTime.Now
