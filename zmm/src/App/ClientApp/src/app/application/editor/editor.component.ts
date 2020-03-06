@@ -689,10 +689,10 @@ export class EditorComponent implements OnInit, OnChanges {
     this.getPreviousLayer($event.value);
     if ($event.value.layerId === 'NA') {
       $event.value.layerId = `${$event.value.name}_${this.flatLayers.length}`;
-      if (this.selectedModel.modelGeneratedFrom === 'Workflow' && $event.value.layerId === 'Section_1') {
+      if ((this.selectedModel.modelGeneratedFrom === 'Workflow' || this.selectedModel.modelGeneratedFrom === 'WorkflowBeta') && $event.value.layerId === 'Section_1') {
         $event.value.layerId = 'model1';
       }
-      if (this.selectedModel.modelGeneratedFrom === 'Workflow' && $event.value.layerId === 'Section_2') {
+      if ((this.selectedModel.modelGeneratedFrom === 'Workflow' || this.selectedModel.modelGeneratedFrom === 'WorkflowBeta') && $event.value.layerId === 'Section_2') {
         $event.value.layerId = 'model2';
       }
     }
