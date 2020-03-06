@@ -1,35 +1,24 @@
 using System;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
-using System.Threading;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using System.Net;
-using Microsoft.AspNetCore.Cors;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ZMM.App.PyServicesClient;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Drawing;
 using Microsoft.Extensions.Logging;
 using ZMM.Models.Payloads;
 using ZMM.Helpers.Extensions;
 using ZMM.Helpers.ZMMDirectory;
 using ZMM.Helpers.Common;
-using ZMM.Helpers.Zipper;
 using ZMM.Models.ResponseMessages;
 using Newtonsoft.Json.Serialization;
 using ZMM.App.ZSServiceClient;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Helpers.CustomAttributes;
 using xml = System.Xml;
 using System.Data;
 using System.Text.RegularExpressions;
@@ -175,6 +164,7 @@ namespace ZMM.App.Controllers
                     if (formFile.Length > 0)
                     {
                         fileName = formFile.FileName;
+                        //type =  Path.GetExtension(formFile.FileName).Substring(1).ToUpper();
                         if (!FilePathHelper.IsFileNameValid(fileName))
                             return BadRequest("File name not valid.");
                         //check if the file with the same name exists
@@ -264,7 +254,7 @@ namespace ZMM.App.Controllers
                                 Name = fileName,
                                 Properties = _props,
                                 Size = formFile.Length,
-                                Type = type,
+                                Type = fileExt.ToUpper(),
                                 Url = _url,
                                 User = CURRENT_USER,
                                 DateCreated = DateTime.Now
