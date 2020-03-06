@@ -424,7 +424,7 @@ class AutoMLTrainer:
                             'model1':{'data':None,'hyperparameters':None,'preProcessingScript':None,
                                 'pipelineObj':Pipeline(finalPipe.steps[:-1]),'modelObj':finalPipe.steps[-1][1],
                                 'featuresUsed':featureVar,
-                                'targetName':targetVar,'postProcessingScript':None,'taskType': 'score'}
+                                'targetName':targetVar,'postProcessingScript':None,'taskType': 'score','modelPath':finalPMMLfile}
                         }
             try:
                 # print ('toExportDict >>>>>>>>>>>> ',toExportDict)

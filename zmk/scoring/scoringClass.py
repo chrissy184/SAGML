@@ -475,12 +475,12 @@ class NewScoringView:
 			resultResp={'result':'Model not for scoring'}
 		elif len(modelObjs) ==1:
 			modeScope=modelInformation['score'][modelObjs[0]]
-			# print ('modeScope',modeScope)
+			print ('modeScope',modeScope)
 			if 'preprocessing' in modeScope:
 				# print ("modeScope['preprocessing']")
 				testData=modeScope['preprocessing']['codeObj'](testData)
 				
-				# print (testData.shape,'new')
+				print (testData.shape,'new')
 			else:
 				testData=testData
 			if modeScope['modelObj']['modelArchType']=='NNModel':

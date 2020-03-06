@@ -447,8 +447,8 @@ class NyokaUtilities:
 
         # print ('0'*100,pmmlObj.get_type())
 
-        if pmmlObj.get_type()=='multi':
-            print ('came to Workflow')
+        if pmmlObj.get_type() in ['multi','multiBeta']:
+            print ('came to Workflow or Beta')
             # print('*'*100)
 
             # print(PMMLMODELSTORAGE)
@@ -524,7 +524,10 @@ class NyokaUtilities:
                     
                 
                 modtempC=copy.deepcopy(tempModel)
-                fileName=pathlib.Path(toexp[modTemp]['modelPath']).name
+                try:
+                    fileName=pathlib.Path(toexp[modTemp]['modelPath']).name
+                except:
+                    fileName='/NotKnown/Unknown.pmml'
                 modtempC['layerId']=fileName
                 modtempC['url']='/Model/'+fileName
                 modtempC['filePath']=toexp[modTemp]['modelPath']
