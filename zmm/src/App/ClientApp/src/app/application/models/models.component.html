@@ -10,15 +10,16 @@
                 <span class="mdi mdi-magnify"></span>
               </span>
             </div>
-            <label for="filter">Filter</label><input type="text" class="form-control" [(ngModel)]="filter" placeholder="Filter" id="filter">
+            <label for="filter">Filter</label><input type="text" class="form-control" [(ngModel)]="filter"
+              placeholder="Filter" id="filter">
           </div>
         </div>
       </div>
       <div class="content-toolbar">
-        <button mat-icon-button aria-label="icon"  matTooltip="Refresh" (click)="refresh()">
+        <button mat-icon-button aria-label="icon" matTooltip="Refresh" (click)="refresh()">
           <span class="mdi mdi-refresh text-secondary"></span>
         </button>
-        <button mat-icon-button aria-label="icon"  matTooltip="New Model" [matMenuTriggerFor]="newPMMLMenu">
+        <button mat-icon-button aria-label="icon" matTooltip="New Model" [matMenuTriggerFor]="newPMMLMenu">
           <span class="mdi mdi-file-plus text-secondary"></span>
         </button>
         <mat-menu #newPMMLMenu="matMenu">
@@ -28,12 +29,15 @@
           <button mat-menu-item (click)="newPmml('WF')">
             Workflow
           </button>
+          <button mat-menu-item (click)="newPmml('WFBETA')">
+            Workflow Beta
+          </button>
           <button mat-menu-item (click)="autoML()">
             AutoML
           </button>
         </mat-menu>
 
-        <button mat-icon-button aria-label="icon"  matTooltip="Upload Models" (click)="uploadNewFiles()">
+        <button mat-icon-button aria-label="icon" matTooltip="Upload Models" (click)="uploadNewFiles()">
           <span class="mdi mdi-cloud-upload text-secondary"></span>
         </button>
       </div>
@@ -73,10 +77,10 @@
                   (blur)="updateName(name)">{{ selectedModel?.id }}</span>.{{ selectedModel?.extension }}</h2>
               <div class="toolbar-mid"></div>
               <div calss="content-toolbar">
-                <button mat-icon-button aria-label="icon"  matTooltip="Publish Model" (click)="publishModel()">
+                <button mat-icon-button aria-label="icon" matTooltip="Publish Model" (click)="publishModel()">
                   <span class="mdi text-secondary mdi-publish"></span>
                 </button>
-                <button mat-icon-button aria-label="icon"  (click)="deployModel()" *ngIf="selectedModel.deployableToZAD"
+                <button mat-icon-button aria-label="icon" (click)="deployModel()" *ngIf="selectedModel.deployableToZAD"
                   [matTooltip]="!selectedModel.deployed ? 'Deploy model to server' : 'Remove model from server'">
                   <span class="mdi mdi-cloud-outline text-secondary"
                     [ngClass]="{'mdi-cloud-outline': !selectedModel.deployed, 'mdi-cloud': selectedModel.deployed}"></span>
@@ -99,21 +103,21 @@
                   <span class="mdi text-secondary mdi-progress-download"></span>
                 </button>
 
-                <button mat-icon-button aria-label="icon" 
-                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'"
+                <button mat-icon-button aria-label="icon"
+                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow' || selectedModel?.modelGeneratedFrom === 'WorkflowBeta'"
                   (click)="trainPmml()" matTooltip="Train Model">
                   <span class="mdi mdi-settings text-secondary"></span>
                 </button>
                 <button
-                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'"
+                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow' || selectedModel?.modelGeneratedFrom === 'WorkflowBeta'"
                   mat-icon-button (click)="editpmml()" matTooltip="Edit Model">
                   <span class="mdi mdi-square-edit-outline  text-secondary"></span>
                 </button>
-                <button mat-icon-button aria-label="icon"  matTooltip="Download" (click)="downloadModel()">
+                <button mat-icon-button aria-label="icon" matTooltip="Download" (click)="downloadModel()">
                   <span class="mdi mdi-download text-secondary"></span>
                 </button>
                 <app-confirmationbar [message]="message" (confirmDelete)="deletePMML()"></app-confirmationbar>
-                <button mat-icon-button aria-label="icon" 
+                <button mat-icon-button aria-label="icon"
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -166,7 +170,7 @@
                   (click)="uploadFilesDone()">
                   <span class="mdi mdi-close text-secondary"></span>
                 </button>
-                <button mat-icon-button aria-label="icon" 
+                <button mat-icon-button aria-label="icon"
                   (click)="sidenav.toggle();toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -195,14 +199,15 @@
                 <!-- <button mat-icon-button aria-label="icon"  (click)="compileForm()" matTooltip="Compile">
                   <span class="mdi mdi-play text-secondary"></span>
                 </button> -->
-                <button mat-icon-button aria-label="icon"  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'"
+                <button mat-icon-button aria-label="icon"
+                  *ngIf="selectedModel?.modelGeneratedFrom === 'DeepNetwork' || selectedModel?.modelGeneratedFrom === 'Workflow'"
                   (click)="trainPmml()" matTooltip="Train Model">
                   <span class="mdi mdi-settings  text-secondary"></span>
                 </button>
-                <button mat-icon-button aria-label="icon"  matTooltip="Cancel" (click)="closeEditor()">
+                <button mat-icon-button aria-label="icon" matTooltip="Cancel" (click)="closeEditor()">
                   <span class="mdi mdi-close text-secondary"></span>
                 </button>
-                <button mat-icon-button aria-label="icon" 
+                <button mat-icon-button aria-label="icon"
                   (click)="sidenav.toggle();toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -222,10 +227,10 @@
               <h2>Pre proccessing Step</h2>
               <div class="toolbar-mid"></div>
               <div calss="content-toolbar">
-                <button mat-icon-button aria-label="icon"  matTooltip="Cancel" (click)="cancelAutoML()">
+                <button mat-icon-button aria-label="icon" matTooltip="Cancel" (click)="cancelAutoML()">
                   <span class="mdi mdi-close"></span>
                 </button>
-                <button mat-icon-button aria-label="icon"  (click)="sidenav.toggle()"
+                <button mat-icon-button aria-label="icon" (click)="sidenav.toggle()"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
                     [ngClass]="{'mdi-fullscreen': sidenav.opened, 'mdi-fullscreen-exit': !sidenav.opened}"></span>
@@ -252,10 +257,10 @@
           Select Item
         </div>
         <div class="content-toolbar">
-          <button mat-icon-button aria-label="icon"  matTooltip="Cancel" (click)="closeFilter()">
+          <button mat-icon-button aria-label="icon" matTooltip="Cancel" (click)="closeFilter()">
             <span class="mdi mdi-close text-secondary"></span>
           </button>
-          <button mat-icon-button aria-label="icon"  matTooltip="Submit" (click)="closeFilter()">
+          <button mat-icon-button aria-label="icon" matTooltip="Submit" (click)="closeFilter()">
             <span class="mdi mdi-check text-secondary"></span>
           </button>
         </div>
@@ -269,7 +274,8 @@
                   <span class="mdi mdi-magnify"></span>
                 </span>
               </div>
-              <label for="filter">Filter</label><input type="text" class="form-control" [(ngModel)]="filter" placeholder="Filter" id="filter">
+              <label for="filter">Filter</label><input type="text" class="form-control" [(ngModel)]="filter"
+                placeholder="Filter" id="filter">
             </div>
           </div>
         </div>

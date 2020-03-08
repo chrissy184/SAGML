@@ -121,7 +121,7 @@ namespace ZMM.App.Controllers
                             {
                                 #region create quartz job for training model
                                 ITrigger trigger = TriggerBuilder.Create()
-                                .WithIdentity($"Uploading Model Job-{DateTime.Now}")
+                                .WithIdentity($"Uploading Code file-{DateTime.Now}")
                                 .WithPriority(1)
                                 .Build();
 

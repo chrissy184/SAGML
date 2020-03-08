@@ -1,6 +1,6 @@
 {
   "name": "mlw",
-  "version": "10.5.222",
+  "version": "10.6.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

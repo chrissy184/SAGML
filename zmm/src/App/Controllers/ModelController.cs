@@ -46,8 +46,9 @@ namespace ZMM.App.Controllers
         private List<DataResponse> dataResponseData;
         private static string[] extensions = new[] { "pmml", "onnx", "h5" };
         private readonly IScheduler _scheduler;
+        private static string deployedModelFileName = "DeployedModel.json"; 
         #endregion
-private static string deployedModelFileName = "DeployedModel.json"; 
+        
         #region Constructor
         public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log, IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, IPyTensorServiceClient tbClientInstance, IScheduler factory)
         {
@@ -486,6 +487,19 @@ private static string deployedModelFileName = "DeployedModel.json";
                     fileContent.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>,@,");
                     fileContent.Append("<PMML xmlns=\"http://www.dmg.org/PMML-4_3\" version=\"4.3Ext\" type=\"multi\">,@,");
                     fileContent.Append("<Header copyright=\"Copyright (c) 2018 Software AG\" description=\"Work Flow\">,@,");
+                    fileContent.Append("<Timestamp>" + DateTime.Now.ToString("yyyy-MM-dd H:mm:ss.") + TimeSpan.TicksPerMillisecond + "</Timestamp>,@,");
+                    fileContent.Append("</Header>,@,");
+                    fileContent.Append("<DeepNetwork>,@,");
+                    fileContent.Append("</DeepNetwork>,@,");
+                    fileContent.Append("</PMML>");
+                    //
+                }
+                else if (_type == "WFBETA")
+                {
+                    //create blank model data for WORKFLOW BETA                                    
+                    fileContent.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>,@,");
+                    fileContent.Append("<PMML xmlns=\"http://www.dmg.org/PMML-4_3\" version=\"4.3Ext\" type=\"multiBeta\">,@,");
+                    fileContent.Append("<Header copyright=\"Copyright (c) 2018 Software AG\" description=\"Work Flow Beta\">,@,");
                     fileContent.Append("<Timestamp>" + DateTime.Now.ToString("yyyy-MM-dd H:mm:ss.") + TimeSpan.TicksPerMillisecond + "</Timestamp>,@,");
                     fileContent.Append("</Header>,@,");
                     fileContent.Append("<DeepNetwork>,@,");

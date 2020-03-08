@@ -689,10 +689,10 @@ export class EditorComponent implements OnInit, OnChanges {
     this.getPreviousLayer($event.value);
     if ($event.value.layerId === 'NA') {
       $event.value.layerId = `${$event.value.name}_${this.flatLayers.length}`;
-      if (this.selectedModel.modelGeneratedFrom === 'Workflow' && $event.value.layerId === 'Section_1') {
+      if ((this.selectedModel.modelGeneratedFrom === 'Workflow' || this.selectedModel.modelGeneratedFrom === 'WorkflowBeta') && $event.value.layerId === 'Section_1') {
         $event.value.layerId = 'model1';
       }
-      if (this.selectedModel.modelGeneratedFrom === 'Workflow' && $event.value.layerId === 'Section_2') {
+      if ((this.selectedModel.modelGeneratedFrom === 'Workflow' || this.selectedModel.modelGeneratedFrom === 'WorkflowBeta') && $event.value.layerId === 'Section_2') {
         $event.value.layerId = 'model2';
       }
     }
@@ -843,9 +843,8 @@ export class EditorComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    if (this.selectedModel.modelGeneratedFrom !== 'Workflow') {
-      this.getLayers();
-    } else {
+
+    if (this.selectedModel.modelGeneratedFrom === 'Workflow') {
       this.sideBarGeneralItems.push(
         {
           'name': 'Model',
@@ -858,6 +857,21 @@ export class EditorComponent implements OnInit, OnChanges {
       for (let item of this.sideBarGeneralItems) {
         item.modelType = 'Workflow';
       }
+    } else if (this.selectedModel.modelGeneratedFrom === 'WorkflowBeta') {
+      this.sideBarGeneralItems.push(
+        {
+          'name': 'Model',
+          'icon': 'mdi mdi-xml',
+          'itemType': 'MODEL',
+          'layerId': 'Model',
+          'trainable': true
+        });
+      // adding model type key
+      for (let item of this.sideBarGeneralItems) {
+        item.modelType = 'WorkflowBeta';
+      }
+    } else {
+      this.getLayers();
     }
   }
 

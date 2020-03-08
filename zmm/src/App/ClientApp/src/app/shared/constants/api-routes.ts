@@ -58,5 +58,6 @@ export const ApiRoutes = {
     datahub: 'datahub',
 
     repo: 'repo',
-    repoGet: (id: string) => `repo/${id}`
+    repoGet: (id: string) => `repo/${id}`,
+    repoDownload: (id: string) => `repo/${id}/download`
 };

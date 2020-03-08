@@ -19,6 +19,7 @@ using ZMM.Helpers.ZMMDirectory;
 using Quartz;
 using Quartz.Impl;
 using System.Linq;
+using ZMM.Models.ClientJsonObjects;
 
 namespace ZMM.App.Controllers
 {
@@ -113,9 +114,11 @@ namespace ZMM.App.Controllers
                 {
                     resp = await nnclient.GetRunningTaskByTaskName(origid.Substring(0, origid.IndexOf(taskData.Name)));
                 }
-                resp = resp.Replace("\\","\\\\");
-                JObject joResp = JObject.Parse(resp);
-                JArray jArr = (JArray)joResp["runningTask"];
+                var joResp = JsonConvert.DeserializeObject<ZMM.Models.ClientJsonObjects.ZMKCodeExecution.RootObject>(resp);
+                JArray jArr = JArray.FromObject(joResp.runningTask);
+
+                // JObject joResp = JObject.Parse(resp);
+                // JArray jArr = (JArray)joResp["runningTask"];
                 //
                 if(taskData.Recurrence == "REPEAT")
                 {

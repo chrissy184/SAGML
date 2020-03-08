@@ -604,6 +604,7 @@ class NyokaServer:
 
 	def updatetoWorkflow(payload,projectID):
 		global MEMORY_DICT_ARCHITECTURE
+		# print ('MEMORY_DICT_ARCHITECTURE',MEMORY_DICT_ARCHITECTURE)
 
 		# print (payload)
 
@@ -656,7 +657,6 @@ class NyokaServer:
 			
 		from nyoka.skl.skl_to_pmml import model_to_pmml
 		processTheInput=payload
-		global MEMORY_DICT_ARCHITECTURE
 		try:
 			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']
 		except:
@@ -883,6 +883,158 @@ class NyokaServer:
 
 		return JsonResponse(message)
 
+	def updatetoWorkflowBeta(payload,projectID):
+		from nyoka import PMML43Ext as nyImp
+		from nyoka.skl import skl_to_pmml
+		print ('Came to Workflow Beta')
+
+		global MEMORY_DICT_ARCHITECTURE
+		# print ('MEMORY_DICT_ARCHITECTURE',MEMORY_DICT_ARCHITECTURE)
+
+		def getCodeObjectToProcess(codeVal):
+			d = {}
+			exec(codeVal, None,d)
+			objeCode=d[list(d.keys())[0]]
+			return objeCode
+			
+		processTheInput=payload
+		try:
+			MEMORY_DICT_ARCHITECTURE[projectID]['dictInfo']
+		except:
+			MEMORY_DICT_ARCHITECTURE[projectID]['dictInfo']={}
+		
+		try:
+			MEMORY_DICT_ARCHITECTURE[projectID]['tempSecMem']
+		except:
+			MEMORY_DICT_ARCHITECTURE[projectID]['tempSecMem']={}
+
+		try:
+			MEMORY_DICT_ARCHITECTURE[projectID]['models_dict']
+		except:
+			MEMORY_DICT_ARCHITECTURE[projectID]['models_dict']={}
+
+		tempMem=MEMORY_DICT_ARCHITECTURE[projectID]['dictInfo']
+		tempSecMem=MEMORY_DICT_ARCHITECTURE[projectID]['tempSecMem']
+		models_dict=MEMORY_DICT_ARCHITECTURE[projectID]['models_dict']
+		# print ('processTheInput,',processTheInput)
+		
+		if processTheInput['itemType']=='FOLDING':
+			tempSecMem[processTheInput['sectionId']]=processTheInput['layerId']
+			tempMem[tempSecMem[processTheInput['sectionId']]]={'data':None,'preProcessingScript':[],'modelObj':None,'postProcessingScript':[]}
+			# print (tempMem)
+
+		elif processTheInput['itemType']=='DATA':
+			tempDataObj=nyImp.Data(for_=tempSecMem[processTheInput['sectionId']],filePath=processTheInput['filePath'])
+			tempMem[tempSecMem[processTheInput['sectionId']]]['data']=[tempDataObj]
+		elif processTheInput['itemType']=='CODE':
+			scrps = []
+			scriptObj=open(processTheInput['filePath'],'r').read()
+			# print('scriptObj',scriptObj)
+			if processTheInput['taskType']=='preprocessing':
+				ct=skl_to_pmml.processScript(scriptObj)
+				scrps.append(pml.script(content=ct, 
+                                        for_= tempSecMem[processTheInput['sectionId']], 
+                                        class_ = 'preprocessing',
+                                        scriptPurpose = processTheInput['scriptPurpose'],
+                                        scriptOutput = processTheInput['scriptOutput'],
+                                        filePath=processTheInput['filePath']
+                                        ))
+				tempMem[tempSecMem[processTheInput['sectionId']]]['preProcessingScript']=scrps
+				
+			elif processTheInput['taskType']=='postprocessing':
+				ct=skl_to_pmml.processScript(scriptObj)
+				scrps.append(pml.script(content=ct, 
+                                        for_= tempSecMem[processTheInput['sectionId']], 
+                                        class_ = 'postprocessing',
+                                        scriptPurpose =processTheInput['scriptPurpose'],
+                                        scriptOutput = processTheInput['scriptOutput'],
+                                        filePath=processTheInput['filePath']
+                                        ))
+				tempMem[tempSecMem[processTheInput['sectionId']]]['postProcessingScript']=scrps
+				
+		
+		elif processTheInput['itemType']=='MODEL':
+			
+			modelPath=processTheInput['filePath']
+			checkList=['MiningBuildTask', 'DataDictionary', 'TransformationDictionary', 'AssociationModel', 'AnomalyDetectionModel', 'BayesianNetworkModel', 'BaselineModel',
+						'ClusteringModel', 'DeepNetwork', 'GaussianProcessModel', 'GeneralRegressionModel', 'MiningModel', 'NaiveBayesModel', 'NearestNeighborModel', 'NeuralNetwork',
+						'RegressionModel', 'RuleSetModel', 'SequenceModel', 'Scorecard', 'SupportVectorMachineModel', 'TextModel', 'TimeSeriesModel', 'TreeModel', 'Extension']
+			pmmlModelObj=nyImp.parse(modelPath,silence=True)
+			
+			for toCh in checkList:
+				if pmmlModelObj.__dict__[toCh] == None:
+					pass
+				elif pmmlModelObj.__dict__[toCh] == []:
+					pass
+				else:
+					models_dict[toCh]=pmmlModelObj.__dict__[toCh]
+
+			
+
+		filetoSave=MEMORY_DICT_ARCHITECTURE[projectID]['filePath']
+		# print (tempMem)
+		scriptObjVal=[]
+		if tempMem[tempSecMem[processTheInput['sectionId']]]['preProcessingScript'] != []:
+			for echEle in tempMem[tempSecMem[processTheInput['sectionId']]]['preProcessingScript']:
+				scriptObjVal.append(echEle )
+		if tempMem[tempSecMem[processTheInput['sectionId']]]['postProcessingScript'] != []:
+			for echEle2 in tempMem[tempSecMem[processTheInput['sectionId']]]['postProcessingScript']:
+				scriptObjVal.append(echEle2 )
+
+		pmmlCreated = nyImp.PMML(
+							version=skl_to_pmml.get_version(),
+							Header=skl_to_pmml.get_header(),
+							Data=tempMem[tempSecMem[processTheInput['sectionId']]]['data'],
+							script = scriptObjVal,
+							type_='multiBeta',
+							**models_dict
+						)
+		pmmlCreated.export(outfile=open(filetoSave, "w"), level=0)
+			
+		
+		MEMORY_DICT_ARCHITECTURE[projectID]['dictInfo']=tempMem.copy()
+		MEMORY_DICT_ARCHITECTURE[projectID]['tempSecMem']=tempSecMem.copy()
+
+		returntoClient={'projectID':projectID,'layerUpdated':processTheInput}
+		return JsonResponse(returntoClient)
+
+	def deleteWorkflowBetalayer(payload,projectID):
+		# print ('/npayload',payload)
+		global MEMORY_DICT_ARCHITECTURE
+		if 'toExportDict' in MEMORY_DICT_ARCHITECTURE[projectID]:
+			tempMemoryToReplace=MEMORY_DICT_ARCHITECTURE[projectID]#['toExportDict']
+			toExportDictExist=tempMemoryToReplace['toExportDict']
+			tempSecMemModelInfo=tempMemoryToReplace['tempSecMem']
+			# print (toExportDictExist)
+
+			modelFromWhereToDelete=tempSecMemModelInfo[payload['layerDelete']['sectionId']]
+
+			if payload['layerDelete']['name']=='Code':
+				if payload['layerDelete']['taskType']=='postprocessing':
+					toExportDictExist[modelFromWhereToDelete]['postProcessingScript']=None
+				elif payload['layerDelete']['taskType']=='preprocessing':
+					toExportDictExist[modelFromWhereToDelete]['preProcessingScript']=None
+
+			if payload['layerDelete']['name']=='Data':
+				toExportDictExist[modelFromWhereToDelete]['data']=None
+
+			if payload['layerDelete']['name']=='Model':
+				toExportDictExist[modelFromWhereToDelete]['modelObj']=None
+
+
+			MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']=toExportDictExist
+
+			from nyoka.skl.skl_to_pmml import model_to_pmml
+			model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
+
+
+			# print ('/n  ************************* ',MEMORY_DICT_ARCHITECTURE[projectID])
+			
+			message={'message':'Success'}
+		else:
+			message={'message':'Failure'}
+		return JsonResponse(message)
+
 	def getGlobalObject():
 		global MEMORY_DICT_ARCHITECTURE
 		# print (MEMORY_DICT_ARCHITECTURE)
@@ -898,12 +1050,12 @@ class NyokaServer:
 			for kk in tempObj['DeepNetwork'][0].NetworkLayer:
 				layerList.append(kk.get_layerType())
 
-			if (len(tempObj['script']) >=1) or ('LSTM' in layerList) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
+			if (len(tempObj['script']) >=1) or ('LSTM' in layerList) or (tempObj['Header'].__dict__['description'] in ['Work Flow','Work Flow Beta']):
 				deployInfo=False
 			else:
 				deployInfo=True
 		else:
-			if (len(tempObj['script']) >=1) or (tempObj['Header'].__dict__['description'] == 'Work Flow'):
+			if (len(tempObj['script']) >=1) or (tempObj['Header'].__dict__['description'] in ['Work Flow','Work Flow Beta']):
 				deployInfo=False
 			else:
 				deployInfo=True
@@ -955,6 +1107,8 @@ class NyokaServer:
 		
 		# print('response sent',allInfo)
 		return JsonResponse(allInfo)
+
+
 
 
 	

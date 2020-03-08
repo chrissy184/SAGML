@@ -121,6 +121,8 @@ class PMMLLayerView(APIView):
 		if 'modelType' in payload:
 			if payload['modelType']== 'Workflow':
 				return NyokaServer.updatetoWorkflow(payload,projectID)
+			elif payload['modelType']== 'WorkflowBeta':
+				return NyokaServer.updatetoWorkflowBeta(payload,projectID)
 		else:
 			return NyokaServer.updatetoArchitecture(payload,projectID)
 
