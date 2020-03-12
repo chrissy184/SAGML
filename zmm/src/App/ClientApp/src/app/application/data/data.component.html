@@ -10,15 +10,16 @@
                 <span class="mdi mdi-magnify"></span>
               </span>
             </div>
-            <label for="filter">Filter</label><input type="text" class="form-control" [(ngModel)]="filter" placeholder="Filter" id="filter">
+            <label for="filter">Filter</label><input type="text" class="form-control" [(ngModel)]="filter"
+              placeholder="Filter" id="filter">
           </div>
         </div>
       </div>
       <div class="content-toolbar">
-        <button mat-icon-button aria-label="icon"  matTooltip="Refresh" (click)="refresh()">
+        <button mat-icon-button aria-label="icon" matTooltip="Refresh" (click)="refresh()">
           <span class="mdi mdi-refresh text-secondary"></span>
         </button>
-        <button mat-icon-button aria-label="icon"  matTooltip="Import Data" [matMenuTriggerFor]="newDataMenu">
+        <button mat-icon-button aria-label="icon" matTooltip="Import Data" [matMenuTriggerFor]="newDataMenu">
           <span class="mdi mdi-file-plus text-secondary"></span>
         </button>
         <mat-menu #newDataMenu="matMenu">
@@ -35,7 +36,7 @@
         <!-- <button mat-icon-button aria-label="icon"  matTooltip="Upload Data from Cumulocity" (click)="uploadNewCumulocityData()">
           <span class="mdi mdi-file-upload text-secondary"></span>
         </button> -->
-        <button mat-icon-button aria-label="icon"  matTooltip="Upload Data" (click)="uploadNewFiles()">
+        <button mat-icon-button aria-label="icon" matTooltip="Upload Data" (click)="uploadNewFiles()">
           <span class="mdi mdi-cloud-upload text-secondary"></span>
         </button>
       </div>
@@ -80,29 +81,30 @@
                   matTooltip="New AutoML" (click)="newAutoML()">
                   <span class="mdi mdi-file-plus text-secondary"></span>
                 </button>
-                <button mat-icon-button aria-label="icon"  matTooltip="Predict Data" [matMenuTriggerFor]="newPredictDataMenu">
+                <button mat-icon-button aria-label="icon" matTooltip="Predict Data"
+                  [matMenuTriggerFor]="newPredictDataMenu">
                   <span class="mdi mdi-file-chart text-secondary"></span>
                 </button>
                 <mat-menu #newPredictDataMenu="matMenu">
                   <button mat-menu-item (click)="predictData('ZMK')">
-                    Zementis Modeler
+                    Machine Learning Workbench
                   </button>
                   <button mat-menu-item (click)="predictData('ZS')">
-                    Zementis Server
+                    Machine Learning Engine
                   </button>
                 </mat-menu>
 
-                <button mat-icon-button aria-label="icon"  matTooltip="Preview" (click)="previewData()">
+                <button mat-icon-button aria-label="icon" matTooltip="Preview" (click)="previewData()">
                   <span class="mdi mdi-eye-outline text-secondary"></span>
                 </button>
 
-                <button mat-icon-button aria-label="icon"  matTooltip="Download" (click)="dowloadData()">
+                <button mat-icon-button aria-label="icon" matTooltip="Download" (click)="dowloadData()">
                   <span class="mdi mdi-download text-secondary"></span>
                 </button>
 
                 <app-confirmationbar [message]="message" (confirmDelete)="deleteData()"></app-confirmationbar>
 
-                <button mat-icon-button aria-label="icon" 
+                <button mat-icon-button aria-label="icon"
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -139,7 +141,7 @@
                   (click)="uploadFilesDone()">
                   <span class="mdi mdi-close text-secondary"></span>
                 </button>
-                <button mat-icon-button aria-label="icon" 
+                <button mat-icon-button aria-label="icon"
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -164,10 +166,10 @@
               <h2>Pre proccessing Step</h2>
               <div class="toolbar-mid"></div>
               <div calss="content-toolbar">
-                <button mat-icon-button aria-label="icon"  matTooltip="Cencel" (click)="goToInfoTab()">
+                <button mat-icon-button aria-label="icon" matTooltip="Cencel" (click)="goToInfoTab()">
                   <span class="mdi mdi-close"></span>
                 </button>
-                <button mat-icon-button aria-label="icon" 
+                <button mat-icon-button aria-label="icon"
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -189,10 +191,10 @@
               <h2>Connect to Cumulocity</h2>
               <div class="toolbar-mid"></div>
               <div calss="content-toolbar">
-                <button mat-icon-button aria-label="icon"  matTooltip="Cencel" (click)="goToInfoTab()">
+                <button mat-icon-button aria-label="icon" matTooltip="Cencel" (click)="goToInfoTab()">
                   <span class="mdi mdi-close"></span>
                 </button>
-                <button mat-icon-button aria-label="icon" 
+                <button mat-icon-button aria-label="icon"
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -219,7 +221,8 @@
                   (click)="newAutoML()">
                   <span class="mdi mdi-file-plus text-secondary"></span>
                 </button>
-                <button mat-icon-button aria-label="icon"  matTooltip="Predict Data" [matMenuTriggerFor]="newPredictDataMenu">
+                <button mat-icon-button aria-label="icon" matTooltip="Predict Data"
+                  [matMenuTriggerFor]="newPredictDataMenu">
                   <span class="mdi mdi-file-chart text-secondary"></span>
                 </button>
                 <mat-menu #newPredictDataMenu="matMenu">
@@ -231,19 +234,19 @@
                   </button>
                 </mat-menu>
 
-                <button mat-icon-button aria-label="icon"  matTooltip="Download" (click)="dowloadData()">
+                <button mat-icon-button aria-label="icon" matTooltip="Download" (click)="dowloadData()">
                   <span class="mdi mdi-download text-secondary"></span>
                 </button>
 
                 <app-confirmationbar [message]="message" (confirmDelete)="deleteData()"></app-confirmationbar>
 
-                <button mat-icon-button aria-label="icon" 
+                <button mat-icon-button aria-label="icon"
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
                     [ngClass]="{'mdi-fullscreen': sidenav.opened, 'mdi-fullscreen-exit': !sidenav.opened}"></span>
                 </button>
-                <button mat-icon-button aria-label="icon"  matTooltip="Close" (click)="goToInfoTab()">
+                <button mat-icon-button aria-label="icon" matTooltip="Close" (click)="goToInfoTab()">
                   <span class="mdi mdi-close text-secondary"></span>
                 </button>
               </div>
@@ -281,10 +284,10 @@
               <h2>Base Image Preview</h2>
               <div class="toolbar-mid"></div>
               <div calss="content-toolbar">
-                <button mat-icon-button aria-label="icon"  matTooltip="Cencel" (click)="goToInfoTab()">
+                <button mat-icon-button aria-label="icon" matTooltip="Cencel" (click)="goToInfoTab()">
                   <span class="mdi mdi-close"></span>
                 </button>
-                <button mat-icon-button aria-label="icon" 
+                <button mat-icon-button aria-label="icon"
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
@@ -308,7 +311,7 @@
               <h2>Connect to Datahub</h2>
               <div class="toolbar-mid"></div>
               <div calss="content-toolbar">
-                <button mat-icon-button aria-label="icon"  matTooltip="Submit" (click)="dataHubFormSubmit()"
+                <button mat-icon-button aria-label="icon" matTooltip="Submit" (click)="dataHubFormSubmit()"
                   [disabled]="!dataHubFormData.sql">
                   <span class="mdi mdi-check text-secondary"></span>
                 </button>
@@ -316,7 +319,7 @@
                   (click)="uploadFilesDone()">
                   <span class="mdi mdi-close text-secondary"></span>
                 </button>
-                <button mat-icon-button aria-label="icon" 
+                <button mat-icon-button aria-label="icon"
                   (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
                   [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
                   <span class="mdi text-secondary"
