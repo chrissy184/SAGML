@@ -13,14 +13,25 @@ namespace ZMM.App
 {
     public class Program
     {
-        
+        #region Variables to get Web Hosting configurations i.e. Http or Https port       
+        private static IConfiguration Configuration { get; set; }
+        private static readonly string AppSettingsFilePrefix = "appsettings";
+        private static readonly string AppSettingsFileExtension = ".json";
+        private static readonly string AppSettingsDevelopmentName = ".Development";
+        #endregion
         public static void Main(string[] args)
-        {         
-            CreateWebHostBuilder(args).Build().Run();            
+        {   
+
+            ConfigurationBuilder Builder = new ConfigurationBuilder();
+            Builder.SetBasePath(Directory.GetCurrentDirectory()).AddEnvironmentVariables().AddJsonFile(GetAppSettingFile());
+            Configuration = Builder.Build(); 
+            IWebHostBuilder HostBuilder = CreateWebHostBuilder(args);
+            HostBuilder.UseUrls("http://+:" + Configuration["WebHosting:HttpPort"] +";https://+:" + Configuration["WebHosting:HttpsPort"]);
+            HostBuilder.Build().Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+            WebHost.CreateDefaultBuilder(args)            
             .ConfigureAppConfiguration((hostingContext, config) =>
             {                
                 config.AddCommandLine(args);
@@ -33,7 +44,16 @@ namespace ZMM.App
                 logging.AddEventSourceLogger();
             })   
             .UseStartup(Assembly.GetEntryAssembly().FullName)
-            .UseKestrel(opt => opt.AddServerHeader = false)
-            .UseUrls("http://+:7007;https://+:7008");
+            .UseKestrel(opt => opt.AddServerHeader = false);
+        
+        private static string GetAppSettingFile()
+        {
+            string AppSettingsFile;
+            string EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            bool IsDefaultProduction = EnvironmentName.ToLower().Equals("production");
+            if(IsDefaultProduction) AppSettingsFile = AppSettingsFilePrefix + AppSettingsFileExtension;
+            else AppSettingsFile = AppSettingsFilePrefix + "." + EnvironmentName + AppSettingsFileExtension;
+            return AppSettingsFile;
+        }
     }
 }
