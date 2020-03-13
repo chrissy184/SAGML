@@ -41,6 +41,7 @@ export class HeaderComponent implements OnInit {
     this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.accountUserInfo)
       .subscribe(response => {
         this.userInfo = response;
+        ApiRoutes.loginRedirect = ApiRoutes.loginRedirect.replace('$realmname', this.userInfo.realm);
       });
   }
   logout() {
