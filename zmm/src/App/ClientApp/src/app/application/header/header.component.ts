@@ -47,7 +47,7 @@ export class HeaderComponent implements OnInit {
   logout() {
     this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.accountLogout)
       .subscribe(response => {
-        console.log('explicitly redirecting to login page');
+        console.log('explicitly redirecting to login page ' + ApiRoutes.loginRedirect);
         this.goToUrl(ApiRoutes.loginRedirect);
       });
   }
