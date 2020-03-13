@@ -54,7 +54,7 @@ namespace ZMM.App.Controllers
                 if(Cl.Type.Equals("name")) Result["name"] = Cl.Value;
                 else if(Cl.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")) Result["email"] = Cl.Value;
                 else if(Cl.Type.Equals("role")) Result["role"] = Cl.Value;
-            }
+            }            
             return new JsonResult(Result);
         }
         
@@ -74,17 +74,17 @@ namespace ZMM.App.Controllers
         [HttpGet("~/api/account/userInfo")]   
         public async Task<IActionResult> GetGravatarImage()
         {
+            Dictionary<string,string> Result = new Dictionary<string, string>();    
             await Task.FromResult(0);
-            string gravatarUrl="";
             string userEmail = this.GetUserEmail() ;
             using (MD5 md5Hash = MD5.Create())
             {
                 string hash = MD5Helper.GetMd5Hash(md5Hash, userEmail);
                 if (MD5Helper.VerifyMd5Hash(md5Hash, userEmail, hash))
                 {                   
-                    gravatarUrl = "{'gravtarUrl': 'https://gravatar.com/avatar/" + hash +"?d=404'}";
-                    JObject jObj = JObject.Parse(gravatarUrl);
-                    return Json(jObj);
+                    Result.Add("gravtarUrl", "https://gravatar.com/avatar/" + hash +"?d=404");
+                    Result.Add("realm", Configuration["Authentication:OIDC:Realm"]);
+                    return new JsonResult(Result);
                 } 
                 else
                 {
