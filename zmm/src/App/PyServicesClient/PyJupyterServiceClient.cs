@@ -12,9 +12,9 @@ namespace ZMM.App.PyServicesClient
         
         private JupyterNotebook JupyterNotebookTool;
         
-        public PyJupyterServiceClient(string HostURL)
+        public PyJupyterServiceClient(string HostURL, string RoutePrefix, int[] PortRangeInUse)
         {  
-            JupyterNotebookTool = new JupyterNotebook(HostURL);          
+            JupyterNotebookTool = new JupyterNotebook(HostURL, RoutePrefix, PortRangeInUse);          
         }      
 
         public JupyterNotebook GetJupyterNotebookTool()

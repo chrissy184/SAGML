@@ -30,20 +30,21 @@ namespace ZMM.Tools.JNB
     } 
 
     public class JupyterNotebook : Tool
-    {
-
-        
+    {        
         protected static string HostURL = "http://localhost";
-
         private const string  TokenPattern = "?token=";
+
+        private static string RoutePrefix = "/jnb";
 
         //We can add this to configuration
         private static List<int> ListOfAllowedPorts = new List<int> { 8888, 8889, 8890 };
 
-        public JupyterNotebook(string Host) : base(ToolTypes.JupyterNotebook, Host.Contains("https")) 
+        public JupyterNotebook(string Host, string HostRoutePrefix, int[] InstancePortsToUse) : base(ToolTypes.JupyterNotebook, Host.Contains("https")) 
         {
              HostURL = Host;
-        }        
+             RoutePrefix = HostRoutePrefix;
+             InitInstancePortsInUse(InstancePortsToUse, ref ListOfAllowedPorts);
+        }       
 
         public void StartTaskAsync(int taskType, string taskName, JObject info)
         {
@@ -103,7 +104,7 @@ namespace ZMM.Tools.JNB
         private string GetLinkPrefix(int Port)
         {
             int Index = ListOfAllowedPorts.FindIndex(x => x == Port) + 1;
-            string Prefix = "/jnb" + Index.ToString();
+            string Prefix = RoutePrefix + Index.ToString();
             return Prefix;
         }
 
@@ -168,7 +169,7 @@ namespace ZMM.Tools.JNB
             }
             System.Threading.Thread.Sleep(1000);
             return tokenId;
-        }
+        }      
         
     }
 }

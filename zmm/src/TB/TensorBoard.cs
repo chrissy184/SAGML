@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -21,14 +21,18 @@ namespace ZMM.Tools.TB
     {
         protected static string HostURL = "http://localhost";
 
+        private static string RoutePrefix = "/tb";
+
         protected static string DataLogParentDirectory = string.Empty;
 
         //We can add this to configuration
         private static List<int> ListOfAllowedPorts = new List<int> { 6006, 6007, 6008 };
 
-        public TensorBoard(string Host, string dataDirectory) : base(ToolTypes.TensorBoard, Host.Contains("https")) 
+        public TensorBoard(string Host, string HostRoutePrefix, int[] InstancePortsToUse, string dataDirectory) : base(ToolTypes.TensorBoard, Host.Contains("https")) 
         {
             HostURL = Host;
+            RoutePrefix = HostRoutePrefix;
+            InitInstancePortsInUse(InstancePortsToUse, ref ListOfAllowedPorts);
             DataLogParentDirectory = dataDirectory + System.IO.Path.DirectorySeparatorChar + "logs";
         }
 
@@ -86,7 +90,7 @@ namespace ZMM.Tools.TB
         private string GetLinkPrefix(int Port)
         {
             int Index = ListOfAllowedPorts.FindIndex(x => x == Port) + 1;
-            string Prefix = "/tb" + Index.ToString() + "/";
+            string Prefix = RoutePrefix + Index.ToString() + "/";
             return Prefix;
         }
 
