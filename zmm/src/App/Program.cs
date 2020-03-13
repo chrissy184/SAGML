@@ -20,10 +20,9 @@ namespace ZMM.App
         private static readonly string AppSettingsDevelopmentName = ".Development";
         #endregion
         public static void Main(string[] args)
-        {   
-
+        {
             ConfigurationBuilder Builder = new ConfigurationBuilder();
-            Builder.SetBasePath(Directory.GetCurrentDirectory()).AddEnvironmentVariables().AddJsonFile(GetAppSettingFile());
+            Builder.SetBasePath(Directory.GetCurrentDirectory()).AddEnvironmentVariables().AddJsonFile(GetAppSettingFile(args));
             Configuration = Builder.Build(); 
             IWebHostBuilder HostBuilder = CreateWebHostBuilder(args);
             HostBuilder.UseUrls("http://+:" + Configuration["WebHosting:HttpPort"] +";https://+:" + Configuration["WebHosting:HttpsPort"]);
@@ -46,11 +45,15 @@ namespace ZMM.App
             .UseStartup(Assembly.GetEntryAssembly().FullName)
             .UseKestrel(opt => opt.AddServerHeader = false);
         
-        private static string GetAppSettingFile()
+        private static string GetAppSettingFile(string[] args)
         {
             string AppSettingsFile;
-            string EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            bool IsDefaultProduction = EnvironmentName.ToLower().Equals("production");
+            bool IsDefaultProduction = true;
+            string EnvironmentName = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if(string.IsNullOrEmpty(EnvironmentName) && args.Length > 0)  EnvironmentName = args[0].Substring(14);
+            else if(string.IsNullOrEmpty(EnvironmentName) && args.Length == 0) EnvironmentName = "production";
+            IsDefaultProduction = EnvironmentName.ToLower().Equals("production");
+            Console.WriteLine("Environment " + EnvironmentName);
             if(IsDefaultProduction) AppSettingsFile = AppSettingsFilePrefix + AppSettingsFileExtension;
             else AppSettingsFile = AppSettingsFilePrefix + "." + EnvironmentName + AppSettingsFileExtension;
             return AppSettingsFile;
