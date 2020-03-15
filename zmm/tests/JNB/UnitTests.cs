@@ -29,7 +29,7 @@ namespace ZMM.JNB.Tests
 
         static readonly string ExceptionAfterAllInstanceRunning = "It reaches maximum number of allowed jupyter notebook instance. Please, stop previously running notebook from \"Assets\" or contact Administrator.";
         static internal string JNBFourthFile = TestDir + DirectoryPathSeperator + "HelloWorld4.ipynb" + DirectoryPathSeperator + "HelloWorld4.ipynb";
-        public static JupyterNotebook JupyterNotebookTool = new JupyterNotebook("http://localhost");
+        public static JupyterNotebook JupyterNotebookTool = new JupyterNotebook("http://localhost", "/jnb", new int[] {8888,8890});
 
         /**************** Usecase (s) *****************************
         //FindWhenThereIsNoInstanceRunning
@@ -123,7 +123,7 @@ namespace ZMM.JNB.Tests
         [Trait("Category", "JNB")]
         public void StartAllAllowedInstances()
         {
-            JupyterNotebookTool = new JupyterNotebook("http://localhost");
+            JupyterNotebookTool = new JupyterNotebook("http://localhost", "/jnb", new int[] {8888,8890});
             System.Console.WriteLine("Start Test : StartAllAllowedInstances");
             var obj = new
             {

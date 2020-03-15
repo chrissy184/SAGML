@@ -39,7 +39,7 @@ namespace ZMM.TB.Tests
             {
                 string LogDirectory = System.Environment.CurrentDirectory + System.IO.Path.DirectorySeparatorChar + "logs";
                 if(!Directory.Exists(LogDirectory)) Directory.CreateDirectory(LogDirectory);
-                TensorBoardTool = new TensorBoard("http://localhost", LogDirectory);
+                TensorBoardTool = new TensorBoard("http://localhost", "/tb", new int[] {6006,6008}, LogDirectory);
             }
         }
         /**************** Usecase (s) *****************************

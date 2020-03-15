@@ -93,7 +93,57 @@ namespace ZMM.App.Controllers
         }
         #endregion
 
-        
+        #region Post Resource Info to add
+        [HttpPost("/api/repo/{id}/download")]
+        /// <summary>
+        /// Get Resource meta data (info) from UMOYA (Repo) Server.
+        /// </summary>
+        /// <returns>Resource meta data (info)</returns>
+        /// <response code="200">Return resource meta data(info) along with list of version(s)</response>
+        /// <response code="400">If any error when getting resource(s) from UMOYA (Repo) Server </response>      
+        [Produces("application/json")]    
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> Download(string id)
+        {
+            try
+            {
+                bool response = true;
+                string reqBody = string.Empty;
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var body = reader.ReadToEnd();
+                    reqBody = body.ToString();
+                }
+                if (!string.IsNullOrEmpty(reqBody))
+                {
+                    try
+                    {                        
+                        JObject rB = JObject.Parse(reqBody);
+                        //userModelName = (string)rB["parameters"]["model_name"];
+                        Resource TempResource = new Resource();
+                        TempResource.Id = (string)rB["id"];
+                        TempResource.Version = (string)rB["version"];
+                        response = await Client.Add(TempResource);
+                    }
+                    catch (Exception ex)
+                    {
+                        //TO DO: ILogger
+                        string _ex = ex.Message;
+                    }
+                    return Ok();
+                }
+                else
+                {
+                    return NotFound();
+                }                
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }            
+        }
+        #endregion       
         
     }
 }

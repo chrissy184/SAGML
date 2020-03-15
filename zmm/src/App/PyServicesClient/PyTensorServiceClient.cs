@@ -12,9 +12,9 @@ namespace ZMM.App.PyServicesClient
 
         private TensorBoard TensorBoardTool;
         
-        public PyTensorServiceClient(string HostURL, string ContentDir)
+        public PyTensorServiceClient(string HostURL, string RoutePrefix, int[] PortRangeInUse, string ContentDir)
         {   
-            TensorBoardTool = new TensorBoard(HostURL, ContentDir + System.IO.Path.DirectorySeparatorChar + "data");          
+            TensorBoardTool = new TensorBoard(HostURL, RoutePrefix, PortRangeInUse, ContentDir + System.IO.Path.DirectorySeparatorChar + "data");          
         }        
 
         public TensorBoard GetTensorBoardTool()

@@ -202,5 +202,14 @@ namespace ZMM.Tasks
             return Status;            
         }
 
+        public void InitInstancePortsInUse(int[] ListOfPorts, ref List<int> ListOfAllowedPorts)
+        {
+            if(ListOfPorts.Length > 0) 
+            {   
+                ListOfAllowedPorts.Clear();
+                ListOfAllowedPorts.AddRange(Enumerable.Range(ListOfPorts[0], ListOfPorts[1] - ListOfPorts[0] + 1).ToList());
+            }
+        }
+
     }
 }

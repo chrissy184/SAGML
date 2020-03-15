@@ -200,6 +200,10 @@ namespace ZMM.App.Controllers
                             response.Add(newRecord);
                         }
                     }
+                    else
+                    {
+                            return Conflict(new { message = "File already exists.", error = "File already exists."});
+                    }
                 }
                 IsFileExists = false;
             }

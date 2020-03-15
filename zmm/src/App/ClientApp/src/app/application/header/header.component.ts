@@ -41,12 +41,13 @@ export class HeaderComponent implements OnInit {
     this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.accountUserInfo)
       .subscribe(response => {
         this.userInfo = response;
+        ApiRoutes.loginRedirect = ApiRoutes.loginRedirect.replace('$realmname', this.userInfo.realm);
       });
   }
   logout() {
     this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.accountLogout)
       .subscribe(response => {
-        console.log('explicitly redirecting to login page');
+        console.log('explicitly redirecting to login page ' + ApiRoutes.loginRedirect);
         this.goToUrl(ApiRoutes.loginRedirect);
       });
   }

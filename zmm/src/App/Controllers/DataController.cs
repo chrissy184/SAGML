@@ -177,6 +177,7 @@ namespace ZMM.App.Controllers
                                 if (record.Name == fileName)
                                 {
                                     IsFileExists = true;
+                                    break;
                                 }
                             }
                         }
@@ -293,6 +294,10 @@ namespace ZMM.App.Controllers
                             };
                             //
                             _response.Add(DataPayload.Create(newRecord));
+                        }
+                        else
+                        {
+                             return Conflict(new { message = "File already exists.", error = "File already exists."});
                         }
                     }
                 }

@@ -127,18 +127,25 @@ namespace ZMM.App
             #region Initialize clients in singleton service
             var pySrvLocation = Configuration["PyServiceLocation:srvurl"];
             var zadSrvLocation = Configuration["ZS:srvurl"];
-            string ToolHostURL = Configuration["Tool:Host"];
+            string ToolHostURL = Configuration["Tools:Host"];
+            int[] JupyterNotebookPortRangeInUse = new int[] { int.Parse(Configuration["Tools:JupyterNotebook:PortRangeInUse:Lower"]), int.Parse(Configuration["Tools:JupyterNotebook:PortRangeInUse:Upper"])};
+            string JupyterNotebookRoutePrefix = Configuration["Tools:JupyterNotebook:RoutePrefix"];
+            int[] TensorBoardPortRangeInUse = new int[] { int.Parse(Configuration["Tools:TensorBoard:PortRangeInUse:Lower"]), int.Parse(Configuration["Tools:TensorBoard:PortRangeInUse:Upper"])};
+            string TensorBoardRoutePrefix = Configuration["Tools:TensorBoard:RoutePrefix"];
+            string RepoURL = Configuration["Repo:URL"];
+            string RepoAPIVersion = Configuration["Repo:APIVersion"];
+            string RepoPAT = Configuration["Repo:PAT"];
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<IPyNNServiceClient>(new PyNNServiceClient(Configuration));
             services.AddSingleton<IPyAutoMLServiceClient>(new PyAutoMLServiceClient(Configuration));
             services.AddSingleton<IBaseImageForWielding>(new BaseImageForWielding(Configuration));
-            services.AddSingleton<IPyJupyterServiceClient>(new PyJupyterServiceClient(ToolHostURL));
+            services.AddSingleton<IPyJupyterServiceClient>(new PyJupyterServiceClient(ToolHostURL, JupyterNotebookRoutePrefix ,JupyterNotebookPortRangeInUse));
             services.AddSingleton<IPyZMEServiceClient>(new PyZMEServiceClient(Configuration));
             services.AddSingleton<IZSModelPredictionClient>(new ZSModelPredictionClient(Configuration));      
-            services.AddSingleton<IPyTensorServiceClient>(new PyTensorServiceClient(ToolHostURL,ContentDir));
+            services.AddSingleton<IPyTensorServiceClient>(new PyTensorServiceClient(ToolHostURL,TensorBoardRoutePrefix,TensorBoardPortRangeInUse,ContentDir));
             services.AddSingleton<IPyCompile>(new PyCompile(Configuration));  
             services.AddSingleton(provider => GetScheduler());
-            services.AddSingleton<IRepoClient>(new RepoClient(Configuration));
+            services.AddSingleton<IRepoClient>(new RepoClient(RepoURL, RepoAPIVersion, RepoPAT));
 
             #endregion
 

@@ -28,6 +28,69 @@
 
     
     {
+      "URLPattern" : "/jnb4", 
+      "EnableAuthentication" : true,
+      "EnableWebSocket" : true,
+      "ResolveHost" : "localhost",
+      "ResolvePort" : "8891"   
+    },
+
+    
+    {
+      "URLPattern" : "/jnb5", 
+      "EnableAuthentication" : true,
+      "EnableWebSocket" : true,
+      "ResolveHost" : "localhost",
+      "ResolvePort" : "8892"   
+    },
+
+    
+    {
+      "URLPattern" : "/jnb6", 
+      "EnableAuthentication" : true,
+      "EnableWebSocket" : true,
+      "ResolveHost" : "localhost",
+      "ResolvePort" : "8893"   
+    },
+
+    
+    {
+      "URLPattern" : "/jnb7", 
+      "EnableAuthentication" : true,
+      "EnableWebSocket" : true,
+      "ResolveHost" : "localhost",
+      "ResolvePort" : "8894"   
+    },
+
+    
+    {
+      "URLPattern" : "/jnb8", 
+      "EnableAuthentication" : true,
+      "EnableWebSocket" : true,
+      "ResolveHost" : "localhost",
+      "ResolvePort" : "8895"   
+    },
+
+    
+    {
+      "URLPattern" : "/jnb9", 
+      "EnableAuthentication" : true,
+      "EnableWebSocket" : true,
+      "ResolveHost" : "localhost",
+      "ResolvePort" : "8896"   
+    },
+
+    
+    {
+      "URLPattern" : "/jnb10", 
+      "EnableAuthentication" : true,
+      "EnableWebSocket" : true,
+      "ResolveHost" : "localhost",
+      "ResolvePort" : "8897"   
+    },
+
+    
+    {
       "URLPattern" : "/tb1", 
       "EnableAuthentication" : true,
       "EnableWebSocket" : true,
