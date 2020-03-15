@@ -10,7 +10,7 @@ namespace ZMM.App.Clients.Repo
         Task<IEnumerable<Resource>> Get();
         Task<ResourceInfo> Get(string ResourceId);
         Task<IEnumerable<Resource>> Get(string ResourceType, string QueryString);
-        Task<IRepoResponse> Add(Resource ResourceInfo);
+        Task<bool> Add(Resource ResourceInfo);
         Task<IRepoResponse> Delete(Resource ResourceInfo);
         Task<IRepoResponse> Publish(Resource ResourceInfo);
         Task<IRepoResponse> Compress();
