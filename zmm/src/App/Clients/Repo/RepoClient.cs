@@ -19,12 +19,22 @@ namespace ZMM.App.Clients.Repo
     {
 
         private List<string> ResourceTypes = new List<string>(){"model", "code", "data"};
-        public IConfiguration Config { get; }  
+        
         readonly ILogger<RepoClient> Logger;
 
-        public RepoClient(IConfiguration Conf)
-        {
-            this.Config = Conf;
+        private string RepoURL, RepoAPIVersion, RepoPAT;
+
+        public RepoClient(string RepoURL, string RepoAPIVersion, string RepoPAT)
+        {            
+            this.RepoURL = RepoURL;
+            this.RepoAPIVersion = RepoAPIVersion;
+            this.RepoPAT = RepoPAT;
+            UMOYA.Instance.Init(RepoURL, RepoAPIVersion, this.RepoPAT);
+            Constants.RepoURL = Constants.RepoURL.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
+            Constants.RepoURLQueryByResourceType = Constants.RepoURLQueryByResourceType.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
+            Constants.RepoURLQuery = Constants.RepoURLQuery.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
+            Constants.RepoURLQueryByResourceTypeAndQueryString = Constants.RepoURLQuery.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
+            Constants.RepoURLByResourceId = Constants.RepoURLQuery.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
         }
 
         public async Task<IEnumerable<Resource>> Get()

@@ -16,7 +16,6 @@ namespace ZMM.App.Clients.Repo
                 if(instance==null)
                 {
                     instance = new UMOYA();
-                    instance.Init();
                 }
                 return instance;                
             }
@@ -27,17 +26,18 @@ namespace ZMM.App.Clients.Repo
             ResourceDirectory = new DirectoryInfo(Helpers.ZMMDirectory.DirectoryHelper.GetDataDirectoryPath()).Parent.FullName;
         }
 
-        private void Init()
+        public void Init(string RepoURL, string RepoVersion, string RepoPAT)
         {
             APIs.InitZMOD(ResourceDirectory);
-            UpdateInfo("https://hub.umoya.ai/v3/index.json");
+            UpdateInfo(RepoURL + "/" + RepoVersion + "/index.json", RepoPAT);
         }
 
-        private void UpdateInfo(string RepoURL)
+        private void UpdateInfo(string RepoURL, string RepoPAT)
         {
             if(File.Exists(Constants.UMOYACLIOutputFile)) File.Delete(Constants.UMOYACLIOutputFile);
-            APIs.CaptureConsoleOutPut("info", "-u " + RepoURL, ResourceDirectory, Constants.UMOYACLIOutputFile);
+            APIs.CaptureConsoleOutPut("info", "-u " + RepoURL + " -k " + RepoPAT, ResourceDirectory, Constants.UMOYACLIOutputFile);
         }
+
 
         public void Add(Resource ResourceInfo)
         {

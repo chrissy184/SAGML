@@ -4,13 +4,13 @@ namespace ZMM.App.Clients.Repo
 {
     public static class Constants
     {
-        public static readonly string RepoURL = "https://hub.umoya.ai/v3/search?semVerLevel=2.0.&prerelease=true";
-        public static readonly string RepoURLQueryByResourceType = "https://hub.umoya.ai/v3/search?semVerLevel=2.0.&prerelease=true&packageType=";
-        public static readonly string RepoURLQuery = "https://hub.umoya.ai/v3/search?semVerLevel=2.0.&prerelease=true&q=";
+        public static string RepoURL = "$URL/$APIVersion/search?semVerLevel=2.0.&prerelease=true";
+        public static string RepoURLQueryByResourceType = "$URL/$APIVersion/search?semVerLevel=2.0.&prerelease=true&packageType=";
+        public static string RepoURLQuery = "$URL/$APIVersion/search?semVerLevel=2.0.&prerelease=true&q=";
 
-        public static readonly string RepoURLQueryByResourceTypeAndQueryString = "https://hub.umoya.ai/v3/search?semVerLevel=2.0.&prerelease=true&packageType=ResourceType&q=QueryString";
+        public static string RepoURLQueryByResourceTypeAndQueryString = "$URL/$APIVersion/search?semVerLevel=2.0.&prerelease=true&packageType=ResourceType&q=QueryString";
 
-        public static readonly string RepoURLByResourceId = "https://hub.umoya.ai/v3/registration/ResourceId/index.json";
+        public static string RepoURLByResourceId = "$URL/$APIVersion/registration/ResourceId/index.json";
 
         public static readonly string UMOYACLIOutputFile = "UMOYA-CLI.json";
         public const string UmoyaHomeName = ".umoya";
