@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -93,9 +94,10 @@ namespace ZMM.App.Clients.Repo
         }
 
 
-        public Task<IRepoResponse> Add(Resource ResourceInfo)
+        public async Task<bool> Add(Resource ResourceInfo)
         {
-            throw new NotImplementedException();
+            UMOYA.Instance.Add(ResourceInfo);
+            return true;
         }
 
         public Task<IRepoResponse> Delete(Resource ResourceInfo)
