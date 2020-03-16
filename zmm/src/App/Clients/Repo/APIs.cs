@@ -36,7 +36,7 @@ namespace ZMM.App.Clients.Repo
                 }
                 else 
                 {
-                    if (!ActualoutputFilePath.Equals(string.Empty)) File.WriteAllText(WorkingDir + Constants.PathSeperator +ActualoutputFilePath, process.StandardOutput.ReadToEnd());
+                    //if (!ActualoutputFilePath.Equals(string.Empty)) File.WriteAllText(WorkingDir + Constants.PathSeperator +ActualoutputFilePath, process.StandardOutput.ReadToEnd());
                     break;
                 }
             }
