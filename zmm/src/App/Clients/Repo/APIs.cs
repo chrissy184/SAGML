@@ -33,12 +33,10 @@ namespace ZMM.App.Clients.Repo
                 if(CLIThread.IsAlive) 
                 {
                     System.Threading.Thread.Sleep(500);
-                    Console.WriteLine("Executing add command.");
                 }
                 else 
                 {
-                    Console.WriteLine("Command execution finished");
-                    if (!ActualoutputFilePath.Equals(string.Empty)) File.WriteAllText(ActualoutputFilePath, process.StandardOutput.ReadToEnd());
+                    if (!ActualoutputFilePath.Equals(string.Empty)) File.WriteAllText(WorkingDir + Constants.PathSeperator +ActualoutputFilePath, process.StandardOutput.ReadToEnd());
                     break;
                 }
             }
