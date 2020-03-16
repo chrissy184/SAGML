@@ -19,6 +19,7 @@ export const ApiRoutes = {
     dataRename: (id: string) => `data/${id}/rename`,
     dataBaseImageForWelding: `data/baseImage`,
     generateImageForWelding: `data/generateImages`,
+    dataUploadStatus: 'data/uploadstatus',
 
     models: 'model',
     modelCreate: 'model/create',
@@ -36,6 +37,7 @@ export const ApiRoutes = {
     modelLoaded: 'model/loaded',
     modelCompile: (id: string) => `model/${id}/compile`,
     modelRename: (id: string) => `model/${id}/rename`,
+    modelUploadStatus: 'model/uploadstatus',
 
     code: 'code',
     codeCreate: `code/create`,
@@ -44,6 +46,7 @@ export const ApiRoutes = {
     codeDownload: (id: string) => `code/${id}/download`,
     codeExecute: (id: string) => `code/${id}/execute`,
     codeRename: (id: string) => `code/${id}/rename`,
+    codeUploadStatus: 'code/uploadstatus',
 
     task: 'task',
     taskGet: (id: number) => `task/${id}`,

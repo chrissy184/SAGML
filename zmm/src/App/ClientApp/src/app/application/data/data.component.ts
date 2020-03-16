@@ -19,6 +19,7 @@ export class DataComponent implements OnInit {
   public automlFormData: any = {};
   public filterConfig: any = {};
   public filter: any = '';
+  public uploadDataStatus: any = [];
   public dropzoneConfig: any = {
     openFileBrowser: false,
     url: ApiRoutes.data,
@@ -53,6 +54,14 @@ export class DataComponent implements OnInit {
 
   public displayedColumns: string[] = [];
   public dataSource: MatTableDataSource<any[]>;
+
+  public uploadStatusColumns: string[] = [
+    'name',
+    'createdAt',
+    'status'
+  ];
+
+  public uploadStatusDataSource: MatTableDataSource<any[]>;
 
   public showFilterPanel = false;
   public uploadFiles = false;
@@ -451,8 +460,22 @@ export class DataComponent implements OnInit {
     }
   }
 
+  getUploadFileStatus() {
+    this.isContentLoading = true;
+    this.uploadStatusDataSource = new MatTableDataSource([]);
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.dataUploadStatus)
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(response => {
+        this.uploadStatusDataSource = new MatTableDataSource(response);
+      }, () => {
+        this.uploadStatusDataSource = new MatTableDataSource([]);
+      });
+  }
+
+
   ngOnInit() {
     this.getAllData();
+    this.getUploadFileStatus();
   }
 
 }
