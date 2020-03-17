@@ -51,7 +51,7 @@ namespace ZMM.App.Controllers
         string fileName = string.Empty;
         private readonly string CURRENT_USER = "";
         private static bool IsScanned = false;
-         private readonly IScheduler _scheduler;
+        private readonly IScheduler _scheduler;
         #endregion
 
         #region Constructor...
@@ -189,10 +189,24 @@ namespace ZMM.App.Controllers
                         {
                             string fileUrl = Path.Combine(dirFullpath, fileName);
                             string fileExt = System.IO.Path.GetExtension(fileUrl).Substring(1).ToLower();
-                            
+
                             #region upload large file > 400MB
                             if (size > 40000000)
                             {
+                                //
+                                FilesInProgress wip = new FilesInProgress()
+                                {
+                                    Id = formFile.FileName,
+                                    CreatedAt = DateTime.Now,
+                                    Name = formFile.FileName,
+                                    Type = fileExt.ToLower(),
+                                    Module = "DATA",
+                                    Status = "In Progess"
+                                };
+
+                                FilesUploadingPayload.Create(wip);
+
+                                //
                                 //check if same job is scheduled
                                 ISchedulerFactory schfack = new StdSchedulerFactory();
                                 IScheduler scheduler = await schfack.GetScheduler();
@@ -241,8 +255,8 @@ namespace ZMM.App.Controllers
                                         return BadRequest("File upload failed");
                                     }
                                 }
-                            }                   
-                             switch (fileExt.ToLower())
+                            }
+                            switch (fileExt.ToLower())
                             {
                                 case "csv":
                                     type = "CSV";
@@ -253,22 +267,22 @@ namespace ZMM.App.Controllers
                                 case "png":
                                     type = "IMAGE";
                                     break;
-                                    case "jpeg":
+                                case "jpeg":
                                     type = "IMAGE";
                                     break;
-                                    case "jpg":
+                                case "jpg":
                                     type = "IMAGE";
                                     break;
-                                    case "webp":
+                                case "webp":
                                     type = "IMAGE";
                                     break;
-                                    case "mp4":
+                                case "mp4":
                                     type = "VIDEO";
                                     break;
-                                     case "zip":
+                                case "zip":
                                     type = "FOLDER";
                                     break;
-                                     case "txt":
+                                case "txt":
                                     type = "TEXT";
                                     break;
                                 default:
@@ -297,7 +311,7 @@ namespace ZMM.App.Controllers
                         }
                         else
                         {
-                             return Conflict(new { message = "File already exists.", error = "File already exists."});
+                            return Conflict(new { message = "File already exists.", error = "File already exists." });
                         }
                     }
                 }
@@ -305,7 +319,7 @@ namespace ZMM.App.Controllers
             catch (Exception ex)
             {
                 #region Remove download file if exists on error
-                if(System.IO.File.Exists(filePath))
+                if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);
                 }
@@ -609,7 +623,7 @@ namespace ZMM.App.Controllers
                     //download mp4 file from resultPath
                     Byte[] dataMP4 = null;
                     dataMP4 = await _client.DownloadFile(joPredict["result"].ToString(), $"Predicted_{dataId}" + ".mp4");
-                    
+
                     List<Property> _props = new List<Property>();
                     dirFullpath = DirectoryHelper.GetDataDirectoryPath();
                     string newFile = $"Predicted_{dataId}" + ".mp4";
@@ -637,10 +651,10 @@ namespace ZMM.App.Controllers
                 else if ((resultPath.ToLower().Contains("jpeg") || resultPath.ToLower().Contains("jpg") || resultPath.ToLower().Contains("png")) && !string.IsNullOrEmpty(data))
                 {
                     //download jpg,jpeg,png file from resultPath
-                    string _mimeType = Path.GetExtension(resultPath).Remove(0,1).ToLower();
+                    string _mimeType = Path.GetExtension(resultPath).Remove(0, 1).ToLower();
                     Byte[] dataMP4 = null;
                     dataMP4 = await _client.DownloadFile(joPredict["result"].ToString(), $"Predicted_{dataId}.{_mimeType}");
-                    
+
                     List<Property> _props = new List<Property>();
                     dirFullpath = DirectoryHelper.GetDataDirectoryPath();
                     string newFile = $"Predicted_{dataId}.{_mimeType}";
@@ -1173,7 +1187,7 @@ namespace ZMM.App.Controllers
                     var content = JObject.Parse(reqBody);
                     newFileName = (string)content["newName"];
                     if (!FilePathHelper.IsFileNameValid(newFileName))
-                      return BadRequest(new { message = "Renaming file failed. Invalid file name." });
+                        return BadRequest(new { message = "Renaming file failed. Invalid file name." });
                     newFileName = Regex.Replace(newFileName, "[\n\r\t]", string.Empty);
                     newFileName = Regex.Replace(newFileName, @"\s", string.Empty);
                 }
@@ -1519,6 +1533,15 @@ namespace ZMM.App.Controllers
             {
                 return NoContent();
             }
+        }
+        #endregion
+
+        #region get uploading files
+        [HttpGet("uploadstatus")]
+        public async Task<IActionResult> GetUploadingFileAsync()
+        {
+            await Task.FromResult(0);
+            return Json(FilesUploadingPayload.Get("Data"));
         }
         #endregion
     }
