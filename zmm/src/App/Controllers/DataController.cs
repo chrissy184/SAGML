@@ -142,7 +142,7 @@ namespace ZMM.App.Controllers
             var filePath = Path.GetTempFileName();
             string dirFullpath = DirectoryHelper.GetDataDirectoryPath();
             string fileContent = string.Empty;
-            #endregion
+            #endregion            
 
             #region check for multipart
             if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
@@ -189,6 +189,39 @@ namespace ZMM.App.Controllers
                         {
                             string fileUrl = Path.Combine(dirFullpath, fileName);
                             string fileExt = System.IO.Path.GetExtension(fileUrl).Substring(1).ToLower();
+                            switch (fileExt.ToLower())
+                            {
+                                case "csv":
+                                    type = "CSV";
+                                    break;
+                                case "json":
+                                    type = "JSON";
+                                    break;
+                                case "png":
+                                    type = "IMAGE";
+                                    break;
+                                case "jpeg":
+                                    type = "IMAGE";
+                                    break;
+                                case "jpg":
+                                    type = "IMAGE";
+                                    break;
+                                case "webp":
+                                    type = "IMAGE";
+                                    break;
+                                case "mp4":
+                                    type = "VIDEO";
+                                    break;
+                                case "zip":
+                                    type = "FOLDER";
+                                    break;
+                                case "txt":
+                                    type = "TEXT";
+                                    break;
+                                default:
+                                    type = "UNRECOGNIZED";
+                                    break;
+                            }
 
                             #region upload large file > 400MB
                             if (size > 40000000)
@@ -199,7 +232,7 @@ namespace ZMM.App.Controllers
                                     Id = formFile.FileName,
                                     CreatedAt = DateTime.Now,
                                     Name = formFile.FileName,
-                                    Type = fileExt.ToLower(),
+                                    Type = type,
                                     Module = "DATA",
                                     Status = "In Progess"
                                 };
@@ -256,39 +289,7 @@ namespace ZMM.App.Controllers
                                     }
                                 }
                             }
-                            switch (fileExt.ToLower())
-                            {
-                                case "csv":
-                                    type = "CSV";
-                                    break;
-                                case "json":
-                                    type = "JSON";
-                                    break;
-                                case "png":
-                                    type = "IMAGE";
-                                    break;
-                                case "jpeg":
-                                    type = "IMAGE";
-                                    break;
-                                case "jpg":
-                                    type = "IMAGE";
-                                    break;
-                                case "webp":
-                                    type = "IMAGE";
-                                    break;
-                                case "mp4":
-                                    type = "VIDEO";
-                                    break;
-                                case "zip":
-                                    type = "FOLDER";
-                                    break;
-                                case "txt":
-                                    type = "TEXT";
-                                    break;
-                                default:
-                                    type = "UNRECOGNIZED";
-                                    break;
-                            }
+                            
                             //
                             DataResponse newRecord = new DataResponse()
                             {
