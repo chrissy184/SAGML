@@ -1541,7 +1541,7 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> GetUploadingFileAsync()
         {
             await Task.FromResult(0);
-            return Json(FilesUploadingPayload.Get("Data"));
+            return Json(FilesUploadingPayload.Get("DATA"));
         }
         #endregion
     }
