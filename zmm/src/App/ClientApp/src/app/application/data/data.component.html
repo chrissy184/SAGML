@@ -153,8 +153,8 @@
               <div class="container-fluid">
                 <app-dropzone [openFileBrowserWindow]="dropzoneConfig.openFileBrowser" [dropzoneConfig]="dropzoneConfig"
                   (dropzoneSuccess)="onDataUploadSuccess($event)"></app-dropzone>
-                <table *ngIf="uploadStatusDataSource.length" mat-table [dataSource]="uploadStatusDataSource" matSort
-                  class="w-100">
+                <table *ngIf="uploadStatusDataSource.data.length" mat-table [dataSource]="uploadStatusDataSource"
+                  matSort class="w-100">
                   <!-- Column 1 -->
                   <ng-container matColumnDef="name">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> Data </th>
