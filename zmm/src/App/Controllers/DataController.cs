@@ -226,6 +226,7 @@ namespace ZMM.App.Controllers
                             #region upload large file > 400MB
                             if (size > 40000000)
                             {
+                                Console.WriteLine(">>>>>>>>>>>>>>>>>>>>UPLOADING................................");
                                 //
                                 FilesInProgress wip = new FilesInProgress()
                                 {
