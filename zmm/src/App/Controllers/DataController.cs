@@ -198,14 +198,8 @@ namespace ZMM.App.Controllers
                                     type = "JSON";
                                     break;
                                 case "png":
-                                    type = "IMAGE";
-                                    break;
-                                case "jpeg":
-                                    type = "IMAGE";
-                                    break;
-                                case "jpg":
-                                    type = "IMAGE";
-                                    break;
+                                case "jpeg":                                   
+                                case "jpg":                                    
                                 case "webp":
                                     type = "IMAGE";
                                     break;
@@ -226,7 +220,8 @@ namespace ZMM.App.Controllers
                             #region upload large file > 400MB
                             if (size > 40000000)
                             {
-                                Console.WriteLine(">>>>>>>>>>>>>>>>>>>>UPLOADING................................");
+                                Console.WriteLine(">>>>>>>>>>>>>>>>>>>>UPLOADING LARGE FILE................................");
+                                #region add to uploading
                                 //
                                 FilesInProgress wip = new FilesInProgress()
                                 {
@@ -240,7 +235,7 @@ namespace ZMM.App.Controllers
 
                                 FilesUploadingPayload.Create(wip);
 
-                                //
+                                #endregion
                                 //check if same job is scheduled
                                 ISchedulerFactory schfack = new StdSchedulerFactory();
                                 IScheduler scheduler = await schfack.GetScheduler();
@@ -290,7 +285,7 @@ namespace ZMM.App.Controllers
                                     }
                                 }
                             }
-                            
+
                             //
                             DataResponse newRecord = new DataResponse()
                             {
@@ -310,6 +305,7 @@ namespace ZMM.App.Controllers
                             };
                             //
                             _response.Add(DataPayload.Create(newRecord));
+                            FilesUploadingPayload.Clear(formFile.FileName);
                         }
                         else
                         {
