@@ -10,7 +10,7 @@ namespace ZMM.Models.ResponseMessages
         public string Id { get; set; }
         public string Type { get; set; }
         public string Name { get; set; }
-        public string Status { get; set; }
+        [JsonProperty("uploadStatus")] public string UploadStatus { get; set; }
         public string Module { get; set; }
         public DateTime CreatedAt {get;set;}
     }
