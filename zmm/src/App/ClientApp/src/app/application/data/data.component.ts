@@ -19,7 +19,6 @@ export class DataComponent implements OnInit {
   public automlFormData: any = {};
   public filterConfig: any = {};
   public filter: any = '';
-  public uploadDataStatus: any = [];
   public dropzoneConfig: any = {
     openFileBrowser: false,
     url: ApiRoutes.data,
@@ -54,14 +53,6 @@ export class DataComponent implements OnInit {
 
   public displayedColumns: string[] = [];
   public dataSource: MatTableDataSource<any[]>;
-
-  public uploadStatusColumns: string[] = [
-    'name',
-    'createdAt',
-    'status'
-  ];
-
-  public uploadStatusDataSource: MatTableDataSource<any[]>;
 
   public showFilterPanel = false;
   public uploadFiles = false;
@@ -256,6 +247,7 @@ export class DataComponent implements OnInit {
         } else if (!refresh) {
           this.uploadNewFiles();
         }
+        this.getUploadFileStatus();
       }, err => {
         this.uploadNewFiles();
       });
@@ -266,6 +258,9 @@ export class DataComponent implements OnInit {
   }
 
   public viewData(data: any) {
+    if (data.uploadStatus === 'IN PROGRESS') {
+      return;
+    }
     this.selectedData = data;
     this.uploadFiles = false;
     this.uploadFilesCounter = 0;
@@ -462,20 +457,15 @@ export class DataComponent implements OnInit {
 
   getUploadFileStatus() {
     this.isContentLoading = true;
-    this.uploadStatusDataSource = new MatTableDataSource([]);
     this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.dataUploadStatus)
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(response => {
-        this.uploadStatusDataSource = new MatTableDataSource(response);
-      }, () => {
-        this.uploadStatusDataSource = new MatTableDataSource([]);
+        this.listOfData = response.concat(this.listOfData);
       });
   }
 
-
   ngOnInit() {
     this.getAllData();
-    this.getUploadFileStatus();
   }
 
 }
