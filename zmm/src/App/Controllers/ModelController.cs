@@ -133,9 +133,25 @@ namespace ZMM.App.Controllers
                         return BadRequest(new { message = "Invalid file name." });
                     if (!IsFileExists)
                     {
+                        Console.WriteLine(">>>>>>>>>>>>>>>>>>>>UPLOADING LARGE MODEL FILE................................");
                         #region upload large file > 400MB
                         if (size > 40000000)
                         {
+                            #region add to uploading
+                            //
+                            FilesInProgress wip = new FilesInProgress()
+                            {
+                                Id = formFile.FileName,
+                                CreatedAt = DateTime.Now,
+                                Name = formFile.FileName,
+                                Type = type,
+                                Module = "MODEL",
+                                Status = "In Progess"
+                            };
+
+                            FilesUploadingPayload.Create(wip);
+
+                            #endregion
                             //check if same job is scheduled
                             ISchedulerFactory schfack = new StdSchedulerFactory();
                             IScheduler scheduler = await schfack.GetScheduler();
@@ -1267,5 +1283,13 @@ namespace ZMM.App.Controllers
         }
         #endregion
 
+        #region get uploading files
+        [HttpGet("uploadstatus")]
+        public async Task<IActionResult> GetUploadingFileAsync()
+        {
+            await System.Threading.Tasks.Task.FromResult(0);
+            return Json(FilesUploadingPayload.Get("MODEL"));
+        }
+        #endregion
     }
 }
