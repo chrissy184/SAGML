@@ -9,7 +9,7 @@ from keras.preprocessing import image
 import os,json,ast
 from random import choice
 from string import ascii_uppercase
-from zmk.settings import BASE_DIR
+
 from tensorflow import Graph, Session
 import tensorflow as tf
 from string import ascii_uppercase
@@ -124,7 +124,7 @@ class KerasUtilities:
                 from nyoka.mrcnn import pmml_to_maskrcnn
                 from nyoka.mrcnn import model as modellib
                 predClasses=self.getPredClasses(nyoka_pmml_obj)
-                modelFolder=BASE_DIR+'/logs/MaskRCNNWei_'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+                modelFolder='./logs/MaskRCNNWei_'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
                 self.checkCreatePath(modelFolder)
                 model_graph = Graph()
                 with model_graph.as_default():
@@ -332,11 +332,11 @@ class KerasUtilities:
                     predClasses=['class_'+str(i) for i in range(len(np.ravel(predi)))]
                 targetResult= {j:str(float(k)) for j,k in zip(predClasses,list(predi[0]))}
 
-        target_path=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+        target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
         self.checkCreatePath(target_path)
         target_path=target_path+'temp.txt'
 
-        # resafile=BASE_DIR+'/logs/'+'temp.txt'
+        # resafile='./logs/'+'temp.txt'
         # print('result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',targetResult)
         with open(target_path,'w') as fila:
             json.dump(targetResult,fila)
@@ -348,7 +348,7 @@ class KerasUtilities:
         global PMMLMODELSTORAGE
         pointerObj=PMMLMODELSTORAGE[pmmlstoragepointer]
         codePart=pointerObj['preProcessScript']
-        fnaMe=BASE_DIR+'/trainModel/testPreprocessing.py'
+        fnaMe='./trainModel/testPreprocessing.py'
         with open(fnaMe,'w') as k:
             k.write(codePart)
         # print ('Code File written')
@@ -360,7 +360,7 @@ class KerasUtilities:
         from random import choice
 
         if scriptOutput == 'IMAGE':
-            target_path2=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+            target_path2='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
             target_path=target_path2+'/test/'
             self.checkCreatePath(target_path2)
             self.checkCreatePath(target_path)
@@ -389,7 +389,7 @@ class KerasUtilities:
         print('$$$$$$$$$$$$$$$$$$ PredictFileData $$$$$$$$$$$$$$$')
         global PMMLMODELSTORAGE
         pointerObj=PMMLMODELSTORAGE[pmmlstoragepointer]
-        target_path=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+        target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
         self.checkCreatePath(target_path)
         if modelType =="sklearnM":
             print ('Came to sklearn part')
@@ -445,7 +445,7 @@ class KerasUtilities:
         # print('$$$$$$$$$$$$$$$$$$ PredictFileData $$$$$$$$$$$$$$$')
         global PMMLMODELSTORAGE
         pointerObj=PMMLMODELSTORAGE[pmmlstoragepointer]
-        target_path=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+        target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
         self.checkCreatePath(target_path)
         if modelType and modelType=="sklearnM":
             model=pointerObj['model']
@@ -490,7 +490,7 @@ class KerasUtilities:
         #####################>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>###############
         codePart=pointerObj['preProcessScript']
         print ('Step 1.2')
-        fnaMe=BASE_DIR+'/trainModel/testPreprocessing.py'
+        fnaMe='./trainModel/testPreprocessing.py'
         with open(fnaMe,'w') as k:
             k.write(codePart)
         print ('Code File written Pre Process')
@@ -503,7 +503,7 @@ class KerasUtilities:
         #####################>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>###############
 
         codePart2=pointerObj['postProcessScript']
-        fnaMe2=BASE_DIR+'/trainModel/testPostprocessing.py'
+        fnaMe2='./trainModel/testPostprocessing.py'
         with open(fnaMe2,'w') as k:
             k.write(codePart2)
         print ('Code File written POST Process')
@@ -521,7 +521,7 @@ class KerasUtilities:
         print ('Step 1.5')
 
         if scriptOutput == 'IMAGE':
-            target_path2=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+            target_path2='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
             target_path=target_path2+'/test/'
             self.checkCreatePath(target_path2)
             self.checkCreatePath(target_path)
@@ -546,7 +546,7 @@ class KerasUtilities:
 
             print ('Step 1.10')
 
-            target_path3=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+            target_path3='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
             self.checkCreatePath(target_path3)
 
             print ('Step 1.11')
@@ -574,7 +574,7 @@ class KerasUtilities:
         #####################>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>###############
 
         codePart2=pointerObj['postProcessScript']
-        fnaMe2=BASE_DIR+'/trainModel/testPostprocessing.py'
+        fnaMe2='./trainModel/testPostprocessing.py'
         with open(fnaMe2,'w') as k:
             k.write(codePart2)
         print ('Code File written POST Process')
@@ -592,7 +592,7 @@ class KerasUtilities:
 
 
         if extenFile in ['.jpg','.JPG','.png','.PNG']:
-            target_path2=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+            target_path2='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
             target_path=target_path2+'/test/'
             self.checkCreatePath(target_path2)
             self.checkCreatePath(target_path)
@@ -601,7 +601,7 @@ class KerasUtilities:
 
             print ('Step 11.9')
 
-            target_path3=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+            target_path3='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
             self.checkCreatePath(target_path3)
 
             print ('Step 11.11')
@@ -629,7 +629,7 @@ class KerasUtilities:
         from string import ascii_uppercase
         from random import choice
 
-        target_path=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+        target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
         self.checkCreatePath(target_path)
         model_graph = pointerObj['model_graph']
         tf_session = pointerObj['tf_session']
@@ -680,7 +680,7 @@ class KerasUtilities:
         from threading import Thread
 
         idforData=''.join(choice(ascii_uppercase) for i in range(12))
-        saveStatus=BASE_DIR+'/logs/'+idforData+'/'
+        saveStatus='./logs/'+idforData+'/'
         self.checkCreatePath(saveStatus)
         statusfileLocation=saveStatus+'status.txt'
         with open(statusfileLocation,'w') as filetosave:

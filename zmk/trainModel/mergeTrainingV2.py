@@ -18,7 +18,6 @@ from nyoka import PMML43Ext as ny
 from tensorflow import Graph, Session
 import tensorflow as tf
 
-from zmk.settings import BASE_DIR
 from trainModel.kerasUtilities import PMMLMODELSTORAGE
 global PMMLMODELSTORAGE
 
@@ -323,7 +322,7 @@ class NewModelOperations:
                         from string import ascii_uppercase
                         from random import choice
                         predClasses=kerasUtilities.getPredClasses(pmmlObj)
-                        modelFolder=BASE_DIR+'/logs/MaskRCNNWei_'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+                        modelFolder='./logs/MaskRCNNWei_'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
                         kerasUtilities.checkCreatePath(modelFolder)
                         model_graph = Graph()
                         with model_graph.as_default():

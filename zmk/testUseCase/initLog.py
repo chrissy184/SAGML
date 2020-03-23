@@ -1,5 +1,4 @@
 import logging, sys, os
-from zmk.settings import BASE_DIR
 
 def initiateLogging():
     root = logging.getLogger()
@@ -11,7 +10,7 @@ def initiateLogging():
     # handler.setFormatter(formatter)
     # root.addHandler(handler)
 
-    handler2 = logging.FileHandler(BASE_DIR+'/testUseCase/ZmkUnitTestLog.log')
+    handler2 = logging.FileHandler(os.path.abspath('testUseCase/ZmkUnitTestLog.log'))
     handler2.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     handler2.setFormatter(formatter)

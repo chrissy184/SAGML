@@ -24,7 +24,7 @@ import skimage
 from keras.preprocessing.image import ImageDataGenerator
 
 from keras.preprocessing import image
-from zmk.settings import BASE_DIR
+
 from multiprocessing import Lock, Process
 lockForModelLoad = None
 
@@ -416,7 +416,7 @@ class NewScoringView:
 			return ('path created')
 
 	def kerasScoring(self,modelName,filePath):
-		target_path=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+		target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
 		self.checkCreatePath(target_path)
 		global PMMLMODELSTORAGE
 		# print (PMMLMODELSTORAGE[modelName])
@@ -459,7 +459,7 @@ class NewScoringView:
 
 
 	def scoreFileData(self,modelName,filePath):
-		target_path=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+		target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
 		self.checkCreatePath(target_path)
 		global PMMLMODELSTORAGE
 		# print (PMMLMODELSTORAGE[modelName])

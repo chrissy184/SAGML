@@ -39,8 +39,7 @@ import random
 import shutil
 from string import ascii_uppercase
 from random import choice
-from zmk.settings import BASE_DIR
-logFolder=BASE_DIR+'/logs/'
+logFolder='./logs/'
 statusfileLocation = ''
 noOfImagegenerated = 0
 

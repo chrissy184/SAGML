@@ -44,8 +44,8 @@ from threading import Thread
 
 from trainModel import kerasUtilities
 kerasUtilities = kerasUtilities.KerasUtilities()
-from zmk.settings import BASE_DIR
-logFolder=BASE_DIR+'/logs/'
+
+logFolder='./logs/'
 statusfileLocation = ''
 
 modelObjectToCheck=['AssociationModel', 'AnomalyDetectionModel', 'BayesianNetworkModel',

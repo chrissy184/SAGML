@@ -2,10 +2,9 @@ import requests
 import json
 import os
 import sys
-from zmk.settings import BASE_DIR
 mainUrl = 'http://localhost:8000/api/v1'
 
-fPath =  BASE_DIR+'/supportData2/'
+fPath =  os.getcwd()+'./supportData2/'
 print (fPath)
 
 def loadModelToZmk(filePath):

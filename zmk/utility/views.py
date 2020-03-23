@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from zmk.settings import BASE_DIR
 
 # Create your views here.
 from django.http import HttpResponse
@@ -91,7 +90,7 @@ class SwaggerUtilityView(APIView):
 		
 	def get(self,requests):
 		import json
-		ff = json.load(open(BASE_DIR+'/settingFiles/swagger.json','r'))
+		ff = json.load(open('./settingFiles/swagger.json','r'))
 		return JsonResponse(ff, status=200)
 
 

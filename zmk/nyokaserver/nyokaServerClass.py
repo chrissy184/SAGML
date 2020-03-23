@@ -15,8 +15,6 @@ from nyoka import PMML43Ext as pml
 import typing
 from datetime import datetime
 import json,sys,subprocess
-
-from zmk.settings import BASE_DIR
 # from SwaggerSchema.schemas import (
 # 	addArchitectureSwagger,
 # 	updateLayerSwagger,
@@ -36,8 +34,8 @@ def create_lock():
     global lockForPMML
     lockForPMML = Lock()
 
-settingFilePath=BASE_DIR+'/settingFiles/'
-savedModels=BASE_DIR+'/SavedModels/'
+settingFilePath='./settingFiles/'
+savedModels='./SavedModels/'
 
 
 

@@ -1,8 +1,7 @@
 # runall.py
 import os
-from zmk.settings import BASE_DIR
 try:
-	os.makedirs(BASE_DIR+'/testUseCase/expandable/')
+	os.makedirs('./testUseCase/expandable/')
 except:
 	pass
 from subprocess import call
@@ -11,25 +10,25 @@ from subprocess import call
 # call(["python", "./testUseCase/TestArchitectures.py"])
 
 print (' TestAutoML.py >>>>>>>>>>>>>> ')
-call(["python", BASE_DIR+"/testUseCase/TestAutoML.py"])
+call(["python", "./testUseCase/TestAutoML.py"])
 
 
 print (' TestDNN.py>>>>>>>>>>>>>> ')
-call(["python", "BASE_DIR+/testUseCase/TestDNN.py"])
+call(["python", "./testUseCase/TestDNN.py"])
 
 
 print ('TestEditorForCNN.py >>>>>>>>>>>>>> ')
-call(["python", BASE_DIR+"/testUseCase/TestEditorForCNN.py"])
+call(["python", "./testUseCase/TestEditorForCNN.py"])
 
 print ('TestScoring.py >>>>>>>>>>>>>> ')
-call(["python", BASE_DIR+"/testUseCase/TestScoring.py"])
+call(["python", "./testUseCase/TestScoring.py"])
 
 print ('TrainDNN.py >>>>>>>>>>>>>> ')
-call(["python", BASE_DIR+"/testUseCase/TrainDNN.py"])
+call(["python", "./testUseCase/TrainDNN.py"])
 
 
-fileList = os.listdir(BASE_DIR+'/testUseCase/expandable/')
+fileList = os.listdir('./testUseCase/expandable/')
 print (fileList)
 for f in fileList:
 	print (f)
-	os.remove(BASE_DIR+'/testUseCase/expandable/'+f)
+	os.remove('./testUseCase/expandable/'+f)

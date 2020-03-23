@@ -7,10 +7,9 @@ import ast,pathlib
 import traceback
 from nyoka import PMML43Ext as ny
 global MEMORY_DICT_ARCHITECTURE,MEMORY_OF_LAYERS
-from zmk.settings import BASE_DIR
 
-settingFilePath=BASE_DIR+'/settingFiles/'
-savedModels=BASE_DIR+'/SavedModels/'
+settingFilePath='./settingFiles/'
+savedModels='./SavedModels/'
 MEMORY_OF_LAYERS={}
 from trainModel.mergeTrainingV2 import PMMLMODELSTORAGE
 layerDetail=open(settingFilePath+'listOflayers.json','r')
