@@ -13,6 +13,7 @@ from rest_framework.decorators import api_view,schema
 import pandas as pd
 import numpy as np
 from sklearn.externals import joblib
+from zmk.settings import BASE_DIR
 
 from django.utils.encoding import smart_str
 import os,ast, signal,operator,requests, json,time,datetime
@@ -24,6 +25,7 @@ global DATA_MEMORY_OBJS_SKLEARN
 import ast,pathlib
 # RUNNING_TASK_MEMORY=[]
 from utility.utilityClass import RUNNING_TASK_MEMORY
+from zmk.settings import BASE_DIR
 DATA_MEMORY_OBJS_SKLEARN={}
 from trainModel import kerasUtilities,mergeTrainingNN,autoMLutilities,trainAutoMLV2,trainMaskRCNN
 
@@ -37,10 +39,10 @@ autoMLutilities = autoMLutilities.AutoMLUtilities()
 # 									)
 
 
-settingFilePath='settingFiles/'
-pathOfStatus='resultStatus/'
-SavedModels='SavedModels/'
-logFolder='logs/'
+settingFilePath=BASE_DIR+'/settingFiles/'
+pathOfStatus=BASE_DIR+'/resultStatus/'
+SavedModels=BASE_DIR+'/SavedModels/'
+logFolder=BASE_DIR+'/logs/'
 runPorts=range(6006,6026)
 runPortsUsage='inactive'
 tensorboardPort=pd.DataFrame(data={'runPorts':runPorts,'runPortsUsage':runPortsUsage,'usedForLogs':None})
@@ -376,7 +378,7 @@ class Training:
 		try:
 			tensorboardLogFolder=userInput['tensorboardLogFolder']
 		except:
-			tensorboardLogFolder=target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
+			tensorboardLogFolder=target_path=BASE_DIR+'/logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
 			# print ('tensorboardLogFolder',tensorboardLogFolder)
 			kerasUtilities.checkCreatePath(tensorboardLogFolder)
 		

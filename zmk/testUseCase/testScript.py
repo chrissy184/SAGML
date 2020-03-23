@@ -1,6 +1,7 @@
 import time
 import sys
 import ast,json
+from zmk.settings import BASE_DIR
 def testCounter(upto):
 	# upto = ast.literal_eval(upto)
 	for i in range(upto):
@@ -23,4 +24,4 @@ def main(*argv):
 
 	from trainModel import kerasUtilities
 	kerasUtilities=kerasUtilities.KerasUtilities()
-	kerasUtilities.updateStatusOfTraining('./logs/UXEWJBAGBGDX/status.txt','Code Execution Completed')
+	kerasUtilities.updateStatusOfTraining(BASE_DIR+'/logs/UXEWJBAGBGDX/status.txt','Code Execution Completed')

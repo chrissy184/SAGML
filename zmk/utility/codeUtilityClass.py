@@ -8,7 +8,8 @@ import datetime
 import linecache
 from trainModel import kerasUtilities
 kerasUtilities = kerasUtilities.KerasUtilities()
-logFolder='./logs/'
+from zmk.settings import BASE_DIR
+logFolder=BASE_DIR+'/logs/'
 statusfileLocation = ''
 
 global SCRIPTSTORAGE

@@ -14,6 +14,7 @@ from trainModel import kerasUtilities
 kerasUtilities = kerasUtilities.KerasUtilities()
 from multiprocessing import Lock, Process
 from nyoka import PMML43Ext as ny
+from zmk.settings import BASE_DIR 
 
 from trainModel.mergeTrainingV2 import TrainingViewModels
 
@@ -26,9 +27,9 @@ class NeuralNetworkModelTrainer:
 
 	def __init__(self):
 		self.pathOfData = None
-		self.logFolder = 'logs/'
+		self.logFolder = BASE_DIR+'/logs/'
 		self.statusFile = None
-		self.scriptFilepath = './trainModel/'
+		self.scriptFilepath = BASE_DIR+'/trainModel/'
 		self.trainFolder = None
 		self.validationFolder = None
 		self.pmmlObj = None

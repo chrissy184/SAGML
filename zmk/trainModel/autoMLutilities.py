@@ -3,11 +3,12 @@ from sklearn import ensemble,preprocessing,linear_model,tree
 from sklearn.pipeline import Pipeline
 from sklearn_pandas import DataFrameMapper
 import os,json
+from zmk.settings import BASE_DIR
 
 settingFilePath='settingFiles/'
 pathOfStatus='resultStatus/'
 SavedModels='SavedModels/'
-logFolder='./logs/'
+logFolder=BASE_DIR+'/logs/'
 
 algorithms={
     'Regression': ['All','ExtraTreeRegressor','GradientBoostingRegressor','DecisionTreeRegressor','LinearSVR',\

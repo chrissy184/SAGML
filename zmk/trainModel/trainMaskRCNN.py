@@ -6,7 +6,8 @@ from trainModel.mrcnn import utils, config
 import os,json,ast
 from random import choice
 from string import ascii_uppercase
-logFolder='./logs/'
+from zmk.settings import BASE_DIR
+logFolder=BASE_DIR+'/logs/'
 
 from trainModel import kerasUtilities
 from multiprocessing import Lock, Process
@@ -117,7 +118,7 @@ class ObjectDetetctionModels():
 
 	def __init__(self):
 		# self.pathOfData = None
-		# self.logFolder = './logs/'
+		# self.logFolder =BASE_DIR+'/logs/'
 		self.statusFile = None
 		self.modelPathName=None
 		self.dataFolder=None
@@ -152,7 +153,7 @@ class ObjectDetetctionModels():
 
 		kerasUtilities.updateStatusOfTraining(statusfileLocation,'Data Loaded')
 
-		MODEL_DIR='./logs/'+idforData+'_mrcnnModel'+'/'
+		MODEL_DIR=BASE_DIR+'/logs/'+idforData+'_mrcnnModel'+'/'
 		kerasUtilities.checkCreatePath(MODEL_DIR)
 
 		class CustomConfig(config.Config):
