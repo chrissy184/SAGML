@@ -137,7 +137,7 @@ namespace ZMM.App.Controllers
                                 Name = formFile.FileName,
                                 Type = type,
                                 Module = "CODE",
-                                UploadStatus = "IN PROGRESS"
+                                UploadStatus = "INPROGRESS"
                             };
 
                             FilesUploadingPayload.Create(wip);
