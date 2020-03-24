@@ -299,7 +299,7 @@ namespace ZMM.App.Controllers
                             {
                                 Created_on = DateTime.Now.ToString(),
                                 Edited_on = DateTime.Now.ToString(),
-                                Extension = fileExt,
+                                Extension = fileExt.ToUpper(),
                                 FilePath = _filePath,
                                 Id = fileName.Replace($".{fileExt}", ""),
                                 MimeType = formFile.ContentType,
