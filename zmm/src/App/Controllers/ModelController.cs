@@ -128,6 +128,10 @@ namespace ZMM.App.Controllers
                     {
                         type = "H5";
                     }
+                    else if (fileExt.ToLower().Contains("onnx"))
+                    {
+                        type = "ONNX";
+                    }
                     //
                     if (!FilePathHelper.IsFileNameValid(formFile.FileName))
                         return BadRequest(new { message = "Invalid file name." });
@@ -241,7 +245,7 @@ namespace ZMM.App.Controllers
                 responseData = ModelPayload.Get();                
             }
             // //get details of model deployed from DeployedModel.json
-                DeployedModelFunctions.GetDeployedModel(deployedModelFileName, responseData);
+            DeployedModelFunctions.GetDeployedModel(deployedModelFileName, responseData);
             DefaultContractResolver contractResolver = new DefaultContractResolver
             {
                 NamingStrategy = new CamelCaseNamingStrategy()

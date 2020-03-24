@@ -416,7 +416,35 @@ namespace ZMM.Helpers.ZMMDirectory
                 ModelPayload.Create(newRecord);
             }
             #endregion
-
+            #region  MODEL - ONNX
+            foreach (var item in zmodDir.OnnxFiles)
+            {
+                List<Property> _props = new List<Property>();
+                fileName = item.Value.info.Name;
+                fileExt = "onnx";
+                _url = DirectoryHelper.GetModelUrl(item.Value.info.Name);
+                //
+                ModelResponse newRecord = new ModelResponse()
+                {
+                    Created_on = item.Value.info.CreationTime.ToString(),
+                    Deployed = false,
+                    Edited_on = item.Value.info.LastWriteTime.ToString(),
+                    Extension = fileExt,
+                    FilePath = item.Value.info.FullName,
+                    Id = fileName.Replace($".{fileExt}", ""),
+                    Loaded = false,
+                    MimeType = "application/octet-stream",
+                    Name = fileName,
+                    Size = item.Value.info.Length,
+                    Type = "ONNX",
+                    Url = _url,
+                    User = "",
+                    Properties = _props,
+                    DateCreated = item.Value.info.CreationTime
+                };
+                ModelPayload.Create(newRecord);
+            }
+            #endregion
             return result;
         }
 
@@ -818,9 +846,36 @@ namespace ZMM.Helpers.ZMMDirectory
                 };
                 ModelPayload.Create(newRecord);
             }
-
-
-
+            #endregion
+            
+            #region  MODEL - ONNX
+            foreach (var item in zmodDir.OnnxFiles)
+            {
+                List<Property> _props = new List<Property>();
+                fileName = item.Value.info.Name;
+                fileExt = "onnx";
+                _url = DirectoryHelper.GetModelUrl(item.Value.info.Name);
+                //
+                ModelResponse newRecord = new ModelResponse()
+                {
+                    Created_on = item.Value.info.CreationTime.ToString(),
+                    Deployed = false,
+                    Edited_on = item.Value.info.LastWriteTime.ToString(),
+                    Extension = fileExt,
+                    FilePath = item.Value.info.FullName,
+                    Id = fileName.Replace($".{fileExt}", ""),
+                    Loaded = false,
+                    MimeType = "application/octet-stream",
+                    Name = fileName,
+                    Size = item.Value.info.Length,
+                    Type = "ONNX",
+                    Url = _url,
+                    User = "",
+                    Properties = _props,
+                    DateCreated = item.Value.info.CreationTime
+                };
+                ModelPayload.Create(newRecord);
+            }
             #endregion
 
             return result;

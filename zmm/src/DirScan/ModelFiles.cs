@@ -85,4 +85,14 @@ namespace ZMM.DS
         {
         }
     }
+
+    public class ONNXFileInfo : ZmodFileInfo
+    {
+        public ONNXFileInfo(string path) : base(path)
+        {
+        }
+        public ONNXFileInfo()
+        {
+        }
+    }
 }
