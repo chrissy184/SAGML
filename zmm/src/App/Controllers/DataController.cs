@@ -183,11 +183,60 @@ namespace ZMM.App.Controllers
                         }
                         existingData.Clear();
                         //
+                        string fileUrl = Path.Combine(dirFullpath, fileName);
+                        string fileExt = System.IO.Path.GetExtension(fileUrl).Substring(1).ToLower();
+                        if (!extensions.Contains(fileExt))
+                        {
+                            return BadRequest("File type not allowed");
+                        }
+                        FileStream fileStream;
+                        //
                         if (!IsFileExists)
                         {
-                            string fileUrl = Path.Combine(dirFullpath, fileName);
-                            string fileExt = System.IO.Path.GetExtension(fileUrl).Substring(1).ToLower();
-                            FileStream fileStream;
+                            #region add to uploading
+                            //
+                            FilesInProgress wip = new FilesInProgress()
+                            {
+                                Id = formFile.FileName,
+                                CreatedAt = DateTime.Now,
+                                Name = formFile.FileName,
+                                Type = type,
+                                Module = "DATA",
+                                UploadStatus = "INPROGRESS"
+                            };
+
+                            FilesUploadingPayload.Create(wip);
+
+                            #endregion
+
+                            #region upload large data file 
+                            ISchedulerFactory schfack = new StdSchedulerFactory();
+                            IScheduler scheduler = await schfack.GetScheduler();
+                            var jobKey = new JobKey(filePath);
+                            if (await scheduler.CheckExists(jobKey))
+                            {
+                                await scheduler.ResumeJob(jobKey);
+                            }
+                            else
+                            {
+                                #region create quartz job for training model
+                                ITrigger trigger = TriggerBuilder.Create()
+                                .WithIdentity($"Uploading Data Job-{DateTime.Now}")
+                                .StartNow()
+                                .WithPriority(1)
+                                .Build();
+
+                                IJobDetail job = JobBuilder.Create<UploadJob>()
+                                .WithIdentity(filePath)
+                                .Build();
+
+                                job.JobDataMap["id"] = formFile.FileName.Replace($".{fileExt}", "");
+                                job.JobDataMap["filePath"] = filePath;
+
+                                await _scheduler.ScheduleJob(job, trigger);
+                                #endregion
+                            }
+                            #endregion                            
 
                             using (fileStream = new FileStream(fileUrl, FileMode.Create))
                             {
@@ -320,7 +369,7 @@ namespace ZMM.App.Controllers
             catch (Exception ex)
             {
                 #region Remove download file if exists on error
-                if(System.IO.File.Exists(filePath))
+                if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);
                 }

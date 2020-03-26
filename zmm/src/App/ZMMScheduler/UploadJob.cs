@@ -10,9 +10,9 @@ public class UploadJob : IJob
         string filePath = dataMap.GetString("filePath");
         string extn = Path.GetExtension(filePath);        
         string id = dataMap.GetString("id");        
-        Console.WriteLine("Uploading {filePath} with Id:{id} started...");
+        Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Uploading {filePath} with Id:{id} started...");
         
-        Console.WriteLine("Uploading {filePath} with Id:{id} completed.");
+        Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Uploading {filePath} with Id:{id} completed.");
         return Task.FromResult(0);
     }
 }
