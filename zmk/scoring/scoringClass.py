@@ -534,8 +534,8 @@ class NewScoringView:
 
 			else:
 				XVarForModel=modeScope['modelObj']['listOFColumns']
-				testData=testData[XVarForModel]
-				resultData=modeScope['modelObj']['recoModelObj'].predict(testData)
+				testData2=testData[XVarForModel]
+				resultData=modeScope['modelObj']['recoModelObj'].predict(testData2)
 				resultData=resultData.tolist()
 			# print (resultData)
 			if pathlib.Path(filePath).suffix =='.csv':
@@ -560,10 +560,6 @@ class NewScoringView:
 			if 'postprocessing' in modeScope:
 				# print ("modeScope['preprocessing']")
 				modeScope['postprocessing']['codeObj'](resafile)
-
-			
-			
-
 			# resultData={'result':'Add support'}
 		elif len(modelObjs) ==2:
 			modeScope=modelInformation['score'][modelObjs[0]]
