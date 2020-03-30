@@ -1292,6 +1292,14 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> GetUploadingFileAsync()
         {
             await System.Threading.Tasks.Task.FromResult(0);
+            //check if file uploaded
+            foreach(var f in FilesUploadingPayload.Get("MODEL"))
+            {
+                if(responseData.Where(i=>i.Name == f.Name).Count() > 0)
+                {
+                    FilesUploadingPayload.Clear(f.Name);
+                }
+            }
             return Json(FilesUploadingPayload.Get("MODEL"));
         }
         #endregion
