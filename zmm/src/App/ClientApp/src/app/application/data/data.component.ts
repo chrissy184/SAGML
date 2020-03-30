@@ -460,6 +460,7 @@ export class DataComponent implements OnInit {
     this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.dataUploadStatus)
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(response => {
+        // response = [{ "id": "myTestdataDemo.csv", "type": "CSV", "name": "myTestdataDemo.csv", "uploadStatus": "IN PROGRESS", "module": "DATA", "created_on": "2020-03-19T11:08:44.2186316+05:30" }];
         this.listOfData = response.concat(this.listOfData);
       });
   }

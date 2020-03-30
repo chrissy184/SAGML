@@ -45,16 +45,16 @@
     <cdk-virtual-scroll-viewport itemSize="51" class="details-list">
       <ul class="list-group list-group-flush">
         <li *cdkVirtualFor="let item of listOfData | searchfilter:'name':filter"
-          [ngClass]="{'active': (item.id === selectedData.id), 'uploading': (item.uploadStatus == 'IN PROGRESS')}"
+          [ngClass]="{'active': (item.id === selectedData.id), 'uploading': (item.uploadStatus == 'INPROGRESS')}"
           class="list-group-item list-group-item-action text-truncate" (click)="sidenav.open();viewData(item)">
           <div class="text-truncate">
             <span class="mdi mr-2" [ngClass]="utilService.fileTypeIcon(item.type)"></span>
             <span innerHtml="{{ item.name | highlight: filter }}"></span>
           </div>
-          <div class="text-muted" *ngIf="item.uploadStatus !== 'IN PROGRESS'">
+          <div class="text-muted" *ngIf="item.uploadStatus !== 'IN PROGRESS'">
             <small>Created: {{ item.created_on | date: 'dd MMM yy, hh:mm a' }}</small>
           </div>
-          <span *ngIf="item.uploadStatus == 'IN PROGRESS'" class="badge badge-primary loading-dots">
+          <span *ngIf="item.uploadStatus == 'INPROGRESS'" class="badge badge-primary loading-dots">
             Uploading in progress <span>.</span><span>.</span><span>.</span>
           </span>
         </li>
