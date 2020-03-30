@@ -195,6 +195,33 @@ namespace ZMM.App.Controllers
                         {
                             #region add to uploading
                             //
+                            switch (fileExt.ToLower())
+                            {
+                                case "csv":
+                                    type = "CSV";
+                                    break;
+                                case "json":
+                                    type = "JSON";
+                                    break;
+                                case "png":
+                                case "jpeg":
+                                case "jpg":
+                                case "webp":
+                                    type = "IMAGE";
+                                    break;
+                                case "mp4":
+                                    type = "VIDEO";
+                                    break;
+                                case "zip":
+                                    type = "FOLDER";
+                                    break;
+                                case "txt":
+                                    type = "TEXT";
+                                    break;
+                                default:
+                                    type = "UNRECOGNIZED";
+                                    break;
+                            }
                             FilesInProgress wip = new FilesInProgress()
                             {
                                 Id = formFile.FileName,
@@ -260,6 +287,7 @@ namespace ZMM.App.Controllers
                                 }
                             }
 
+                            #region Type
                             if (formFile.ContentType.Contains("image"))
                             {
                                 type = "IMAGE";
@@ -340,6 +368,9 @@ namespace ZMM.App.Controllers
                             {
                                 type = "UNRECOGNIZED";
                             }
+
+                            #endregion
+
                             //
                             string _url = DirectoryHelper.GetDataUrl(formFile.FileName);
                             string _filePath = Path.Combine(dirFullpath, fileName);
@@ -1591,6 +1622,14 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> GetUploadingFileAsync()
         {
             await Task.FromResult(0);
+            //check if file uploaded
+            foreach(var f in FilesUploadingPayload.Get("DATA"))
+            {
+                if(responseData.Where(i=>i.Name == f.Name).Count() > 0)
+                {
+                    FilesUploadingPayload.Clear(f.Name);
+                }
+            }
             return Json(FilesUploadingPayload.Get("DATA"));
         }
         #endregion
