@@ -61,6 +61,9 @@ namespace ZMM.DS
             new Dictionary<string, PmmlFileInfo>();        
         public Dictionary<string, H5FileInfo> H5Files { get; set; } =
             new Dictionary<string, H5FileInfo>();
+
+        public Dictionary<string, ONNXFileInfo> OnnxFiles { get; set; } =
+            new Dictionary<string, ONNXFileInfo>();
         public Dictionary<string, TextFileInfo> TextFiles { get; set; } =
             new Dictionary<string, TextFileInfo>();
         public Dictionary<string, RFileInfo> RFiles { get; set; } =
@@ -86,6 +89,8 @@ namespace ZMM.DS
                     select _).ToDictionary(x => new RaiFile(x).NameWithExtension, x => new PmmlFileInfo(x));
             H5Files = (from _ in Directory.GetFiles(ModelDir, "*.h5", SearchOption.AllDirectories)
                     select _).ToDictionary(x => new RaiFile(x).NameWithExtension, x => new H5FileInfo(x));
+            OnnxFiles = (from _ in Directory.GetFiles(ModelDir, "*.onnx", SearchOption.AllDirectories)
+                    select _).ToDictionary(x => new RaiFile(x).NameWithExtension, x => new ONNXFileInfo(x));
             TextFiles = (from _ in Directory.GetFiles(DataDir, "*.txt", SearchOption.TopDirectoryOnly)
                     select _).ToDictionary(x => new RaiFile(x).NameWithExtension, x => new TextFileInfo(x));
             RFiles = (from _ in Directory.GetFiles(CodeDir, "*.r", SearchOption.TopDirectoryOnly)

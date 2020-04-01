@@ -84,6 +84,25 @@ namespace ZMM.App.Controllers
             foreach (var formFile in file)
             {
                 dirFullpath = DirectoryHelper.GetCodeDirectoryPath();
+                #region type
+                var fileExt = System.IO.Path.GetExtension(formFile.FileName).Substring(1);
+                // upload file edn and start creating payload
+                switch (fileExt.ToLower())
+                {
+                    case "py":
+                        type = "PYTHON";
+                        break;
+                    case "ipynb":
+                        type = "JUPYTER_NOTEBOOK";
+                        break;
+                    case "r":
+                        type = "R";
+                        break;
+                    default:
+                        type = "UNRECOGNIZED";
+                        break;
+                }
+                #endregion
                 if (formFile.Length > 0)
                 {
                     //check if the file with the same name exists
@@ -104,11 +123,26 @@ namespace ZMM.App.Controllers
                     if (!FilePathHelper.IsFileNameValid(formFile.FileName))
                         return BadRequest("File name not valid.");
                     if (!IsFileExists)
-                    {
-                        var fileExt = System.IO.Path.GetExtension(formFile.FileName).Substring(1);
+                    {                        
                         #region upload large file > 400MB
                         if (size > 40000000)
                         {
+                            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>UPLOADING LARGE CODE FILE................................");
+                            #region add to uploading
+                            //
+                            FilesInProgress wip = new FilesInProgress()
+                            {
+                                Id = formFile.FileName,
+                                CreatedAt = DateTime.Now,
+                                Name = formFile.FileName,
+                                Type = type,
+                                Module = "CODE",
+                                UploadStatus = "INPROGRESS"
+                            };
+
+                            FilesUploadingPayload.Create(wip);
+
+                            #endregion
                             //check if same job is scheduled
                             ISchedulerFactory schfack = new StdSchedulerFactory();
                             IScheduler scheduler = await schfack.GetScheduler();
@@ -130,7 +164,7 @@ namespace ZMM.App.Controllers
                                 .Build();
 
                                 job.JobDataMap["id"] = formFile.FileName.Replace($".{fileExt}", "");
-                                job.JobDataMap["filePath"] = filePath; 
+                                job.JobDataMap["filePath"] = filePath;
                                 await _scheduler.ScheduleJob(job, trigger);
                                 #endregion
                             }
@@ -164,23 +198,6 @@ namespace ZMM.App.Controllers
                             //file copy
                             await formFile.CopyToAsync(fileStream);
 
-                            // upload file edn and start creating payload
-                            switch (fileExt.ToLower())
-                            {
-                                case "py":
-                                    type = "PYTHON";
-                                    break;
-                                case "ipynb":
-                                    type = "JUPYTER_NOTEBOOK";
-                                    break;
-                                case "r":
-                                    type = "R";
-                                    break;
-                                default:
-                                    type = "UNRECOGNIZED";
-                                    break;
-                            }
-
                             CodeResponse newRecord = new CodeResponse()
                             {
                                 Id = formFile.FileName.Replace("." + fileExt, ""),
@@ -202,7 +219,7 @@ namespace ZMM.App.Controllers
                     }
                     else
                     {
-                            return Conflict(new { message = "File already exists.", error = "File already exists."});
+                        return Conflict(new { message = "File already exists.", error = "File already exists." });
                     }
                 }
                 IsFileExists = false;
@@ -712,12 +729,12 @@ namespace ZMM.App.Controllers
         }
         #endregion
         #endregion
-    
+
         #region Create new empty file
         [HttpPost("create")]
         public async Task<IActionResult> CreateFileAsync(string type)
         {
-            if(string.IsNullOrEmpty(type)) return BadRequest(new{message = "Type is needed."});
+            if (string.IsNullOrEmpty(type)) return BadRequest(new { message = "Type is needed." });
             await System.Threading.Tasks.Task.FromResult(0);
             #region Variables
             string _type = type.ToLower();
@@ -735,7 +752,7 @@ namespace ZMM.App.Controllers
             switch (_type)
             {
                 case "py":
-                    fileContent.Append("print ('Your code goes here')");                    
+                    fileContent.Append("print ('Your code goes here')");
                     break;
                 case "ipynb":
                     fileContent.Append("{");
@@ -758,12 +775,12 @@ namespace ZMM.App.Controllers
                     fileContent.Append("\"nbformat\": 4,");
                     fileContent.Append("\"nbformat_minor\": 2");
                     fileContent.Append("}");
-                    dirFullpath = $"{dirFullpath}{_id}/";                    
+                    dirFullpath = $"{dirFullpath}{_id}/";
                     if (!Directory.Exists(dirFullpath))
                     {
                         Directory.CreateDirectory(dirFullpath);
                         _filePath = $"{dirFullpath}{newFile}";
-                    }                                         
+                    }
                     break;
             }
 
@@ -779,20 +796,37 @@ namespace ZMM.App.Controllers
             CodeResponse newRecord = new CodeResponse()
             {
                 Id = _id,
-                Name = newFile,                
+                Name = newFile,
                 Created_on = DateTime.Now.ToString(),
                 Edited_on = DateTime.Now.ToString(),
                 Extension = _type,
                 MimeType = "application/octet-stream",
                 Size = fileSize,
-                Type = _type == "ipynb"? "JUPYTER_NOTEBOOK" : "PYTHON",
+                Type = _type == "ipynb" ? "JUPYTER_NOTEBOOK" : "PYTHON",
                 Url = _url,
                 FilePath = _filePath,
                 DateCreated = DateTime.Now
             };
             CodePayload.Create(newRecord);
-            
+
             return Json(CodePayload.GetById(_id));
+        }
+        #endregion
+
+        #region get uploading files
+        [HttpGet("uploadstatus")]
+        public async Task<IActionResult> GetUploadingFileAsync()
+        {
+            await System.Threading.Tasks.Task.FromResult(0);
+            //check if file uploaded
+            foreach(var f in FilesUploadingPayload.Get("CODE"))
+            {
+                if(codeResponse.Where(i=>i.Name == f.Name).Count() > 0)
+                {
+                    FilesUploadingPayload.Clear(f.Name);
+                }
+            }
+            return Json(FilesUploadingPayload.Get("CODE"));
         }
         #endregion
     }

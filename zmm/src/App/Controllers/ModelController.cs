@@ -128,14 +128,34 @@ namespace ZMM.App.Controllers
                     {
                         type = "H5";
                     }
+                    else if (fileExt.ToLower().Contains("onnx"))
+                    {
+                        type = "ONNX";
+                    }
                     //
                     if (!FilePathHelper.IsFileNameValid(formFile.FileName))
                         return BadRequest(new { message = "Invalid file name." });
                     if (!IsFileExists)
                     {
+                        Console.WriteLine(">>>>>>>>>>>>>>>>>>>>UPLOADING LARGE MODEL FILE................................");
                         #region upload large file > 400MB
                         if (size > 40000000)
                         {
+                            #region add to uploading
+                            //
+                            FilesInProgress wip = new FilesInProgress()
+                            {
+                                Id = formFile.FileName,
+                                CreatedAt = DateTime.Now,
+                                Name = formFile.FileName,
+                                Type = type,
+                                Module = "MODEL",
+                                UploadStatus = "INPROGRESS"
+                            };
+
+                            FilesUploadingPayload.Create(wip);
+
+                            #endregion
                             //check if same job is scheduled
                             ISchedulerFactory schfack = new StdSchedulerFactory();
                             IScheduler scheduler = await schfack.GetScheduler();
@@ -225,7 +245,7 @@ namespace ZMM.App.Controllers
                 responseData = ModelPayload.Get();                
             }
             // //get details of model deployed from DeployedModel.json
-                DeployedModelFunctions.GetDeployedModel(deployedModelFileName, responseData);
+            DeployedModelFunctions.GetDeployedModel(deployedModelFileName, responseData);
             DefaultContractResolver contractResolver = new DefaultContractResolver
             {
                 NamingStrategy = new CamelCaseNamingStrategy()
@@ -1267,5 +1287,21 @@ namespace ZMM.App.Controllers
         }
         #endregion
 
+        #region get uploading files
+        [HttpGet("uploadstatus")]
+        public async Task<IActionResult> GetUploadingFileAsync()
+        {
+            await System.Threading.Tasks.Task.FromResult(0);
+            //check if file uploaded
+            foreach(var f in FilesUploadingPayload.Get("MODEL"))
+            {
+                if(responseData.Where(i=>i.Name == f.Name).Count() > 0)
+                {
+                    FilesUploadingPayload.Clear(f.Name);
+                }
+            }
+            return Json(FilesUploadingPayload.Get("MODEL"));
+        }
+        #endregion
     }
 }

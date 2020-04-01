@@ -17,6 +17,8 @@ namespace ZMM.Models.Storage
             InstanceStorage = new ConcurrentDictionary<string, InstanceResponse>();
             SchedulerStorage = new ConcurrentDictionary<string, SchedulerResponse>();
             ZSSettingStorage = new ConcurrentDictionary<string, ZSSettingResponse>();
+            FilesInProgressStorage = new ConcurrentDictionary<string, FilesInProgress>();
+
         }
         public static ConcurrentDictionary<string, DataResponse> DataStorage { get; set; }
         public static ConcurrentDictionary<string, CodeResponse> CodeStorage { get; set; }
@@ -25,5 +27,6 @@ namespace ZMM.Models.Storage
         public static ConcurrentDictionary<string, InstanceResponse> InstanceStorage { get; set; } 
         public static ConcurrentDictionary<string, SchedulerResponse> SchedulerStorage { get; set; }
         public static ConcurrentDictionary<string, ZSSettingResponse> ZSSettingStorage { get; set; }
+         public static ConcurrentDictionary<string, FilesInProgress> FilesInProgressStorage { get; set; }
     }
 }

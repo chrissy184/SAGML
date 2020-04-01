@@ -247,6 +247,7 @@ export class DataComponent implements OnInit {
         } else if (!refresh) {
           this.uploadNewFiles();
         }
+        this.getUploadFileStatus();
       }, err => {
         this.uploadNewFiles();
       });
@@ -257,6 +258,9 @@ export class DataComponent implements OnInit {
   }
 
   public viewData(data: any) {
+    if (data.uploadStatus === 'IN PROGRESS') {
+      return;
+    }
     this.selectedData = data;
     this.uploadFiles = false;
     this.uploadFilesCounter = 0;
@@ -449,6 +453,16 @@ export class DataComponent implements OnInit {
           console.log(errorResponse);
         });
     }
+  }
+
+  getUploadFileStatus() {
+    this.isContentLoading = true;
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.dataUploadStatus)
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(response => {
+        // response = [{ "id": "myTestdataDemo.csv", "type": "CSV", "name": "myTestdataDemo.csv", "uploadStatus": "IN PROGRESS", "module": "DATA", "created_on": "2020-03-19T11:08:44.2186316+05:30" }];
+        this.listOfData = response.concat(this.listOfData);
+      });
   }
 
   ngOnInit() {
