@@ -24,7 +24,7 @@ from nyokaserver import nyokaUtilities,nyokaPMMLUtilities
 # from nyokaBase import PMML43Ext as pml
 from scoring.scoringClass import Scoring,NewScoringView
 from trainModel.mergeTrainingV2 import NewModelOperations
-from KerasModelSupport.views import KerasExecution
+from KerasModelSupport.views import KerasExecution,ONNXExecution
 
 
 class ModelsView(APIView):
@@ -57,6 +57,8 @@ class ModelsView(APIView):
 			return NewModelOperations().loadExecutionModel(filePath)
 		elif fO.suffix == '.h5':
 			return KerasExecution().loadKerasModel(filePath)
+		elif fO.suffix == '.onnx':
+			return ONNXExecution().loadOnnxModel(filePath)
 		# return Scoring().loadModelfile(filePath,idfordata)
 
 
@@ -102,6 +104,7 @@ class ScoreView(APIView):
 		# modelName=modelName[:-5]
 		modelName=modelName.replace('.pmml','')
 		modelName=modelName.replace('.h5','')
+		modelName=modelName.replace('.onnx','')
 		print (modelName)
 		try:
 			filePath=requests.POST.get('filePath')

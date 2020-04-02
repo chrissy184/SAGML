@@ -20,7 +20,7 @@ import requests, json,sys,subprocess, typing
 from nyokaserver import nyokaUtilities,nyokaPMMLUtilities
 from nyoka import PMML43Ext as pml
 from nyokaserver.nyokaServerClass import NyokaServer
-from KerasModelSupport.views import KerasExecution
+from KerasModelSupport.views import KerasExecution,ONNXExecution
 
 class PMMLView(APIView):
 	http_method_names=['get']
@@ -47,6 +47,8 @@ class PMMLView(APIView):
 			return NyokaServer.getDetailsOfPMML(filePath)
 		elif fO.suffix == '.h5':
 			return KerasExecution().getDetailsfromKerasModel(filePath)
+		elif fO.suffix == '.onnx':
+			return ONNXExecution().getDetailsfromOnnxModel(filePath)
 
 
 class PMMLGlobalView(APIView):
