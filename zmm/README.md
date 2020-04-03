@@ -22,7 +22,7 @@ A startup **ASP.NET Core 3.0.100 / Angular 9** (Ubuntu 18.04) **project** with a
 
 ## Gettting started for Development
 
-*   Clone the [iRepo](http://irepo.eur.ad.sag/projects/AIAN/repos/zmm/browse) on Ubuntu 18.04.
+*   Clone this branch.
 *   Install .Net Core 3.0.100 from [here](https://www.microsoft.com/net/download/dotnet-core)
 *   Install your favorite IDE Visual Studio 2017 or Visual Studio Code.
 *   If you are using Visual Studio Code then install extension like [C# extension](https://marketplace.visualstudio.com/items?itemName=jchannon.csharpextensions) and [C# Project Solution](https://marketplace.visualstudio.com/items?itemName=fernandoescolar.vscode-solution-explorer)
