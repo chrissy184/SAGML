@@ -1,7 +1,7 @@
-# **ZMM App** - ASPNET Core 3.0.100 / Angular 7+ project development setup
+# **ZMM App** - ASPNET Core 3.0.100 / Angular 9 project development setup
 [License](http://irepo.eur.ad.sag/projects/AIAN/repos/zmm/browse/LICENSE)
 
-A startup **ASP.NET Core 3.0.100 / Angular 7** (Ubuntu 18.04) **project** with an end-to-end login (keycloak integration), data, models, code and tasks implementation.
+A startup **ASP.NET Core 3.0.100 / Angular 9** (Ubuntu 18.04) **project** with an end-to-end login (keycloak integration), data, models, code and tasks implementation.
 
 ## INTRODUCING ZMM App
 *   Overview [iWiki](https://iwiki.eur.ad.sag/pages/viewpage.action?pageId=551011559)
@@ -12,7 +12,7 @@ A startup **ASP.NET Core 3.0.100 / Angular 7** (Ubuntu 18.04) **project** with a
 
 ## This application consists of:
 
-*   Pages using Angular7.1.1 and TypeScript
+*   Pages using Angular 9 and TypeScript
 *   RESTful API Backend using ASP.NET Core 3.0.100 MVC Web API
 *   Authentication based on OpenID Connect/OAuth 2.0 using KeyCloak
 *   API Documentation using Swagger
@@ -36,7 +36,7 @@ A startup **ASP.NET Core 3.0.100 / Angular 7** (Ubuntu 18.04) **project** with a
 *   Configure your development system specific setting in appsettings.Development.json.
     For example, setting for ContentDir and JNB.
 *   Open Terminal and go to main folder (which has ZMM.sln), Build all c# projects with command **dotnet build** 
-*   Go to ClientApp folder in Terminal. Build ClientApp (Angular 7) with below commands
+*   Go to ClientApp folder in Terminal. Build ClientApp (Angular 9) with below commands
     1. yarn
     2. yarn build:prod
 *   If you get any other errors, consider running manually the steps to build the project and note where the errors occur.  
