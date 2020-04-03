@@ -18,7 +18,7 @@
 
 **Step 7**: We could now navigate to our Cumulocity IoT instance using the App Switcher within MLW 
 
-<img width="100%" src="https://github.com/SoftwareAG/MLW/blob/master/docs/Use-Cases/Add%20Machine%20Learning%20Workbench%20as%20an%20application%20within%20Cumulocity%20IoT/snap-shots/quick-snaps.gif">
+<img width="100%" src="https://github.com/SoftwareAG/MLW/blob/master/docs/use%20cases/Add%20Machine%20Learning%20Workbench%20as%20an%20application%20within%20Cumulocity%20IoT/snap-shots/quick-snaps.gif">
 
 # Troubleshooting #
 
