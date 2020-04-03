@@ -1,2 +1,4 @@
-Please use the [documentation website](https://mlw.ai/)
-for the best browsing experience.
+## Index
+*   [Use Case(s)](https://github.com/SoftwareAG/MLW/tree/master/docs/use%20cases)
+*   [Design documents](https://github.com/SoftwareAG/MLW/tree/master/docs/design)
+*   [Training Video(s)](https://mlw.ai/)
