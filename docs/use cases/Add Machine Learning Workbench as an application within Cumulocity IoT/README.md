@@ -1,4 +1,4 @@
-# Adding Machine Learning Workbench as an application within Cumulocity IoT
+# Add Machine Learning Workbench as an application within Cumulocity IoT
 
 **Step 1**: Make sure the MLW is up and running in the Docker environment
 
