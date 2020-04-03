@@ -23,7 +23,7 @@ ML Workbench allows it's user to cover a wide variety of algorithms and Deep Neu
    3. [Import data from Cumulocity](https://www.zmod.org/learn/)<br/>
    4. [Jupyter Notebook](https://www.zmod.org/learn/)<br/>
    5. [Python Execution](https://www.zmod.org/learn/)<br/>
-4. For any query, Get help from our [Open Source Community](https://www.mlw.ai/community) 
+4. For any query, You can visit [help documents](https://github.com/SoftwareAG/MLW/tree/master/docs) 
 
 ## Feature(s)
 1. AutoML for automated training of Machine Learning models.
