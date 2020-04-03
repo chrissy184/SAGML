@@ -17,7 +17,7 @@ namespace ZMM.Models.ClientJsonObjects.ZMKCodeExecution
         public string status { get; set; }
         public string createdOn { get; set; }
         public string type { get; set; }
-        public int pid { get; set; }
+        public long pid { get; set; }
         public string newPMMLFileName { get; set; }
         public List<Information> information { get; set; }
         public string taskName { get; set; }       
