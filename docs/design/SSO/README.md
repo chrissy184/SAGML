@@ -2,7 +2,7 @@
 
 MLW SSO works over OAuth 2.0 and OpenId Connect Protocol. It uses RedHat Identity Server : KeyCloak to authenticate and authorize Users.
 
-## How User gets logged with Identity Server.
+## How User logs in with Identity Server.
 <img width="100%" src="https://github.com/SoftwareAG/MLW/blob/master/docs/design/SSO/SSO%20-%20OAuth2.0%20OpenIdConnect.png"/>
 
 ## How MLW can work with other SSO system.
