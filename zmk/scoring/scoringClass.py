@@ -28,6 +28,8 @@ from keras.preprocessing import image
 from multiprocessing import Lock, Process
 lockForModelLoad = None
 
+from KerasModelSupport.views import ONNXExecution
+
 
 def create_lockForModel():
     global lockForModelLoad
@@ -387,8 +389,12 @@ class NewScoringView:
 		elif filePath != None:
 			if modelName in PMMLMODELSTORAGE:
 				if 'modelGeneratedFrom' in PMMLMODELSTORAGE[modelName]:
-					print ('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Came here')
-					scoredOutput=self.kerasScoring(modelName,filePath)
+					if PMMLMODELSTORAGE[modelName]['modelGeneratedFrom']=='Keras':
+						print ('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Came here')
+						scoredOutput=self.kerasScoring(modelName,filePath)
+					elif PMMLMODELSTORAGE[modelName]['modelGeneratedFrom']=='ONNX':
+						print ('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Came ONNX here')
+						scoredOutput=ONNXExecution().scoreOnnxModel(modelName,filePath)
 				else:
 					print ('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Came here 2')
 					scoredOutput=self.scoreFileData(modelName,filePath)
