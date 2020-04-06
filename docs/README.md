@@ -3,4 +3,4 @@
 *   [Design documents](https://github.com/SoftwareAG/MLW/tree/master/docs/design)
 *   [Training Video(s)](https://mlw.ai/)
 *   [Blog](https://mlw.ai/blog)
-*   [MLW Open Source Communities](https://mlw.ai/community)
+*   [Open Source Communities](https://mlw.ai/community)
