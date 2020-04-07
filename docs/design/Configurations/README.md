@@ -1,4 +1,4 @@
 # **Configurations**
 
-MLW MVC stack has couple four configurations to switch on or off features. 
-<img width="100%" src="Tool%20configurations.png"/>
+MLW MVC stack has four configurations to switch on or off features. <br/> <br/>
+<img width="70%" src="Tool%20configurations.png"/>
