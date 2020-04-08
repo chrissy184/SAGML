@@ -51,7 +51,7 @@
             <span class="mdi mr-2" [ngClass]="utilService.fileTypeIcon(item.type)"></span>
             <span innerHtml="{{ item.name | highlight: filter }}"></span>
           </div>
-          <div class="text-muted" *ngIf="item.uploadStatus !== 'IN PROGRESS'">
+          <div class="text-muted" *ngIf="item.uploadStatus !== 'INPROGRESS'">
             <small>Created: {{ item.created_on | date: 'dd MMM yy, hh:mm a' }}</small>
           </div>
           <span *ngIf="item.uploadStatus == 'INPROGRESS'" class="badge badge-primary loading-dots">
