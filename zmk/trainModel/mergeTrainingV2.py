@@ -303,7 +303,8 @@ class NewModelOperations:
                             tempDict[taskT][mO]['modelObj']['hyperparameters']=None
                     elif tempDict[taskT][mO]['modelObj']['modelArchType']=="SKLModel":
                         modelProp=tempDict[taskT][mO]['modelObj']['pmmlNyokaObj']
-                        # print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp)
+                        print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp)
+                        print ('>>>>>>>>>>>>>>>>>>>>>>>',modelProp.__dict__)
                         from nyoka.reconstruct.pmml_to_pipeline_model import generate_skl_model
                         recoModelObj=generate_skl_model(modelProp)
                         if recoModelObj != None:

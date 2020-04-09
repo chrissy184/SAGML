@@ -435,4 +435,5 @@ dt {
 
 .list-group.list-group-flush .list-group-item-action.uploading {
     cursor: default;
+    pointer-events: none !important;
 }

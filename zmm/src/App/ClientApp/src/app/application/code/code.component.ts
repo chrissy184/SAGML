@@ -71,6 +71,7 @@ export class CodeComponent implements OnInit {
         } else if (!refresh) {
           this.uploadNewFiles();
         }
+        this.getUploadFileStatus();
       }, err => {
         this.uploadNewFiles();
       });
@@ -203,6 +204,15 @@ export class CodeComponent implements OnInit {
       .pipe(finalize(() => { this.isLoading = false; }))
       .subscribe(response => {
         this.refresh();
+      });
+  }
+
+  getUploadFileStatus() {
+    this.isLoading = true;
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.codeUploadStatus)
+      .pipe(finalize(() => { this.isLoading = false; }))
+      .subscribe(response => {
+        this.listOfCode = response.concat(this.listOfCode);
       });
   }
 

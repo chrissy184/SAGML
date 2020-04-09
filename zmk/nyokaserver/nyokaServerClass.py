@@ -14,7 +14,7 @@ from nyokaserver import nyokaUtilities,nyokaPMMLUtilities
 from nyoka import PMML43Ext as pml
 import typing
 from datetime import datetime
-import json,sys,subprocess
+import json,sys,subprocess,ast
 # from SwaggerSchema.schemas import (
 # 	addArchitectureSwagger,
 # 	updateLayerSwagger,
@@ -718,6 +718,7 @@ class NyokaServer:
 						
 			else:
 				modelOb=generate_skl_model(pmObj)
+				print (modelOb)
 				model_graph=None
 			# print (modelOb)
 			# modelOb=None
@@ -734,11 +735,23 @@ class NyokaServer:
 				tempMem[tempSecMem[processTheInput['sectionId']]]['tf_session']=tf_session
 			tempMem[tempSecMem[processTheInput['sectionId']]]['modelPath']=modelPath
 			tempMem[tempSecMem[processTheInput['sectionId']]]['taskType']=processTheInput['taskType']
+
+			try:
+				for i in pmObj.__dict__['MiningBuildTask'].__dict__['Extension']:
+					if i.name == 'hyperparameters':
+						# print (i.__dict__['value'])
+						tempMem[tempSecMem[processTheInput['sectionId']]]['hyperparameters']=i.__dict__['value']
+				modelOb.params['objective']=ast.literal_eval(i.__dict__['value'])['objective']
+				tempMem[tempSecMem[processTheInput['sectionId']]]['modelObj']=modelOb
+				# print (modelOb.dump_model()['feature_names'])
+				tempMem[tempSecMem[processTheInput['sectionId']]]['featuresUsed']=modelOb.dump_model()['feature_names']
+			except:
+				pass
 			
 		
 		MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']=tempMem.copy()
 
-		# print ('tempMem',tempMem)
+		# print ('tempMem',MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'])
 
 		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
 		# print ('processTheInput',processTheInput)

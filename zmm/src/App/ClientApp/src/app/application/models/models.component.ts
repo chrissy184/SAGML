@@ -97,6 +97,7 @@ export class ModelsComponent implements OnInit {
         } else if (!refresh) {
           this.uploadNewFiles();
         }
+        this.getUploadFileStatus();
       }, err => {
         this.uploadNewFiles();
       });
@@ -321,6 +322,15 @@ export class ModelsComponent implements OnInit {
   }
   isArray(obj: any) {
     return Array.isArray(obj)
+  }
+
+  getUploadFileStatus() {
+    this.isLoading = true;
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.modelUploadStatus)
+      .pipe(finalize(() => { this.isLoading = false; }))
+      .subscribe(response => {
+        this.listOfModels = response.concat(this.listOfModels);
+      });
   }
 
   ngOnInit() {
