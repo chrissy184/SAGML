@@ -744,11 +744,11 @@ class NyokaServer:
 			try:
 				for i in pmObj.__dict__['MiningBuildTask'].__dict__['Extension']:
 					if i.name == 'hyperparameters':
-						print (i.__dict__['value'])
+						# print (i.__dict__['value'])
 						tempMem[tempSecMem[processTheInput['sectionId']]]['hyperparameters']=i.__dict__['value']
 				modelOb.params['objective']=ast.literal_eval(i.__dict__['value'])['objective']
 				tempMem[tempSecMem[processTheInput['sectionId']]]['modelObj']=modelOb
-				print (modelOb.dump_model()['feature_names'])
+				# print (modelOb.dump_model()['feature_names'])
 				tempMem[tempSecMem[processTheInput['sectionId']]]['featuresUsed']=modelOb.dump_model()['feature_names']
 			except:
 				pass
@@ -756,7 +756,7 @@ class NyokaServer:
 		
 		MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict']=tempMem.copy()
 
-		print ('tempMem',MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'])
+		# print ('tempMem',MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'])
 
 		model_to_pmml(MEMORY_DICT_ARCHITECTURE[projectID]['toExportDict'], PMMLFileName=MEMORY_DICT_ARCHITECTURE[projectID]['filePath'],tyP='multi')
 		# print ('processTheInput',processTheInput)
