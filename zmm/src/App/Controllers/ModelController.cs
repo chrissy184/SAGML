@@ -1156,7 +1156,7 @@ namespace ZMM.App.Controllers
                         catch (Exception ex)
                         {
                             Logger.LogCritical(ex, ex.StackTrace);
-                            return BadRequest(new { message = "Model loading failed.", errorCode = 400, exception = ex.StackTrace });
+                            return BadRequest(new { message = "Model deploy failed.", errorCode = 400, exception = ex.StackTrace });
                         }
                     }
                 }
