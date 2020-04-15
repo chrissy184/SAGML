@@ -95,4 +95,11 @@ namespace ZMM.DS
         {
         }
     }
+    public class JsonModelFileInfo : ZmodFileInfo
+    {
+        public JsonModelFileInfo(string path)
+        : base(path)
+        {
+        }
+    } 
 }

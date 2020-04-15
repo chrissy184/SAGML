@@ -44,11 +44,11 @@ namespace ZMM.App.Controllers
         private readonly IPyTensorServiceClient tbClient;
         private List<ModelResponse> responseData;
         private List<DataResponse> dataResponseData;
-        private static string[] extensions = new[] { "pmml", "onnx", "h5" };
+        private static string[] extensions = new[] { "pmml", "onnx", "h5", "json" };
         private readonly IScheduler _scheduler;
-        private static string deployedModelFileName = "DeployedModel.json"; 
+        private static string deployedModelFileName = "DeployedModel.json";
         #endregion
-        
+
         #region Constructor
         public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log, IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, IPyTensorServiceClient tbClientInstance, IScheduler factory)
         {
@@ -64,7 +64,7 @@ namespace ZMM.App.Controllers
             {
                 responseData = ModelPayload.Get();
                 dataResponseData = DataPayload.Get();
-               
+
             }
             catch (Exception ex)
             {
@@ -242,7 +242,7 @@ namespace ZMM.App.Controllers
             {
                 ModelPayload.Clear();
                 InitZmodDirectory.ScanModelsDirectory();
-                responseData = ModelPayload.Get();                
+                responseData = ModelPayload.Get();
             }
             // //get details of model deployed from DeployedModel.json
             DeployedModelFunctions.GetDeployedModel(deployedModelFileName, responseData);
@@ -1058,7 +1058,7 @@ namespace ZMM.App.Controllers
                                 ModelPayload.Update(updateRecord);
                                 responseData = ModelPayload.Get();
                                 response = "{ id: '" + record.Id + "', deployed: false}";
-                               // string fileName = "DeployedModel.json";
+                                // string fileName = "DeployedModel.json";
                                 if (!DeployedModelFunctions.DeleteDeployedModel(deployedModelFileName, record.Id))
                                     return BadRequest(new { message = "Error in updating Deployed model status file." });
                                 if (!string.IsNullOrEmpty(response)) jsonResponse = JObject.Parse(response);
@@ -1142,7 +1142,7 @@ namespace ZMM.App.Controllers
                                 ModelPayload.Update(updateRecord);
                                 responseData = ModelPayload.Get();
                                 response = @"{ id: '" + record.Id + "', deployed: true}";
-                               // string fileName = "DeployedModel.json";
+                                // string fileName = "DeployedModel.json";
                                 if (!DeployedModelFunctions.CreateUpdateJSONFile(deployedModelFileName, record.Id))
                                     return BadRequest(new { message = "Error while creating or updating Deployed Model file." });
                                 if (!string.IsNullOrEmpty(response)) jsonResponse = JObject.Parse(response);
