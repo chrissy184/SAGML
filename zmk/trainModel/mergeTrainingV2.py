@@ -954,23 +954,30 @@ class TrainingViewModels:
         # print ('*'*500)
         # print ('Came to complicated part',modelObj)
         # print ('modelObj',modelObj.keys())
-
+        print ('process started')
         if scriptOutputPrepro=='DATA':
             dataObj,tar=modelObj['preprocessing']()
-            # print (dataObj.shape)
+            print (dataObj.shape)
         else:
             pass
 
         predictedClass=None
-        df = dataObj
+        # df = dataObj
         datHyperPara=modelObj['modelObj']['hyperparameters']
         
         if modelObj['modelObj']['modelArchType']=='SKLModel':
-            # print('P'*200)
             modelV1=modelObj['modelObj']['recoModelObj']
-            modelV1=self.getSKLMOdelObjtoFit(modelV1)
-            modelV1.fit(df,tar)
-            modelObj['modelObj']['recoModelObj']=modelV1
+            if str(type(modelV1))=="<class 'lightgbm.basic.Booster'>":
+                print('Booster Model started')
+                import lightgbm as lgb
+                train_data=lgb.Dataset(dataObj,tar)
+                newmodel1_ = lgb.train(datHyperPara, train_data,init_model=modelV1)
+                modelObj['modelObj']['recoModelObj']=newmodel1_
+                print ('Training Finished!')
+            else:
+                modelV1=self.getSKLMOdelObjtoFit(modelV1)
+                modelV1.fit(df,tar)
+                modelObj['modelObj']['recoModelObj']=modelV1
 
         else:
             listOfMetrics=datHyperPara['metrics']

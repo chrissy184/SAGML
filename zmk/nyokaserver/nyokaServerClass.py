@@ -745,6 +745,7 @@ class NyokaServer:
 				for i in pmObj.__dict__['MiningBuildTask'].__dict__['Extension']:
 					if i.name == 'hyperparameters':
 						# print (i.__dict__['value'])
+						# print (ast.literal_eval(i.__dict__['value'])['objective'])
 						tempMem[tempSecMem[processTheInput['sectionId']]]['hyperparameters']=i.__dict__['value']
 				modelOb.params['objective']=ast.literal_eval(i.__dict__['value'])['objective']
 				tempMem[tempSecMem[processTheInput['sectionId']]]['modelObj']=modelOb
