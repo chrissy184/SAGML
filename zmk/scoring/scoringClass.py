@@ -378,7 +378,14 @@ class NewScoringView:
 		global PMMLMODELSTORAGE
 		print (modelName,PMMLMODELSTORAGE.keys())
 		if jsonData != None:
-			return JsonResponse({'Result':'Please add support'})
+			if modelName in PMMLMODELSTORAGE:
+				scoredOutput=self.scoreFileData(modelName,None,jsonData)
+				return scoredOutput
+			else:
+				pmmlFile='../ZMOD/Models/'+modelName+'.pmml'
+				NewModelOperations().loadExecutionModel(pmmlFile)
+				scoredOutput=self.scoreFileData(modelName,None,jsonData)
+				return scoredOutput
 			# if modelName in PMMLMODELSTORAGE:
 			# 	scoredOutput=self.scoreJsonData(modelName,jsonData)
 			# else:
@@ -397,11 +404,11 @@ class NewScoringView:
 						scoredOutput=ONNXExecution().scoreOnnxModel(modelName,filePath)
 				else:
 					print ('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Came here 2')
-					scoredOutput=self.scoreFileData(modelName,filePath)
+					scoredOutput=self.scoreFileData(modelName,filePath,None)
 			else:
 				pmmlFile='../ZMOD/Models/'+modelName+'.pmml'
 				NewModelOperations().loadExecutionModel(pmmlFile)
-				scoredOutput=self.scoreFileData(modelName,filePath)
+				scoredOutput=self.scoreFileData(modelName,filePath,None)
 
 		return scoredOutput
 
@@ -464,18 +471,22 @@ class NewScoringView:
 		return JsonResponse(resultResp,status=200)
 
 
-	def scoreFileData(self,modelName,filePath):
+	def scoreFileData(self,modelName,filePath,jsonData):
 		target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
 		self.checkCreatePath(target_path)
 		global PMMLMODELSTORAGE
 		# print (PMMLMODELSTORAGE[modelName])
 		modelInformation =PMMLMODELSTORAGE[modelName]
 		modelObjs=list(modelInformation['score'].keys())
-		if pathlib.Path(filePath).suffix =='.csv':
-			testData=pd.read_csv(filePath)
-			print (testData.shape)
-		else:
-			testData=None
+
+		if jsonData != None:
+			testData=pd.read_json(jsonData)
+		if filePath != None:
+			if pathlib.Path(filePath).suffix =='.csv':
+				testData=pd.read_csv(filePath)
+				print (testData.shape)
+			else:
+				testData=None
 
 		if len(modelObjs)==0:
 			resultResp={'result':'Model not for scoring'}
@@ -634,9 +645,11 @@ class NewScoringView:
 			else:
 				resultData=modeScope2['modelObj']['recoModelObj'].predict(testData)
 			if 'postprocessing' in modeScope2:
-				modeScope2['postprocessing']['codeObj'](resultData)
-
-			resultData=resultData.tolist()
+				resultData=modeScope2['postprocessing']['codeObj'](resultData)
+			try:
+				resultData=resultData.tolist()
+			except:
+				pass
 
 			if pathlib.Path(filePath).suffix =='.csv':
 				if modeScope['modelObj']['targetCol']==None:
@@ -647,5 +660,10 @@ class NewScoringView:
 				resafile=target_path+'result.csv'
 				testData.to_csv(resafile, index=False)
 
-		resultResp={'result':resafile}
-		return JsonResponse(resultResp,status=200)
+		if jsonData != None:
+			resultResp={'result':resultData}
+			return JsonResponse(resultResp,status=200)
+		else:
+			resultResp={'result':resafile}
+			return JsonResponse(resultResp,status=200)
+		

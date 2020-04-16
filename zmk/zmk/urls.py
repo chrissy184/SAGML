@@ -62,7 +62,7 @@ urlpatterns=[
     path(pref+'models',csrf_exempt(ModelsView.as_view()), name="Models"),
     path(pref+'models/<modelName>',csrf_exempt(ModelOperationView.as_view()), name="Models"),
     path(pref+'models/<modelName>/score',csrf_exempt(ScoreView.as_view()), name="Models"),
-    path(pref+'models/<modelName>/scoreJson',csrf_exempt(ScoreViewReturnJson.as_view()), name="Models"),
+    path(pref+'models/<modelName>/scoreJson',csrf_exempt(ScoreView.as_view()), name="Models"),
 
     path(pref+'listOfLayers',NyokaServer.listOfLayers,name='listOfLayers'),
     path(pref+'pmml',csrf_exempt(PMMLView.as_view()), name="PMML"),
