@@ -378,6 +378,7 @@ class NewScoringView:
 		global PMMLMODELSTORAGE
 		print (modelName,PMMLMODELSTORAGE.keys())
 		if jsonData != None:
+			print ('came to json records')
 			if modelName in PMMLMODELSTORAGE:
 				scoredOutput=self.scoreFileData(modelName,None,jsonData)
 				return scoredOutput
@@ -472,6 +473,7 @@ class NewScoringView:
 
 
 	def scoreFileData(self,modelName,filePath,jsonData):
+		import numpy as np
 		target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
 		self.checkCreatePath(target_path)
 		global PMMLMODELSTORAGE
@@ -480,7 +482,8 @@ class NewScoringView:
 		modelObjs=list(modelInformation['score'].keys())
 
 		if jsonData != None:
-			testData=pd.read_json(jsonData)
+			print ('jsonData >>>>>>>>.',jsonData)
+			testData=pd.DataFrame(jsonData)
 		if filePath != None:
 			if pathlib.Path(filePath).suffix =='.csv':
 				testData=pd.read_csv(filePath)
@@ -651,14 +654,15 @@ class NewScoringView:
 			except:
 				pass
 
-			if pathlib.Path(filePath).suffix =='.csv':
-				if modeScope['modelObj']['targetCol']==None:
-					testData['predicted']=resultData
-				else:
-					testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
-				print (testData.shape)
-				resafile=target_path+'result.csv'
-				testData.to_csv(resafile, index=False)
+			if jsonData == None:
+				if pathlib.Path(filePath).suffix =='.csv':
+					if modeScope['modelObj']['targetCol']==None:
+						testData['predicted']=resultData
+					else:
+						testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
+					print (testData.shape)
+					resafile=target_path+'result.csv'
+					testData.to_csv(resafile, index=False)
 
 		if jsonData != None:
 			resultResp={'result':resultData}
