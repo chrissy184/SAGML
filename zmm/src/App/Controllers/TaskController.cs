@@ -139,6 +139,13 @@ namespace ZMM.App.Controllers
                             obj.status = _status;
                             taskHistNew.Add(obj);
                         }
+                        if (_type.Contains("NN"))
+                        {
+                            TrainingResponse obj = (TrainingResponse)j;
+                            string _status = jArr.Where(s => s["idforData"].ToString() == obj.idforData).Select(s => s["status"].Value<string>()).FirstOrDefault();
+                            obj.status = _status;
+                            taskHistNew.Add(obj);
+                        }
                     }                    
                 }
                 else if(taskData.Recurrence == "ONE_TIME")

@@ -18,6 +18,7 @@ public class TrainModelJob : IJob
         Console.WriteLine($"Model training started: {dataMap.GetString("filePath")} - {dataMap.GetString("id")} is now running at {DateTime.Now.ToString()} and a random number is : {new Random().Next(0, 99999)}");
         string filePath = dataMap.GetString("filePath");
         string baseAddress = $"{dataMap.GetString("baseurl")}trainNNModel/{dataMap.GetString("id")}";
+        Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  {baseAddress}");
         //
         try
         {
@@ -36,7 +37,7 @@ public class TrainModelJob : IJob
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.StackTrace);
+            Console.WriteLine(ex.InnerException);
         }
         return Task.FromResult(0);
     }
