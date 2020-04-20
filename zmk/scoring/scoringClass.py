@@ -604,6 +604,7 @@ class NewScoringView:
 						try:
 							resultData=modelToUse.predict(testData.values)
 						except:
+							print ('scoring for LSTM')
 							testData=testData.values.reshape(rowsIn,1,colsIn)
 							resultData=modelToUse.predict(testData)
 			# if modeScope['modelObj']['modelArchType']=='NNModel':
@@ -645,9 +646,11 @@ class NewScoringView:
 						try:
 							resultData=modelToUse.predict(testData.values)
 						except:
+							print ('Came to LSTM in 2nd Model')
 							testData=testData.values.reshape(rowsIn,1,colsIn)
 							resultData=modelToUse.predict(testData)
 							resultData=np.ravel(resultData)
+							print (resultData,'from LSTM')
 			else:
 				resultData=modeScope2['modelObj']['recoModelObj'].predict(testData)
 			if 'postprocessing' in modeScope2:
@@ -655,7 +658,8 @@ class NewScoringView:
 			try:
 				resultData=resultData.tolist()
 			except:
-				pass
+				print ('Some issue with Last response')
+				resultData='Done'
 
 			if jsonData == None:
 				if pathlib.Path(filePath).suffix =='.csv':
