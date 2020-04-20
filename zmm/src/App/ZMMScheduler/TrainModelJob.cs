@@ -17,7 +17,7 @@ public class TrainModelJob : IJob
         JobDataMap dataMap = context.JobDetail.JobDataMap;
         Console.WriteLine($"Model training started: {dataMap.GetString("filePath")} - {dataMap.GetString("id")} is now running at {DateTime.Now.ToString()} and a random number is : {new Random().Next(0, 99999)}");
         string filePath = dataMap.GetString("filePath");
-        string baseAddress = $"{dataMap.GetString("baseurl")}newtrainmodels/{dataMap.GetString("id")}";
+        string baseAddress = $"{dataMap.GetString("baseurl")}trainNNModel/{dataMap.GetString("id")}";
         //
         try
         {

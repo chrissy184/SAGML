@@ -199,7 +199,7 @@ namespace ZMM.App.PyServicesClient
                 //
                 try
                 {
-                    HttpResponseMessage response = await httpClient.PostAsync($"newtrainmodels", _httpContent);
+                    HttpResponseMessage response = await httpClient.PostAsync($"trainNNModel", _httpContent);
                     // HttpResponseMessage response = await httpClient.GetAsync($"trainNNModel/{requestBody}");
                     if (response.IsSuccessStatusCode)
                     {
