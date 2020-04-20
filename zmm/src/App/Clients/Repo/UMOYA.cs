@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ZMM.App.Clients.Repo
 {
@@ -26,24 +27,24 @@ namespace ZMM.App.Clients.Repo
             ResourceDirectory = new DirectoryInfo(Helpers.ZMMDirectory.DirectoryHelper.GetDataDirectoryPath()).Parent.FullName;
         }
 
-        public void Init(string RepoURL, string RepoVersion, string RepoPAT)
+        public async Task Init(string RepoURL, string RepoVersion, string RepoPAT)
         {
-            APIs.InitZMOD(ResourceDirectory);
-            UpdateInfo(RepoURL + "/" + RepoVersion + "/index.json", RepoPAT);
+            await APIs.InitZMOD(ResourceDirectory);
+            await UpdateInfo(RepoURL + "/" + RepoVersion + "/index.json", RepoPAT);
         }
 
-        private void UpdateInfo(string RepoURL, string RepoPAT)
+        private async Task UpdateInfo(string RepoURL, string RepoPAT)
         {
             if(File.Exists(Constants.UMOYACLIOutputFile)) File.Delete(Constants.UMOYACLIOutputFile);
-            APIs.CaptureConsoleOutPut("info", "-u " + RepoURL + " -k " + RepoPAT, ResourceDirectory, Constants.UMOYACLIOutputFile);
+            await APIs.CaptureConsoleOutPutAsync("info", "-u " + RepoURL + " -k " + RepoPAT, ResourceDirectory, Constants.UMOYACLIOutputFile);
         }
 
 
-        public void Add(Resource ResourceInfo)
+        public async Task Add(Resource ResourceInfo)
         {
             Console.WriteLine("UMOYA add " + ResourceInfo.Id + "@" + ResourceInfo.Version);
             if(File.Exists(Constants.UMOYACLIOutputFile)) File.Delete(Constants.UMOYACLIOutputFile);
-            APIs.CaptureConsoleOutPut("add", ResourceInfo.Id + "@" + ResourceInfo.Version, ResourceDirectory, Constants.UMOYACLIOutputFile);
+            await APIs.CaptureConsoleOutPutAsync("add", ResourceInfo.Id + "@" + ResourceInfo.Version, ResourceDirectory, Constants.UMOYACLIOutputFile);
         }
 
     }

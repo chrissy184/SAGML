@@ -112,7 +112,7 @@ namespace ZMM.App.Controllers
                 string reqBody = string.Empty;
                 using (var reader = new StreamReader(Request.Body))
                 {
-                    var body = reader.ReadToEnd();
+                    var body = await reader.ReadToEndAsync();
                     reqBody = body.ToString();
                 }
                 if (!string.IsNullOrEmpty(reqBody))

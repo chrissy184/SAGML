@@ -20,11 +20,14 @@ namespace ZMM.App.Clients.Repo
 
         private List<string> ResourceTypes = new List<string>(){"model", "code", "data"};
         
-        readonly ILogger<RepoClient> Logger;
+        // readonly ILogger<RepoClient> Logger;
 
         private string RepoURL, RepoAPIVersion, RepoPAT;
 
-        public RepoClient(string RepoURL, string RepoAPIVersion, string RepoPAT)
+        public RepoClient(
+            string RepoURL,
+            string RepoAPIVersion,
+            string RepoPAT)
         {            
             this.RepoURL = RepoURL;
             this.RepoAPIVersion = RepoAPIVersion;
@@ -106,7 +109,7 @@ namespace ZMM.App.Clients.Repo
 
         public async Task<bool> Add(Resource ResourceInfo)
         {
-            UMOYA.Instance.Add(ResourceInfo);
+            await UMOYA.Instance.Add(ResourceInfo);
             return true;
         }
 
