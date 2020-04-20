@@ -483,7 +483,10 @@ class NewScoringView:
 
 		if jsonData != None:
 			print ('jsonData >>>>>>>>.',jsonData)
-			testData=pd.DataFrame(jsonData)
+			try:
+				testData=pd.DataFrame(jsonData)
+			except:
+				testData=pd.DataFrame([jsonData])
 		if filePath != None:
 			if pathlib.Path(filePath).suffix =='.csv':
 				testData=pd.read_csv(filePath)
