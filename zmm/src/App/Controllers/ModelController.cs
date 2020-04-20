@@ -894,6 +894,7 @@ namespace ZMM.App.Controllers
                 /* call NN train api */
                 response = await nnclient.TrainModel(jObjOrig.ToString());
                 //
+                Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>{jObjOrig.ToString()}");
                 var objresp = JsonConvert.DeserializeObject<TrainingResponse>(response);
                 objresp.executedAt = DateTime.Now;
                 List<TrainingResponse> tresp = new List<TrainingResponse>();
