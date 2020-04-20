@@ -483,7 +483,10 @@ class NewScoringView:
 
 		if jsonData != None:
 			print ('jsonData >>>>>>>>.',jsonData)
-			testData=pd.DataFrame(jsonData)
+			try:
+				testData=pd.DataFrame(jsonData)
+			except:
+				testData=pd.DataFrame([jsonData])
 		if filePath != None:
 			if pathlib.Path(filePath).suffix =='.csv':
 				testData=pd.read_csv(filePath)
@@ -601,6 +604,7 @@ class NewScoringView:
 						try:
 							resultData=modelToUse.predict(testData.values)
 						except:
+							print ('scoring for LSTM')
 							testData=testData.values.reshape(rowsIn,1,colsIn)
 							resultData=modelToUse.predict(testData)
 			# if modeScope['modelObj']['modelArchType']=='NNModel':
@@ -642,17 +646,20 @@ class NewScoringView:
 						try:
 							resultData=modelToUse.predict(testData.values)
 						except:
+							print ('Came to LSTM in 2nd Model')
 							testData=testData.values.reshape(rowsIn,1,colsIn)
 							resultData=modelToUse.predict(testData)
 							resultData=np.ravel(resultData)
+							print (resultData,'from LSTM')
 			else:
 				resultData=modeScope2['modelObj']['recoModelObj'].predict(testData)
 			if 'postprocessing' in modeScope2:
 				resultData=modeScope2['postprocessing']['codeObj'](resultData)
-			try:
-				resultData=resultData.tolist()
-			except:
-				pass
+			# try:
+			# 	resultData=resultData.tolist()
+			# except:
+			# 	print ('Some issue with Last response')
+			# 	resultData='Done'
 
 			if jsonData == None:
 				if pathlib.Path(filePath).suffix =='.csv':
