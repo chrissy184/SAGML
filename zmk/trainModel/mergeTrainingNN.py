@@ -190,7 +190,7 @@ class NeuralNetworkModelTrainer:
 
 		target=TrainingViewModels().trainModel
 
-		print ('>>>>>> Step ',4)
+		print ('>>>>>> Step  train Model',4)
 		try:
 			# train_prc = Process(target=target,args=(pmmlFile,self.pathOfData,fileName,tensorboardLogFolder,lossType,\
 			# 	listOfMetrics,batchSize,epoch,idforData,problemType,scriptOutputPrepro,optimizerName,learningRate,
