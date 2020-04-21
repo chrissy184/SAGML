@@ -894,6 +894,7 @@ namespace ZMM.App.Controllers
                 /* call NN train api */
                 response = await nnclient.TrainModel(jObjOrig.ToString());
                 //
+                Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>{jObjOrig.ToString()}");
                 var objresp = JsonConvert.DeserializeObject<TrainingResponse>(response);
                 objresp.executedAt = DateTime.Now;
                 List<TrainingResponse> tresp = new List<TrainingResponse>();
@@ -1156,7 +1157,7 @@ namespace ZMM.App.Controllers
                         catch (Exception ex)
                         {
                             Logger.LogCritical(ex, ex.StackTrace);
-                            return BadRequest(new { message = "Model loading failed.", errorCode = 400, exception = ex.StackTrace });
+                            return BadRequest(new { message = "Model deploy failed.", errorCode = 400, exception = ex.StackTrace });
                         }
                     }
                 }

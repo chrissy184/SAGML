@@ -378,7 +378,15 @@ class NewScoringView:
 		global PMMLMODELSTORAGE
 		print (modelName,PMMLMODELSTORAGE.keys())
 		if jsonData != None:
-			return JsonResponse({'Result':'Please add support'})
+			print ('came to json records')
+			if modelName in PMMLMODELSTORAGE:
+				scoredOutput=self.scoreFileData(modelName,None,jsonData)
+				return scoredOutput
+			else:
+				pmmlFile='../ZMOD/Models/'+modelName+'.pmml'
+				NewModelOperations().loadExecutionModel(pmmlFile)
+				scoredOutput=self.scoreFileData(modelName,None,jsonData)
+				return scoredOutput
 			# if modelName in PMMLMODELSTORAGE:
 			# 	scoredOutput=self.scoreJsonData(modelName,jsonData)
 			# else:
@@ -397,11 +405,11 @@ class NewScoringView:
 						scoredOutput=ONNXExecution().scoreOnnxModel(modelName,filePath)
 				else:
 					print ('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Came here 2')
-					scoredOutput=self.scoreFileData(modelName,filePath)
+					scoredOutput=self.scoreFileData(modelName,filePath,None)
 			else:
 				pmmlFile='../ZMOD/Models/'+modelName+'.pmml'
 				NewModelOperations().loadExecutionModel(pmmlFile)
-				scoredOutput=self.scoreFileData(modelName,filePath)
+				scoredOutput=self.scoreFileData(modelName,filePath,None)
 
 		return scoredOutput
 
@@ -464,18 +472,27 @@ class NewScoringView:
 		return JsonResponse(resultResp,status=200)
 
 
-	def scoreFileData(self,modelName,filePath):
+	def scoreFileData(self,modelName,filePath,jsonData):
+		import numpy as np
 		target_path='./logs/'+''.join(choice(ascii_uppercase) for i in range(12))+'/'
 		self.checkCreatePath(target_path)
 		global PMMLMODELSTORAGE
 		# print (PMMLMODELSTORAGE[modelName])
 		modelInformation =PMMLMODELSTORAGE[modelName]
 		modelObjs=list(modelInformation['score'].keys())
-		if pathlib.Path(filePath).suffix =='.csv':
-			testData=pd.read_csv(filePath)
-			print (testData.shape)
-		else:
-			testData=None
+
+		if jsonData != None:
+			print ('jsonData >>>>>>>>.',jsonData)
+			try:
+				testData=pd.DataFrame(jsonData)
+			except:
+				testData=pd.DataFrame([jsonData])
+		if filePath != None:
+			if pathlib.Path(filePath).suffix =='.csv':
+				testData=pd.read_csv(filePath)
+				print (testData.shape)
+			else:
+				testData=None
 
 		if len(modelObjs)==0:
 			resultResp={'result':'Model not for scoring'}
@@ -587,6 +604,7 @@ class NewScoringView:
 						try:
 							resultData=modelToUse.predict(testData.values)
 						except:
+							print ('scoring for LSTM')
 							testData=testData.values.reshape(rowsIn,1,colsIn)
 							resultData=modelToUse.predict(testData)
 			# if modeScope['modelObj']['modelArchType']=='NNModel':
@@ -628,24 +646,36 @@ class NewScoringView:
 						try:
 							resultData=modelToUse.predict(testData.values)
 						except:
+							print ('Came to LSTM in 2nd Model')
 							testData=testData.values.reshape(rowsIn,1,colsIn)
 							resultData=modelToUse.predict(testData)
 							resultData=np.ravel(resultData)
+							print (resultData,'from LSTM')
 			else:
 				resultData=modeScope2['modelObj']['recoModelObj'].predict(testData)
 			if 'postprocessing' in modeScope2:
-				modeScope2['postprocessing']['codeObj'](resultData)
+				resultData=modeScope2['postprocessing']['codeObj'](resultData)
 
-			resultData=resultData.tolist()
+			if jsonData == None:
+				if pathlib.Path(filePath).suffix =='.csv':
+					if modeScope['modelObj']['targetCol']==None:
+						testData['predicted']=resultData
+					else:
+						testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
+					print (testData.shape)
+					resafile=target_path+'result.csv'
+					testData.to_csv(resafile, index=False)
 
-			if pathlib.Path(filePath).suffix =='.csv':
-				if modeScope['modelObj']['targetCol']==None:
-					testData['predicted']=resultData
-				else:
-					testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
-				print (testData.shape)
-				resafile=target_path+'result.csv'
-				testData.to_csv(resafile, index=False)
-
-		resultResp={'result':resafile}
-		return JsonResponse(resultResp,status=200)
+		if jsonData != None:
+			try:
+				resultData=[i.astype(float) for i in resultData]
+				print (resultData,'after processed')
+			except:
+				print ('Some issue with Last response')
+				resultData='Done'
+			resultResp={'result':resultData}
+			return JsonResponse(resultResp,status=200)
+		else:
+			resultResp={'result':resafile}
+			return JsonResponse(resultResp,status=200)
+		

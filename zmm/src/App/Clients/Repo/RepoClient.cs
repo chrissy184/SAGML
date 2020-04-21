@@ -33,8 +33,8 @@ namespace ZMM.App.Clients.Repo
             Constants.RepoURL = Constants.RepoURL.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
             Constants.RepoURLQueryByResourceType = Constants.RepoURLQueryByResourceType.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
             Constants.RepoURLQuery = Constants.RepoURLQuery.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
-            Constants.RepoURLQueryByResourceTypeAndQueryString = Constants.RepoURLQuery.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
-            Constants.RepoURLByResourceId = Constants.RepoURLQuery.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
+            Constants.RepoURLQueryByResourceTypeAndQueryString = Constants.RepoURLQueryByResourceTypeAndQueryString.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
+            Constants.RepoURLByResourceId = Constants.RepoURLByResourceId.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
         }
 
         public async Task<IEnumerable<Resource>> Get()
@@ -106,7 +106,7 @@ namespace ZMM.App.Clients.Repo
 
         public async Task<bool> Add(Resource ResourceInfo)
         {
-            UMOYA.Instance.Add(ResourceInfo);
+            await UMOYA.Instance.Add(ResourceInfo);
             return true;
         }
 

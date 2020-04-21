@@ -7,12 +7,13 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.IO.Compression;
+using System.Threading.Tasks;
 
 namespace ZMM.App.Clients.Repo
 {
     public class APIs
     {
-        internal static void CaptureConsoleOutPut(string ActionName, string ParamString, string WorkingDir, string ActualoutputFilePath)
+        internal static async System.Threading.Tasks.Task CaptureConsoleOutPutAsync(string ActionName, string ParamString, string WorkingDir, string ActualoutputFilePath)
         {
 
             var process = new Process();
@@ -32,7 +33,9 @@ namespace ZMM.App.Clients.Repo
             {
                 if(CLIThread.IsAlive) 
                 {
-                    System.Threading.Thread.Sleep(500);
+                    // System.Threading.Thread.Sleep(500);
+                    await System.Threading.Tasks.Task.Delay(500);
+                    Console.WriteLine("Executing command " + ActionName);
                 }
                 else 
                 {
@@ -42,11 +45,11 @@ namespace ZMM.App.Clients.Repo
             }
         }             
 
-        public static bool InitZMOD(string ZMODPath)
+        public static async Task<bool> InitZMOD(string ZMODPath)
         {
             bool Status = true;
-            CaptureConsoleOutPut("init", string.Empty, ZMODPath, string.Empty);
-            CaptureConsoleOutPut("info", "-d False -sp False", ZMODPath, string.Empty);
+            await CaptureConsoleOutPutAsync("init", string.Empty, ZMODPath, string.Empty);
+            await CaptureConsoleOutPutAsync("info", "-d False -sp False", ZMODPath, string.Empty);
             return Status;
         }
 

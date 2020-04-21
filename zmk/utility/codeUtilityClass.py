@@ -56,6 +56,7 @@ class CodeUtilityClass:
             args = [str(a) for a in args]
             popen = subprocess.Popen([sys.executable,filePath]+args,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
             output,error = popen.communicate()
+            print (output,'output')
             if output:
                 output=output.decode('utf-8')
                 info = {'Output':output}
@@ -72,7 +73,7 @@ class CodeUtilityClass:
         with open(statusfileLocation,'w') as filetosave:
             json.dump({}, filetosave)
 
-        print ('>>>>>>>>>>>>>>>> parmas',params)
+        print ('>>>>>>>>>>>>>>>> parmas',params,statusfileLocation)
 
         import threading
         pp = threading.Thread(target=monitorThread,args=(filePath,params,statusfileLocation))

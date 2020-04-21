@@ -148,3 +148,40 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = "./logs/"
 MEDIA_URL = "./logs/"
 
+
+# LOGGING={
+#     'version':1,
+#     'disable_existing_loggers':False,
+#     'handlers':{
+#         'file':{
+#             'level':'DEBUG',
+#             'class':'logging.FileHandler',
+#             'filename':'./debuglogs/debug.log',
+#             'formatter':'verbose'
+#         }
+#     },
+#     'loggers':{
+#         'django':{
+#             'handlers':['file'],
+#             'level':'INFO',
+#             'propogate':True,
+#                 },
+#         'django.request':{
+#             'handlers':['file'],
+#             'level':'INFO',
+#             'propagate':False,
+#         },
+#         'django.server':{
+#             'handlers':['file'],
+#             'level':'INFO',
+#             'propagate':False,
+#         },
+#     },
+#     'formatters':{
+#         'verbose':{
+#             'format':'{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+#             'style':'{',
+#         }
+#     },
+
+# }

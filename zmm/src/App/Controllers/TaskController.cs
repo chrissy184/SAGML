@@ -116,7 +116,7 @@ namespace ZMM.App.Controllers
                 }
                 var joResp = JsonConvert.DeserializeObject<ZMM.Models.ClientJsonObjects.ZMKCodeExecution.RootObject>(resp);
                 JArray jArr = JArray.FromObject(joResp.runningTask);
-
+                Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ZMK RUNNING TASK: {joResp}");
                 // JObject joResp = JObject.Parse(resp);
                 // JArray jArr = (JArray)joResp["runningTask"];
                 //
@@ -139,6 +139,14 @@ namespace ZMM.App.Controllers
                             obj.status = _status;
                             taskHistNew.Add(obj);
                         }
+                        if (_type.Contains("NN"))
+                        {
+                            TrainingResponse obj = (TrainingResponse)j;
+                            string _status = jArr.Where(s => s["idforData"].ToString() == obj.idforData).Select(s => s["status"].Value<string>()).FirstOrDefault();
+                            obj.status = _status;
+                            taskHistNew.Add(obj);
+                        }
+                        
                     }                    
                 }
                 else if(taskData.Recurrence == "ONE_TIME")
