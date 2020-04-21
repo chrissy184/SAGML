@@ -20,14 +20,11 @@ namespace ZMM.App.Clients.Repo
 
         private List<string> ResourceTypes = new List<string>(){"model", "code", "data"};
         
-        // readonly ILogger<RepoClient> Logger;
+        readonly ILogger<RepoClient> Logger;
 
         private string RepoURL, RepoAPIVersion, RepoPAT;
 
-        public RepoClient(
-            string RepoURL,
-            string RepoAPIVersion,
-            string RepoPAT)
+        public RepoClient(string RepoURL, string RepoAPIVersion, string RepoPAT)
         {            
             this.RepoURL = RepoURL;
             this.RepoAPIVersion = RepoAPIVersion;
@@ -36,8 +33,8 @@ namespace ZMM.App.Clients.Repo
             Constants.RepoURL = Constants.RepoURL.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
             Constants.RepoURLQueryByResourceType = Constants.RepoURLQueryByResourceType.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
             Constants.RepoURLQuery = Constants.RepoURLQuery.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
-            Constants.RepoURLQueryByResourceTypeAndQueryString = Constants.RepoURLQuery.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
-            Constants.RepoURLByResourceId = Constants.RepoURLQuery.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
+            Constants.RepoURLQueryByResourceTypeAndQueryString = Constants.RepoURLQueryByResourceTypeAndQueryString.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
+            Constants.RepoURLByResourceId = Constants.RepoURLByResourceId.Replace("$URL", RepoURL).Replace("$APIVersion", RepoAPIVersion);
         }
 
         public async Task<IEnumerable<Resource>> Get()
