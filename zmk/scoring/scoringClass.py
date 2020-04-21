@@ -655,12 +655,6 @@ class NewScoringView:
 				resultData=modeScope2['modelObj']['recoModelObj'].predict(testData)
 			if 'postprocessing' in modeScope2:
 				resultData=modeScope2['postprocessing']['codeObj'](resultData)
-			try:
-				resultData=[i.astype(float) for i in resultData]
-				print (resultData,'after processed')
-			except:
-				print ('Some issue with Last response')
-				resultData='Done'
 
 			if jsonData == None:
 				if pathlib.Path(filePath).suffix =='.csv':
@@ -673,6 +667,12 @@ class NewScoringView:
 					testData.to_csv(resafile, index=False)
 
 		if jsonData != None:
+			try:
+				resultData=[i.astype(float) for i in resultData]
+				print (resultData,'after processed')
+			except:
+				print ('Some issue with Last response')
+				resultData='Done'
 			resultResp={'result':resultData}
 			return JsonResponse(resultResp,status=200)
 		else:
