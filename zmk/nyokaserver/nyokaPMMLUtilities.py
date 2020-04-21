@@ -111,16 +111,6 @@ class NyokaPMMLUtilities:
             # print('No input came')
             tomul=0
             return '({},1)'.format(tomul) 
-    
-    def outputForSimpleRNN(self,tempdata7):
-        # print ('$$$$$$$$$$$$$$ Dense 001',tempdata7)
-        try:
-            tomul=tempdata7['properties']['units']
-            return '(1,{})'.format(tomul) 
-        except:
-            # print('No input came')
-            tomul=0
-            return '(1,{})'.format(tomul) 
 
     def weightBiasDense(self,tempdata):
         try:
@@ -131,16 +121,6 @@ class NyokaPMMLUtilities:
             # print('No input came')
             xSide,ySide=0,0
             return ('({},{})'.format(xSide,ySide),'({},1)'.format(ySide))
-
-    def weightShapeRNN(self,tempdata):
-        try:
-            xSide=ast.literal_eval(tempdata['properties']['inputDimension'])[1]
-            ySide=ast.literal_eval(tempdata['properties']['outputDimension'])[1]
-            return ('({},{})'.format(xSide,ySide),'({},1)'.format(ySide),'({},{})'.format(ySide,ySide))
-        except:
-            # print('No input came')
-            xSide,ySide=0,0
-            return ('({},{})'.format(xSide,ySide),'({},1)'.format(ySide),'({},{})'.format(ySide,ySide))
 
 
     def weightConvo(self,tempdata):
@@ -179,10 +159,6 @@ class NyokaPMMLUtilities:
         tempLayerWeightobject=pml.LayerWeights(content=[])
         tempWei=tempLayerWeightobject.__dict__
         tempWei['weightsFlattenAxis']="0"
-
-        tempRecurrentLayerWeightobject=pml.LayerRecurrentWeights(content=[])
-        tempRecurrentWei=tempRecurrentLayerWeightobject.__dict__
-        tempRecurrentWei['recurrentWeightsFlattenAxis']="0"
         
         if tempData['layerType'] in ['Input']:
             tempData['properties']['outputDimension']=self.outputForInput(tempData)
@@ -226,13 +202,7 @@ class NyokaPMMLUtilities:
              
             tempData['properties']['outputDimension']=self.outputForDense(tempData)
             tempWei['weightsShape']=self.weightBiasDense(tempData)[0]
-            tempBia['biasShape']=self.weightBiasDense(tempData)[1]
-        elif tempData['layerType'] in ['SimpleRNN','GRU','LSTM']:
-            tempData['properties']['outputDimension']=self.outputForSimpleRNN(tempData)
-            tempWei['weightsShape']=self.weightShapeRNN(tempData)[0]
-            tempBia['biasShape']=self.weightShapeRNN(tempData)[1]
-            tempRecurrentWei['recurrentWeightsShape']=self.weightShapeRNN(tempData)[2]
-            # tempData['properties']['reshapeTarget'] = str(tuple(tempData['properties']['reshapeTarget']))
+            tempBia['weightsShape']=self.weightBiasDense(tempData)[1]
         # print ('$$$$$$$$$$$$$$$tempData',tempData)
         tempLayerobject=pml.LayerParameters()
         tempvals=tempLayerobject.__dict__
@@ -252,12 +222,6 @@ class NyokaPMMLUtilities:
                 kk=pml.NetworkLayer(layerType=tempData['layerType'],layerId=tempData['layerId'],\
                                    connectionLayerId=tempData['connectionLayerId'],\
                                    LayerParameters=tempLayerobject,LayerWeights=tempLayerWeightobject,LayerBias=tempLayerBiasobject)
-            elif tempData['layerType'] in ['SimpleRNN','GRU','LSTM']:
-
-                kk=pml.NetworkLayer(layerType=tempData['layerType'],layerId=tempData['layerId'],\
-                                   connectionLayerId=tempData['connectionLayerId'],\
-                                   LayerParameters=tempLayerobject,LayerWeights=tempLayerWeightobject,LayerBias=tempLayerBiasobject,\
-                                    LayerRecurrentWeights=tempRecurrentLayerWeightobject)
             elif tempData['layerType'] in ['Conv2D','DepthwiseConv2D','BatchNormalization'] :
                 kk=pml.NetworkLayer(layerType=tempData['layerType'],layerId=tempData['layerId'],\
                                    connectionLayerId=tempData['connectionLayerId'],\

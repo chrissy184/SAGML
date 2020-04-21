@@ -12,7 +12,7 @@ namespace ZMM.App.Clients.Repo
 
         public static string RepoURLByResourceId = "$URL/$APIVersion/registration/ResourceId/index.json";
 
-        public static readonly string UMOYACLIOutputFile = "UMOYA-CLI.json";
+        public static readonly string UMOYACLIOutputFile = "log.txt";
         public const string UmoyaHomeName = ".umoya";
         public static readonly char PathSeperator = System.IO.Path.DirectorySeparatorChar;
         public static readonly string OwnerAsCurrentUser = Environment.UserName;

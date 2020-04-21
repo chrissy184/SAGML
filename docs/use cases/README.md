@@ -1,0 +1,3 @@
+## Index
+*   [Install Cumulocity IOT ML Workbench in Windows 10,  Linux and or  MacOS](https://github.com/SoftwareAG/MLW/tree/master/docs/use%20cases/Install%20Cumulocity%20IOT%20ML%20Workbench%20in%20Windows%2010%20%20Linux%20%20MacOS)
+*   [Add Machine Learning Workbench as an application within Cumulocity IoT](https://github.com/SoftwareAG/MLW/tree/master/docs/use%20cases/Add%20Machine%20Learning%20Workbench%20as%20an%20application%20within%20Cumulocity%20IoT)
