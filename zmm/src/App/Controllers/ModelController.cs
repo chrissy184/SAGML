@@ -20,10 +20,12 @@ using ZMM.Models.ResponseMessages;
 using ZMM.Helpers.ZMMDirectory;
 using ZMM.App.PyServicesClient;
 using ZMM.App.ZSServiceClient;
+using ZMM.App.MLEngineService;
 using ZMM.Tools.TB;
 using ZMM.Helpers.Common;
 using Quartz;
 using Quartz.Impl;
+using System.Text.Json;
 
 namespace ZMM.App.Controllers
 {
@@ -33,7 +35,7 @@ namespace ZMM.App.Controllers
     {
         #region Variables 
         private readonly string CURRENT_USER = "";
-
+        private readonly IOnnxClient OnnxClient;
         private readonly IWebHostEnvironment _environment;
         readonly ILogger<ModelController> Logger;
         private IConfiguration Configuration { get; }
@@ -50,7 +52,10 @@ namespace ZMM.App.Controllers
         #endregion
         
         #region Constructor
-        public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log, IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, IPyTensorServiceClient tbClientInstance, IScheduler factory)
+        public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log,
+                IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, 
+                IPyTensorServiceClient tbClientInstance, IScheduler factory,
+                IOnnxClient _onnxClient)
         {
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.Configuration = configuration;
@@ -58,6 +63,7 @@ namespace ZMM.App.Controllers
             this.Logger = log;
             this.zmeClient = _zmeClient;
             this.zsClient = _zsClient;
+            this.OnnxClient = _onnxClient;
             this.tbClient = tbClientInstance;
             _scheduler = factory;
             try
@@ -1151,7 +1157,7 @@ namespace ZMM.App.Controllers
                             }
                             else
                             {
-                                return BadRequest(new { message = "Model loading failed.", errorCode = 500, exception = "No response from server." });
+                                return BadRequest(new { message = "Model deploying failed.", errorCode = 500, exception = "No response from server." });
                             }
                         }
                         catch (Exception ex)
@@ -1171,7 +1177,6 @@ namespace ZMM.App.Controllers
 
 
         #endregion
-
 
         #region Get deployed models
         [HttpGet("~/api/model/deployed")]
@@ -1303,6 +1308,57 @@ namespace ZMM.App.Controllers
             }
             return Json(FilesUploadingPayload.Get("MODEL"));
         }
+        #endregion
+    
+        #region MLE - ONNX related
+
+        #region Deploy to MLE
+        [HttpPost("onnx/{id}")]
+        public async Task<IActionResult> DeployToMLEAsync(string id)
+        {
+            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            //get filePath of the file
+            string filePath = responseData.Where(i => i.Id == id).Select(item => item.FilePath).FirstOrDefault().ToString();
+            var response = await OnnxClient.DeployModelAsync(zmodId, filePath);
+            MleResponse mle = JsonConvert.DeserializeObject<MleResponse>(response);
+            //add response to ModelResponse
+            ModelResponse record = responseData.Where(i=> i.Id == id).FirstOrDefault();
+            record.MleResponse = mle;
+            ModelPayload.Update(record);
+            return Ok(record);
+        }
+        #endregion
+
+        #region Get model list from MLE
+        [HttpGet("onnx")]
+        public async Task<IActionResult> GetModelsFromMLEAsync()
+        {
+            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            var response = await OnnxClient.GetAllModel(zmodId);
+            return Ok(response);
+        }
+        #endregion
+
+        #region get selected model info from MLE
+        [HttpGet("onnx/{id}/info")]
+        public async Task<IActionResult> GetModelInfoFromMLEAsync()
+        {
+            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            var response = await OnnxClient.GetModelInfo(zmodId);
+            return Ok();
+        }
+        #endregion
+
+        #region remove model from MLE
+        [HttpDelete("onnx/{id}")]
+        public async Task<IActionResult> DeleteModelFromMLEAsync()
+        {
+            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            var response = await OnnxClient.RemoveModelAsync(zmodId);
+            return Ok();
+        }
+        #endregion
+        
         #endregion
     }
 }

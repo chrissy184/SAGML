@@ -40,6 +40,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using ZMM.Middlewares;
 using Microsoft.IdentityModel.Logging;
 using ZMM.App.Clients.Repo;
+using ZMM.App.MLEngineService;
 
 namespace ZMM.App
 {
@@ -141,7 +142,8 @@ namespace ZMM.App
             services.AddSingleton<IBaseImageForWielding>(new BaseImageForWielding(Configuration));
             services.AddSingleton<IPyJupyterServiceClient>(new PyJupyterServiceClient(ToolHostURL, JupyterNotebookRoutePrefix ,JupyterNotebookPortRangeInUse));
             services.AddSingleton<IPyZMEServiceClient>(new PyZMEServiceClient(Configuration));
-            services.AddSingleton<IZSModelPredictionClient>(new ZSModelPredictionClient(Configuration));      
+            services.AddSingleton<IZSModelPredictionClient>(new ZSModelPredictionClient(Configuration));    
+            services.AddSingleton<IOnnxClient>(new OnnxClient(Configuration));   
             services.AddSingleton<IPyTensorServiceClient>(new PyTensorServiceClient(ToolHostURL,TensorBoardRoutePrefix,TensorBoardPortRangeInUse,ContentDir));
             services.AddSingleton<IPyCompile>(new PyCompile(Configuration));  
             services.AddSingleton(provider => GetScheduler());

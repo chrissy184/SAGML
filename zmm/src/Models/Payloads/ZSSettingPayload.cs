@@ -119,5 +119,30 @@ namespace ZMM.Models.Payloads
         }
         #endregion      
 
+        #region Get credential Info - url,uname,pass
+        public static Tuple<string, string, string> GetUserCredetials(string zmodId, string type)
+        {
+            string url = "", uname = "", pass = "";
+            // var qry = GetSettingsByUser(zmodId)
+            // .Where(i => i.Settings.Any(s => s.selected == true))
+            // .SelectMany(col => col.Settings.Select(s => new { s.url, s.username, s.password }));
+
+            foreach (var _ in GetSettingsByUser(zmodId))
+            {
+                foreach (var record in _.Settings)
+                {
+                    if ((record.selected == true) && (record.type == type))
+                    {
+                        url = record.url;
+                        uname = record.username;
+                        pass = record.password;
+                        break;
+                    }
+                }
+            }
+
+            return new Tuple<string, string, string>(url, uname, pass);
+        }
+        #endregion
     }
 }
