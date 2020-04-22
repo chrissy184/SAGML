@@ -656,24 +656,25 @@ class NewScoringView:
 			if 'postprocessing' in modeScope2:
 				resultData=modeScope2['postprocessing']['codeObj'](resultData)
 
-			if jsonData == None:
-				print (resultData,'resultData')
-				if pathlib.Path(filePath).suffix =='.csv':
-					testData=pd.DataFrame(resultData,columns=['predicted'])
-					print (testData.shape)
-					resafile=target_path+'result.csv'
-					testData.to_csv(resafile, index=False)
-
-			if jsonData != None:
-				try:
-					resultData=[i.astype(float) for i in resultData]
-					print (resultData,'after processed')
-				except:
-					print ('Some issue with Last response')
-					resultData='Done'
-				resultResp={'result':resultData}
-				return JsonResponse(resultResp,status=200)
-			else:
+		if jsonData == None:
+			print (resultData,'resultData')
+			if pathlib.Path(filePath).suffix =='.csv':
+				testData=pd.DataFrame(resultData,columns=['predicted'])
+				print (testData.shape)
+				resafile=target_path+'result.csv'
+				testData.to_csv(resafile, index=False)
 				resultResp={'result':resafile}
+
+		if jsonData != None:
+			try:
+				resultData=[i.astype(float) for i in resultData]
+				print (resultData,'after processed')
+			except:
+				print ('Some issue with Last response')
+				resultData='Done'
+			resultResp={'result':resultData}
+			return JsonResponse(resultResp,status=200)
+		else:
+			resultResp={'result':resafile}
 		return JsonResponse(resultResp,status=200)
 		
