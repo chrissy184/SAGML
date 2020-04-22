@@ -659,7 +659,7 @@ class NewScoringView:
 			if jsonData == None:
 				print (resultData,'resultData')
 				if pathlib.Path(filePath).suffix =='.csv':
-					testData=pd.DataFrame(resultData)
+					testData=pd.DataFrame(resultData,columns=['predicted'])
 					print (testData.shape)
 					resafile=target_path+'result.csv'
 					testData.to_csv(resafile, index=False)
