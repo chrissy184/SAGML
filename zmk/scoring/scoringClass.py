@@ -656,15 +656,14 @@ class NewScoringView:
 			if 'postprocessing' in modeScope2:
 				resultData=modeScope2['postprocessing']['codeObj'](resultData)
 
-			if jsonData == None:
-				if pathlib.Path(filePath).suffix =='.csv':
-					if modeScope['modelObj']['targetCol']==None:
-						testData['predicted']=resultData
-					else:
-						testData['predicted_'+modeScope['modelObj']['targetCol']]=resultData
-					print (testData.shape)
-					resafile=target_path+'result.csv'
-					testData.to_csv(resafile, index=False)
+		if jsonData == None:
+			print (resultData,'resultData')
+			if pathlib.Path(filePath).suffix =='.csv':
+				testData=pd.DataFrame(resultData,columns=['predicted'])
+				print (testData.shape)
+				resafile=target_path+'result.csv'
+				testData.to_csv(resafile, index=False)
+				resultResp={'result':resafile}
 
 		if jsonData != None:
 			try:
@@ -677,5 +676,5 @@ class NewScoringView:
 			return JsonResponse(resultResp,status=200)
 		else:
 			resultResp={'result':resafile}
-			return JsonResponse(resultResp,status=200)
+		return JsonResponse(resultResp,status=200)
 		
