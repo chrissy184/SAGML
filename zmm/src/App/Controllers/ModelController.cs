@@ -1368,7 +1368,7 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> DeleteModelFromMLEAsync(string id)
         {
             string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-            string mleId = responseData.Where(i => i.Id == id).Select(item => item.MleResponse).FirstOrDefault().ToString();
+            string mleId = responseData.Where(i => i.Id == id).Select(item => item.MleResponse).Select(item => item.MLEModelName).FirstOrDefault().ToString();
             var response = await OnnxClient.RemoveModelAsync(zmodId, mleId);
             //update model
             if (response.Contains("Success@@"))

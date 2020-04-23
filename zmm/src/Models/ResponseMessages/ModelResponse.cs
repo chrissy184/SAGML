@@ -18,10 +18,7 @@ namespace ZMM.Models.ResponseMessages
         public DateTime DateCreated { get; set; }
 
         [JsonProperty("mleresponse")]
-        public MleResponse MleResponse { get; set; }
-
-        [JsonProperty("modelGeneratedFrom")]
-        public string ModelGeneratedFrom { get; set; }
+        public MleResponse MleResponse { get; set; }      
 
     }
 
