@@ -78,7 +78,7 @@ namespace ZMM.App.MLEngineService
 
                 try
                 {
-                    HttpResponseMessage response = await httpClient.GetAsync("/service/zementis/onnx/models");
+                    HttpResponseMessage response = await httpClient.GetAsync("/service/onnx/models");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -116,7 +116,7 @@ namespace ZMM.App.MLEngineService
 
                 try
                 {
-                    HttpResponseMessage response = await httpClient.DeleteAsync($"/service/zementis/onnx/models/{mleModelId}");
+                    HttpResponseMessage response = await httpClient.DeleteAsync($"/service/onnx/models/{mleModelId}");
 
                     if (response.IsSuccessStatusCode)
                     {

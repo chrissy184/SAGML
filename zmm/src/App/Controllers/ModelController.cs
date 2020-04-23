@@ -1378,7 +1378,7 @@ namespace ZMM.App.Controllers
                 record.MleResponse = null;
                 record.Deployed = false;
                 ModelPayload.Update(record);
-                return Ok();
+                return Ok(record);
             }
             return NotFound(new { error = "Onnx model removal failed." });
         }
