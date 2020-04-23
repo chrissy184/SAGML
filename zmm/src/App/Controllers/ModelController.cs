@@ -601,22 +601,31 @@ namespace ZMM.App.Controllers
             }
             try
             {
-                pmmlProps = await nnclient.GetPmmlProperties(_data.FilePath);
-                //  
-                string strjObj1 = JsonConvert.SerializeObject(_data);
-                JObject jObj1 = JObject.Parse(strjObj1);
-                JObject jObj2 = JObject.Parse(pmmlProps);
-
-                if (!string.IsNullOrEmpty(pmmlProps))
+                string type = responseData.Where(i => i.Id == id).Select(i => i.Type).FirstOrDefault().ToString();
+                if (type == "ONNX")
                 {
-                    jObj1.Merge(jObj2, new JsonMergeSettings
-                    {
-                        // union array values together to avoid duplicates
-                        MergeArrayHandling = MergeArrayHandling.Union
-                    });
+                    _data.ModelGeneratedFrom = "Onnx";
+                    return Ok(_data);
                 }
+                else
+                {
+                    pmmlProps = await nnclient.GetPmmlProperties(_data.FilePath);
+                    //  
+                    string strjObj1 = JsonConvert.SerializeObject(_data);
+                    JObject jObj1 = JObject.Parse(strjObj1);
+                    JObject jObj2 = JObject.Parse(pmmlProps);
+
+                    if (!string.IsNullOrEmpty(pmmlProps))
+                    {
+                        jObj1.Merge(jObj2, new JsonMergeSettings
+                        {
+                            // union array values together to avoid duplicates
+                            MergeArrayHandling = MergeArrayHandling.Union
+                        });
+                    }                
                 //
                 return Json(jObj1);
+                }
             }
             catch (Exception ex)
             {
@@ -1320,10 +1329,15 @@ namespace ZMM.App.Controllers
             //get filePath of the file
             string filePath = responseData.Where(i => i.Id == id).Select(item => item.FilePath).FirstOrDefault().ToString();
             var response = await OnnxClient.DeployModelAsync(zmodId, filePath);
+            if(string.IsNullOrEmpty(response) || response.Contains("Fail@@") || response.Contains("FileExists"))
+            {
+                return BadRequest(new {error = response});
+            }
             MleResponse mle = JsonConvert.DeserializeObject<MleResponse>(response);
             //add response to ModelResponse
             ModelResponse record = responseData.Where(i=> i.Id == id).FirstOrDefault();
             record.MleResponse = mle;
+            record.Deployed=true;
             ModelPayload.Update(record);
             return Ok(record);
         }
@@ -1344,17 +1358,18 @@ namespace ZMM.App.Controllers
         public async Task<IActionResult> GetModelInfoFromMLEAsync()
         {
             string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-            var response = await OnnxClient.GetModelInfo(zmodId);
+            // var response = await OnnxClient.GetModelInfo(zmodId);
             return Ok();
         }
         #endregion
 
         #region remove model from MLE
         [HttpDelete("onnx/{id}")]
-        public async Task<IActionResult> DeleteModelFromMLEAsync()
+        public async Task<IActionResult> DeleteModelFromMLEAsync(string id)
         {
-            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-            var response = await OnnxClient.RemoveModelAsync(zmodId);
+            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);  
+            string mleId = responseData.Where(i => i.Id == id).Select(item => item.MleResponse).FirstOrDefault().ToString();         
+            var response = await OnnxClient.RemoveModelAsync(zmodId,mleId);
             return Ok();
         }
         #endregion

@@ -54,7 +54,7 @@ namespace ZMM.App.MLEngineService
                     }
                     else
                     {
-                        return "Fail";
+                        return $"Fail@@{jsonResult}";
                     }
 
                 }                
@@ -96,12 +96,12 @@ namespace ZMM.App.MLEngineService
             return jsonResult;
         }
 
-        public Task<string> GetModelInfo(string zmodId)
+        public Task<string> GetModelInfo(string zmodId, string mleModelId)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<string> RemoveModelAsync(string zmodId)
+        public Task<string> RemoveModelAsync(string zmodId, string mleModelId)
         {
             throw new System.NotImplementedException();
         }

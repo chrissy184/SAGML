@@ -19,6 +19,10 @@ namespace ZMM.Models.ResponseMessages
 
         [JsonProperty("mleresponse")]
         public MleResponse MleResponse { get; set; }
+
+        [JsonProperty("modelGeneratedFrom")]
+        public string ModelGeneratedFrom { get; set; }
+
     }
 
     public class MleResponse
