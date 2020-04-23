@@ -62,7 +62,7 @@ namespace ZMM.Models.Payloads
             {
                 foreach (var record in _.Settings)
                 {
-                    if ((record.selected == true) && (record.type == "ZS"))
+                    if ((record.selected == true) && (record.type == "MLE-PMML"))
                     {
                         url = record.url;
                         uname = record.username;

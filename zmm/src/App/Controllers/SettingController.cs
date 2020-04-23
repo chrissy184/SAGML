@@ -128,10 +128,11 @@ namespace ZMM.App.Controllers
                     Settings = new List<SettingProperty> {
                         new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="*******",password="*******",url="https://ai.eu-latest.cumulocity.com",selected=true },
                         new SettingProperty{ name="Cumulocity",type="C8Y",tenantID="ai", username="*******",password="*******",url="https://ai.cumulocity.com",selected=false },
-                        new SettingProperty{ name="Predictive Analytics",type="ZS",tenantID="zserver", username="*******",password="*******",url="https://ai.eu-latest.cumulocity.com/",selected=true },
+                        new SettingProperty{ name="Predictive Analytics-PMML",type="MLE-PMML",tenantID="zserver", username="*******",password="*******",url="https://ai.eu-latest.cumulocity.com/",selected=true },
                         new SettingProperty{ name="Repo Server 1",type="NR",tenantID="repo", username="*******",password="*******",url="https://repo.umoya.ai/",selected=false },
                         new SettingProperty{ name="Repo Server 2",type="NR",tenantID="hub", username="*******",password="*******",url="https://hub.umoya.ai/",selected=true },
-                        new SettingProperty{ name="DataHub 1",type="DH",driver="Dremio", username="*******",password="*******",url="https://url",port="0000",selected=true, ssl ="1" }
+                        new SettingProperty{ name="DataHub 1",type="DH",driver="Dremio", username="*******",password="*******",url="https://url",port="0000",selected=true, ssl ="1" },
+                        new SettingProperty{ name="Predictive Analytics-ONNX",type="MLE-ONNX",username="*******",password="*******",url="https://your-tenent-id/",selected=true}
                     }
                 };
                 jObj = JObject.Parse(JsonConvert.SerializeObject(template));

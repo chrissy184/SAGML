@@ -23,7 +23,7 @@ namespace ZMM.App.MLEngineService
         public async Task<string> DeployModelAsync(string zmodId, string filePath)
         {
             string jsonResult = string.Empty;
-            var tuple = ZSSettingPayload.GetUserCredetials(zmodId, "MLE");
+            var tuple = ZSSettingPayload.GetUserCredetials(zmodId, "MLE-ONNX");
             var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using (var httpClient = new HttpClient())
@@ -43,7 +43,7 @@ namespace ZMM.App.MLEngineService
                     }
                     memory.Position = 0;
                     content.Add(new StreamContent(memory), "file", filePath);
-                    HttpResponseMessage response = await httpClient.PostAsync("/service/zementis/onnx/models", content);
+                    HttpResponseMessage response = await httpClient.PostAsync("service/zementis/onnx/models", content);
                     if (response.IsSuccessStatusCode)
                     {
                         jsonResult = await response.Content.ReadAsStringAsync();
@@ -66,7 +66,7 @@ namespace ZMM.App.MLEngineService
         public async Task<string> GetAllModel(string zmodId)
         {
             string jsonResult = string.Empty;
-            var tuple = ZSSettingPayload.GetUserCredetials(zmodId, "MLE");
+            var tuple = ZSSettingPayload.GetUserCredetials(zmodId, "MLE-ONNX");
             var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using (var httpClient = new HttpClient())
@@ -78,7 +78,7 @@ namespace ZMM.App.MLEngineService
 
                 try
                 {
-                    HttpResponseMessage response = await httpClient.GetAsync("/service/onnx/models");
+                    HttpResponseMessage response = await httpClient.GetAsync("service/onnx/models");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -104,7 +104,7 @@ namespace ZMM.App.MLEngineService
         public async Task<string> RemoveModelAsync(string zmodId, string mleModelId)
         {
             string jsonResult = string.Empty;
-            var tuple = ZSSettingPayload.GetUserCredetials(zmodId, "MLE");
+            var tuple = ZSSettingPayload.GetUserCredetials(zmodId, "MLE-ONNX");
             var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
 
             using (var httpClient = new HttpClient())
@@ -116,7 +116,7 @@ namespace ZMM.App.MLEngineService
 
                 try
                 {
-                    HttpResponseMessage response = await httpClient.DeleteAsync($"/service/onnx/models/{mleModelId}");
+                    HttpResponseMessage response = await httpClient.DeleteAsync($"service/onnx/models/{mleModelId}");
 
                     if (response.IsSuccessStatusCode)
                     {
