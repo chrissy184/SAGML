@@ -602,30 +602,30 @@ namespace ZMM.App.Controllers
             try
             {
                 string type = responseData.Where(i => i.Id == id).Select(i => i.Type).FirstOrDefault().ToString();
-                if (type == "ONNX")
-                {
-                    _data.ModelGeneratedFrom = "Onnx";
-                    return Ok(_data);
-                }
-                else
-                {
-                    pmmlProps = await nnclient.GetPmmlProperties(_data.FilePath);
-                    //  
-                    string strjObj1 = JsonConvert.SerializeObject(_data);
-                    JObject jObj1 = JObject.Parse(strjObj1);
-                    JObject jObj2 = JObject.Parse(pmmlProps);
+                // if (type == "ONNX")
+                // {
+                //     _data.ModelGeneratedFrom = "Onnx";
+                //     return Ok(_data);
+                // }
+                // else
+                // {
+                pmmlProps = await nnclient.GetPmmlProperties(_data.FilePath);
+                //  
+                string strjObj1 = JsonConvert.SerializeObject(_data);
+                JObject jObj1 = JObject.Parse(strjObj1);
+                JObject jObj2 = JObject.Parse(pmmlProps);
 
-                    if (!string.IsNullOrEmpty(pmmlProps))
+                if (!string.IsNullOrEmpty(pmmlProps))
+                {
+                    jObj1.Merge(jObj2, new JsonMergeSettings
                     {
-                        jObj1.Merge(jObj2, new JsonMergeSettings
-                        {
-                            // union array values together to avoid duplicates
-                            MergeArrayHandling = MergeArrayHandling.Union
-                        });
-                    }                
+                        // union array values together to avoid duplicates
+                        MergeArrayHandling = MergeArrayHandling.Union
+                    });
+                }
                 //
                 return Json(jObj1);
-                }
+                // }
             }
             catch (Exception ex)
             {
