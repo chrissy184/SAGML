@@ -262,6 +262,18 @@ export class ModelsComponent implements OnInit {
       });
   }
 
+  public deployModelONNX() {
+    this.isContentLoading = true;
+    const route = ApiRoutes.modelDeployOnnx(this.selectedModel.id);
+    const method = this.selectedModel.deployed ? ApiRoutes.methods.DELETE : ApiRoutes.methods.POST;
+    this.apiService.request(method, route)
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(responseData => {
+        this.selectedModel.deployed = responseData.deployed;
+        this.utilService.alert(this.selectedModel.deployed ? AlertMessages.MODEL.deploy : AlertMessages.MODEL.deployUndo);
+      });
+  }
+
   public newPmml(type: string) {
     this.isLoading = true;
     this.uploadFiles = false;
