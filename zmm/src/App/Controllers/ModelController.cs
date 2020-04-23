@@ -1367,10 +1367,20 @@ namespace ZMM.App.Controllers
         [HttpDelete("onnx/{id}")]
         public async Task<IActionResult> DeleteModelFromMLEAsync(string id)
         {
-            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);  
-            string mleId = responseData.Where(i => i.Id == id).Select(item => item.MleResponse).FirstOrDefault().ToString();         
-            var response = await OnnxClient.RemoveModelAsync(zmodId,mleId);
-            return Ok();
+            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+            string mleId = responseData.Where(i => i.Id == id).Select(item => item.MleResponse).FirstOrDefault().ToString();
+            var response = await OnnxClient.RemoveModelAsync(zmodId, mleId);
+            //update model
+            if (response.Contains("Success@@"))
+            {
+                //add response to ModelResponse
+                ModelResponse record = responseData.Where(i => i.Id == id).FirstOrDefault();
+                record.MleResponse = null;
+                record.Deployed = false;
+                ModelPayload.Update(record);
+                return Ok();
+            }
+            return NotFound(new { error = "Onnx model removal failed." });
         }
         #endregion
         

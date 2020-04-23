@@ -101,9 +101,37 @@ namespace ZMM.App.MLEngineService
             throw new System.NotImplementedException();
         }
 
-        public Task<string> RemoveModelAsync(string zmodId, string mleModelId)
+        public async Task<string> RemoveModelAsync(string zmodId, string mleModelId)
         {
-            throw new System.NotImplementedException();
+            string jsonResult = string.Empty;
+            var tuple = ZSSettingPayload.GetUserCredetials(zmodId, "MLE");
+            var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{tuple.Item2}:{tuple.Item3}")));
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.BaseAddress = new System.Uri(tuple.Item1);
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.DefaultRequestHeaders.Authorization = auth;
+
+                try
+                {
+                    HttpResponseMessage response = await httpClient.DeleteAsync($"/service/zementis/onnx/models/{mleModelId}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        jsonResult = await response.Content.ReadAsStringAsync();
+                    }
+                    else
+                        return ZMMConstants.ErrorFailed;
+                }
+                catch (HttpRequestException ex)
+                {
+                    jsonResult = "{'message': '" + ex.Message + "', 'error':'" + ZMMConstants.ErrorFailed + "'}";
+                }
+            }
+
+            return $"Success@@{jsonResult}";
         }
     }
 }
