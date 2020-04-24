@@ -1034,75 +1034,97 @@ namespace ZMM.App.Controllers
         }
         #endregion
 
-        #region Unload/delete pmml from MLE [DELETE] i.e deployed = false
+        #region Unload/delete model from MLE [DELETE] i.e deployed = false
         [HttpDelete("{id}/deploy")]
-        public async Task<IActionResult> DeletePmmlFromZementisServer(string id)
+        public async Task<IActionResult> RemoveModelFromMLEAsync(string id)
         {
             string response = string.Empty;
             JObject jsonResponse = new JObject();
             bool isExists = false;
-
-            if (responseData.Count > 0)
+            string modelType = responseData.Where(m => m.Id == id).Select(m => m.Type).FirstOrDefault();
+            //if type=pmml
+            if (modelType == "PMML")
             {
-                foreach (var record in responseData)
+                if (responseData.Count > 0)
                 {
-                    if (record.Id.ToString() == id)
+                    foreach (var record in responseData)
                     {
-                        try
+                        if (record.Id.ToString() == id)
                         {
-                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-                            string zsResponse = await zsClient.DeletePmml(record.ModelName, zmodId);
-                            if (zsResponse != "fail")
+                            try
                             {
-                                //
-                                ModelResponse updateRecord = new ModelResponse()
+                                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                                string zsResponse = await zsClient.DeletePmml(record.ModelName, zmodId);
+                                if (zsResponse != "fail")
                                 {
-                                    Created_on = record.Created_on,
-                                    Deployed = false,
-                                    Edited_on = record.Edited_on,
-                                    Extension = record.Extension,
-                                    FilePath = record.FilePath,
-                                    Id = record.Id,
-                                    Loaded = record.Loaded,
-                                    MimeType = record.MimeType,
-                                    Name = record.Name,
-                                    Size = record.Size,
-                                    Type = record.Type,
-                                    Url = record.Url
-                                };
-                                //
-                                ModelPayload.Update(updateRecord);
-                                responseData = ModelPayload.Get();
-                                response = "{ id: '" + record.Id + "', deployed: false}";
-                               // string fileName = "DeployedModel.json";
-                                if (!DeployedModelFunctions.DeleteDeployedModel(deployedModelFileName, record.Id))
-                                    return BadRequest(new { message = "Error in updating Deployed model status file." });
-                                if (!string.IsNullOrEmpty(response)) jsonResponse = JObject.Parse(response);
-                                isExists = true;
+                                    //
+                                    ModelResponse updateRecord = new ModelResponse()
+                                    {
+                                        Created_on = record.Created_on,
+                                        Deployed = false,
+                                        Edited_on = record.Edited_on,
+                                        Extension = record.Extension,
+                                        FilePath = record.FilePath,
+                                        Id = record.Id,
+                                        Loaded = record.Loaded,
+                                        MimeType = record.MimeType,
+                                        Name = record.Name,
+                                        Size = record.Size,
+                                        Type = record.Type,
+                                        Url = record.Url
+                                    };
+                                    //
+                                    ModelPayload.Update(updateRecord);
+                                    responseData = ModelPayload.Get();
+                                    response = "{ id: '" + record.Id + "', deployed: false}";
+                                    // string fileName = "DeployedModel.json";
+                                    if (!DeployedModelFunctions.DeleteDeployedModel(deployedModelFileName, record.Id))
+                                        return BadRequest(new { message = "Error in updating Deployed model status file." });
+                                    if (!string.IsNullOrEmpty(response)) jsonResponse = JObject.Parse(response);
+                                    isExists = true;
+                                }
+                                else
+                                {
+                                    return BadRequest(new { message = "Model loading failed.", errorCode = 500, exception = "No response from server." });
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                return BadRequest(new { message = "Model loading failed.", errorCode = 500, exception = "No response from server." });
+                                Logger.LogCritical(ex, ex.StackTrace);
+                                return BadRequest(new { message = "Model loading failed.", errorCode = 400, exception = ex.Message });
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.LogCritical(ex, ex.StackTrace);
-                            return BadRequest(new { message = "Model loading failed.", errorCode = 400, exception = ex.Message });
                         }
                     }
                 }
+                if (!isExists)
+                {
+                    return NotFound(new { message = "Model remove failed.", errorCode = 404, exception = "No such model." });
+                }
             }
-            if (!isExists)
+            else if (modelType == "ONNX")
             {
-                return NotFound(new { message = "Model loading failed.", errorCode = 404, exception = "No such model." });
+                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                string mleId = responseData.Where(i => i.Id == id).Select(item => item.MleResponse).Select(item => item.MLEModelName).FirstOrDefault().ToString();
+                var onnxResponse = await OnnxClient.RemoveModelAsync(zmodId, mleId);
+                //update model
+                if (onnxResponse.Contains("Success@@"))
+                {
+                    //add response to ModelResponse
+                    ModelResponse record = responseData.Where(i => i.Id == id).FirstOrDefault();
+                    record.MleResponse = null;
+                    record.Deployed = false;
+                    ModelPayload.Update(record);
+                    return Ok(record);
+                }
+                return NotFound(new { error = "Onnx model removal failed." });
             }
+            
             return Json(jsonResponse);
 
         }
         #endregion
 
-        #region Load/upload pmml or onnx in MLE [GET] i.e- deployed = true
+        #region Load/upload model in MLE [GET] i.e- deployed = true
         [HttpGet("{id}/deploy")]
         public async Task<IActionResult> UploadModelToMLEAsync(string id)
         {
