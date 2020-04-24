@@ -252,21 +252,8 @@ export class ModelsComponent implements OnInit {
 
   public deployModel() {
     this.isContentLoading = true;
-    const modelDeployEndPoint = ApiRoutes.modelDeploy(this.selectedModel.id);
-    const route = this.selectedModel.deployed ? ApiRoutes.modelDeployUndo(this.selectedModel.id) : modelDeployEndPoint;
-    this.apiService.request(ApiRoutes.methods.GET, route)
-      .pipe(finalize(() => { this.isContentLoading = false; }))
-      .subscribe(responseData => {
-        this.selectedModel.deployed = responseData.deployed;
-        this.utilService.alert(this.selectedModel.deployed ? AlertMessages.MODEL.deploy : AlertMessages.MODEL.deployUndo);
-      });
-  }
-
-  public deployModelONNX() {
-    this.isContentLoading = true;
-    const route = ApiRoutes.modelDeployOnnx(this.selectedModel.id);
-    const method = this.selectedModel.deployed ? ApiRoutes.methods.DELETE : ApiRoutes.methods.POST;
-    this.apiService.request(method, route)
+    const method = this.selectedModel.deployed ? ApiRoutes.methods.DELETE : ApiRoutes.methods.GET;
+    this.apiService.request(method, ApiRoutes.modelDeploy(this.selectedModel.id))
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(responseData => {
         this.selectedModel.deployed = responseData.deployed;
