@@ -1216,9 +1216,9 @@ namespace ZMM.App.Controllers
                 //get filePath of the file
                 string filePath = responseData.Where(i => i.Id == id).Select(item => item.FilePath).FirstOrDefault().ToString();
                 var onnxResponse = await OnnxClient.DeployModelAsync(zmodId, filePath);
-                if (string.IsNullOrEmpty(onnxResponse) || onnxResponse.Contains("Fail@@") || onnxResponse.Contains("FileExists"))
+                if (string.IsNullOrEmpty(onnxResponse) || onnxResponse.Contains("Fail@@"))
                 {
-                    return BadRequest(new { error = onnxResponse });
+                    return Conflict(new { message = onnxResponse.Replace("Fail@@",""), errorCode = 409, exception = $"Conflict.{ZMMConstants.MLEModelDeployFail}" });
                 }
                 MleResponse mle = JsonConvert.DeserializeObject<MleResponse>(onnxResponse);
                 //add response to ModelResponse

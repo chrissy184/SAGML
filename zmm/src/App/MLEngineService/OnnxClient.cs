@@ -48,13 +48,13 @@ namespace ZMM.App.MLEngineService
                     {
                         jsonResult = await response.Content.ReadAsStringAsync();
                     }
-                    else if (response.StatusCode.ToString() == "402")
+                    else if (response.StatusCode.ToString() == "Conflict")
                     {
-                        return "FileExists";
+                        return $"Fail@@A model with the same name already exists.";
                     }
                     else
-                    {
-                        return $"Fail@@{jsonResult}";
+                    {                        
+                        return $"Fail@@Something went wrong while deploying to MLE. Please try again.";
                     }
 
                 }                
