@@ -5,6 +5,7 @@ namespace ZMM.Helpers.Common
         public const string ErrorNotFound = "NotFound";
         public const string ErrorFailed = "Failed";
         public const string ErrorZMKStarting = "ZMK failed to start.";
+        public const string MLEModelDeployFail = "Model deploy failed.";
         
     }
 }
