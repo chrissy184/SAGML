@@ -28,7 +28,7 @@ namespace MLW.SchedulerService
             string onnxResponse = "";            
             #endregion
 
-            Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Model deploy started at {baseAddress} -");
+            Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Model deploy started");
 
             #region deploy model
 
