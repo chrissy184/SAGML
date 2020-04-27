@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +24,6 @@ using ZMM.Tools.TB;
 using ZMM.Helpers.Common;
 using Quartz;
 using Quartz.Impl;
-using System.Text.Json;
 
 namespace ZMM.App.Controllers
 {
@@ -1212,27 +1210,44 @@ namespace ZMM.App.Controllers
             }
             else if (modelType == "ONNX")
             {
-                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-                //get filePath of the file
-                string filePath = responseData.Where(i => i.Id == id).Select(item => item.FilePath).FirstOrDefault().ToString();
-                var onnxResponse = await OnnxClient.DeployModelAsync(zmodId, filePath);
-                if (string.IsNullOrEmpty(onnxResponse) || onnxResponse.Contains("Fail@@"))
+                //get zmodId
+                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                //get filePath of the file
+                string filePath = responseData.Where(i => i.Id == id).Select(item => item.FilePath).FirstOrDefault().ToString();           
+            
+                #region onnx scheduler
+                //check if same job is scheduled
+                ISchedulerFactory schfack = new StdSchedulerFactory();
+                IScheduler scheduler = await schfack.GetScheduler();
+                
+                var jobKey = new JobKey(filePath);
+                if (await scheduler.CheckExists(jobKey))
                 {
-                    return Conflict(new { message = onnxResponse.Replace("Fail@@",""), errorCode = 409, exception = $"Conflict.{ZMMConstants.MLEModelDeployFail}" });
+                    await scheduler.ResumeJob(jobKey);
                 }
-                MleResponse mle = JsonConvert.DeserializeObject<MleResponse>(onnxResponse);
-                //add response to ModelResponse
-                ModelResponse record = responseData.Where(i => i.Id == id).FirstOrDefault();
-                record.MleResponse = mle;
-                record.Deployed = true;
-                ModelPayload.Update(record);
-                return Ok(record);
+                else
+                {
+                    #region create quartz job for deploying model
+                    ITrigger trigger = TriggerBuilder.Create()
+                    .WithIdentity($"deploying {modelType} Model Job-{DateTime.Now}")
+                    .StartNow()                    
+                    .Build();
+
+                    IJobDetail job = JobBuilder.Create<DeployOnnxModelJob>()
+                    .WithIdentity(filePath)                    
+                    .Build();
+
+                    job.JobDataMap["id"] = id;
+                    job.JobDataMap["zmodId"] = zmodId;
+                    job.JobDataMap["filePath"] = filePath;
+                    //
+                    await _scheduler.ScheduleJob(job, trigger); 
+                }
+                #endregion
             }
             //
-            return Json(jsonResponse);
+            return Ok(new { message = $"{modelType} model deploy in started and is progress." });
         }
-
-
         #endregion
 
         #region Get deployed models
@@ -1274,6 +1289,8 @@ namespace ZMM.App.Controllers
         }
         #endregion
         //
+        #endregion
+        
         #endregion
 
         #region modify model filename

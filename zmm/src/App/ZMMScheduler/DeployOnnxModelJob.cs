@@ -7,51 +7,70 @@ using ZMM.Models.ResponseMessages;
 using ZMM.Models.Payloads;
 using System.Linq;
 using ZMM.Helpers.Common;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
-namespace MLW.SchedulerService
+public class DeployOnnxModelJob : IJob
 {
-    public class DeployOnnxModelJob : IJob
+    private readonly IOnnxClient OnnxClient;
+    private IConfiguration Configuration;
+
+    // public DeployOnnxModelJob(IOnnxClient _onnxClient)
+    // {
+    //     this.OnnxClient = _onnxClient;
+    // }
+    public DeployOnnxModelJob()
     {
-        private readonly IOnnxClient OnnxClient;
+        Configuration = GetConfiguration();
+        this.OnnxClient = new OnnxClient(Configuration);
+    }
+    public async Task Execute(IJobExecutionContext context)
+    {
+        #region Variables
+        JobDataMap dataMap = context.JobDetail.JobDataMap;
+        string filePath = dataMap.GetString("filePath");
+        string zmodId = dataMap.GetString("zmodId");
+        string id = dataMap.GetString("id");
+        string onnxResponse = "";
+        #endregion
 
-        public DeployOnnxModelJob(IOnnxClient _onnxClient)
+        Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> {id} Model deploy started");
+
+        #region deploy model
+
+        onnxResponse = await OnnxClient.DeployModelAsync(zmodId, filePath);
+
+        #endregion
+
+        ModelResponse record = ModelPayload.Get().Where(i => i.Id == id).FirstOrDefault();
+        //
+        if (string.IsNullOrEmpty(onnxResponse) || onnxResponse.Contains("Fail@@"))
         {
-           this.OnnxClient = _onnxClient;
+            record.Deployed = false;
+            record.ReasonFailed = onnxResponse.Replace("Fail@@", "");
+            ModelPayload.Update(record);
         }
-        public async Task Execute(IJobExecutionContext context)
+        else
         {
-            #region Variables
-            JobDataMap dataMap = context.JobDetail.JobDataMap;
-            string filePath = dataMap.GetString("filePath");            
-            string zmodId = dataMap.GetString("zmodId");
-            string id = dataMap.GetString("id");
-            string onnxResponse = "";            
-            #endregion
-
-            Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Model deploy started");
-
-            #region deploy model
-
-            onnxResponse = await OnnxClient.DeployModelAsync(zmodId, filePath);            
-
-            #endregion
-
-            ModelResponse record = ModelPayload.Get().Where(i => i.Id == id).FirstOrDefault();
-            //
-            if (string.IsNullOrEmpty(onnxResponse) || onnxResponse.Contains("Fail@@"))
-            {
-                record.Deployed = false;
-                record.ReasonFailed = onnxResponse.Replace("Fail@@","");
-                ModelPayload.Update(record);
-                return;
-            }
             MleResponse mle = JsonSerializer.Deserialize<MleResponse>(onnxResponse);
             //add response to ModelResponse            
             record.MleResponse = mle;
-            record.Deployed = true;            
+            record.Deployed = true;
             ModelPayload.Update(record);
-
-            return;
         }
+
+        await Task.FromResult(0);
+        Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> {id} Model deploy completed");
+    }
+
+    private IConfiguration GetConfiguration()
+    {
+        var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .AddEnvironmentVariables();
+
+        Configuration = builder.Build();
+        return Configuration;
     }
 }
