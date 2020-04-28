@@ -365,6 +365,7 @@ export class DataComponent implements OnInit {
   }
 
   public uploadNewDataFromDataHub() {
+    this.dataHubFormData.sql = `/* Write your SQL query for Data pulling */`;
     this.changeSelectedIndex(6);
   }
 
@@ -445,7 +446,7 @@ export class DataComponent implements OnInit {
       };
       this.isContentLoading = true;
       this.apiService.request(ApiRoutes.methods.POST, ApiRoutes.datahub, options)
-        .pipe(finalize(() => { this.isContentLoading = false; this.dataHubFormData = {}; }))
+        .pipe(finalize(() => { this.isContentLoading = false; }))
         .subscribe(response => {
           console.log(response);
           this.refresh();
