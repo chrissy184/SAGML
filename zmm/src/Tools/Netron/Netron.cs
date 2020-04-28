@@ -123,12 +123,10 @@ namespace ZMM.Tools.Netron
         public string GetResourceLink(string resourcePath)
         {
             string LinkForResource = string.Empty;
-            ITask task = FindTask(NetronTemplateResource);
             if (IsNetronStarted)
             {
                 //http://localhost:7007/modelviewer/?url=http://localhost:7007/api/model/download/mobilenet.h5
-                LinkForResource = Netron.HostURL + "/" + GetLinkPrefix() + "/?url=" + Netron.HostURL + "/api/model/download/" + resourcePath;
-                UpdateTask(resourcePath, task, "ResourceLink", LinkForResource);
+                LinkForResource = Netron.HostURL + GetLinkPrefix() + "/?url=" + Netron.HostURL + "/api/model/download/" + resourcePath;
             }
             return LinkForResource;
         }
