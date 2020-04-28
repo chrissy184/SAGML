@@ -1210,43 +1210,30 @@ namespace ZMM.App.Controllers
             }
             else if (modelType == "ONNX")
             {
-                //get zmodId
                 string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
                 //get filePath of the file
-                string filePath = responseData.Where(i => i.Id == id).Select(item => item.FilePath).FirstOrDefault().ToString();           
-            
-                #region onnx scheduler
-                //check if same job is scheduled
-                ISchedulerFactory schfack = new StdSchedulerFactory();
-                IScheduler scheduler = await schfack.GetScheduler();
-                
-                var jobKey = new JobKey(filePath);
-                if (await scheduler.CheckExists(jobKey))
-                {
-                    await scheduler.ResumeJob(jobKey);
-                }
-                else
-                {
-                    #region create quartz job for deploying model
-                    ITrigger trigger = TriggerBuilder.Create()
-                    .WithIdentity($"deploying {modelType} Model Job-{DateTime.Now}")
-                    .StartNow()                    
-                    .Build();
+                string filePath = responseData.Where(i => i.Id == id).Select(item => item.FilePath).FirstOrDefault().ToString();
+                
+                #region deploy model
+                var onnxResponse = await OnnxClient.DeployModelAsync(zmodId, filePath);
 
-                    IJobDetail job = JobBuilder.Create<DeployOnnxModelJob>()
-                    .WithIdentity(filePath)                    
-                    .Build();
-
-                    job.JobDataMap["id"] = id;
-                    job.JobDataMap["zmodId"] = zmodId;
-                    job.JobDataMap["filePath"] = filePath;
-                    //
-                    await _scheduler.ScheduleJob(job, trigger); 
-                }
-                #endregion
+                #endregion
+                //
+                if (string.IsNullOrEmpty(onnxResponse) || onnxResponse.Contains("Fail@@"))
+                {
+                    return Conflict(new { message = onnxResponse.Replace("Fail@@",""), errorCode = 409, exception = $"Conflict.{ZMMConstants.MLEModelDeployFail}" });
+                }
+                MleResponse mle = JsonConvert.DeserializeObject<MleResponse>(onnxResponse);
+                //add response to ModelResponse
+                ModelResponse record = responseData.Where(i => i.Id == id).FirstOrDefault();
+                record.MleResponse = mle;
+                record.Deployed = true;
+                ModelPayload.Update(record);
+                return Ok(record);                
             }
             //
-            return Ok(new { message = $"{modelType} model deploy in started and is progress." });
+            // return Ok(new { message = $"{modelType} model deploy in started and is progress." });
+            return Json(jsonResponse);
         }
         #endregion
 
@@ -1289,9 +1276,7 @@ namespace ZMM.App.Controllers
         }
         #endregion
         //
-        #endregion
-        
-        #endregion
+        #endregion   // MLE related code ends here   
 
         #region modify model filename
         [HttpPut("{id}/rename")]
