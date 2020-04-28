@@ -18,7 +18,9 @@ namespace ZMM.Models.ResponseMessages
         public DateTime DateCreated { get; set; }
 
         [JsonProperty("mleresponse")]
-        public MleResponse MleResponse { get; set; }      
+        public MleResponse MleResponse { get; set; }
+        [JsonProperty("deployFailReason")]
+        public string ReasonFailed { get; set; }
 
     }
 

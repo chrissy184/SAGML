@@ -26,27 +26,22 @@ namespace ZMM.Models.Payloads
             {
                 foreach (var item in GlobalStorage.FilesInProgressStorage)
                 {
-                    if(item.Value.Module == module) wip.Add(item.Value);
+                    if (item.Value.Module == module) wip.Add(item.Value);
                 }
             }
-            
+
             return wip;
         }
-        
+
         #endregion
 
-        #region Soft Delete from GlobalStorage
-        public static bool Clear(string id)
+        #region Remove completed from GlobalStorage
+        public static bool RemoveCompleted(string id)
         {
-            bool result = false;
-
+            //id is the filename
+            bool result = false;            
             FilesInProgress _data = new FilesInProgress();
-
-            foreach (var item in GlobalStorage.FilesInProgressStorage)
-            {
-                GlobalStorage.FilesInProgressStorage.TryRemove(id, out _data);
-                result = true;
-            }
+            result = GlobalStorage.FilesInProgressStorage.TryRemove(id, out _data);
             return result;
         }
         #endregion

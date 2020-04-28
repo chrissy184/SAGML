@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,8 +24,6 @@ using ZMM.Tools.TB;
 using ZMM.Helpers.Common;
 using Quartz;
 using Quartz.Impl;
-using System.Text.Json;
-using ZMM.Tools.Netron;
 
 namespace ZMM.App.Controllers
 {
@@ -49,16 +46,14 @@ namespace ZMM.App.Controllers
         private List<DataResponse> dataResponseData;
         private static string[] extensions = new[] { "pmml", "onnx", "h5" };
         private readonly IScheduler _scheduler;
-        private static string deployedModelFileName = "DeployedModel.json";
-        private readonly IPyNetronServiceClient ntronClient;
-
+        private static string deployedModelFileName = "DeployedModel.json"; 
         #endregion
-
+        
         #region Constructor
         public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log,
-                IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient,
+                IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, 
                 IPyTensorServiceClient tbClientInstance, IScheduler factory,
-                IOnnxClient _onnxClient, IPyNetronServiceClient _netronClient)
+                IOnnxClient _onnxClient)
         {
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.Configuration = configuration;
@@ -69,12 +64,11 @@ namespace ZMM.App.Controllers
             this.OnnxClient = _onnxClient;
             this.tbClient = tbClientInstance;
             _scheduler = factory;
-            this.ntronClient = _netronClient;
             try
             {
                 responseData = ModelPayload.Get();
                 dataResponseData = DataPayload.Get();
-
+               
             }
             catch (Exception ex)
             {
@@ -149,7 +143,7 @@ namespace ZMM.App.Controllers
                     {
                         Console.WriteLine(">>>>>>>>>>>>>>>>>>>>UPLOADING LARGE MODEL FILE................................");
                         #region upload large file > 400MB
-                        if (size > 40000000)
+                        if (size > 0)
                         {
                             #region add to uploading
                             //
@@ -233,7 +227,7 @@ namespace ZMM.App.Controllers
                     }
                     else
                     {
-                        return Conflict(new { message = "File already exists.", error = "File already exists." });
+                            return Conflict(new { message = "File already exists.", error = "File already exists."});
                     }
                 }
             }
@@ -252,7 +246,7 @@ namespace ZMM.App.Controllers
             {
                 ModelPayload.Clear();
                 InitZmodDirectory.ScanModelsDirectory();
-                responseData = ModelPayload.Get();
+                responseData = ModelPayload.Get();                
             }
             // //get details of model deployed from DeployedModel.json
             DeployedModelFunctions.GetDeployedModel(deployedModelFileName, responseData);
@@ -328,11 +322,11 @@ namespace ZMM.App.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            string wip_id = ModelPayload.Get().Where(m=> m.Id == id).Select(m=>m.Name).FirstOrDefault();
             bool result = ModelPayload.Delete(id);
-
-
             if (result == true)
-            {
+            {                
+                FilesUploadingPayload.RemoveCompleted(wip_id);
                 return Ok(new { user = CURRENT_USER, id = id, message = "File deleted successfully." });
             }
             else
@@ -819,47 +813,6 @@ namespace ZMM.App.Controllers
 
         #endregion
 
-        #region Download Model for Netron Tool
-        [HttpGet("download/{id}")]
-        public async Task<IActionResult> NetronModelDownload(string id)
-        {
-            string filePath = string.Empty;
-            string type = string.Empty;
-            string _contentType = string.Empty;
-            try
-            {
-                if (responseData.Count > 0)
-                {
-                    foreach (var record in responseData)
-                    {
-                        if (record.Id.ToString() == id)
-                        {
-                            filePath = record.FilePath;
-                        }
-                    }
-                }
-                string ResourcePath = DirectoryHelper.GetModelDirectoryPath() + id;
-                filePath = ResourcePath;
-                type = Path.GetExtension(filePath);
-                _contentType = string.Empty;
-                var memory = new MemoryStream();
-                using (var stream = new FileStream(filePath, FileMode.Open))
-                {
-                    await stream.CopyToAsync(memory);
-                }
-                memory.Position = 0;
-                //
-                string fileName = Path.GetFileName(filePath);
-                _contentType = "application/" + type;
-                return File(memory, _contentType, fileName);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message + "filePath :" + filePath);
-            }
-        }
-        #endregion
-
         #region Training POST - /api/model/{id}/train (ScheduledJob)
         [HttpPost("{id}/train")]
         public async Task<IActionResult> PostModelTrainAsync(string id)
@@ -919,7 +872,7 @@ namespace ZMM.App.Controllers
                         ZMM.Tasks.ITask TensorBoardTask = TBTool.FindTask(ResourcePath);
                         if (TensorBoardTask.IsEmpty())
                         {
-                            TBTool.StartTaskAsync((int)ZMM.Tools.TB.TaskTypes.Start, ResourcePath, (JObject)JObject.FromObject(obj));
+                            TBTool.StartTaskAsync((int)TaskTypes.Start, ResourcePath, (JObject)JObject.FromObject(obj));
                         }
                         TensorBoardLink = TBTool.GetResourceLink(ResourcePath, out TensorboardLogFolder);
                         Console.WriteLine($"TensorBoardLink >>>>>>{TensorBoardLink}");
@@ -1163,7 +1116,7 @@ namespace ZMM.App.Controllers
                 }
                 return NotFound(new { error = "Onnx model removal failed." });
             }
-
+            
             return Json(jsonResponse);
 
         }
@@ -1257,27 +1210,31 @@ namespace ZMM.App.Controllers
             }
             else if (modelType == "ONNX")
             {
-                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-                //get filePath of the file
-                string filePath = responseData.Where(i => i.Id == id).Select(item => item.FilePath).FirstOrDefault().ToString();
-                var onnxResponse = await OnnxClient.DeployModelAsync(zmodId, filePath);
-                if (string.IsNullOrEmpty(onnxResponse) || onnxResponse.Contains("Fail@@"))
-                {
-                    return Conflict(new { message = onnxResponse.Replace("Fail@@", ""), errorCode = 409, exception = $"Conflict.{ZMMConstants.MLEModelDeployFail}" });
-                }
-                MleResponse mle = JsonConvert.DeserializeObject<MleResponse>(onnxResponse);
-                //add response to ModelResponse
-                ModelResponse record = responseData.Where(i => i.Id == id).FirstOrDefault();
-                record.MleResponse = mle;
-                record.Deployed = true;
-                ModelPayload.Update(record);
-                return Ok(record);
+                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                //get filePath of the file
+                string filePath = responseData.Where(i => i.Id == id).Select(item => item.FilePath).FirstOrDefault().ToString();
+                
+                #region deploy model
+                var onnxResponse = await OnnxClient.DeployModelAsync(zmodId, filePath);
+
+                #endregion
+                //
+                if (string.IsNullOrEmpty(onnxResponse) || onnxResponse.Contains("Fail@@"))
+                {
+                    return Conflict(new { message = onnxResponse.Replace("Fail@@",""), errorCode = 409, exception = $"Conflict.{ZMMConstants.MLEModelDeployFail}" });
+                }
+                MleResponse mle = JsonConvert.DeserializeObject<MleResponse>(onnxResponse);
+                //add response to ModelResponse
+                ModelResponse record = responseData.Where(i => i.Id == id).FirstOrDefault();
+                record.MleResponse = mle;
+                record.Deployed = true;
+                ModelPayload.Update(record);
+                return Ok(record);                
             }
             //
+            // return Ok(new { message = $"{modelType} model deploy in started and is progress." });
             return Json(jsonResponse);
         }
-
-
         #endregion
 
         #region Get deployed models
@@ -1319,7 +1276,7 @@ namespace ZMM.App.Controllers
         }
         #endregion
         //
-        #endregion
+        #endregion   // MLE related code ends here   
 
         #region modify model filename
         [HttpPut("{id}/rename")]
@@ -1401,16 +1358,16 @@ namespace ZMM.App.Controllers
         {
             await System.Threading.Tasks.Task.FromResult(0);
             //check if file uploaded
-            foreach (var f in FilesUploadingPayload.Get("MODEL"))
+            foreach(var f in FilesUploadingPayload.Get("MODEL"))
             {
-                if (responseData.Where(i => i.Name == f.Name).Count() > 0)
+                if(responseData.Where(i=>i.Name == f.Name).Count() > 0)
                 {
-                    FilesUploadingPayload.Clear(f.Name);
+                    FilesUploadingPayload.RemoveCompleted(f.Name);
                 }
             }
             return Json(FilesUploadingPayload.Get("MODEL"));
         }
         #endregion
-
+    
     }
 }

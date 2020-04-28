@@ -658,7 +658,7 @@ class TrainingViewModels:
         
         # print ('scriptOutputPrepro',scriptOutputPrepro,dataObj,modelArch)
         datHyperPara=modelObj['modelObj']['hyperparameters']
-        
+        # print (datHyperPara)
         if modelArch == 'NNModel':
             print ('came to final model training')
             checkVal=self.verifyHyperparameters(datHyperPara)
@@ -668,7 +668,7 @@ class TrainingViewModels:
                 data_details=self.upDateStatus()
                 self.updateStatusWithError(data_details,'Training Failed',"Some issue with hyperparameters >> ",'No info',self.statusFile)
                 return -1
-
+        print ('Passed Step NN 1',dataObj,scriptOutputPrepro)
         try:
             if (dataObj == None) & (scriptOutputPrepro != None):
                 print ('To complicated 1')
@@ -1261,12 +1261,19 @@ class TrainingViewModels:
             # print ('>>>>>>>>>>>>>>>                 ',self.statusFile)
             print('Came in model 1')
             modeScope=modelInformation['train'][modelObjsTrain[0]]
-            if len(modeScope['modelObj']['hyperparameters'] )>=1:
-                pass
-            else:
+            try:
+                if len(modeScope['modelObj']['hyperparameters'] )>=1:
+                    pass
+                else:
+                    if hyperParaUser['epoch'] != None:
+                        # print ('Print to update hyperparp',hyperParaUser['epoch'])
+                        modeScope['modelObj']['hyperparameters']=hyperParaUser
+            except:
                 if hyperParaUser['epoch'] != None:
                     # print ('Print to update hyperparp',hyperParaUser['epoch'])
                     modeScope['modelObj']['hyperparameters']=hyperParaUser
+            # print (modeScope['modelObj']['hyperparameters'])
+
             kerasUtilities.updateStatusofProcess(self.statusFile,'Training Model Loaded')
 
             modeScope=self.trainModelObjectDict(modeScope,idforData,tensorboardLogFolder)
