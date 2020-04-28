@@ -50,6 +50,7 @@
     <ProjectReference Include="..\JNB\JNB.csproj" />
     <ProjectReference Include="..\TB\TB.csproj" />
     <ProjectReference Include="..\..\lib\Microsoft.AspNetCore.Proxy\Microsoft.AspNetCore.Proxy.csproj" />
+    <ProjectReference Include="..\Tools\Netron\Netron.csproj" />
   </ItemGroup>
   <Target Name="ResolveToolDependenciesForUbuntu" BeforeTargets="Build" Condition=" '$(IsLinux)' == 'true'">
     <Message Text="Resolving Tool dependecies (ubuntu)" Importance="high" />
