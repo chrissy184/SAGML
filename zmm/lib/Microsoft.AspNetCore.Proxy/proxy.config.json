@@ -132,6 +132,18 @@
     },
 
     {
+      "URLPattern" : "/nrn1", 
+      "EnableAuthentication" : true,
+      "EnableWebSocket" : true,
+      "ResolveHost" : "localhost",
+      "ResolvePort" : "8080",
+      "ReWritePathPattern" : 
+      [
+        {"In" : "/nrn1/", "Out" : "/"}
+      ]   
+    },
+
+    {
       "URLPattern" : "/umoyaportal", 
       "EnableAuthentication" : true,
       "EnableWebSocket" : true,
