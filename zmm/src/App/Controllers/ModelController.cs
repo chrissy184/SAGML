@@ -24,6 +24,7 @@ using ZMM.Tools.TB;
 using ZMM.Helpers.Common;
 using Quartz;
 using Quartz.Impl;
+using ZMM.Tools.Netron;
 
 namespace ZMM.App.Controllers
 {
@@ -47,13 +48,15 @@ namespace ZMM.App.Controllers
         private static string[] extensions = new[] { "pmml", "onnx", "h5" };
         private readonly IScheduler _scheduler;
         private static string deployedModelFileName = "DeployedModel.json"; 
+        private readonly IPyNetronServiceClient ntronClient;
+
         #endregion
         
         #region Constructor
         public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log,
-                IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, 
+                IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient,
                 IPyTensorServiceClient tbClientInstance, IScheduler factory,
-                IOnnxClient _onnxClient)
+                IOnnxClient _onnxClient, IPyNetronServiceClient _netronClient)
         {
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.Configuration = configuration;
@@ -64,11 +67,12 @@ namespace ZMM.App.Controllers
             this.OnnxClient = _onnxClient;
             this.tbClient = tbClientInstance;
             _scheduler = factory;
+            this.ntronClient = _netronClient;
             try
             {
                 responseData = ModelPayload.Get();
                 dataResponseData = DataPayload.Get();
-               
+
             }
             catch (Exception ex)
             {
@@ -77,7 +81,7 @@ namespace ZMM.App.Controllers
             }
 
         }
-        #endregion
+        #endregion		
 
         #region Post/ upload pmml file
         // POST api/model
@@ -872,7 +876,7 @@ namespace ZMM.App.Controllers
                         ZMM.Tasks.ITask TensorBoardTask = TBTool.FindTask(ResourcePath);
                         if (TensorBoardTask.IsEmpty())
                         {
-                            TBTool.StartTaskAsync((int)TaskTypes.Start, ResourcePath, (JObject)JObject.FromObject(obj));
+                            TBTool.StartTaskAsync((int)Tools.TB.TaskTypes.Start, ResourcePath, (JObject)JObject.FromObject(obj));
                         }
                         TensorBoardLink = TBTool.GetResourceLink(ResourcePath, out TensorboardLogFolder);
                         Console.WriteLine($"TensorBoardLink >>>>>>{TensorBoardLink}");
@@ -1366,6 +1370,83 @@ namespace ZMM.App.Controllers
                 }
             }
             return Json(FilesUploadingPayload.Get("MODEL"));
+        }
+        #endregion
+
+        #region Download Model for Netron Tool specific url pattern
+        [HttpGet("download/{name}")]
+        public async Task<IActionResult> NetronModelDownload(string name)
+        {         
+            string resourcePath = DirectoryHelper.GetModelDirectoryPath() + name;   
+            string type = string.Empty;
+            string contentType = string.Empty;
+            if(System.IO.File.Exists(resourcePath))
+            {
+                try
+                {               
+                    type = Path.GetExtension(resourcePath).Substring(1);
+                    contentType = string.Empty;
+                    var memory = new MemoryStream();
+                    using (var stream = new FileStream(resourcePath, FileMode.Open))
+                    {
+                        await stream.CopyToAsync(memory);
+                    }
+                    memory.Position = 0;
+                    contentType = "application/" + type;
+                    return File(memory, contentType, name);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message + "filePath :" + resourcePath);
+                }
+            }
+            else
+            {
+                return BadRequest("Given resource " + resourcePath + " is not found.");
+            }
+        }
+        #endregion
+
+        #region Get Model View URL for Netron Tool
+        [HttpGet("{id}/netron")]
+        public async Task<IActionResult> GetNetronUrlAsync(string id)
+        {
+            string convertedPath = string.Empty;
+            JObject jsonResponse = new JObject();  
+            string modelType = responseData.Where(m => m.Id == id).Select(m => m.Type).FirstOrDefault().ToLower(); 
+            string modelName = responseData.Where(m => m.Id == id).Select(m => m.Name).FirstOrDefault(); 
+            if (modelType == "onnx" || modelType == "h5")
+            {
+                string _jUrl = string.Empty;
+                string message = "Model Viewer is up and running successfully.";
+                string CURRENT_USER = string.Empty;
+                string ResourcePath = DirectoryHelper.GetModelDirectoryPath() + modelName;
+                if (System.IO.File.Exists(ResourcePath))
+                {
+                    FileInfo resourceInfo = new System.IO.FileInfo(ResourcePath);
+                    string tempDir = resourceInfo.Directory.ToString();
+                    string modelViewLinkURL = string.Empty;
+                    try
+                    {
+                        Netron NtronTool = this.ntronClient.GetNetronTool();
+                        modelViewLinkURL = NtronTool.GetResourceLink(modelName);                        
+                        return Ok(new { user = CURRENT_USER, id = id, message = message, url = modelViewLinkURL });
+                    }
+                    catch (Exception ex)
+                    {
+                        message = ex.Message;
+                        return BadRequest(new { user = CURRENT_USER, id = id, message = message });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new { user = CURRENT_USER, id = id, message = "Model " + id + " is not found." });
+                }
+            }
+            else
+            {
+                return BadRequest(new { user = CURRENT_USER, id = id, message = "Model is not supported with viewer. Supported Model Type is ONNX and H5" });
+            }
         }
         #endregion
     
