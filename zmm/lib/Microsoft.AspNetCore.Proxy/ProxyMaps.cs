@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Microsoft.AspNetCore.Proxy
 {
@@ -20,7 +21,7 @@ namespace Microsoft.AspNetCore.Proxy
 
         public bool EnableWebSocket { get; set;} = false;
 
-        public Dictionary<string,string> ReWritePathPatterns = new Dictionary<string, string>();
+        public ConcurrentDictionary<string,string> ReWritePathPatterns = new ConcurrentDictionary<string, string>();
 
     }
     public static class Maps 
@@ -28,7 +29,7 @@ namespace Microsoft.AspNetCore.Proxy
 
         private static List<Map> ListOfMaps = new List<Map>();
 
-        public static Dictionary<string, int> MappedURLPattern = new Dictionary<string, int>();
+        public static ConcurrentDictionary<string, int> MappedURLPattern = new ConcurrentDictionary<string, int>();
         private static void Init(ref IApplicationBuilder app)
         {
             try
@@ -66,11 +67,11 @@ namespace Microsoft.AspNetCore.Proxy
             }
         }
 
-        private static void PopulateReWritePathPatterns(IConfiguration RootConfig, int ItemIndex, ref Dictionary<string,string> ListOfReWritePathPatterns)
+        private static void PopulateReWritePathPatterns(IConfiguration RootConfig, int ItemIndex, ref ConcurrentDictionary<string,string> ListOfReWritePathPatterns)
         {
             //Maps:i:ReWritePathPattern:0:In  -> Key
             //Maps:i:ReWritePathPattern:0:Out -> Value
-            ListOfReWritePathPatterns = new Dictionary<string, string>();
+            ListOfReWritePathPatterns = new ConcurrentDictionary<string, string>();
             string MapReWritePathPatternItemKey = string.Empty;
             string MapReWritePathPatternItemValue = string.Empty;
             string MapReWritePathPatternItemKeyConfigurationPattern = string.Empty;
@@ -187,7 +188,8 @@ namespace Microsoft.AspNetCore.Proxy
                     }
                 }
                 //Need to Manage MappedURLPattern by user session
-                MappedURLPattern.Remove(requestPath);
+                int requestPathValue;
+                MappedURLPattern.TryRemove(requestPath, out requestPathValue);
             }
             else throw new Exception("Unable to resolve proxy map " + requestPath);
             return Out;
