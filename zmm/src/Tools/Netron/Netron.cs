@@ -45,15 +45,7 @@ namespace ZMM.Tools.Netron
         {
             HostURL = Host;
             RoutePrefix = HostRoutePrefix;
-            InitInstancePortsInUse(InstancePortsToUse, ref ListOfAllowedPorts);
-            #region start netron with template
-            var obj = new
-            {
-                base_url = "/",
-                ResourcePath = $"{NetronTemplateResource}"
-            };
-            StartTaskAsync((int)ZMM.Tools.Netron.TaskTypes.Start, NetronTemplateResource, (JObject)JObject.FromObject(obj));
-            #endregion
+            InitInstancePortsInUse(InstancePortsToUse, ref ListOfAllowedPorts);            
         }
 
         public void StartTaskAsync(int taskType, string taskName, JObject info)
@@ -122,13 +114,27 @@ namespace ZMM.Tools.Netron
 
         public string GetResourceLink(string resourcePath)
         {
-            string LinkForResource = string.Empty;
-            if (IsNetronStarted)
+            string outLink = "Error when getting link.";
+            try
             {
-                //http://localhost:7007/modelviewer/?url=http://localhost:7007/api/model/download/mobilenet.h5
-                LinkForResource = Netron.HostURL + GetLinkPrefix() + "/?url=" + Netron.HostURL + "/api/model/download/" + resourcePath;
+                if(!IsNetronStarted)
+                {
+                    #region start netron with template
+                    var obj = new
+                    {
+                        base_url = "/",
+                        ResourcePath = $"{NetronTemplateResource}"
+                    };
+                    StartTaskAsync((int)ZMM.Tools.Netron.TaskTypes.Start, NetronTemplateResource, (JObject)JObject.FromObject(obj));
+                    #endregion
+                }      
+                outLink = Netron.HostURL + GetLinkPrefix() + "/?url=" + Netron.HostURL + "/api/model/download/" + resourcePath;
             }
-            return LinkForResource;
+            catch(Exception ex)
+            {
+                outLink = ex.Message;
+            }
+            return outLink;
         }
 
         private string WaitForStartTaskToken(ITask task, int TaskPort)
