@@ -823,7 +823,7 @@ namespace ZMM.App.Controllers
             {
                 if(codeResponse.Where(i=>i.Name == f.Name).Count() > 0)
                 {
-                    FilesUploadingPayload.Clear(f.Name);
+                    FilesUploadingPayload.RemoveCompleted(f.Name);
                 }
             }
             return Json(FilesUploadingPayload.Get("CODE"));

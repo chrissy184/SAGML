@@ -143,7 +143,7 @@ namespace ZMM.App.Controllers
                     {
                         Console.WriteLine(">>>>>>>>>>>>>>>>>>>>UPLOADING LARGE MODEL FILE................................");
                         #region upload large file > 400MB
-                        if (size > 40000000)
+                        if (size > 0)
                         {
                             #region add to uploading
                             //
@@ -322,11 +322,11 @@ namespace ZMM.App.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            string wip_id = ModelPayload.Get().Where(m=> m.Id == id).Select(m=>m.Name).FirstOrDefault();
             bool result = ModelPayload.Delete(id);
-
-
             if (result == true)
-            {
+            {                
+                FilesUploadingPayload.RemoveCompleted(wip_id);
                 return Ok(new { user = CURRENT_USER, id = id, message = "File deleted successfully." });
             }
             else
@@ -1362,7 +1362,7 @@ namespace ZMM.App.Controllers
             {
                 if(responseData.Where(i=>i.Name == f.Name).Count() > 0)
                 {
-                    FilesUploadingPayload.Clear(f.Name);
+                    FilesUploadingPayload.RemoveCompleted(f.Name);
                 }
             }
             return Json(FilesUploadingPayload.Get("MODEL"));
