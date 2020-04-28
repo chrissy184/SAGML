@@ -123,7 +123,7 @@ namespace ZMM.App.Controllers
                 return Json(_data);
             }
 
-            return Json(jsonObj.Select(s=> new{s.Created_on,s.DateCreated,s.Edited_on,s.Extension,s.Id,s.Name,s.Properties,s.Size,s.Type,s.Url,s.User}));
+            return Json(jsonObj.Select(s=> new{s.Created_on,s.DateCreated,s.Edited_on,s.Extension,s.FilePath,s.Id,s.Name,s.Properties,s.Size,s.Type,s.Url,s.User}));
         }
         #endregion
 
