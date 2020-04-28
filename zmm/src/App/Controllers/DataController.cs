@@ -419,10 +419,12 @@ namespace ZMM.App.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            string wip_id = DataPayload.Get().Where(m => m.Id == id).Select(m => m.Name).FirstOrDefault();
             //TODO: update currentuser from keycloak
             bool result = DataPayload.Delete(id);
             if (result == true)
             {
+                FilesUploadingPayload.RemoveCompleted(wip_id);
                 return Ok(new { user = CURRENT_USER, id = id, message = "File deleted successfully." });
             }
             else
@@ -1627,7 +1629,7 @@ namespace ZMM.App.Controllers
             {
                 if(responseData.Where(i=>i.Name == f.Name).Count() > 0)
                 {
-                    FilesUploadingPayload.Clear(f.Name);
+                    FilesUploadingPayload.RemoveCompleted(f.Name);
                 }
             }
             return Json(FilesUploadingPayload.Get("DATA"));
