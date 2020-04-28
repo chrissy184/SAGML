@@ -7,7 +7,7 @@ export const ApiRoutes = {
     },
     accountUserInfo: 'account/userInfo',
     accountLogout: 'account/logout',
-    loginRedirect: 'https://accounts.mlw.ai/auth/realms/$realmname/protocol/openid-connect/logout?post_logout_redirect_uri=' + location.origin + '&x-client-SKU=ID_NETSTANDARD2_0&x-client-ver=5.5.0.0',
+    loginRedirect: 'https://accounts.mlw.ai/auth/realms/master/protocol/openid-connect/logout?post_logout_redirect_uri=' + location.origin + '&x-client-SKU=ID_NETSTANDARD2_0&x-client-ver=5.5.0.0',
 
     data: 'data',
     dataGet: (id: string) => `data/${id}`,
