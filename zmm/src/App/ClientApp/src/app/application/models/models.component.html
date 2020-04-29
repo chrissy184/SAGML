@@ -80,6 +80,9 @@
                   (blur)="updateName(name)">{{ selectedModel?.id }}</span>.{{ selectedModel?.extension }}</h2>
               <div class="toolbar-mid"></div>
               <div calss="content-toolbar">
+                <button mat-icon-button aria-label="icon" matTooltip="Preview" (click)="previewModel()">
+                  <span class="mdi mdi-eye-outline text-secondary"></span>
+                </button>
                 <button mat-icon-button aria-label="icon" matTooltip="Publish Model" (click)="publishModel()">
                   <span class="mdi text-secondary mdi-publish"></span>
                 </button>
@@ -242,6 +245,32 @@
             </mat-toolbar>
             <div class="details">
               <app-automl [dataSource]="automlFormData"></app-automl>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="NETRON">
+        <ng-template matTabContent>
+          <div *ngIf="tabSelectedIndex === 4">
+            <mat-toolbar>
+              <h2><span #name contenteditable="true"
+                  (blur)="updateName(name)">{{ selectedModel.id }}</span>.{{ selectedModel?.extension }}</h2>
+              <div class="toolbar-mid"></div>
+              <div class="content-toolbar">
+                <button mat-icon-button aria-label="icon" matTooltip="Close" (click)="cancelAutoML()">
+                  <span class="mdi mdi-close text-secondary"></span>
+                </button>
+                <button mat-icon-button aria-label="icon"
+                  (click)="sidenav.toggle(); toggleSidebar(sidenav.opened ? 'FULLSCREEN' : 'FULLSCREEN_EXIT')"
+                  [matTooltip]="sidenav.opened ? 'Fullscreen' : 'Fullscreen Exit'">
+                  <span class="mdi text-secondary"
+                    [ngClass]="{'mdi-fullscreen': sidenav.opened, 'mdi-fullscreen-exit': !sidenav.opened}"></span>
+                </button>
+              </div>
+            </mat-toolbar>
+            <div class="details">
+              <iframe *ngIf="selectedModel.netronUrl" [src]="selectedModel.netronUrl" class="iframe"></iframe>
             </div>
           </div>
         </ng-template>
