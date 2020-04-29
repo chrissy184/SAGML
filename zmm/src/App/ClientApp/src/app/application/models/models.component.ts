@@ -332,6 +332,17 @@ export class ModelsComponent implements OnInit {
       });
   }
 
+  previewModel() {
+    //const url = `${window.location.origin}/nrn1/?url=${window.location.origin}/api/model/download/${this.selectedModel.id}`;
+    this.isContentLoading = true;
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.modelPreview(this.selectedModel.id))
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(response => {
+        this.selectedModel.netronUrl = this.utilService.transformUrl(response.url);
+        this.changeSelectedIndex(4);
+      });
+  }
+
   ngOnInit() {
     this.getAllPMML();
     this.getZMKInstances();

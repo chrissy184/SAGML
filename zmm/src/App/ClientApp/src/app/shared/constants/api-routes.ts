@@ -38,6 +38,7 @@ export const ApiRoutes = {
     modelCompile: (id: string) => `model/${id}/compile`,
     modelRename: (id: string) => `model/${id}/rename`,
     modelUploadStatus: 'model/uploadstatus',
+    modelPreview: (id: string) => `model/${id}/netron`,
 
     code: 'code',
     codeCreate: `code/create`,
