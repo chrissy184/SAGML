@@ -1084,7 +1084,13 @@ class TrainingViewModels:
                         toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
 
                         if 'Data' in tempDict[modObjeCom][echMod]:
-                            toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['Data']
+                            print ('Came here to train model')
+                            import pathlib
+                            pathObj=pathlib.Path(tempDict[modObjeCom][echMod]['Data'])
+                            if pathObj.is_dir():
+                                toExportDict[echMod]['dataSet']='image'
+                            else:
+                                toExportDict[echMod]['dataSet']=None
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
             if modObjeCom == 'score':
                 for echMod in toExportDict:
@@ -1115,7 +1121,12 @@ class TrainingViewModels:
                         toExportDict[echMod]['modelPath']=tempDict[modObjeCom][echMod]['modelObj']['modelPath']
                         toExportDict[echMod]['predictedClasses']=tempDict[modObjeCom][echMod]['modelObj']['predictedClasses']
                         if 'Data' in tempDict[modObjeCom][echMod]:
-                            toExportDict[echMod]['dataSet']=tempDict[modObjeCom][echMod]['Data']
+                            import pathlib
+                            pathObj=pathlib.Path(tempDict[modObjeCom][echMod]['Data'])
+                            if pathObj.is_dir():
+                                toExportDict[echMod]['dataSet']='image'
+                            else:
+                                toExportDict[echMod]['dataSet']=None
                             toExportDict[echMod]['data']=tempDict[modObjeCom][echMod]['Data']
     
         for modNa in listOfModelNames:
@@ -1286,6 +1297,7 @@ class TrainingViewModels:
         
         tempDict=modelInformation
         toExportDict=self.restructureModelInforForExportDict(tempDict)
+        print ('toExportDict >>>>>>>>>>>>> ',toExportDict)
         fN=pathlib.Path(pmmlFile).name
         orgfName='../ZMOD/Models/'+fN#+'.pmml'
         fN=fN.replace('.pmml','')
