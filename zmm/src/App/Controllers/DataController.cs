@@ -170,7 +170,7 @@ namespace ZMM.App.Controllers
                 #endregion
             }
             #endregion
-            
+
             #region check for multipart
             if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
             {
@@ -278,7 +278,7 @@ namespace ZMM.App.Controllers
                                 .WithPriority(1)
                                 .Build();
 
-                                IJobDetail job = JobBuilder.Create<UploadJob>()
+                                IJobDetail job = JobBuilder.Create<UploadDataJob>()
                                 .WithIdentity(filePath)
                                 .Build();
 
