@@ -83,7 +83,7 @@
                 <button mat-icon-button aria-label="icon" matTooltip="Preview" (click)="previewModel()">
                   <span class="mdi mdi-eye-outline text-secondary"></span>
                 </button>
-                <button mat-icon-button aria-label="icon" matTooltip="Publish Model" (click)="publishModel()">
+                <button mat-icon-button aria-label="icon" matTooltip="Publish Model" (click)="publishModel()" hidden>
                   <span class="mdi text-secondary mdi-publish"></span>
                 </button>
                 <button mat-icon-button aria-label="icon" (click)="deployModel()" *ngIf="selectedModel.deployableToZAD"
