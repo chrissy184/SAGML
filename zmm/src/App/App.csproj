@@ -47,22 +47,22 @@
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\Helpers\Helpers.csproj" />
     <ProjectReference Include="..\DirScan\DirScan.csproj" />
-    <ProjectReference Include="..\JNB\JNB.csproj" />
-    <ProjectReference Include="..\TB\TB.csproj" />
     <ProjectReference Include="..\..\lib\Microsoft.AspNetCore.Proxy\Microsoft.AspNetCore.Proxy.csproj" />
     <ProjectReference Include="..\Tools\Netron\Netron.csproj" />
+    <ProjectReference Include="..\Tools\JNB\JNB.csproj" />
+    <ProjectReference Include="..\Tools\TB\TB.csproj" />
   </ItemGroup>
   <Target Name="ResolveToolDependenciesForUbuntu" BeforeTargets="Build" Condition=" '$(IsLinux)' == 'true'">
     <Message Text="Resolving Tool dependecies (ubuntu)" Importance="high" />
-    <Exec Command="cp -r ../JNB/config $(OutputPath)" />
-    <Exec Command="cp -r ../JNB/config ." />
+    <Exec Command="cp -r ../Tools/JNB/config $(OutputPath)" />
+    <Exec Command="cp -r ../Tools/JNB/config ." />
     <Exec Command="cp -r ../Tasks/tools $(OutputPath)" />
     <Exec Command="cp -r ../Tasks/tools ." />
   </Target>
   <Target Name="ResolveToolDependenciesForWindow" BeforeTargets="Build" Condition=" '$(IsWindows)' == 'true'">
     <Message Text="Resolving Tool dependecies (windows)" Importance="high" />
-    <Exec Command="xcopy ..\JNB\config $(OutputPath)\config\ /K /D /H /Y" />
-    <Exec Command="xcopy ..\JNB\config config\ /K /D /H /Y" />
+    <Exec Command="xcopy ..\Tools\JNB\config $(OutputPath)\config\ /K /D /H /Y" />
+    <Exec Command="xcopy ..\Tools\JNB\config config\ /K /D /H /Y" />
     <Exec Command="xcopy ..\Tasks\tools $(OutputPath)\tools\ /K /D /H /Y" />
     <Exec Command="xcopy ..\Tasks\tools tools\ /K /D /H /Y" />
   </Target>
@@ -73,8 +73,8 @@
   </Target>
   <Target Name="ResolveToolDependenciesPublishForWindow" BeforeTargets="Publish" Condition=" '$(IsWindows)' == 'true'">
     <Message Text="Resolving Tool dependecies (windows) for Publish" Importance="high" />
-    <Exec Command="xcopy ..\JNB\config $(PublishDir)\config\ /K /D /H /Y" />
-    <Exec Command="xcopy ..\JNB\config config\ /K /D /H /Y" />
+    <Exec Command="xcopy ..\Tools\JNB\config $(PublishDir)\config\ /K /D /H /Y" />
+    <Exec Command="xcopy ..\Tools\JNB\config config\ /K /D /H /Y" />
   </Target>
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
     <Exec Command="node --version" ContinueOnError="true">
