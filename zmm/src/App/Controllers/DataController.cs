@@ -224,9 +224,9 @@ namespace ZMM.App.Controllers
                             }
                             FilesInProgress wip = new FilesInProgress()
                             {
-                                Id = formFile.FileName,
+                                Id = Path.GetFileNameWithoutExtension(formFile.FileName),
                                 CreatedAt = DateTime.Now,
-                                Name = formFile.FileName,
+                                Name = Path.GetFileNameWithoutExtension(formFile.FileName),
                                 Type = type,
                                 Module = "DATA",
                                 UploadStatus = "INPROGRESS"
