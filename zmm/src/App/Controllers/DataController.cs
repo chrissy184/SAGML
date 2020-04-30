@@ -146,6 +146,31 @@ namespace ZMM.App.Controllers
             string fileContent = string.Empty;
             #endregion
 
+            #region upload large data file 
+            ISchedulerFactory schfackTemp = new StdSchedulerFactory();
+            IScheduler schedulerTemp = await schfackTemp.GetScheduler();
+            var jobKeyTemp = new JobKey(filePath);
+            if (await schedulerTemp.CheckExists(jobKeyTemp))
+            {
+                await schedulerTemp.ResumeJob(jobKeyTemp);
+            }
+            else
+            {
+                #region create quartz job for training model
+                ITrigger trigger = TriggerBuilder.Create()
+                .WithIdentity($"Uploading Data Job-{DateTime.Now}")
+                .StartNow()
+                .WithPriority(1)
+                .Build();
+
+                IJobDetail job = JobBuilder.Create<UploadDataJob>()
+                .WithIdentity(filePath)
+                .Build();   
+                await _scheduler.ScheduleJob(job, trigger);
+                #endregion
+            }
+            #endregion
+            
             #region check for multipart
             if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
             {
