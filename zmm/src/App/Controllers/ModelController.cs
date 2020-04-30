@@ -849,7 +849,7 @@ namespace ZMM.App.Controllers
                             //create dir with filename in data folder
                             if (!Directory.Exists(dirFullpath + record.Name.Replace(".pmml", string.Empty)))
                             {
-                                Directory.CreateDirectory(dirFullpath + record.Name.Replace(".pmml", string.Empty));
+                                // Directory.CreateDirectory(dirFullpath + record.Name.Replace(".pmml", string.Empty));
                                 dataFolder = dirFullpath + record.Name.Replace(".pmml", string.Empty);
                             }
                         }
