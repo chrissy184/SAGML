@@ -13,34 +13,44 @@ namespace ZMM.App.Clients.Repo
 {
     public class APIs
     {
-        internal static async System.Threading.Tasks.Task CaptureConsoleOutPutAsync(string ActionName, string ParamString, string WorkingDir, string ActualoutputFilePath)
+        internal static async System.Threading.Tasks.Task CaptureConsoleOutPutAsync(string ActionName, string ParamString, string WorkingDir, string ActualoutputFilePath, bool NeedToRedirect=false)
         {
-
-            var process = new Process();
+            Process process = new Process();
+            int processId = 0;
             System.Threading.Thread CLIThread = new System.Threading.Thread( ()=>
             {
-            process.StartInfo.FileName = "umoya";
-            process.StartInfo.Arguments = ActionName + " " + ParamString;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.WorkingDirectory = WorkingDir;
-            process.Start();
-            process.WaitForExit();
+                process.StartInfo.FileName = "umoya";
+                process.StartInfo.Arguments = ActionName + " " + ParamString;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardOutput = NeedToRedirect;
+                process.StartInfo.WorkingDirectory = WorkingDir;
+                process.Start();
+                processId = process.Id;
+                process.WaitForExit();
             });
-            CLIThread.Start();
+            CLIThread.Start();            
+            int MaxCount = 120;
             while(true)
             {
-                if(CLIThread.IsAlive) 
+                if(!CLIThread.IsAlive || MaxCount < 1) 
                 {
-                    // System.Threading.Thread.Sleep(500);
-                    await System.Threading.Tasks.Task.Delay(500);
-                    Console.WriteLine("Executing command " + ActionName);
-                }
+                    try
+                    {
+                        Process tempProcess = Process.GetProcessById(processId);
+                        tempProcess.Kill();
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex.StackTrace);
+                    }
+                    break;
+                } 
                 else 
                 {
-                    //if (!ActualoutputFilePath.Equals(string.Empty)) File.WriteAllText(WorkingDir + Constants.PathSeperator +ActualoutputFilePath, process.StandardOutput.ReadToEnd());
-                    break;
+                    System.Threading.Thread.Sleep(1000);
+                    MaxCount--;
+                    Console.WriteLine("Executing command " + ActionName + " process id " + processId);
                 }
             }
         }             
