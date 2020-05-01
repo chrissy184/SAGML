@@ -97,5 +97,16 @@ namespace ZMM.Netron.Tests
             System.Console.WriteLine("End Test : PreviewAllDifferentResourcesWithValidFormats");
         }
 
+         [Fact, Order(4)]
+        [Trait("Category", "Netron")]
+        public void StopModelViewerService()
+        {
+            System.Console.WriteLine("Start Test : StopModelViewerService");
+            NetronTool.GetTasks().FirstOrDefault().Value.Stop();
+            System.Console.WriteLine("Stop Test : StopModelViewerService");
+        }
+
+
+
     }
 }
