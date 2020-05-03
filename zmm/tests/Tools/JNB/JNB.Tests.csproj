@@ -35,14 +35,14 @@
 
   <Target Name="ResolveToolDependenciesForUbuntu" BeforeTargets="Build" Condition=" '$(IsLinux)' == 'true'">    
     <Message Text="Resolving Tool dependecies (ubuntu)" Importance="high" /> 
-    <Exec Command="cp -r ../../src/JNB/config $(OutputPath)" />     
-    <Exec Command="cp -r ../../src/JNB/config ." />  
+    <Exec Command="cp -r ../../src/Tools/JNB/config $(OutputPath)" />     
+    <Exec Command="cp -r ../../src/Tools/JNB/config ." />  
   </Target>
 
   <Target Name="ResolveToolDependenciesForWindows" BeforeTargets="Build" Condition=" '$(IsWindows)' == 'true'">    
     <Message Text="Resolving Tool dependecies (window)" Importance="high" /> 
-    <Exec Command="xcopy ..\..\src\JNB\config $(OutputPath)\config\ /K /D /H /Y" />
-    <Exec Command="xcopy ..\..\src\JNB\config config\ /K /D /H /Y" />
+    <Exec Command="xcopy ..\..\src\Tools\JNB\config $(OutputPath)\config\ /K /D /H /Y" />
+    <Exec Command="xcopy ..\..\src\Tools\JNB\config config\ /K /D /H /Y" />
   </Target>
 
   <Target Name="CopyFiles" AfterTargets="build">
