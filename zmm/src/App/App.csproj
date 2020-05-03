@@ -68,8 +68,8 @@
   </Target>
   <Target Name="ResolveToolDependenciesPublishForUbuntu" BeforeTargets="Publish" Condition=" '$(IsLinux)' == 'true'">
     <Message Text="Resolving Tool dependecies (ubuntu) for Publish" Importance="high" />
-    <Exec Command="cp -r ../JNB/config $(PublishDir)" />
-    <Exec Command="cp -r ../JNB/config ." />
+    <Exec Command="cp -r ../Tools/JNB/config $(PublishDir)" />
+    <Exec Command="cp -r ../Tools/JNB/config ." />
   </Target>
   <Target Name="ResolveToolDependenciesPublishForWindow" BeforeTargets="Publish" Condition=" '$(IsWindows)' == 'true'">
     <Message Text="Resolving Tool dependecies (windows) for Publish" Importance="high" />
