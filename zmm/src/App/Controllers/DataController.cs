@@ -195,17 +195,17 @@ namespace ZMM.App.Controllers
                             return BadRequest("File name not valid.");
                         //check if the file with the same name exists
                         existingData = DataPayload.Get();
-                        if (existingData.Count > 0)
-                        {
+                        // if (existingData.Count > 0)
+                        // {
                             //
-                            foreach (var record in existingData)
+                        foreach (var record in existingData)
+                        {
+                            if (record.Name == fileName)
                             {
-                                if (record.Name == fileName)
-                                {
-                                    IsFileExists = true;
-                                }
+                                IsFileExists = true;
                             }
                         }
+                        // }
                         existingData.Clear();
                         //
                         string fileUrl = Path.Combine(dirFullpath, fileName);
@@ -544,10 +544,10 @@ namespace ZMM.App.Controllers
                         {"executedAt",r.executedAt}
                     });
                 }
-                string idExisted = SchedulerPayload.GetById(id).Where(i => i.Type == "AUTOML" && i.Id == id).Select(i => i.Id).FirstOrDefault();
+                string idExisted = SchedulerPayload.GetById(id).Where(i => i.Id == id).Select(i => i.Id).FirstOrDefault();
                 if (idExisted == id)
                 {
-                    id = id + userModelName;
+                    id = $"{id}-{userModelName}";
                 }
 
                 SchedulerResponse schJob = new SchedulerResponse()
