@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ['lambda-quad','ban-lambda-quad','10.60.24.249','10.140.65.238',
 #     os.path.join(BASE_DIR, 'dist'),
 # ]
 
-# SWAGGER_URL = '/index.html'
+#SWAGGER_URL = '/index.html'
 # Application definition
 
 INSTALLED_APPS = [
@@ -131,13 +131,13 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-STATIC_URL = '/static/'
+STATIC_URL = '/assets/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, STATIC_URL)
 
 # STATICFILES_DIRS = (
 #     os.path.join(BASE_DIR, 'static'),

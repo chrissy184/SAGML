@@ -1,9 +1,9 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Zementis Modeler",
-        "description": "Swagger for ZMOD",
-        "version": "0.0.8"
+        "title": "MLW / ZMK Swagger",
+        "description": "Swagger for MLW / ZMK",
+        "version": "1.0.1"
     },
     "host": "localhost:8000",
     "schemes": [

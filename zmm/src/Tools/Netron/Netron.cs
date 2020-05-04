@@ -19,7 +19,7 @@ using System.Text.RegularExpressions;
 /// <summary>
 /// see bottom of file for developer notes
 /// </summary>
-namespace ZMM.Tools.Netron
+namespace ZMM.Tools.NT
 {
 
     public enum TaskTypes
@@ -95,10 +95,7 @@ namespace ZMM.Tools.Netron
             string LinkPrefixString = GetLinkPrefix();
             bool IsProductionEnvironment = !HostURL.Contains("localhost");
             info.Add("Port", port.ToString());
-            info.Add("NotebookConfigFile", NotebookConfigFile);
             info.Add("LinkPrefix", LinkPrefixString);
-            info.Add("NotebookCertFile", NotebookCertFile);
-            info.Add("NotebookKeyFile", NotebookKeyFile);
         }
 
         private void UpdateStopTaskInfo(ref JObject info, int port)
@@ -125,7 +122,7 @@ namespace ZMM.Tools.Netron
                         base_url = "/",
                         ResourcePath = $"{NetronTemplateResource}"
                     };
-                    StartTaskAsync((int)ZMM.Tools.Netron.TaskTypes.Start, NetronTemplateResource, (JObject)JObject.FromObject(obj));
+                    StartTaskAsync((int)ZMM.Tools.NT.TaskTypes.Start, NetronTemplateResource, (JObject)JObject.FromObject(obj));
                     #endregion
                 }      
                 outLink = Netron.HostURL + GetLinkPrefix() + "/?url=" + Netron.HostURL + "/api/model/download/" + resourcePath;
@@ -140,7 +137,7 @@ namespace ZMM.Tools.Netron
         private string WaitForStartTaskToken(ITask task, int TaskPort)
         {
             string tokenId = string.Empty;
-            for (int i = 1; i < 50; i++)
+            for (int i = 1; i < 20; i++)
             {
                 if (tokenId != string.Empty) break;
                 else
