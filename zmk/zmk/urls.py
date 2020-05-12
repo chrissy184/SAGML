@@ -55,6 +55,9 @@ except:
 
 pref='api/v1/'
 
+swagger_pref='swagger/index.html'
+
+
 urlpatterns=[
     path(pref+'downloadFile',csrf_exempt(UtilityView.as_view()), name="Download File"),
     path(pref+'pmml/zmk/convert',csrf_exempt(UtilityView.as_view()), name="Utility"),
@@ -80,7 +83,7 @@ urlpatterns=[
     path(pref+'objectDetection/train/mrcnn',csrf_exempt(MRCNNView.as_view()), name="Train MRCNN"),
     path(pref+'code',csrf_exempt(CodeUtilityView.as_view()), name="Code Utility"),
     path(pref+'code/<scriptName>/Execute',csrf_exempt(CodeUtilityView2View.as_view()), name="Code Utility"),
-    path(pref+'swagger',csrf_exempt(SwaggerView.as_view()), name='swagger'),
+    path(swagger_pref,csrf_exempt(SwaggerView.as_view()), name='swagger'),
     path(pref,csrf_exempt(SwaggerView.as_view()),name='swagger'),
     path('',csrf_exempt(SwaggerView.as_view()),name='swagger'),
     path('swagger/v1/swagger.json',csrf_exempt(SwaggerUtilityView.as_view()),name='swagger'),

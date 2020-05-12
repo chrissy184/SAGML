@@ -20,6 +20,14 @@
     "Command.1.Name": "Kill",
     "Command.1.Value": "kill {Pid}"
   },
+  "Netron": {
+    "Path": "netron",
+    "Param": "",
+    "Command.0.Name": "Start",
+    "Command.0.Value": "  --port {Port} --log",
+    "Command.1.Name": "Stop",
+    "Command.1.Value": "kill {Pid}"
+  },
   "Logging": {
     "LogLevel": {
       "Default": "Debug",

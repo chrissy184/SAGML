@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +19,12 @@ using ZMM.Models.ResponseMessages;
 using ZMM.Helpers.ZMMDirectory;
 using ZMM.App.PyServicesClient;
 using ZMM.App.ZSServiceClient;
+using ZMM.App.MLEngineService;
 using ZMM.Tools.TB;
 using ZMM.Helpers.Common;
 using Quartz;
 using Quartz.Impl;
+using ZMM.Tools.NT;
 
 namespace ZMM.App.Controllers
 {
@@ -33,7 +34,7 @@ namespace ZMM.App.Controllers
     {
         #region Variables 
         private readonly string CURRENT_USER = "";
-
+        private readonly IOnnxClient OnnxClient;
         private readonly IWebHostEnvironment _environment;
         readonly ILogger<ModelController> Logger;
         private IConfiguration Configuration { get; }
@@ -47,10 +48,15 @@ namespace ZMM.App.Controllers
         private static string[] extensions = new[] { "pmml", "onnx", "h5" };
         private readonly IScheduler _scheduler;
         private static string deployedModelFileName = "DeployedModel.json"; 
+        private readonly IPyNetronServiceClient ntronClient;
+
         #endregion
         
         #region Constructor
-        public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log, IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient, IPyTensorServiceClient tbClientInstance, IScheduler factory)
+        public ModelController(IWebHostEnvironment environment, IConfiguration configuration, ILogger<ModelController> log,
+                IPyNNServiceClient srv, IPyZMEServiceClient _zmeClient, IZSModelPredictionClient _zsClient,
+                IPyTensorServiceClient tbClientInstance, IScheduler factory,
+                IOnnxClient _onnxClient, IPyNetronServiceClient _netronClient)
         {
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.Configuration = configuration;
@@ -58,13 +64,15 @@ namespace ZMM.App.Controllers
             this.Logger = log;
             this.zmeClient = _zmeClient;
             this.zsClient = _zsClient;
+            this.OnnxClient = _onnxClient;
             this.tbClient = tbClientInstance;
             _scheduler = factory;
+            this.ntronClient = _netronClient;
             try
             {
                 responseData = ModelPayload.Get();
                 dataResponseData = DataPayload.Get();
-               
+
             }
             catch (Exception ex)
             {
@@ -73,7 +81,7 @@ namespace ZMM.App.Controllers
             }
 
         }
-        #endregion
+        #endregion		
 
         #region Post/ upload pmml file
         // POST api/model
@@ -139,7 +147,7 @@ namespace ZMM.App.Controllers
                     {
                         Console.WriteLine(">>>>>>>>>>>>>>>>>>>>UPLOADING LARGE MODEL FILE................................");
                         #region upload large file > 400MB
-                        if (size > 40000000)
+                        if (size > 0)
                         {
                             #region add to uploading
                             //
@@ -318,11 +326,11 @@ namespace ZMM.App.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            string wip_id = ModelPayload.Get().Where(m=> m.Id == id).Select(m=>m.Name).FirstOrDefault();
             bool result = ModelPayload.Delete(id);
-
-
             if (result == true)
-            {
+            {                
+                FilesUploadingPayload.RemoveCompleted(wip_id);
                 return Ok(new { user = CURRENT_USER, id = id, message = "File deleted successfully." });
             }
             else
@@ -595,6 +603,14 @@ namespace ZMM.App.Controllers
             }
             try
             {
+                string type = responseData.Where(i => i.Id == id).Select(i => i.Type).FirstOrDefault().ToString();
+                // if (type == "ONNX")
+                // {
+                //     _data.ModelGeneratedFrom = "Onnx";
+                //     return Ok(_data);
+                // }
+                // else
+                // {
                 pmmlProps = await nnclient.GetPmmlProperties(_data.FilePath);
                 //  
                 string strjObj1 = JsonConvert.SerializeObject(_data);
@@ -611,6 +627,7 @@ namespace ZMM.App.Controllers
                 }
                 //
                 return Json(jObj1);
+                // }
             }
             catch (Exception ex)
             {
@@ -832,7 +849,7 @@ namespace ZMM.App.Controllers
                             //create dir with filename in data folder
                             if (!Directory.Exists(dirFullpath + record.Name.Replace(".pmml", string.Empty)))
                             {
-                                Directory.CreateDirectory(dirFullpath + record.Name.Replace(".pmml", string.Empty));
+                                // Directory.CreateDirectory(dirFullpath + record.Name.Replace(".pmml", string.Empty));
                                 dataFolder = dirFullpath + record.Name.Replace(".pmml", string.Empty);
                             }
                         }
@@ -859,7 +876,7 @@ namespace ZMM.App.Controllers
                         ZMM.Tasks.ITask TensorBoardTask = TBTool.FindTask(ResourcePath);
                         if (TensorBoardTask.IsEmpty())
                         {
-                            TBTool.StartTaskAsync((int)TaskTypes.Start, ResourcePath, (JObject)JObject.FromObject(obj));
+                            TBTool.StartTaskAsync((int)Tools.TB.TaskTypes.Start, ResourcePath, (JObject)JObject.FromObject(obj));
                         }
                         TensorBoardLink = TBTool.GetResourceLink(ResourcePath, out TensorboardLogFolder);
                         Console.WriteLine($"TensorBoardLink >>>>>>{TensorBoardLink}");
@@ -989,7 +1006,7 @@ namespace ZMM.App.Controllers
         }
         #endregion
 
-        #region Zementis Server API calls
+        #region MLE API calls
 
         #region Check for the model existence - [GET]
         [HttpGet("zsmodels")]
@@ -1019,159 +1036,210 @@ namespace ZMM.App.Controllers
         }
         #endregion
 
-        #region Unload/delete pmml from zementis server [DELETE] i.e deployed = false
-        [HttpGet("{id}/unloadFromZS")]
-        public async Task<IActionResult> DeletePmmlFromZementisServer(string id)
+        #region Unload/delete model from MLE [DELETE] i.e deployed = false
+        [HttpDelete("{id}/deploy")]
+        public async Task<IActionResult> RemoveModelFromMLEAsync(string id)
         {
             string response = string.Empty;
             JObject jsonResponse = new JObject();
             bool isExists = false;
-
-            if (responseData.Count > 0)
+            string modelType = responseData.Where(m => m.Id == id).Select(m => m.Type).FirstOrDefault();
+            //if type=pmml
+            if (modelType == "PMML")
             {
-                foreach (var record in responseData)
+                if (responseData.Count > 0)
                 {
-                    if (record.Id.ToString() == id)
+                    foreach (var record in responseData)
                     {
-                        try
+                        if (record.Id.ToString() == id)
                         {
-                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-                            string zsResponse = await zsClient.DeletePmml(record.ModelName, zmodId);
-                            if (zsResponse != "fail")
+                            try
                             {
-                                //
-                                ModelResponse updateRecord = new ModelResponse()
+                                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                                string zsResponse = await zsClient.DeletePmml(record.ModelName, zmodId);
+                                if (zsResponse != "fail")
                                 {
-                                    Created_on = record.Created_on,
-                                    Deployed = false,
-                                    Edited_on = record.Edited_on,
-                                    Extension = record.Extension,
-                                    FilePath = record.FilePath,
-                                    Id = record.Id,
-                                    Loaded = record.Loaded,
-                                    MimeType = record.MimeType,
-                                    Name = record.Name,
-                                    Size = record.Size,
-                                    Type = record.Type,
-                                    Url = record.Url
-                                };
-                                //
-                                ModelPayload.Update(updateRecord);
-                                responseData = ModelPayload.Get();
-                                response = "{ id: '" + record.Id + "', deployed: false}";
-                               // string fileName = "DeployedModel.json";
-                                if (!DeployedModelFunctions.DeleteDeployedModel(deployedModelFileName, record.Id))
-                                    return BadRequest(new { message = "Error in updating Deployed model status file." });
-                                if (!string.IsNullOrEmpty(response)) jsonResponse = JObject.Parse(response);
-                                isExists = true;
+                                    //
+                                    ModelResponse updateRecord = new ModelResponse()
+                                    {
+                                        Created_on = record.Created_on,
+                                        Deployed = false,
+                                        Edited_on = record.Edited_on,
+                                        Extension = record.Extension,
+                                        FilePath = record.FilePath,
+                                        Id = record.Id,
+                                        Loaded = record.Loaded,
+                                        MimeType = record.MimeType,
+                                        Name = record.Name,
+                                        Size = record.Size,
+                                        Type = record.Type,
+                                        Url = record.Url
+                                    };
+                                    //
+                                    ModelPayload.Update(updateRecord);
+                                    responseData = ModelPayload.Get();
+                                    response = "{ id: '" + record.Id + "', deployed: false}";
+                                    // string fileName = "DeployedModel.json";
+                                    if (!DeployedModelFunctions.DeleteDeployedModel(deployedModelFileName, record.Id))
+                                        return BadRequest(new { message = "Error in updating Deployed model status file." });
+                                    if (!string.IsNullOrEmpty(response)) jsonResponse = JObject.Parse(response);
+                                    isExists = true;
+                                }
+                                else
+                                {
+                                    return BadRequest(new { message = "Model loading failed.", errorCode = 500, exception = "No response from server." });
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                return BadRequest(new { message = "Model loading failed.", errorCode = 500, exception = "No response from server." });
+                                Logger.LogCritical(ex, ex.StackTrace);
+                                return BadRequest(new { message = "Model loading failed.", errorCode = 400, exception = ex.Message });
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.LogCritical(ex, ex.StackTrace);
-                            return BadRequest(new { message = "Model loading failed.", errorCode = 400, exception = ex.Message });
                         }
                     }
                 }
+                if (!isExists)
+                {
+                    return NotFound(new { message = "Model remove failed.", errorCode = 404, exception = "No such model." });
+                }
             }
-            if (!isExists)
+            else if (modelType == "ONNX")
             {
-                return NotFound(new { message = "Model loading failed.", errorCode = 404, exception = "No such model." });
+                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                string mleId = responseData.Where(i => i.Id == id).Select(item => item.MleResponse).Select(item => item.MLEModelName).FirstOrDefault().ToString();
+                var onnxResponse = await OnnxClient.RemoveModelAsync(zmodId, mleId);
+                //update model
+                if (onnxResponse.Contains("Success@@"))
+                {
+                    //add response to ModelResponse
+                    ModelResponse record = responseData.Where(i => i.Id == id).FirstOrDefault();
+                    record.MleResponse = null;
+                    record.Deployed = false;
+                    ModelPayload.Update(record);
+                    return Ok(record);
+                }
+                return NotFound(new { error = "Onnx model removal failed." });
             }
+            
             return Json(jsonResponse);
 
         }
         #endregion
 
-        #region Load/upload pmml [POST] i.e- deployed = true
-        [HttpGet("{id}/loadInZS")]
-        public async Task<IActionResult> PostZSUploadPmmlAsync(string id)
+        #region Load/upload model in MLE [GET] i.e- deployed = true
+        [HttpGet("{id}/deploy")]
+        public async Task<IActionResult> UploadModelToMLEAsync(string id)
         {
             string response, modelName, convertedPath = string.Empty;
             JObject jsonResponse = new JObject();
             bool isExists = false;
+            string modelType = responseData.Where(m => m.Id == id).Select(m => m.Type).FirstOrDefault();
 
-            if (responseData.Count > 0)
+            //if type=pmml
+            if (modelType == "PMML")
             {
-                foreach (var record in responseData)
+                if (responseData.Count > 0)
                 {
-                    if (record.Id.ToString() == id)
+                    foreach (var record in responseData)
                     {
-                        try
+                        if (record.Id.ToString() == id)
                         {
-                            string zmkResponse = await zmeClient.PostConvertPmmlAsync(record.FilePath, record.FilePath.Replace(id, $"{id}_model"));
-                            Logger.LogInformation("PostZSUploadPmmlAsync ZMK Response after post " + zmkResponse);
-                            if (!string.IsNullOrEmpty(zmkResponse) && !zmkResponse.Contains("Failed"))
+                            try
                             {
-                                JObject jo = JObject.Parse(zmkResponse);
-                                convertedPath = jo["filePath"].ToString();
-                            }
-                            if (string.IsNullOrEmpty(convertedPath)) return BadRequest(new { message = "Model loading failed.", errorCode = 400, exception = ZMMConstants.ErrorFailed });
-                            string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
-                            string zsResponse = await zsClient.UploadPmml(convertedPath, zmodId);
-                            Logger.LogInformation("PostZSUploadPmmlAsync ZS Response on deploy " + zsResponse);
-                            //remove file after upload
-                            if (System.IO.File.Exists(convertedPath))
-                            {
-                                System.IO.File.Delete(convertedPath);
-                            }
-                            if (zsResponse != "Fail" && zsResponse != "FileExists")
-                            {
-                                //
-                                modelName = JObject.Parse(zsResponse)["modelName"].ToString();
-                                ModelResponse updateRecord = new ModelResponse()
+                                string zmkResponse = await zmeClient.PostConvertPmmlAsync(record.FilePath, record.FilePath.Replace(id, $"{id}_model"));
+                                Logger.LogInformation("PostZSUploadPmmlAsync ZMK Response after post " + zmkResponse);
+                                if (!string.IsNullOrEmpty(zmkResponse) && !zmkResponse.Contains("Failed"))
                                 {
-                                    Created_on = record.Created_on,
-                                    Deployed = true,
-                                    Edited_on = record.Edited_on,
-                                    Extension = record.Extension,
-                                    FilePath = record.FilePath,
-                                    Id = record.Id,
-                                    Loaded = record.Loaded,
-                                    MimeType = record.MimeType,
-                                    ModelName = modelName,
-                                    Name = record.Name,
-                                    Size = record.Size,
-                                    Type = record.Type,
-                                    Url = record.Url
-                                };
-                                //
-                                ModelPayload.Update(updateRecord);
-                                responseData = ModelPayload.Get();
-                                response = @"{ id: '" + record.Id + "', deployed: true}";
-                               // string fileName = "DeployedModel.json";
-                                if (!DeployedModelFunctions.CreateUpdateJSONFile(deployedModelFileName, record.Id))
-                                    return BadRequest(new { message = "Error while creating or updating Deployed Model file." });
-                                if (!string.IsNullOrEmpty(response)) jsonResponse = JObject.Parse(response);
-                                isExists = true;
+                                    JObject jo = JObject.Parse(zmkResponse);
+                                    convertedPath = jo["filePath"].ToString();
+                                }
+                                if (string.IsNullOrEmpty(convertedPath)) return BadRequest(new { message = "Model loading failed.", errorCode = 400, exception = ZMMConstants.ErrorFailed });
+                                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                                string zsResponse = await zsClient.UploadPmml(convertedPath, zmodId);
+                                Logger.LogInformation("PostZSUploadPmmlAsync ZS Response on deploy " + zsResponse);
+                                //remove file after upload
+                                if (System.IO.File.Exists(convertedPath))
+                                {
+                                    System.IO.File.Delete(convertedPath);
+                                }
+                                if (zsResponse != "Fail" && zsResponse != "FileExists")
+                                {
+                                    //
+                                    modelName = JObject.Parse(zsResponse)["modelName"].ToString();
+                                    ModelResponse updateRecord = new ModelResponse()
+                                    {
+                                        Created_on = record.Created_on,
+                                        Deployed = true,
+                                        Edited_on = record.Edited_on,
+                                        Extension = record.Extension,
+                                        FilePath = record.FilePath,
+                                        Id = record.Id,
+                                        Loaded = record.Loaded,
+                                        MimeType = record.MimeType,
+                                        ModelName = modelName,
+                                        Name = record.Name,
+                                        Size = record.Size,
+                                        Type = record.Type,
+                                        Url = record.Url
+                                    };
+                                    //
+                                    ModelPayload.Update(updateRecord);
+                                    responseData = ModelPayload.Get();
+                                    response = @"{ id: '" + record.Id + "', deployed: true}";
+                                    // string fileName = "DeployedModel.json";
+                                    if (!DeployedModelFunctions.CreateUpdateJSONFile(deployedModelFileName, record.Id))
+                                        return BadRequest(new { message = "Error while creating or updating Deployed Model file." });
+                                    if (!string.IsNullOrEmpty(response)) jsonResponse = JObject.Parse(response);
+                                    isExists = true;
+                                }
+                                else
+                                {
+                                    return BadRequest(new { message = ZMMConstants.MLEModelDeployFail, errorCode = 500, exception = "No response from server." });
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                return BadRequest(new { message = "Model loading failed.", errorCode = 500, exception = "No response from server." });
+                                Logger.LogCritical(ex, ex.StackTrace);
+                                return BadRequest(new { message = ZMMConstants.MLEModelDeployFail, errorCode = 400, exception = ex.StackTrace });
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.LogCritical(ex, ex.StackTrace);
-                            return BadRequest(new { message = "Model deploy failed.", errorCode = 400, exception = ex.StackTrace });
                         }
                     }
                 }
+
+                if (!isExists)
+                {
+                    return NotFound(new { message = ZMMConstants.MLEModelDeployFail, errorCode = 404, exception = "No such model." });
+                }
+
             }
-            if (!isExists)
+            else if (modelType == "ONNX")
             {
-                return NotFound(new { message = "Model loading failed.", errorCode = 404, exception = "No such model." });
+                string zmodId = ZSSettingPayload.GetUserNameOrEmail(HttpContext);
+                //get filePath of the file
+                string filePath = responseData.Where(i => i.Id == id).Select(item => item.FilePath).FirstOrDefault().ToString();
+                
+                #region deploy model
+                var onnxResponse = await OnnxClient.DeployModelAsync(zmodId, filePath);
+
+                #endregion
+                //
+                if (string.IsNullOrEmpty(onnxResponse) || onnxResponse.Contains("Fail@@"))
+                {
+                    return Conflict(new { message = onnxResponse.Replace("Fail@@",""), errorCode = 409, exception = $"Conflict.{ZMMConstants.MLEModelDeployFail}" });
+                }
+                MleResponse mle = JsonConvert.DeserializeObject<MleResponse>(onnxResponse);
+                //add response to ModelResponse
+                ModelResponse record = responseData.Where(i => i.Id == id).FirstOrDefault();
+                record.MleResponse = mle;
+                record.Deployed = true;
+                ModelPayload.Update(record);
+                return Ok(record);                
             }
+            //
+            // return Ok(new { message = $"{modelType} model deploy in started and is progress." });
             return Json(jsonResponse);
         }
-
-
         #endregion
-
 
         #region Get deployed models
         [HttpGet("~/api/model/deployed")]
@@ -1212,7 +1280,7 @@ namespace ZMM.App.Controllers
         }
         #endregion
         //
-        #endregion
+        #endregion   // MLE related code ends here   
 
         #region modify model filename
         [HttpPut("{id}/rename")]
@@ -1298,11 +1366,89 @@ namespace ZMM.App.Controllers
             {
                 if(responseData.Where(i=>i.Name == f.Name).Count() > 0)
                 {
-                    FilesUploadingPayload.Clear(f.Name);
+                    FilesUploadingPayload.RemoveCompleted(f.Name);
                 }
             }
             return Json(FilesUploadingPayload.Get("MODEL"));
         }
         #endregion
+
+        #region Download Model for Netron Tool specific url pattern
+        [HttpGet("download/{name}")]
+        public async Task<IActionResult> NetronModelDownload(string name)
+        {         
+            string resourcePath = DirectoryHelper.GetModelDirectoryPath() + name;   
+            string type = string.Empty;
+            string contentType = string.Empty;
+            if(System.IO.File.Exists(resourcePath))
+            {
+                try
+                {               
+                    type = Path.GetExtension(resourcePath).Substring(1);
+                    contentType = string.Empty;
+                    var memory = new MemoryStream();
+                    using (var stream = new FileStream(resourcePath, FileMode.Open))
+                    {
+                        await stream.CopyToAsync(memory);
+                    }
+                    memory.Position = 0;
+                    contentType = "application/" + type;
+                    return File(memory, contentType, name);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message + "filePath :" + resourcePath);
+                }
+            }
+            else
+            {
+                return BadRequest("Given resource " + resourcePath + " is not found.");
+            }
+        }
+        #endregion
+
+        #region Get Model View URL for Netron Tool
+        [HttpGet("{id}/netron")]
+        public async Task<IActionResult> GetNetronUrlAsync(string id)
+        {
+            string convertedPath = string.Empty;
+            JObject jsonResponse = new JObject();  
+            string modelType = responseData.Where(m => m.Id == id).Select(m => m.Type).FirstOrDefault().ToLower(); 
+            string modelName = responseData.Where(m => m.Id == id).Select(m => m.Name).FirstOrDefault(); 
+            if (modelType == "onnx" || modelType == "h5")
+            {
+                string _jUrl = string.Empty;
+                string message = "Model Viewer is up and running successfully.";
+                string CURRENT_USER = string.Empty;
+                string ResourcePath = DirectoryHelper.GetModelDirectoryPath() + modelName;
+                if (System.IO.File.Exists(ResourcePath))
+                {
+                    FileInfo resourceInfo = new System.IO.FileInfo(ResourcePath);
+                    string tempDir = resourceInfo.Directory.ToString();
+                    string modelViewLinkURL = string.Empty;
+                    try
+                    {
+                        Netron NtronTool = this.ntronClient.GetNetronTool();
+                        modelViewLinkURL = NtronTool.GetResourceLink(modelName);                        
+                        return Ok(new { user = CURRENT_USER, id = id, message = message, url = modelViewLinkURL });
+                    }
+                    catch (Exception ex)
+                    {
+                        message = ex.Message;
+                        return BadRequest(new { user = CURRENT_USER, id = id, message = message });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new { user = CURRENT_USER, id = id, message = "Model " + id + " is not found." });
+                }
+            }
+            else
+            {
+                return BadRequest(new { user = CURRENT_USER, id = id, message = "Model is not supported with viewer. Supported Model Type is ONNX and H5" });
+            }
+        }
+        #endregion
+    
     }
 }

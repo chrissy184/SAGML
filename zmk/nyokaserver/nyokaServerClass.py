@@ -598,7 +598,6 @@ class NyokaServer:
 			# 	_positionOfLayer=getIndexForExistingLayer(existingPmmlObj,layerId,runUpto)
 			_updatedPMMLObj=addLayerToPMML(_positionOfLayer,toUpdateLayer,processTheInput,existingPmmlObj)
 			writePmml(_updatedPMMLObj, filetoSave, lockForPMML)
-
 		tempGlobal['architecture']=existingArch
 		MEMORY_DICT_ARCHITECTURE[projectID]['architecture']=tempGlobal['architecture']
 		if typeOfLayer == 'TEMPLATE':

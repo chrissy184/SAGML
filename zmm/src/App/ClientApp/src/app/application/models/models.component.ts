@@ -252,9 +252,8 @@ export class ModelsComponent implements OnInit {
 
   public deployModel() {
     this.isContentLoading = true;
-    const modelDeployEndPoint = ApiRoutes.modelDeploy(this.selectedModel.id);
-    const route = this.selectedModel.deployed ? ApiRoutes.modelDeployUndo(this.selectedModel.id) : modelDeployEndPoint;
-    this.apiService.request(ApiRoutes.methods.GET, route)
+    const method = this.selectedModel.deployed ? ApiRoutes.methods.DELETE : ApiRoutes.methods.GET;
+    this.apiService.request(method, ApiRoutes.modelDeploy(this.selectedModel.id))
       .pipe(finalize(() => { this.isContentLoading = false; }))
       .subscribe(responseData => {
         this.selectedModel.deployed = responseData.deployed;
@@ -330,6 +329,17 @@ export class ModelsComponent implements OnInit {
       .pipe(finalize(() => { this.isLoading = false; }))
       .subscribe(response => {
         this.listOfModels = response.concat(this.listOfModels);
+      });
+  }
+
+  previewModel() {
+    //const url = `${window.location.origin}/nrn1/?url=${window.location.origin}/api/model/download/${this.selectedModel.id}`;
+    this.isContentLoading = true;
+    this.apiService.request(ApiRoutes.methods.GET, ApiRoutes.modelPreview(this.selectedModel.id))
+      .pipe(finalize(() => { this.isContentLoading = false; }))
+      .subscribe(response => {
+        this.selectedModel.netronUrl = this.utilService.transformUrl(response.url);
+        this.changeSelectedIndex(4);
       });
   }
 

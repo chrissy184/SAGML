@@ -16,7 +16,8 @@ namespace ZMM.Tasks
     public enum ToolTypes
     {
         JupyterNotebook,
-        TensorBoard
+        TensorBoard,
+        Netron
     }
 
     public class Tool : ITool

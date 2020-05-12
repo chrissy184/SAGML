@@ -91,11 +91,13 @@ namespace ZMM.Models.Payloads
                 try
                 {
                     if ((item.Key == id))
-                    {
-                        File.Delete(item.Value.FilePath);
-                        if (item.Value.Type == "JUPYTER_NOTEBOOK")
-                        {
-                            Directory.Delete(item.Value.FilePath.Replace(item.Value.Name, ""), true);
+                    {        
+                        string resourcePath = item.Value.FilePath;   
+                        File.Delete(resourcePath);                                
+                        if (item.Value.Type == "JUPYTER_NOTEBOOK" || item.Value.Type == "PYTHON")
+                        {        
+                            string directoryToDelete = resourcePath.Substring(0, resourcePath.LastIndexOf(item.Value.Name));
+                            Directory.Delete(directoryToDelete);
                         }
                         GlobalStorage.CodeStorage.TryRemove(id, out _code);
                         result = true;

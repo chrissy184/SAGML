@@ -123,7 +123,7 @@ namespace ZMM.App.Controllers
                 return Json(_data);
             }
 
-            return Json(jsonObj.Select(s=> new{s.Created_on,s.DateCreated,s.Edited_on,s.Extension,s.Id,s.Name,s.Properties,s.Size,s.Type,s.Url,s.User}));
+            return Json(jsonObj.Select(s=> new{s.Created_on,s.DateCreated,s.Edited_on,s.Extension,s.FilePath,s.Id,s.Name,s.Properties,s.Size,s.Type,s.Url,s.User}));
         }
         #endregion
 
@@ -144,6 +144,31 @@ namespace ZMM.App.Controllers
             var filePath = Path.GetTempFileName();
             string dirFullpath = DirectoryHelper.GetDataDirectoryPath();
             string fileContent = string.Empty;
+            #endregion
+
+            #region upload large data file 
+            ISchedulerFactory schfackTemp = new StdSchedulerFactory();
+            IScheduler schedulerTemp = await schfackTemp.GetScheduler();
+            var jobKeyTemp = new JobKey(filePath);
+            if (await schedulerTemp.CheckExists(jobKeyTemp))
+            {
+                await schedulerTemp.ResumeJob(jobKeyTemp);
+            }
+            else
+            {
+                #region create quartz job for training model
+                ITrigger trigger = TriggerBuilder.Create()
+                .WithIdentity($"Uploading Data Job-{DateTime.Now}")
+                .StartNow()
+                .WithPriority(1)
+                .Build();
+
+                IJobDetail job = JobBuilder.Create<UploadDataJob>()
+                .WithIdentity(filePath)
+                .Build();   
+                await _scheduler.ScheduleJob(job, trigger);
+                #endregion
+            }
             #endregion
 
             #region check for multipart
@@ -170,17 +195,17 @@ namespace ZMM.App.Controllers
                             return BadRequest("File name not valid.");
                         //check if the file with the same name exists
                         existingData = DataPayload.Get();
-                        if (existingData.Count > 0)
-                        {
+                        // if (existingData.Count > 0)
+                        // {
                             //
-                            foreach (var record in existingData)
+                        foreach (var record in existingData)
+                        {
+                            if (record.Name == fileName)
                             {
-                                if (record.Name == fileName)
-                                {
-                                    IsFileExists = true;
-                                }
+                                IsFileExists = true;
                             }
                         }
+                        // }
                         existingData.Clear();
                         //
                         string fileUrl = Path.Combine(dirFullpath, fileName);
@@ -224,9 +249,9 @@ namespace ZMM.App.Controllers
                             }
                             FilesInProgress wip = new FilesInProgress()
                             {
-                                Id = formFile.FileName,
+                                Id = (type == "FOLDER")?Path.GetFileNameWithoutExtension(formFile.FileName):formFile.FileName,
                                 CreatedAt = DateTime.Now,
-                                Name = formFile.FileName,
+                                Name = (type == "FOLDER")?Path.GetFileNameWithoutExtension(formFile.FileName):formFile.FileName,
                                 Type = type,
                                 Module = "DATA",
                                 UploadStatus = "INPROGRESS"
@@ -253,7 +278,7 @@ namespace ZMM.App.Controllers
                                 .WithPriority(1)
                                 .Build();
 
-                                IJobDetail job = JobBuilder.Create<UploadJob>()
+                                IJobDetail job = JobBuilder.Create<UploadDataJob>()
                                 .WithIdentity(filePath)
                                 .Build();
 
@@ -419,10 +444,12 @@ namespace ZMM.App.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            string wip_id = DataPayload.Get().Where(m => m.Id == id).Select(m => m.Name).FirstOrDefault();
             //TODO: update currentuser from keycloak
             bool result = DataPayload.Delete(id);
             if (result == true)
             {
+                FilesUploadingPayload.RemoveCompleted(wip_id);
                 return Ok(new { user = CURRENT_USER, id = id, message = "File deleted successfully." });
             }
             else
@@ -517,10 +544,10 @@ namespace ZMM.App.Controllers
                         {"executedAt",r.executedAt}
                     });
                 }
-                string idExisted = SchedulerPayload.GetById(id).Where(i => i.Type == "AUTOML" && i.Id == id).Select(i => i.Id).FirstOrDefault();
+                string idExisted = SchedulerPayload.GetById(id).Where(i => i.Id == id).Select(i => i.Id).FirstOrDefault();
                 if (idExisted == id)
                 {
-                    id = id + userModelName;
+                    id = $"{id}-{userModelName}";
                 }
 
                 SchedulerResponse schJob = new SchedulerResponse()
@@ -1627,7 +1654,7 @@ namespace ZMM.App.Controllers
             {
                 if(responseData.Where(i=>i.Name == f.Name).Count() > 0)
                 {
-                    FilesUploadingPayload.Clear(f.Name);
+                    FilesUploadingPayload.RemoveCompleted(f.Name);
                 }
             }
             return Json(FilesUploadingPayload.Get("DATA"));

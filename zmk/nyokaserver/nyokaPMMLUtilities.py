@@ -196,7 +196,7 @@ class NyokaPMMLUtilities:
         elif tempData['layerType'] in ['Activation']:
             tempData['properties']['outputDimension']=tempData['properties']['inputDimension']
         elif tempData['layerType'] in ['Conv2D','DepthwiseConv2D']:
-            tempData['properties']['outputDimension']=self.outputForFlatten(tempData)
+            tempData['properties']['outputDimension']=self.outputForConv2D(tempData)
             tempWei['weightsShape']=self.weightConvo(tempData)
         elif tempData['layerType'] in ['Flatten','GlobalAveragePooling2D']:
             tempData['properties']['outputDimension']=self.outputForFlatten(tempData)

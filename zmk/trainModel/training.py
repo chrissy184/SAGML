@@ -73,6 +73,7 @@ class Training:
 		# pmmlFile=requests.POST.get('filePath')
 
 		bodyVal=json.loads(requests.body)
+		# print (bodyVal)
 
 		# print ('came heer 2nd',bodyVal)
 

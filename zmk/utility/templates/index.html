@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>Zementis Modeler</title>
+    <title>MLW / ZMK Swagger</title>
     <!-- <link rel="stylesheet" type="text/css" href="" > -->
     <link rel="stylesheet" type="text/css" href="{% static 'swagger-ui.css' %}">
 
@@ -40,10 +40,20 @@
     <script src="{% static 'swagger-ui-standalone-preset.js' %}"> </script>
   
     <script>
+      getSwaggerURL = function()
+      {
+        var requestSwaggerURL = location.href;
+        var out = location.origin + "/swagger/v1/swagger.json"
+        if(requestSwaggerURL.indexOf("/zmk/") > 0)
+        {
+          out = location.origin + "/assets/static/swagger.json";
+        }
+        return out;
+      }
     window.onload = function() {
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        url: "http://localhost:8000/swagger/v1/swagger.json",
+        url: getSwaggerURL(),
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [

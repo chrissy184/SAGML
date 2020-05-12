@@ -16,6 +16,7 @@ django-rest-swagger==2.2.0
 django-sslserver==0.22
 djangorestframework==3.11.0
 gast==0.2.2
+google-pasta==0.2.0
 grpcio==1.26.0
 h5py==2.10.0
 idna==2.8
@@ -37,8 +38,12 @@ matplotlib==3.1.2
 mock==3.0.5
 networkx==2.4
 numpy==1.18.0
+netron==4.1.1
 git+https://github.com/nyoka-pmml/nyoka.git@44Ext 
+onnx==1.6.0
+onnxruntime==1.2.0
 openapi-codec==1.3.2
+opt-einsum==3.2.1
 pandas==0.25.3
 parso==0.5.2
 pickleshare==0.7.5
@@ -68,10 +73,12 @@ termcolor==1.1.0
 TPOT==0.9.5
 tqdm==4.41.1
 traitlets==4.3.3
+typing-extensions==3.7.4.2
 update-checker==0.16
 uritemplate==3.0.1
 urllib3==1.25.7
 wcwidth==0.1.8
 Werkzeug==0.15.3
 wincertstore==0.2
+wrapt==1.12.1
 xgboost==0.81

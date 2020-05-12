@@ -1,149 +1,184 @@
 {
-    "Maps" : [   
-    {
-      "URLPattern" : "/jnb1", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8888"   
-    },
-    
+  "Maps" : [   
+  {
+    "URLPattern" : "/jnb1", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8888"   
+  },
+  
+
+  {
+    "URLPattern" : "/jnb2", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8889"   
+  },
+
  
-    {
-      "URLPattern" : "/jnb2", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8889"   
-    },
-
-   
-    {
-      "URLPattern" : "/jnb3", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8890"   
-    },
-
-    
-    {
-      "URLPattern" : "/jnb4", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8891"   
-    },
-
-    
-    {
-      "URLPattern" : "/jnb5", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8892"   
-    },
-
-    
-    {
-      "URLPattern" : "/jnb6", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8893"   
-    },
-
-    
-    {
-      "URLPattern" : "/jnb7", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8894"   
-    },
-
-    
-    {
-      "URLPattern" : "/jnb8", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8895"   
-    },
-
-    
-    {
-      "URLPattern" : "/jnb9", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8896"   
-    },
-
-    
-    {
-      "URLPattern" : "/jnb10", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8897"   
-    },
-
-    
-    {
-      "URLPattern" : "/tb1", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "6006",
-      "ReWritePathPattern" : 
-      [
-        {"In" : "/tb1/index.html", "Out" : "/"},
-        {"In" : "/tb1/", "Out" : "/"}
-      ]
-    },
+  {
+    "URLPattern" : "/jnb3", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8890"   
+  },
 
   
-    {
-      "URLPattern" : "/tb2", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "6007",   
-      "ReWritePathPattern" : 
-      [
-        {"In" : "/tb2/index.html", "Out" : "/"},
-        {"In" : "/tb2/", "Out" : "/"}
-      ]
-    },
+  {
+    "URLPattern" : "/jnb4", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8891"   
+  },
 
-   
-    {
-      "URLPattern" : "/tb3", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "6008",
-      "ReWritePathPattern" : 
-      [
-        {"In" : "/tb3/index.html", "Out" : "/"},
-        {"In" : "/tb3/", "Out" : "/"}
-      ]   
-    },
+  
+  {
+    "URLPattern" : "/jnb5", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8892"   
+  },
 
-    {
-      "URLPattern" : "/umoyaportal", 
-      "EnableAuthentication" : true,
-      "EnableWebSocket" : true,
-      "ResolveHost" : "localhost",
-      "ResolvePort" : "8007",
-      "ReWritePathPattern" : 
-      [
-        {"In" : "/umoyaportal/index.html", "Out" : "/"},
-        {"In" : "/umoyaportal/", "Out" : "/"}
-      ]      
-    }
+  
+  {
+    "URLPattern" : "/jnb6", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8893"   
+  },
 
+  
+  {
+    "URLPattern" : "/jnb7", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8894"   
+  },
+
+  
+  {
+    "URLPattern" : "/jnb8", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8895"   
+  },
+
+  
+  {
+    "URLPattern" : "/jnb9", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8896"   
+  },
+
+  
+  {
+    "URLPattern" : "/jnb10", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8897"   
+  },
+
+  
+  {
+    "URLPattern" : "/tb1", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "6006",
+    "ReWritePathPattern" : 
+    [
+      {"In" : "/tb1/index.html", "Out" : "/"},
+      {"In" : "/tb1/", "Out" : "/"}
     ]
+  },
+
+
+  {
+    "URLPattern" : "/tb2", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "6007",   
+    "ReWritePathPattern" : 
+    [
+      {"In" : "/tb2/index.html", "Out" : "/"},
+      {"In" : "/tb2/", "Out" : "/"}
+    ]
+  },
+ 
+  {
+    "URLPattern" : "/tb3", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "6008",
+    "ReWritePathPattern" : 
+    [
+      {"In" : "/tb3/index.html", "Out" : "/"},
+      {"In" : "/tb3/", "Out" : "/"}
+    ]   
+  },
+
+  {
+    "URLPattern" : "/nrn1", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8080",
+    "ReWritePathPattern" : 
+    [
+      {"In" : "/nrn1/", "Out" : "/"}
+    ]   
+  },
+
+  {
+    "URLPattern" : "/zmk", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8000",
+    "ReWritePathPattern" : 
+    [
+      {"In" : "/zmk/", "Out" : "/"}
+    ]   
+  },
+
+  {
+    "URLPattern" : "/zmm", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "7007",
+    "ReWritePathPattern" : 
+    [
+      {"In" : "/zmm/", "Out" : "/"}
+    ]    
+  },
+
+  {
+    "URLPattern" : "/umoyaportal", 
+    "EnableAuthentication" : true,
+    "EnableWebSocket" : true,
+    "ResolveHost" : "localhost",
+    "ResolvePort" : "8007",
+    "ReWritePathPattern" : 
+    [
+      {"In" : "/umoyaportal/index.html", "Out" : "/"},
+      {"In" : "/umoyaportal/", "Out" : "/"}
+    ]      
+  }
+
+  ]
 
 }
